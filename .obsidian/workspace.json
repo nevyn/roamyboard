@@ -1,0 +1,192 @@
+{
+  "main": {
+    "id": "db0ddcb8313751ff",
+    "type": "split",
+    "children": [
+      {
+        "id": "dc6b4c7f7a91c5c7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "19f7ecff2e435d4e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "README"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "74c5c0c84c5378fa",
+    "type": "split",
+    "children": [
+      {
+        "id": "2e6ab40a4971b586",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "af17f0f964c75617",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "352feafc95633863",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "f8cb869d7153029f",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "right": {
+    "id": "71e456b8edff74b2",
+    "type": "split",
+    "children": [
+      {
+        "id": "6a7bc4ecc196657e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "65c5f251fb85a1a4",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "README.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for README"
+            }
+          },
+          {
+            "id": "95cf110939a66cb3",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "README.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from README"
+            }
+          },
+          {
+            "id": "320b91732f276e27",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "be08c19ce67202ca",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "README.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of README"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "19f7ecff2e435d4e",
+  "lastOpenFiles": [
+    "case/Harness design.md",
+    "README.md",
+    "case/Case design.md",
+    "Images/choczard wiring.png",
+    "zmk/Layout.md",
+    "Images/Default layout.png",
+    "Images/Lily58 example.png",
+    "zmk/config/west.yml",
+    "zmk/config/lily58.keymap",
+    "zmk/config/lily58.conf",
+    "zmk/config",
+    "zmk/build.yaml",
+    "firmware/lily58_left-nice_view_adapter-nice_view-nice_nano_v2-zmk-055ed1d8b9d076ae239380a9f96912cc.uf2",
+    "firmware/lily58_right-nice_view_adapter-nice_view-nice_nano_v2-zmk-003e5f630b644b10fedcd2d3061695e6.uf2",
+    "case",
+    "zmk",
+    "firmware",
+    "Lily58 example 1.png"
+  ]
+}
