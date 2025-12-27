@@ -1,8 +1,30 @@
 So what I'm thinking is that I will need a hard enclosure for the electronics, because a flexible keyboard is very hard to type on (that's an earlier failed experiment of mine). So I want to basically build a top plate with roughly the same layout as lily58, but curved (I'm thinking flat sections with a slight bend in between each column). And then I can make a bottom case with the same curvature to mount battery, controller etc in.
 
-We're [designing `roamyboard` in OnShape](https://cad.onshape.com/documents/851b4428f77cf5984ffec433/w/909caff9b78525c7946543d4/e/0bc4b4ece8e92a1460095204).
+# Version 3
+Before even finishing version 2, Bengan wanted in on the project, but focused on just a single half and for gaming.
+That made me thinking: What if roamyboard is made out of modular columns? That you can snap together to make it as narrow or wide as you want. By making the edges sloped, you create curvature when snapping them together. Each column could then also have its own PCB.
+
+# Version 2
+Curvature. How much is the right curvature? I could math it. Or wing it. Here's V1 compared to wingin' it for v2:
+![[curvature1.png]]
+![[curvature2.png]]
+
+- [x] Wider curvature
+- [x] Narrower between keys
+- [x] Make it more variable driven
+- [ ] Another column to fit the microcontroller, screen and battery
+- [ ] Use the profile of actual switch to make a fitting that hooks into the switch
+	- [ ] Sink the top of the switch into the part
+	- [ ] Make it snug
+- [ ] Close up the two unused holes
+- [ ] Fix screw posts
+- [ ] On the bottom case, add something for fastening to the harness
+- [ ] Try making the base an actual curve and just the key seats square! 
+	- [ ] Probably means remaking the model from scratch.
+	- [ ] Can I project a sketch onto a shape to pattern the holes?
 
 ## Version 1
+We're [designing `roamyboard` in OnShape](https://cad.onshape.com/documents/851b4428f77cf5984ffec433/w/909caff9b78525c7946543d4/e/0bc4b4ece8e92a1460095204).
 
 ![[roamyboard_v1.png]]
 See [[Parts]] to see what key caps etc were used.
@@ -13,9 +35,10 @@ Learnings:
 * A good position on the leg is out towards the side, roughly 45° leaning, not centered on leg. So right below/atop the pocket.
 * The plate is actually too thick for the keys to anchor properly! Use the key model as a prop to make a perfect little hole for the keys.
 * One more column for the screen basically
-* 
+* Column offsets? The leftmost and rightmost columns aren't very easy to reach... I hope this is fixed by just moving the keys closer together :S
 * I'm going to have to order more buttons and caps I think
 * Interestingly, it needs to be located at pocket height when standing up, and just above the knee when stitting down. So it'll need an adjustment system to move it up and down the leg
+* I forgot to order "homing" keycaps, for finding the home row by touch.
 
 
 

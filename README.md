@@ -2,7 +2,7 @@
 
 A pants-mounted keyboard that I can use while walking and sitting. Original idea was to literally sew it into pants, but that’s too impractical; now I’m imagining it as a belt/strap you put on top of your pants to make it wearable.
 
-Made by [Nevyn Bengtsson](mailto:hello@nevyn.dev) 2012-2025 (this is not the first iteration 😅).
+Made by [Nevyn Bengtsson](mailto:hello@nevyn.dev) 2012-2026 (this is not the first iteration 😅).
 # Inspiration
 
 The general construction is based on ScottoChoczard, because it’s a straightforward hard-wired PCB-less design and thus doesn’t have to be flat, but can follow the curve of the leg.
