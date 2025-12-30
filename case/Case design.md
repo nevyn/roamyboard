@@ -1,11 +1,13 @@
 So what I'm thinking is that I will need a hard enclosure for the electronics, because a flexible keyboard is very hard to type on (that's an earlier failed experiment of mine). So I want to basically build a top plate with roughly the same layout as lily58, but curved (I'm thinking flat sections with a slight bend in between each column). And then I can make a bottom case with the same curvature to mount battery, controller etc in.
 
 # Version 3
+![[Modular sketch.png]]
 Before even finishing version 2, Bengan wanted in on the project, but focused on just a single half and for gaming.
 That made me thinking: What if roamyboard is made out of modular columns? That you can snap together to make it as narrow or wide as you want. By making the edges sloped, you create curvature when snapping them together. Each column could then also have its own PCB.
 
+This iteration is designed in CadQuery and the file can be found in roamy-v3.py. Read more in [[Modular Design (v3)]].
 # Version 2
-Curvature. How much is the right curvature? I could math it. Or wing it. Here's V1 compared to wingin' it for v2:
+Curvature. How much is the right curvature? I could math it. Or wing it. Still working in the same OnShape file. Here's V1 compared to wingin' it for v2:
 ![[curvature1.png]]
 ![[curvature2.png]]
 
