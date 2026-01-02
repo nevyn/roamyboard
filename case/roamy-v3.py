@@ -106,4 +106,5 @@ if False:
 
 # Optional exports:
 # cq.exporters.export(body, "choc_column_mockup_joined.step")
-# cq.exporters.export(body, "choc_column_mockup_joined.stl")
+cq.exporters.export(top, "../build/roamy_top.stl")
+cq.exporters.export(bottom, "../build/roamy_bottom.stl")
