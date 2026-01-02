@@ -29,7 +29,7 @@ Learnings:
 * Curvature!
 
 Learnings:
-- [ ] 
+- [ ] The right wall (by the t socket) is needlessly thick due to the prism. Can I make it thinner? Move the prism "inside" the body? Cut out the inner hollow _after_ joining with the prism and shift it to the right?
 
 Todo:
 - [ ] Design the brain module

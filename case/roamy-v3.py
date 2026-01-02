@@ -11,7 +11,7 @@ thickness = 12.0 # in mm of the whole column module
 
 column_angle_deg = 8.0  # curvature per module (enforced by join geometry)
 
-wall = 2.0
+wall = 2.2
 floor = 2.0
 ceiling = 1.3
 
@@ -19,9 +19,9 @@ ceiling = 1.3
 choc_cut = 13.8
 
 # Join (simple rectangular tongue/groove, rotated to create the angle)
-join_depth = 2.0 # how far the socket extends from the body
-join_height = 8.0 # how high the socket is, in the same dimension as thickness
-join_indent = 1.0 
+join_depth = 1.4 # how far the socket extends from the body
+join_height = 6.0 # how high the socket is, in the same dimension as thickness
+join_indent = 0.6 
 join_clearance = 0.7 # how many mm of clearance to add to the tsocket to fit the groove
 
 # -------- Build straight shell --------
@@ -84,7 +84,13 @@ neg_tsocket = neg_tsocket.translate((-col_w/2 + join_depth/2, 0, 0))
 body = body.cut(neg_tsocket)
 
 # -------- Prepare for preview and print --------
-show_object(body, name="body")
+
+# Split for easier printing
+split_z = -1.7  # just under switch plate
+top = body.faces(">Z").workplane(offset=split_z).split(keepTop=True)
+bottom = body.faces(">Z").workplane(offset=split_z).split(keepBottom=True)
+show_object(top, name="top")
+show_object(bottom, name="bottom")
 
 # Preview the full body with 6 columns
 if False:
