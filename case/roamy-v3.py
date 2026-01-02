@@ -83,15 +83,19 @@ neg_tsocket = make_tsocket(0) # join_height*1.1, join_indent*join_tolerance
 neg_tsocket = neg_tsocket.translate((-col_w/2 + join_depth/2, 0, 0))
 body = body.cut(neg_tsocket)
 
+# -------- Prepare for preview and print --------
 show_object(body, name="body")
-for i in range(5):
-    body = (body
-        .rotate((-col_w/2, 0, 0), (-col_w/2, 1, 0), column_angle_deg)
-        .translate((col_w + prism_displacement/2, 0, 0))
-    )
-    show_object(
-        body, name="body"+str(i)
-    )
+
+# Preview the full body with 6 columns
+if False:
+    for i in range(5):
+        body = (body
+            .rotate((-col_w/2, 0, 0), (-col_w/2, 1, 0), column_angle_deg)
+            .translate((col_w + prism_displacement/2, 0, 0))
+        )
+        show_object(
+            body, name="body"+str(i)
+        )
 
 
 # Optional exports:

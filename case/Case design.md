@@ -11,8 +11,8 @@ This iteration is designed in CadQuery and the file can be found in roamy-v3.py.
 ![[proto 3.0.png]]
 Learnings:
 - [x] Print standing up, not laying down. The supports going into the module are terrible.
-- [ ]  Make the T socket smaller. The tolerances won't allow it to go in
-- [ ]  Keys are too wide apart. Make the groove negative, and remove some margins on the main body
+- [x]  Make the T socket smaller. The tolerances won't allow it to go in
+- [x]  Keys are too wide apart. Make the groove negative, and remove some margins on the main body
 
 ## 3.1
 ![[proto 3.1.png]]
@@ -23,6 +23,18 @@ Learnings:
 * Forgot to make the keys less wide apart
 ## 3.2
 ![[proto 3.2.png]]
+* Nicer math for clearance
+## 3.3
+![[proto 3.3.png]]
+* Curvature!
+
+Learnings:
+- [ ] 
+
+Todo:
+- [ ] Design the brain module
+- [ ] Design the terminator module
+- [ ] Learn KiCad and design the PCBs :O
 # Version 2
 Curvature. How much is the right curvature? I could math it. Or wing it. Still working in the same OnShape file. Here's V1 compared to wingin' it for v2:
 ![[curvature1.png]]
