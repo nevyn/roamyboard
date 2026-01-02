@@ -22,7 +22,7 @@ choc_cut = 13.8
 join_depth = 2.0 # how far the socket extends from the body
 join_height = 8.0 # how high the socket is, in the same dimension as thickness
 join_indent = 1.0 
-join_tolerance = 0.75 # how much to scale the tsocket to fit the groove
+join_clearance = 0.5 # how many mm of clearance to add to the tsocket to fit the groove
 
 # -------- Build straight shell --------
 outer = cq.Workplane("XY").box(col_w, col_h, thickness, centered=True)
@@ -64,23 +64,21 @@ for i in range(keys):
 # -------- Joining geometry (T socket and groove) --------
 
 # T socket on the right edge
-def make_tsocket(join_indent):
-    tsocket = cq.Workplane("XY").box(join_depth, col_h, join_height, centered=True)
-    cutout = cq.Workplane("XY").box(join_indent, col_h, join_indent, centered=True)
+def make_tsocket(clearance):
+    tsocket = cq.Workplane("XY").box(join_depth, col_h, join_height - clearance, centered=True)
+    cutout = cq.Workplane("XY").box(join_indent + clearance, col_h, join_indent + clearance, centered=True)
     tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, join_height/2 - join_indent/2)))
     return tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, -join_height/2 + join_indent/2)))
-pos_tsocket = make_tsocket(join_indent).translate((col_w/2 + join_depth/2, 0, 0))
+pos_tsocket = make_tsocket(join_clearance).translate((col_w/2 + join_depth/2, 0, 0))
 body = body.union(pos_tsocket)
 
 # Groove on the left edge
-groove = cq.Workplane("XY").box(join_depth, col_h, thickness, centered=True)
-groove = groove.cut(make_tsocket(join_indent*join_tolerance))
-groove = groove.translate((-col_w/2 - join_depth/2, 0, 0))
-body = body.union(groove)
-
+neg_tsocket = make_tsocket(0) # join_height*1.1, join_indent*join_tolerance
+neg_tsocket = neg_tsocket.translate((-col_w/2 + join_depth/2, 0, 0))
+body = body.cut(neg_tsocket)
 
 show_object(body, name="body")
-show_object(body.translate((col_w+join_depth, 0, 0)), name="body2")
+show_object(body.translate((col_w, 0, 0)), name="body2")
 
 
 # Optional exports:
