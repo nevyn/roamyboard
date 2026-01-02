@@ -5,7 +5,7 @@ import math
 keys = 6
 key_pitch_y = 19.05
 
-col_w = 22.0
+col_w = 18.0
 col_h = 12 + (keys - 1) * key_pitch_y + 12
 thickness = 12.0 # in mm of the whole column module
 
@@ -22,7 +22,7 @@ choc_cut = 13.8
 join_depth = 2.0 # how far the socket extends from the body
 join_height = 8.0 # how high the socket is, in the same dimension as thickness
 join_indent = 1.0 
-join_clearance = 0.5 # how many mm of clearance to add to the tsocket to fit the groove
+join_clearance = 0.7 # how many mm of clearance to add to the tsocket to fit the groove
 
 # -------- Build straight shell --------
 outer = cq.Workplane("XY").box(col_w, col_h, thickness, centered=True)

@@ -10,10 +10,19 @@ This iteration is designed in CadQuery and the file can be found in roamy-v3.py.
 ## 3.0
 ![[proto 3.0.png]]
 Learnings:
-* Print standing up, not laying down. The supports going into the module are terrible.
-* Make the T socket smaller. The tolerances won't allow it to go in
-* Keys are too wide apart. Make the groove negative, and remove some margins on the main body
+- [x] Print standing up, not laying down. The supports going into the module are terrible.
+- [ ]  Make the T socket smaller. The tolerances won't allow it to go in
+- [ ]  Keys are too wide apart. Make the groove negative, and remove some margins on the main body
 
+## 3.1
+![[proto 3.1.png]]
+![[proto 3.1 irl.png]]
+* Standing up print helped a lot!
+* 0.275 top Z distance helped a lot to make supports easy to remove
+* My clearance math is bad so I immediately rewrote it for 3.2, so we'll see if it actually works then too
+* Forgot to make the keys less wide apart
+## 3.2
+![[proto 3.2.png]]
 # Version 2
 Curvature. How much is the right curvature? I could math it. Or wing it. Still working in the same OnShape file. Here's V1 compared to wingin' it for v2:
 ![[curvature1.png]]
