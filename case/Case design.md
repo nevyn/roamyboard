@@ -6,6 +6,14 @@ Before even finishing version 2, Bengan wanted in on the project, but focused on
 That made me thinking: What if roamyboard is made out of modular columns? That you can snap together to make it as narrow or wide as you want. By making the edges sloped, you create curvature when snapping them together. Each column could then also have its own PCB.
 
 This iteration is designed in CadQuery and the file can be found in roamy-v3.py. Read more in [[Modular Design (v3)]].
+
+## 3.0
+![[proto 3.0.png]]
+Learnings:
+* Print standing up, not laying down. The supports going into the module are terrible.
+* Make the T socket smaller. The tolerances won't allow it to go in
+* Keys are too wide apart. Make the groove negative, and remove some margins on the main body
+
 # Version 2
 Curvature. How much is the right curvature? I could math it. Or wing it. Still working in the same OnShape file. Here's V1 compared to wingin' it for v2:
 ![[curvature1.png]]
