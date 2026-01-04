@@ -39,7 +39,9 @@ Learnings:
 - At the same time, the keys are a little bit too widely apart compared to a normal keyboard...
 
 Todo:
-- [ ] Design locking and stopping mechanism for the socket
+- [x] Design locking and stopping mechanism for the socket
+	- [x] Stopping
+	- [x] Locking
 - [ ] Order
 	- [x] Shift registers
 	- [x] Pogo pins 

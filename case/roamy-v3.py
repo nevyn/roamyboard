@@ -65,7 +65,7 @@ body = (body.faces("<Y").workplane()
 )
 
 # -------- Joining geometry (T socket and groove) --------
-
+locking_depth = 2.0
 # T socket on the right edge
 def make_tsocket(clearance):
     stopper_length = 2.0
@@ -73,25 +73,53 @@ def make_tsocket(clearance):
     tsocket = cq.Workplane("XY").box(join_depth, socket_length, join_height - clearance, centered=True)
     cutout = cq.Workplane("XY").box(join_indent + clearance, socket_length, join_indent + clearance, centered=True)
     tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, join_height/2 - join_indent/2)))
+    tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, -join_height/2 + join_indent/2)))
     tsocket = tsocket.translate((0, stopper_length/2, 0))
-    return tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, -join_height/2 + join_indent/2)))
+    return tsocket
+
 pos_tsocket = (make_tsocket(join_clearance)
+    # cut a hole for the locking mechanism to attach to
+    .cut(cq.Workplane("XY").box(join_depth, locking_depth, join_height, centered=True).translate((0, col_h/2, 0)))
+    # position the socket outside the prism
     .rotate((0, 0, 0), (0, 1, 0), column_angle_deg)
     .translate((col_w/2 + join_depth/2 + prism_displacement/2, 0, 0))
 )
 body = body.union(pos_tsocket)
 
 # Groove on the left edge
-neg_tsocket = make_tsocket(0) # join_height*1.1, join_indent*join_tolerance
+neg_tsocket = make_tsocket(0)
 neg_tsocket = neg_tsocket.translate((-col_w/2 + join_depth/2, 0, 0))
 body = body.cut(neg_tsocket)
+
+## Locking mechanism
+# Add a small block that locks at the top of the socket. Cut a U-shaped groove out of the body so 
+# the lock can be pushed back and release the next module.
+u_groove_depth = 2.0
+u_groove_length = 6.0
+u_groove_inset = 1.0
+u_groove = (cq.Workplane("XY")
+    .box(u_groove_depth, u_groove_length, join_height - 2)
+    .cut(cq.Workplane("XY")
+        .box(u_groove_depth - u_groove_inset, u_groove_length - u_groove_inset + join_clearance, join_height - 2 - u_groove_inset)
+        .translate((-u_groove_inset/2, -u_groove_inset/2 + join_clearance/2, 0))
+    )
+    .translate((-col_w/2 + u_groove_depth/2 + join_depth, col_h/2 - u_groove_length/2, 0))
+)
+body = body.cut(u_groove)
+tongue = (cq.Workplane("XY")
+    # sorry, I ran out of patience to not use magic numbers :/
+    .box(locking_depth*0.7, 1, join_height - 2 - u_groove_inset)
+    .cut(cq.Workplane("XY").box(2, 1, 3).rotate((0, 0, 0), (0, 0, 1), 45).translate((-1, 0.2, 0))) # angled cutout to allow next module to slide in
+    .translate((-col_w/2 + 1.7, col_h/2 - 0.5 + join_clearance, 0))
+)
+body = body.union(tongue)
 
 # -------- Screw holes for the top ---------
 # Screw holes for attaching the top plate to the body bottom
 screw_hole_inset = 2.2
 body = (body.faces(">Z").workplane()
     .center(-col_w/2, col_h/2)
-    .rect(col_w - screw_hole_inset - 2.0, col_h - screw_hole_inset, forConstruction=True)
+    .rect(col_w - screw_hole_inset - 7.0, col_h - screw_hole_inset, forConstruction=True)
     .vertices().tag("screw_holes")
     .hole(1.0, 5.0)
     .workplaneFromTagged("screw_holes").hole(2.0, ceiling/2)
