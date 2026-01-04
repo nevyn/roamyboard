@@ -5,13 +5,13 @@ import math
 keys = 6
 key_pitch_y = 19.05
 
-col_w = 19.0 # width of the column module, viewed from the top
+col_w = 18.0 # width of the column module, viewed from the top
 col_h = 12 + (keys - 1) * key_pitch_y + 12 # height of the column module, viewed from the top
 thickness = 12.0 # in mm of the whole column module
-
+centerline_x_offset = 0.8 # offset inner cutout and key cutout to use the space used by prism
 column_angle_deg = 8.0  # curvature per module (enforced by join geometry)
 
-wall = 2.2
+wall = 1.8
 floor = 2.0
 ceiling = 1.3
 
@@ -24,34 +24,11 @@ join_height = 6.0 # how high the socket is, in the same dimension as thickness
 join_indent = 0.6 
 join_clearance = 0.2 # how many mm of clearance to add to the tsocket to fit the groove
 
-# -------- Build straight shell --------
+# -------- Main body --------
 # outer shell
-outer = cq.Workplane("XY").box(col_w, col_h, thickness, centered=True)
-# inner shell
-inner = (
-    cq.Workplane("XY")
-    .box(col_w - 2*wall, col_h - 2*wall, thickness - floor - ceiling, centered=True)
-    .translate((0, 0, (floor - ceiling)/2))  # keep a floor and a top wall
-)
-# hollow body with wall, floor and ceilings
-body = outer.cut(inner)
-
-
-# -------- Key cutouts (through top) --------
-y0 = -col_h/2 + 12.0
-
-for i in range(keys):
-    y = y0 + i * key_pitch_y
-    body = body.cut(
-        cq.Workplane("XY")
-        .center(0, y)
-        .rect(choc_cut, choc_cut)
-        .extrude(ceiling)
-        .translate((0, 0, thickness/2 - ceiling))  # start near top face
-    )
+body = cq.Workplane("XY").box(col_w, col_h, thickness, centered=True)
 
 # -------- Angled sides --------
-
 # make a triangular prism, and add it to the right side of the body. This way, each added column 
 # contributes to an overall curvature of the full keyboard.
 prism_displacement = math.tan(math.radians(column_angle_deg)) * thickness
@@ -63,6 +40,28 @@ body = (body.faces("<Y").workplane()
     .close()
     .extrude(-col_h)
 )
+
+# -------- Inner body --------
+# inner shell, that makes the body hollow
+inner = (
+    cq.Workplane("XY")
+    .box(col_w - 2*wall, col_h - 2*wall, thickness - floor - ceiling, centered=True)
+    .translate((centerline_x_offset, 0, (floor - ceiling)/2))  # keep a floor and a top wall
+)
+# hollow body with wall, floor and ceilings
+body = body.cut(inner)
+
+# -------- Key cutouts (through top) --------
+y0 = -col_h/2 + 12.0
+for i in range(keys):
+    y = y0 + i * key_pitch_y
+    body = body.cut(
+        cq.Workplane("XY")
+        .center(centerline_x_offset, y)
+        .rect(choc_cut, choc_cut)
+        .extrude(ceiling)
+        .translate((0, 0, thickness/2 - ceiling))  # start near top face
+    )
 
 # -------- Joining geometry (T socket and groove) --------
 locking_depth = 2.0
@@ -94,7 +93,7 @@ body = body.cut(neg_tsocket)
 ## Locking mechanism
 # Add a small block that locks at the top of the socket. Cut a U-shaped groove out of the body so 
 # the lock can be pushed back and release the next module.
-u_groove_depth = 2.0
+u_groove_depth = 1.6
 u_groove_length = 6.0
 u_groove_inset = 1.0
 u_groove = (cq.Workplane("XY")
@@ -116,9 +115,9 @@ body = body.union(tongue)
 
 # -------- Screw holes for the top ---------
 # Screw holes for attaching the top plate to the body bottom
-screw_hole_inset = 2.2
+screw_hole_inset = 1.8
 body = (body.faces(">Z").workplane()
-    .center(-col_w/2, col_h/2)
+    .center(-col_w/2 + centerline_x_offset, col_h/2)
     .rect(col_w - screw_hole_inset - 7.0, col_h - screw_hole_inset, forConstruction=True)
     .vertices().tag("screw_holes")
     .hole(1.0, 5.0)

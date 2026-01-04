@@ -30,7 +30,6 @@ Learnings:
 * Curvature!
 
 Learnings:
-- [ ] The right wall (by the t socket) is needlessly thick due to the prism. Can I make it thinner? Move the prism "inside" the body? Cut out the inner hollow _after_ joining with the prism and shift it to the right?
 - [x] Too much clearance. The pieces don't snap together anymore.
 - [x] If I make two pieces that need to be glued together, there needs to be a groove or something to guide alignment when putting them back together
 	- I made screw holes. Let's avoid glue.
@@ -52,6 +51,13 @@ Todo:
 - [ ] Learn KiCad and design the PCBs :O
 
 ## 3.4
+![[proto 3.4.png]]
+
+Learnings/todo
+- [x] The locking mechanism shouldn't have a hole to the body, and doesn't need that much x-space behind it
+- [ ] Cutout for connection between modules
+- [ ] The right wall (by the t socket) is needlessly thick due to the prism. Can I make it thinner? Move the prism "inside" the body? Cut out the inner hollow _after_ joining with the prism and shift it to the right?
+## 3.5
 
 # Version 2
 Curvature. How much is the right curvature? I could math it. Or wing it. Still working in the same OnShape file. Here's V1 compared to wingin' it for v2:
