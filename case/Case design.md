@@ -69,8 +69,12 @@ After print:
 ![[proto 3.5 irl.png]]
 Learnings/todo for next version
 - [ ] Modularize so we can create different kind of module boxes
+	- [x] Fix exports
+	- [ ] Fix showing subassemblies in a way that can be enabled/disabled
 - [ ] Use this to create the MCU module
 - [ ] Use this to create the terminator module
+- [ ] Order
+	- [ ] M2 6mm screws
 After print:
 - [ ] The hole in the top plate should be wider than the screw's 2mm so it only grabs onto the bottom
 - [ ] Clearance still isn't great. Look into having an asymmetrical clearance the way it was in 3.1

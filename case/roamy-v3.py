@@ -185,9 +185,8 @@ mcu_assembly.add(mcu_bottom, name="bottom", color=cq.Color("green"))
 ########################################################
 
 def export(assembly, name):
-    #cq.exporters.export(assembly.top, "../build/roamy_"+name+"_top.stl")
-    #cq.exporters.export(assembly.bottom, "../build/roamy_"+name+"_bottom.stl")
-    pass
+    cq.exporters.export(assembly.objects["top"].obj, "../build/roamy_"+name+"_top.stl")
+    cq.exporters.export(assembly.objects["bottom"].obj, "../build/roamy_"+name+"_bottom.stl")
 
 
 full_assembly = cq.Assembly()
