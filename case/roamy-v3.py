@@ -169,16 +169,26 @@ keys_assembly.add(keys_bottom, name="bottom", color=cq.Color("orange"))
 ########################################################
 # MCU module
 ########################################################
-mcu_module = make_module_body(col_w)
-
-#nicenano = cq.importers.importStep("../deps_step/nice-nano-v2-1.snapshot.2/nice-nano_v2.step")
-#nicenano = nicenano.translate((0, 0, thickness/2 - ceiling))
-
 mcu_assembly = cq.Assembly()
-#mcu_assembly.add(nicenano, name="nicenano")
+
+mcu_width = 20.0
+mcu_height = 33.4
+battery_width = 30.0
+display_width = 14.2
+display_height = 36.2
+display_inner_width = 10.6
+display_inner_height = 25.2
+mcu_module = make_module_body(battery_width)
 (mcu_top, mcu_bottom) = split_body(mcu_module)
 mcu_assembly.add(mcu_top, name="top", color=cq.Color("blue"))
 mcu_assembly.add(mcu_bottom, name="bottom", color=cq.Color("green"))
+
+# nicenano = (cq.importers.importStep("../deps_step/nice-nano-v2-1.snapshot.2/nice-nano_v2.step")
+#     .rotate((0, 0, 0), (0, 0, 1), 90)
+#     .translate((0, -col_h/2 + mcu_height/2 + 0.2, -thickness/2 + floor))
+# )
+# mcu_assembly.add(nicenano, name="nicenano")
+
 
 ########################################################
 # Meta work: previewing and printing
@@ -188,14 +198,25 @@ def export(assembly, name):
     cq.exporters.export(assembly.objects["top"].obj, "../build/roamy_"+name+"_top.stl")
     cq.exporters.export(assembly.objects["bottom"].obj, "../build/roamy_"+name+"_bottom.stl")
 
+def show_recursive_assembly(asm: cq.Assembly, base_name: str = "", parent_loc = None):
+    if parent_loc is None: parent_loc = cq.Location()
+    for item in asm.children:
+        name = item.name
+        obj_name = f"{base_name}/{name}"
+        loc = parent_loc * item.loc
+        if len(item.children) > 0:
+            show_recursive_assembly(item, obj_name, loc)
+            continue
+        item.loc = loc # this actually breaks the full_assembly, but we're not usign it so whatev 😅
+        show_object(item, name=obj_name)
 
 full_assembly = cq.Assembly()
 full_assembly.add(keys_assembly, name="keys")
 full_assembly.add(mcu_assembly, name="mcu")
-full_assembly.constrain("keys/bottom?right_mate", "mcu/bottom?left_mate", "Plane")
-full_assembly.constrain("keys/bottom?right_mate", "mcu/bottom?left_mate", "Axis")
+full_assembly.constrain("keys/bottom?left_mate", "mcu/bottom?right_mate", "Plane")
+full_assembly.constrain("keys/bottom?left_mate", "mcu/bottom?right_mate", "Axis")
 full_assembly.solve()
-show_object(full_assembly)
+show_recursive_assembly(full_assembly, "roamy")
 export(keys_assembly, "keys")
 export(mcu_assembly, "mcu")
 

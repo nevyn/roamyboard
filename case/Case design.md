@@ -70,9 +70,11 @@ After print:
 Learnings/todo for next version
 - [ ] Modularize so we can create different kind of module boxes
 	- [x] Fix exports
-	- [ ] Fix showing subassemblies in a way that can be enabled/disabled
+	- [x] Fix showing subassemblies in a way that can be enabled/disabled
 - [ ] Use this to create the MCU module
+	- [ ] make it not have a right socket
 - [ ] Use this to create the terminator module
+	- [ ] make it not have a left groove
 - [ ] Order
 	- [ ] M2 6mm screws
 After print:
