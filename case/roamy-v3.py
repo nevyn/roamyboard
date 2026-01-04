@@ -12,7 +12,8 @@ column_angle_deg = 8.0  # curvature per module (enforced by join geometry)
 prism_displacement = math.tan(math.radians(column_angle_deg)) * thickness
 centerline_x_offset = prism_displacement/2 # offset inner cutout and key cutout to use the space used by prism
 
-wall = 1.8
+side_wall = 1.8
+edge_wall = 4.0
 floor = 2.0
 ceiling = 1.3
 
@@ -49,10 +50,10 @@ body = (body.faces("<Y").workplane()
 # inner shell, that makes the body hollow
 inner = (
     cq.Workplane("XY")
-    .box(col_w - 2*wall, col_h - 2*wall, thickness - floor - ceiling, centered=True)
-    .translate((centerline_x_offset, 0, (floor - ceiling)/2))  # keep a floor and a top wall
+    .box(col_w - 2*side_wall, col_h - 2*edge_wall, thickness - floor - ceiling, centered=True)
+    .translate((centerline_x_offset, 0, (floor - ceiling)/2))  # keep a floor and a top side_wall
 )
-# hollow body with wall, floor and ceilings
+# hollow out the body so it gets walls, floor and ceiling
 body = body.cut(inner)
 
 # -------- Key cutouts (through top) --------
@@ -119,13 +120,13 @@ body = body.union(tongue)
 
 # -------- Screw holes for the top ---------
 # Screw holes for attaching the top plate to the body bottom
-screw_hole_inset = 1.8
+screw_hole_inset = 5.0
 body = (body.faces(">Z").workplane()
     .center(-col_w/2 + centerline_x_offset, col_h/2)
-    .rect(col_w - screw_hole_inset - 7.0, col_h - screw_hole_inset, forConstruction=True)
+    .rect(col_w - screw_hole_inset - 2.0, col_h - screw_hole_inset, forConstruction=True)
     .vertices().tag("screw_holes")
-    .hole(1.0, 5.0)
-    .workplaneFromTagged("screw_holes").hole(2.0, ceiling/2)
+    .hole(2.0, 13.0) # m2 screw holes, 12mm screws (too long, but it's what I have at hand)
+    .workplaneFromTagged("screw_holes").hole(3.44, ceiling/2) # m2 screw head indent
 )
 
 # -------- Interconnect cutout --------
