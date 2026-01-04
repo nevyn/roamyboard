@@ -97,23 +97,23 @@ body = body.cut(neg_tsocket)
 ## Locking mechanism
 # Add a small block that locks at the top of the socket. Cut a U-shaped groove out of the body so 
 # the lock can be pushed back and release the next module.
-u_groove_depth = 1.6
-u_groove_length = 6.0
+u_groove_depth = 2.2
+u_groove_length = 8.0
 u_groove_inset = 1.0
 u_groove = (cq.Workplane("XY")
     .box(u_groove_depth, u_groove_length, join_height - 2)
     .cut(cq.Workplane("XY")
-        .box(u_groove_depth - u_groove_inset, u_groove_length - u_groove_inset + join_clearance, join_height - 2 - u_groove_inset)
+        .box(u_groove_depth - u_groove_inset - 0.4, u_groove_length - u_groove_inset + join_clearance, join_height - 2 - u_groove_inset)
         .translate((-u_groove_inset/2, -u_groove_inset/2 + join_clearance/2, 0))
     )
-    .translate((-col_w/2 + u_groove_depth/2 + join_depth, col_h/2 - u_groove_length/2, 0))
+    .translate((-col_w/2 + u_groove_depth/2 + join_depth - 0.4, col_h/2 - u_groove_length/2, 0))
 )
 body = body.cut(u_groove)
 tongue = (cq.Workplane("XY")
     # sorry, I ran out of patience to not use magic numbers :/
     .box(locking_depth*0.7, 1, join_height - 2 - u_groove_inset)
-    .cut(cq.Workplane("XY").box(2, 1, 3).rotate((0, 0, 0), (0, 0, 1), 45).translate((-1, 0.2, 0))) # angled cutout to allow next module to slide in
-    .translate((-col_w/2 + 1.7, col_h/2 - 0.5 + join_clearance, 0))
+    .cut(cq.Workplane("XY").box(3, 1, 3).rotate((0, 0, 0), (0, 0, 1), 40).translate((-1, 0.2, 0))) # angled cutout to allow next module to slide in
+    .translate((-col_w/2 + 1.3, col_h/2 - 0.5 + join_clearance, 0))
 )
 body = body.union(tongue)
 
