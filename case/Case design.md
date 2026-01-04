@@ -52,7 +52,7 @@ Todo:
 
 ## 3.4
 ![[proto 3.4.png]]
-![[proto 3.5 irl.png]]
+![[proto 3.4 irl.png]]
 
 Learnings/todo
 - [x] The locking mechanism shouldn't have a hole to the body, and doesn't need that much x-space behind it
@@ -66,6 +66,16 @@ After print:
 - [x] Actually, it DOES need that much x-space behind it! Re-add it please
 ## 3.5
 ![[proto 3.5.png]]
+![[proto 3.5 irl.png]]
+Learnings/todo for next version
+- [ ] Modularize so we can create different kind of module boxes
+- [ ] Use this to create the MCU module
+- [ ] Use this to create the terminator module
+After print:
+- [ ] The hole in the top plate should be wider than the screw's 2mm so it only grabs onto the bottom
+- [ ] Clearance still isn't great. Look into having an asymmetrical clearance the way it was in 3.1
+- [ ] The tongue doesn't quite engage, and the bottoms don't quite align. Add clearance to the bottom of the groove, by the stopper! Maybe make the stopper 1% thinner on the receiving side.
+## 3.6
 
 # Version 2
 Curvature. How much is the right curvature? I could math it. Or wing it. Still working in the same OnShape file. Here's V1 compared to wingin' it for v2:
