@@ -27,11 +27,23 @@
 	- Each module has decoupling capacitors for both the 165 and neopixel data lines
 
 ## Connector pinout
+### alt 1
+two 5V to make sure to have juice for LEDs
+GND near each important signal line
 ```
 1    2     3     4    5    6    7     8     9    10   11   12    13    14
 GND  +5V   +5V   GND  LED  GND  CLK   DATA  /PL  GND  SDA  SCL   INT   +3.3V
 ```
+### alt 2
+pack everything important into just 9 pins so we can go single column. Skip power and ground redundancy, and skip the i2c interrupt line.
+```
+1    2     3     4     5    6    7     8     9
+GND  +3.3V CLK   DATA  /PL  +5V  LED   SDA  SCL   
+```
+
+
 
 ## Component breakdown
 
 - Pogo pin connector: TBD
+- Shift register: 74HC165
