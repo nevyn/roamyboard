@@ -55,7 +55,7 @@ Todo:
 
 Learnings/todo
 - [x] The locking mechanism shouldn't have a hole to the body, and doesn't need that much x-space behind it
-- [ ] Cutout for connection between modules
+- [x] Cutout for connection between modules
 - [ ] The right wall (by the t socket) is needlessly thick due to the prism. Can I make it thinner? Move the prism "inside" the body? Cut out the inner hollow _after_ joining with the prism and shift it to the right?
 ## 3.5
 

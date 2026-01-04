@@ -24,6 +24,10 @@ join_height = 6.0 # how high the socket is, in the same dimension as thickness
 join_indent = 0.6 
 join_clearance = 0.2 # how many mm of clearance to add to the tsocket to fit the groove
 
+interconnect_width = 22.86 + join_clearance # width of https://www.electrokit.com/upload/quick/dc/ae/ae5d_41022086.pdf (along y axis)
+interconnect_height = 2.5 + join_clearance # height (along z)
+interconnect_distance_from_bottom = 4.0
+
 # -------- Main body --------
 # outer shell
 body = cq.Workplane("XY").box(col_w, col_h, thickness, centered=True)
@@ -124,6 +128,13 @@ body = (body.faces(">Z").workplane()
     .workplaneFromTagged("screw_holes").hole(2.0, ceiling/2)
 )
 
+# -------- Interconnect cutout --------
+interconnect_cutout = (cq.Workplane("ZY")
+    .rect(interconnect_height, interconnect_width)
+    .extrude(col_w*2)
+    .translate((col_w, -col_h/2 + interconnect_width/2 + interconnect_distance_from_bottom, 0))
+)
+body = body.cut(interconnect_cutout)
 
 # -------- Prepare for preview and print --------
 
