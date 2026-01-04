@@ -28,7 +28,7 @@ join_clearance = 0.3 # how many mm of clearance to add to the tsocket to fit the
 
 interconnect_width = 22.86 + join_clearance # width of https://www.electrokit.com/upload/quick/dc/ae/ae5d_41022086.pdf (along y axis)
 interconnect_height = 2.5 + join_clearance # height (along z)
-interconnect_distance_from_bottom = 4.0
+interconnect_distance_from_bottom = 6.0
 
 # -------- Main body --------
 # outer shell
