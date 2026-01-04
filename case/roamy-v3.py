@@ -68,9 +68,12 @@ body = (body.faces("<Y").workplane()
 
 # T socket on the right edge
 def make_tsocket(clearance):
-    tsocket = cq.Workplane("XY").box(join_depth, col_h, join_height - clearance, centered=True)
-    cutout = cq.Workplane("XY").box(join_indent + clearance, col_h, join_indent + clearance, centered=True)
+    stopper_length = 2.0
+    socket_length = col_h - stopper_length
+    tsocket = cq.Workplane("XY").box(join_depth, socket_length, join_height - clearance, centered=True)
+    cutout = cq.Workplane("XY").box(join_indent + clearance, socket_length, join_indent + clearance, centered=True)
     tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, join_height/2 - join_indent/2)))
+    tsocket = tsocket.translate((0, stopper_length/2, 0))
     return tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, -join_height/2 + join_indent/2)))
 pos_tsocket = (make_tsocket(join_clearance)
     .rotate((0, 0, 0), (0, 1, 0), column_angle_deg)
