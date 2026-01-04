@@ -183,7 +183,7 @@ mcu_module = make_module_body(battery_width)
 mcu_assembly.add(mcu_top, name="top", color=cq.Color("blue"))
 mcu_assembly.add(mcu_bottom, name="bottom", color=cq.Color("green"))
 
-# nicenano = (cq.importers.importStep("../deps_step/nice-nano-v2-1.snapshot.2/nice-nano_v2.step")
+# nicenano = (cq.importers.importStep("../step/nice-nano-v2-1.snapshot.2/nice-nano_v2.step")
 #     .rotate((0, 0, 0), (0, 0, 1), 90)
 #     .translate((0, -col_h/2 + mcu_height/2 + 0.2, -thickness/2 + floor))
 # )
