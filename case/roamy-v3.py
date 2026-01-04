@@ -5,7 +5,7 @@ import math
 keys = 6
 key_pitch_y = 19.05
 
-col_w = 20.0 # width of the column module, viewed from the top
+col_w = 19.0 # width of the column module, viewed from the top
 col_h = 12 + (keys - 1) * key_pitch_y + 12 # height of the column module, viewed from the top
 thickness = 12.0 # in mm of the whole column module
 
@@ -22,7 +22,7 @@ choc_cut = 13.8
 join_depth = 1.4 # how far the socket extends from the body
 join_height = 6.0 # how high the socket is, in the same dimension as thickness
 join_indent = 0.6 
-join_clearance = 0.4 # how many mm of clearance to add to the tsocket to fit the groove
+join_clearance = 0.2 # how many mm of clearance to add to the tsocket to fit the groove
 
 # -------- Build straight shell --------
 # outer shell
