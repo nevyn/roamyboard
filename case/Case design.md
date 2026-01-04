@@ -61,7 +61,8 @@ Learnings/todo
 After print:
 - [x] ok now clearance is too LOW :/ I can't even force the pieces together more than a third of the way.
 - [x] Screw holes are too small. M2 is 2 mm, so aim for that.
-- [x] Screw hole indents on the top side must not have supports because that clogs the hole, so lay them upwards on the build plate and remove the ridges on the underside (move the cut to JUST below the ceiling)
+- [x] Screw hole indents on the top plate must not have supports because that clogs the hole, so lay them upwards on the build plate 
+- [x] and remove the ridges on the underside of the top plate (move the cut to JUST below the ceiling)
 - [x] Actually, it DOES need that much x-space behind it! Re-add it please
 ## 3.5
 ![[proto 3.5.png]]

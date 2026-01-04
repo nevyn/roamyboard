@@ -140,7 +140,7 @@ body = body.cut(interconnect_cutout)
 # -------- Prepare for preview and print --------
 
 # Split for easier printing
-split_z = -1.7  # just under switch plate
+split_z = -ceiling  # just under switch plate
 top = body.faces(">Z").workplane(offset=split_z).split(keepTop=True)
 bottom = body.faces(">Z").workplane(offset=split_z).split(keepBottom=True)
 show_object(top, name="top")
