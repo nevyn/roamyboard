@@ -83,6 +83,18 @@ neg_tsocket = make_tsocket(0) # join_height*1.1, join_indent*join_tolerance
 neg_tsocket = neg_tsocket.translate((-col_w/2 + join_depth/2, 0, 0))
 body = body.cut(neg_tsocket)
 
+# -------- Screw holes for the top ---------
+# Screw holes for attaching the top plate to the body bottom
+screw_hole_inset = 2.2
+body = (body.faces(">Z").workplane()
+    .center(-col_w/2, col_h/2)
+    .rect(col_w - screw_hole_inset - 2.0, col_h - screw_hole_inset, forConstruction=True)
+    .vertices().tag("screw_holes")
+    .hole(1.0, 5.0)
+    .workplaneFromTagged("screw_holes").hole(2.0, ceiling/2)
+)
+
+
 # -------- Prepare for preview and print --------
 
 # Split for easier printing

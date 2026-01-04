@@ -32,16 +32,18 @@ Learnings:
 Learnings:
 - [ ] The right wall (by the t socket) is needlessly thick due to the prism. Can I make it thinner? Move the prism "inside" the body? Cut out the inner hollow _after_ joining with the prism and shift it to the right?
 - [x] Too much clearance. The pieces don't snap together anymore.
-- [ ] If I make two pieces that need to be glued together, there needs to be a groove or something to guide alignment when putting them back together
+- [x] If I make two pieces that need to be glued together, there needs to be a groove or something to guide alignment when putting them back together
+	- I made screw holes. Let's avoid glue.
 - Being open on the top is actually pretty nice. I liked the initial idea of sliding the PCB in from the short end, but it will make debugging so much harder. OTOH, with a top plate, I will need a lot of ugly screws...
 - [x] The columns are now so narrow that the plastic clips on the switches don't engage and the switches just fall out. Make it wider so the clips can engage.
-- [ ] At the same time, the keys are a little bit too widely apart compared to a normal keyboard... But maybe that's unavoidable.
+- At the same time, the keys are a little bit too widely apart compared to a normal keyboard...
 
 Todo:
 - [ ] Design locking and stopping mechanism for the socket
 - [ ] Order
 	- [x] Shift registers
-	- [ ] Pogo pins and pads
+	- [x] Pogo pins 
+	- [ ] Pogo pads
 	- [ ] kailh sockets
 - [ ] Design the brain module
 - [ ] Design the terminator module
