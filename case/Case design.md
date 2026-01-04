@@ -57,6 +57,11 @@ Learnings/todo
 - [x] The locking mechanism shouldn't have a hole to the body, and doesn't need that much x-space behind it
 - [x] Cutout for connection between modules
 - [ ] The right wall (by the t socket) is needlessly thick due to the prism. Can I make it thinner? Move the prism "inside" the body? Cut out the inner hollow _after_ joining with the prism and shift it to the right?
+After print:
+- [ ] ok now clearance is too LOW :/
+- [ ] Screw holes are too small. M2 is 2 mm, so aim for that.
+- [ ] Screw hole indents on the top side need to not have supports, so lay them upwards on the build plate and remove the ridges on the underside (move the cut to JUST below the ceiling)
+- [ ] Actually, it DOES need that much x-space behind it! Re-add it please
 ## 3.5
 
 # Version 2

@@ -23,7 +23,7 @@ choc_cut = 13.8
 join_depth = 1.4 # how far the socket extends from the body
 join_height = 6.0 # how high the socket is, in the same dimension as thickness
 join_indent = 0.6 
-join_clearance = 0.2 # how many mm of clearance to add to the tsocket to fit the groove
+join_clearance = 0.3 # how many mm of clearance to add to the tsocket to fit the groove
 
 interconnect_width = 22.86 + join_clearance # width of https://www.electrokit.com/upload/quick/dc/ae/ae5d_41022086.pdf (along y axis)
 interconnect_height = 2.5 + join_clearance # height (along z)
