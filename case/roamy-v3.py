@@ -5,7 +5,7 @@ import math
 keys = 6
 key_pitch_y = 19.05
 
-col_w = 18.0 # width of the column module, viewed from the top
+col_w = 20.0 # width of the column module, viewed from the top
 col_h = 12 + (keys - 1) * key_pitch_y + 12 # height of the column module, viewed from the top
 thickness = 12.0 # in mm of the whole column module
 
