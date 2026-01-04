@@ -30,37 +30,130 @@ interconnect_width = 22.86 + join_clearance # width of https://www.electrokit.co
 interconnect_height = 2.5 + join_clearance # height (along z)
 interconnect_distance_from_bottom = 6.0
 
-# -------- Main body --------
-# outer shell
-body = cq.Workplane("XY").box(col_w, col_h, thickness, centered=True)
+########################################################
+# Generic module body
+########################################################
+def make_module_body(col_w):
+    # -------- Main body --------
+    # outer shell
+    body = (cq.Workplane("XY")
+        .box(col_w, col_h, thickness, centered=True)
+        .tag("box")
+        .faces("<X").tag("right_mate")
+        .workplaneFromTagged("box")
+    )
 
-# -------- Angled sides --------
-# make a triangular prism, and add it to the right side of the body. This way, each added column 
-# contributes to an overall curvature of the full keyboard.
-body = (body.faces("<Y").workplane()
-    .center(col_w/2, 0)
-    .moveTo(0, -thickness/2)
-    .lineTo(0, thickness/2)
-    .lineTo(prism_displacement, thickness/2)
-    .close()
-    .extrude(-col_h)
-)
+    # -------- Angled sides --------
+    # make a triangular prism, and add it to the right side of the body. This way, each added column 
+    # contributes to an overall curvature of the full keyboard.
+    body = (body.faces("<Y").workplane()
+        .center(col_w/2, 0)
+        .moveTo(0, -thickness/2)
+        .lineTo(0, thickness/2)
+        .lineTo(prism_displacement, thickness/2)
+        .close()
+        .extrude(-col_h)
+        .faces(">X").tag("left_mate")
+    )
 
-# -------- Inner body --------
-# inner shell, that makes the body hollow
-inner = (
-    cq.Workplane("XY")
-    .box(col_w - 2*side_wall, col_h - 2*edge_wall, thickness - floor - ceiling, centered=True)
-    .translate((centerline_x_offset, 0, (floor - ceiling)/2))  # keep a floor and a top side_wall
-)
-# hollow out the body so it gets walls, floor and ceiling
-body = body.cut(inner)
+    # -------- Inner body --------
+    # inner shell, that makes the body hollow
+    inner = (
+        cq.Workplane("XY")
+        .box(col_w - 2*side_wall, col_h - 2*edge_wall, thickness - floor - ceiling, centered=True)
+        .translate((centerline_x_offset, 0, (floor - ceiling)/2))  # keep a floor and a top side_wall
+    )
+    # hollow out the body so it gets walls, floor and ceiling
+    body = body.cut(inner)
+
+    # -------- Joining geometry (T socket and groove) --------
+    locking_depth = 2.0
+    # T socket on the right edge
+    def make_tsocket(clearance):
+        stopper_length = 2.0
+        socket_length = col_h - stopper_length
+        tsocket = cq.Workplane("XY").box(join_depth, socket_length, join_height - clearance, centered=True)
+        cutout = cq.Workplane("XY").box(join_indent + clearance, socket_length, join_indent + clearance, centered=True)
+        tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, join_height/2 - join_indent/2)))
+        tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, -join_height/2 + join_indent/2)))
+        tsocket = tsocket.translate((0, stopper_length/2, 0))
+        return tsocket
+
+    pos_tsocket = (make_tsocket(join_clearance)
+        # cut a hole for the locking mechanism to attach to
+        .cut(cq.Workplane("XY").box(join_depth, locking_depth, join_height, centered=True).translate((0, col_h/2, 0)))
+        # position the socket outside the prism
+        .rotate((0, 0, 0), (0, 1, 0), column_angle_deg)
+        .translate((col_w/2 + join_depth/2 + prism_displacement/2, 0, 0))
+    )
+    body = body.union(pos_tsocket)
+
+    # Groove on the left edge
+    neg_tsocket = make_tsocket(0)
+    neg_tsocket = neg_tsocket.translate((-col_w/2 + join_depth/2, 0, 0))
+    body = body.cut(neg_tsocket)
+
+    ## Locking mechanism
+    # Add a small block that locks at the top of the socket. Cut a U-shaped groove out of the body so 
+    # the lock can be pushed back and release the next module.
+    u_groove_depth = 2.2
+    u_groove_length = 8.0
+    u_groove_inset = 1.0
+    u_groove = (cq.Workplane("XY")
+        .box(u_groove_depth, u_groove_length, join_height - 2)
+        .cut(cq.Workplane("XY")
+            .box(u_groove_depth - u_groove_inset - 0.4, u_groove_length - u_groove_inset + join_clearance, join_height - 2 - u_groove_inset)
+            .translate((-u_groove_inset/2, -u_groove_inset/2 + join_clearance/2, 0))
+        )
+        .translate((-col_w/2 + u_groove_depth/2 + join_depth - 0.4, col_h/2 - u_groove_length/2, 0))
+    )
+    body = body.cut(u_groove)
+    tongue = (cq.Workplane("XY")
+        # sorry, I ran out of patience to not use magic numbers :/
+        .box(locking_depth*0.7, 1, join_height - 2 - u_groove_inset)
+        .cut(cq.Workplane("XY").box(3, 1, 3).rotate((0, 0, 0), (0, 0, 1), 40).translate((-1, 0.2, 0))) # angled cutout to allow next module to slide in
+        .translate((-col_w/2 + 1.3, col_h/2 - 0.5 + join_clearance, 0))
+    )
+    body = body.union(tongue)
+
+    # -------- Screw holes for the top ---------
+    # Screw holes for attaching the top plate to the body bottom
+    screw_hole_inset = 5.0
+    body = (body.faces(">Z").workplane()
+        .center(-col_w/2 + centerline_x_offset, col_h/2)
+        .rect(col_w - screw_hole_inset - 2.0, col_h - screw_hole_inset, forConstruction=True)
+        .vertices().tag("screw_holes")
+        .hole(2.0, 13.0) # m2 screw holes, 12mm screws (too long, but it's what I have at hand)
+        .workplaneFromTagged("screw_holes").hole(3.44, ceiling/2) # m2 screw head counterbore
+    )
+
+    # -------- Interconnect cutout --------
+    interconnect_cutout = (cq.Workplane("ZY")
+        .rect(interconnect_height, interconnect_width)
+        .extrude(col_w*2)
+        .translate((col_w, -col_h/2 + interconnect_width/2 + interconnect_distance_from_bottom, 0))
+    )
+    body = body.cut(interconnect_cutout)
+
+    return body
+
+def split_body(body):
+    split_z = -ceiling  # just under top plate
+    top = body.faces(">Z").workplane(offset=split_z).split(keepTop=True)
+    bottom = body.faces(">Z").workplane(offset=split_z).split(keepBottom=True)
+
+    return top, bottom
+
+########################################################
+# Keyswitch module
+########################################################
+keys_module = make_module_body(col_w)
 
 # -------- Key cutouts (through top) --------
 y0 = -col_h/2 + 12.0
 for i in range(keys):
     y = y0 + i * key_pitch_y
-    body = body.cut(
+    keys_module = keys_module.cut(
         cq.Workplane("XY")
         .center(centerline_x_offset, y)
         .rect(choc_cut, choc_cut)
@@ -68,97 +161,54 @@ for i in range(keys):
         .translate((0, 0, thickness/2 - ceiling))  # start near top face
     )
 
-# -------- Joining geometry (T socket and groove) --------
-locking_depth = 2.0
-# T socket on the right edge
-def make_tsocket(clearance):
-    stopper_length = 2.0
-    socket_length = col_h - stopper_length
-    tsocket = cq.Workplane("XY").box(join_depth, socket_length, join_height - clearance, centered=True)
-    cutout = cq.Workplane("XY").box(join_indent + clearance, socket_length, join_indent + clearance, centered=True)
-    tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, join_height/2 - join_indent/2)))
-    tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, -join_height/2 + join_indent/2)))
-    tsocket = tsocket.translate((0, stopper_length/2, 0))
-    return tsocket
+keys_assembly = cq.Assembly()
+(keys_top, keys_bottom) = split_body(keys_module)
+keys_assembly.add(keys_top, name="top", color=cq.Color("red"))
+keys_assembly.add(keys_bottom, name="bottom", color=cq.Color("orange"))
 
-pos_tsocket = (make_tsocket(join_clearance)
-    # cut a hole for the locking mechanism to attach to
-    .cut(cq.Workplane("XY").box(join_depth, locking_depth, join_height, centered=True).translate((0, col_h/2, 0)))
-    # position the socket outside the prism
-    .rotate((0, 0, 0), (0, 1, 0), column_angle_deg)
-    .translate((col_w/2 + join_depth/2 + prism_displacement/2, 0, 0))
-)
-body = body.union(pos_tsocket)
+########################################################
+# MCU module
+########################################################
+mcu_module = make_module_body(col_w)
 
-# Groove on the left edge
-neg_tsocket = make_tsocket(0)
-neg_tsocket = neg_tsocket.translate((-col_w/2 + join_depth/2, 0, 0))
-body = body.cut(neg_tsocket)
+#nicenano = cq.importers.importStep("../deps_step/nice-nano-v2-1.snapshot.2/nice-nano_v2.step")
+#nicenano = nicenano.translate((0, 0, thickness/2 - ceiling))
 
-## Locking mechanism
-# Add a small block that locks at the top of the socket. Cut a U-shaped groove out of the body so 
-# the lock can be pushed back and release the next module.
-u_groove_depth = 2.2
-u_groove_length = 8.0
-u_groove_inset = 1.0
-u_groove = (cq.Workplane("XY")
-    .box(u_groove_depth, u_groove_length, join_height - 2)
-    .cut(cq.Workplane("XY")
-        .box(u_groove_depth - u_groove_inset - 0.4, u_groove_length - u_groove_inset + join_clearance, join_height - 2 - u_groove_inset)
-        .translate((-u_groove_inset/2, -u_groove_inset/2 + join_clearance/2, 0))
-    )
-    .translate((-col_w/2 + u_groove_depth/2 + join_depth - 0.4, col_h/2 - u_groove_length/2, 0))
-)
-body = body.cut(u_groove)
-tongue = (cq.Workplane("XY")
-    # sorry, I ran out of patience to not use magic numbers :/
-    .box(locking_depth*0.7, 1, join_height - 2 - u_groove_inset)
-    .cut(cq.Workplane("XY").box(3, 1, 3).rotate((0, 0, 0), (0, 0, 1), 40).translate((-1, 0.2, 0))) # angled cutout to allow next module to slide in
-    .translate((-col_w/2 + 1.3, col_h/2 - 0.5 + join_clearance, 0))
-)
-body = body.union(tongue)
+mcu_assembly = cq.Assembly()
+#mcu_assembly.add(nicenano, name="nicenano")
+(mcu_top, mcu_bottom) = split_body(mcu_module)
+mcu_assembly.add(mcu_top, name="top", color=cq.Color("blue"))
+mcu_assembly.add(mcu_bottom, name="bottom", color=cq.Color("green"))
 
-# -------- Screw holes for the top ---------
-# Screw holes for attaching the top plate to the body bottom
-screw_hole_inset = 5.0
-body = (body.faces(">Z").workplane()
-    .center(-col_w/2 + centerline_x_offset, col_h/2)
-    .rect(col_w - screw_hole_inset - 2.0, col_h - screw_hole_inset, forConstruction=True)
-    .vertices().tag("screw_holes")
-    .hole(2.0, 13.0) # m2 screw holes, 12mm screws (too long, but it's what I have at hand)
-    .workplaneFromTagged("screw_holes").hole(3.44, ceiling/2) # m2 screw head indent
-)
+########################################################
+# Meta work: previewing and printing
+########################################################
 
-# -------- Interconnect cutout --------
-interconnect_cutout = (cq.Workplane("ZY")
-    .rect(interconnect_height, interconnect_width)
-    .extrude(col_w*2)
-    .translate((col_w, -col_h/2 + interconnect_width/2 + interconnect_distance_from_bottom, 0))
-)
-body = body.cut(interconnect_cutout)
+def export(assembly, name):
+    #cq.exporters.export(assembly.top, "../build/roamy_"+name+"_top.stl")
+    #cq.exporters.export(assembly.bottom, "../build/roamy_"+name+"_bottom.stl")
+    pass
 
-# -------- Prepare for preview and print --------
 
-# Split for easier printing
-split_z = -ceiling  # just under switch plate
-top = body.faces(">Z").workplane(offset=split_z).split(keepTop=True)
-bottom = body.faces(">Z").workplane(offset=split_z).split(keepBottom=True)
-show_object(top, name="top")
-show_object(bottom, name="bottom")
+full_assembly = cq.Assembly()
+full_assembly.add(keys_assembly, name="keys")
+full_assembly.add(mcu_assembly, name="mcu")
+full_assembly.constrain("keys/bottom?right_mate", "mcu/bottom?left_mate", "Plane")
+full_assembly.constrain("keys/bottom?right_mate", "mcu/bottom?left_mate", "Axis")
+full_assembly.solve()
+show_object(full_assembly)
+export(keys_assembly, "keys")
+export(mcu_assembly, "mcu")
 
 # Preview the full body with 6 columns
 if False:
     for i in range(5):
-        body = (body
+        keys_module = (keys_module
             .rotate((-col_w/2, 0, 0), (-col_w/2, 1, 0), column_angle_deg)
             .translate((col_w + prism_displacement/2, 0, 0))
         )
         show_object(
-            body, name="body"+str(i)
+            keys_module, name="keys_"+str(i)
         )
 
 
-# Optional exports:
-# cq.exporters.export(body, "choc_column_mockup_joined.step")
-cq.exporters.export(top, "../build/roamy_top.stl")
-cq.exporters.export(bottom, "../build/roamy_bottom.stl")
