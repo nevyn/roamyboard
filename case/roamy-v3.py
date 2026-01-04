@@ -2,7 +2,7 @@ import cadquery as cq
 import math
 
 # -------- Parameters --------
-keys = 6
+keys = 5
 key_pitch_y = 19.05
 
 col_w = 18.0 # width of the column module, viewed from the top
