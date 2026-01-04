@@ -8,8 +8,9 @@ key_pitch_y = 19.05
 col_w = 18.0 # width of the column module, viewed from the top
 col_h = 12 + (keys - 1) * key_pitch_y + 12 # height of the column module, viewed from the top
 thickness = 12.0 # in mm of the whole column module
-centerline_x_offset = 0.8 # offset inner cutout and key cutout to use the space used by prism
 column_angle_deg = 8.0  # curvature per module (enforced by join geometry)
+prism_displacement = math.tan(math.radians(column_angle_deg)) * thickness
+centerline_x_offset = prism_displacement/2 # offset inner cutout and key cutout to use the space used by prism
 
 wall = 1.8
 floor = 2.0
@@ -35,7 +36,6 @@ body = cq.Workplane("XY").box(col_w, col_h, thickness, centered=True)
 # -------- Angled sides --------
 # make a triangular prism, and add it to the right side of the body. This way, each added column 
 # contributes to an overall curvature of the full keyboard.
-prism_displacement = math.tan(math.radians(column_angle_deg)) * thickness
 body = (body.faces("<Y").workplane()
     .center(col_w/2, 0)
     .moveTo(0, -thickness/2)
