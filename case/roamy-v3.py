@@ -22,7 +22,7 @@ choc_cut = 13.8
 join_depth = 1.4 # how far the socket extends from the body
 join_height = 6.0 # how high the socket is, in the same dimension as thickness
 join_indent = 0.6 
-join_clearance = 0.7 # how many mm of clearance to add to the tsocket to fit the groove
+join_clearance = 0.4 # how many mm of clearance to add to the tsocket to fit the groove
 
 # -------- Build straight shell --------
 # outer shell
