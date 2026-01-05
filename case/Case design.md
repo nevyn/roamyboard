@@ -89,7 +89,7 @@ After print:
 ## 3.6
 Let's try this weird clearance which is more like 3.1.
 ![[proto 3.6 clearance.png]]
-
+![[proto 3.6.png]]
 
 
 # Version 2
