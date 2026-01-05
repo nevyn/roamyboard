@@ -75,6 +75,8 @@ Learnings/todo for next version
 	- [x] Make it not have a right socket
 	- [ ] Harness attachment
 	- [ ] Display window
+	- [x] USB cutout
+	- [x] MCU attachment
 - [ ] Use this to create the terminator module
 	- [ ] Make it not have a left groove
 	- [ ] Harness attachment
