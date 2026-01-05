@@ -33,7 +33,7 @@ interconnect_distance_from_bottom = 6.0
 ########################################################
 # Generic module body
 ########################################################
-def make_module_body(col_w):
+def make_module_body(col_w, left_socket = True, right_socket = True):
     # -------- Main body --------
     # outer shell
     body = (cq.Workplane("XY")
@@ -79,42 +79,44 @@ def make_module_body(col_w):
         tsocket = tsocket.translate((0, stopper_length/2, 0))
         return tsocket
 
-    pos_tsocket = (make_tsocket(join_clearance)
-        # cut a hole for the locking mechanism to attach to
-        .cut(cq.Workplane("XY").box(join_depth, locking_depth, join_height, centered=True).translate((0, col_h/2, 0)))
-        # position the socket outside the prism
-        .rotate((0, 0, 0), (0, 1, 0), column_angle_deg)
-        .translate((col_w/2 + join_depth/2 + prism_displacement/2, 0, 0))
-    )
-    body = body.union(pos_tsocket)
-
-    # Groove on the left edge
-    neg_tsocket = make_tsocket(0)
-    neg_tsocket = neg_tsocket.translate((-col_w/2 + join_depth/2, 0, 0))
-    body = body.cut(neg_tsocket)
-
-    ## Locking mechanism
-    # Add a small block that locks at the top of the socket. Cut a U-shaped groove out of the body so 
-    # the lock can be pushed back and release the next module.
-    u_groove_depth = 2.2
-    u_groove_length = 8.0
-    u_groove_inset = 1.0
-    u_groove = (cq.Workplane("XY")
-        .box(u_groove_depth, u_groove_length, join_height - 2)
-        .cut(cq.Workplane("XY")
-            .box(u_groove_depth - u_groove_inset - 0.4, u_groove_length - u_groove_inset + join_clearance, join_height - 2 - u_groove_inset)
-            .translate((-u_groove_inset/2, -u_groove_inset/2 + join_clearance/2, 0))
+    if(right_socket):
+        pos_tsocket = (make_tsocket(join_clearance)
+            # cut a hole for the locking mechanism to attach to
+            .cut(cq.Workplane("XY").box(join_depth, locking_depth, join_height, centered=True).translate((0, col_h/2, 0)))
+            # position the socket outside the prism
+            .rotate((0, 0, 0), (0, 1, 0), column_angle_deg)
+            .translate((col_w/2 + join_depth/2 + prism_displacement/2, 0, 0))
         )
-        .translate((-col_w/2 + u_groove_depth/2 + join_depth - 0.4, col_h/2 - u_groove_length/2, 0))
-    )
-    body = body.cut(u_groove)
-    tongue = (cq.Workplane("XY")
-        # sorry, I ran out of patience to not use magic numbers :/
-        .box(locking_depth*0.7, 1, join_height - 2 - u_groove_inset)
-        .cut(cq.Workplane("XY").box(3, 1, 3).rotate((0, 0, 0), (0, 0, 1), 40).translate((-1, 0.2, 0))) # angled cutout to allow next module to slide in
-        .translate((-col_w/2 + 1.3, col_h/2 - 0.5 + join_clearance, 0))
-    )
-    body = body.union(tongue)
+        body = body.union(pos_tsocket)
+
+    if(left_socket):
+        # Groove on the left edge
+        neg_tsocket = make_tsocket(0)
+        neg_tsocket = neg_tsocket.translate((-col_w/2 + join_depth/2, 0, 0))
+        body = body.cut(neg_tsocket)
+
+        ## Locking mechanism
+        # Add a small block that locks at the top of the socket. Cut a U-shaped groove out of the body so 
+        # the lock can be pushed back and release the next module.
+        u_groove_depth = 2.2
+        u_groove_length = 8.0
+        u_groove_inset = 1.0
+        u_groove = (cq.Workplane("XY")
+            .box(u_groove_depth, u_groove_length, join_height - 2)
+            .cut(cq.Workplane("XY")
+                .box(u_groove_depth - u_groove_inset - 0.4, u_groove_length - u_groove_inset + join_clearance, join_height - 2 - u_groove_inset)
+                .translate((-u_groove_inset/2, -u_groove_inset/2 + join_clearance/2, 0))
+            )
+            .translate((-col_w/2 + u_groove_depth/2 + join_depth - 0.4, col_h/2 - u_groove_length/2, 0))
+        )
+        body = body.cut(u_groove)
+        tongue = (cq.Workplane("XY")
+            # sorry, I ran out of patience to not use magic numbers :/
+            .box(locking_depth*0.7, 1, join_height - 2 - u_groove_inset)
+            .cut(cq.Workplane("XY").box(3, 1, 3).rotate((0, 0, 0), (0, 0, 1), 40).translate((-1, 0.2, 0))) # angled cutout to allow next module to slide in
+            .translate((-col_w/2 + 1.3, col_h/2 - 0.5 + join_clearance, 0))
+        )
+        body = body.union(tongue)
 
     # -------- Screw holes for the top ---------
     # Screw holes for attaching the top plate to the body bottom
@@ -130,8 +132,12 @@ def make_module_body(col_w):
     # -------- Interconnect cutout --------
     interconnect_cutout = (cq.Workplane("ZY")
         .rect(interconnect_height, interconnect_width)
-        .extrude(col_w*2)
-        .translate((col_w, -col_h/2 + interconnect_width/2 + interconnect_distance_from_bottom, 0))
+        .extrude(col_w* (2 if (left_socket and right_socket) else 1))
+        .translate((
+            col_w if right_socket else 0, 
+            -col_h/2 + interconnect_width/2 + interconnect_distance_from_bottom, 
+            0
+        ))
     )
     body = body.cut(interconnect_cutout)
 
@@ -178,7 +184,7 @@ display_width = 14.2
 display_height = 36.2
 display_inner_width = 10.6
 display_inner_height = 25.2
-mcu_module = make_module_body(battery_width)
+mcu_module = make_module_body(battery_width, right_socket = False)
 (mcu_top, mcu_bottom) = split_body(mcu_module)
 mcu_assembly.add(mcu_top, name="top", color=cq.Color("blue"))
 mcu_assembly.add(mcu_bottom, name="bottom", color=cq.Color("green"))

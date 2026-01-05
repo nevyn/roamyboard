@@ -68,13 +68,16 @@ After print:
 ![[proto 3.5.png]]
 ![[proto 3.5 irl.png]]
 Learnings/todo for next version
-- [ ] Modularize so we can create different kind of module boxes
+- [x] Modularize so we can create different kind of module boxes
 	- [x] Fix exports
 	- [x] Fix showing subassemblies in a way that can be enabled/disabled
 - [ ] Use this to create the MCU module
-	- [ ] make it not have a right socket
+	- [x] Make it not have a right socket
+	- [ ] Harness attachment
+	- [ ] Display window
 - [ ] Use this to create the terminator module
-	- [ ] make it not have a left groove
+	- [ ] Make it not have a left groove
+	- [ ] Harness attachment
 - [ ] Order
 	- [ ] M2 6mm screws
 After print:
