@@ -73,7 +73,7 @@ def make_module_body(col_w, left_socket = True, right_socket = True):
         stopper_length = 2.0
         socket_length = col_h - stopper_length
         tsocket = cq.Workplane("XY").box(join_depth, socket_length, join_height - clearance, centered=True)
-        cutout = cq.Workplane("XY").box(join_indent + clearance, socket_length, join_indent + clearance, centered=True)
+        cutout = cq.Workplane("XY").box(join_indent + clearance, socket_length, join_indent + clearance*2 + 0.5, centered=True)
         tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, join_height/2 - join_indent/2)))
         tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, -join_height/2 + join_indent/2)))
         tsocket = tsocket.translate((0, stopper_length/2, 0))
