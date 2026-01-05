@@ -126,7 +126,8 @@ def make_module_body(col_w, left_socket = True, right_socket = True):
         .rect(col_w - screw_hole_inset - 2.0, col_h - screw_hole_inset, forConstruction=True)
         .vertices().tag("screw_holes")
         .hole(2.0, 13.0) # m2 screw holes, 12mm screws (too long, but it's what I have at hand)
-        .workplaneFromTagged("screw_holes").hole(3.44, ceiling/2) # m2 screw head counterbore
+        .workplaneFromTagged("screw_holes")
+            .cboreHole(2.5, 3.44, ceiling/2, ceiling) # m2 screw head counterbore, plus wider hole so screw holds lid down but isn't screwed into it.
     )
 
     # -------- Interconnect cutout --------
