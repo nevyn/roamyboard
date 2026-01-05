@@ -41,6 +41,8 @@ pack everything important into just 9 pins so we can go single column. Skip powe
 GND  +3.3V CLK   DATA  /PL  +5V  LED   SDA  SCL   
 ```
 
+## alt 3
+HEY, put the power rails furthest towards the top of the module!! so that if you remove a module while it's running, we're not shorting power with every other pin on the way out.
 
 
 ## Component breakdown
