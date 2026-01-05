@@ -85,7 +85,7 @@ Learnings/todo for next version
 After print:
 - [x] The hole in the top plate should be wider than the screw's 2mm so it only grabs onto the bottom
 - [x] Clearance still isn't great. Look into having an asymmetrical clearance the way it was in 3.1
-- [ ] The tongue doesn't quite engage, and the bottoms don't quite align. Add clearance to the bottom of the groove, by the stopper! Maybe make the stopper 1% thinner on the receiving side.
+- [x] The tongue doesn't quite engage, and the bottoms don't quite align. Add clearance to the bottom of the groove, by the stopper! Maybe make the stopper 1% thinner on the receiving side.
 ## 3.6
 Let's try this weird clearance which is more like 3.1.
 ![[proto 3.6 clearance.png]]

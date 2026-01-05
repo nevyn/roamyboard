@@ -70,7 +70,7 @@ def make_module_body(col_w, left_socket = True, right_socket = True):
     locking_depth = 2.0
     # T socket on the right edge
     def make_tsocket(clearance):
-        stopper_length = 2.0
+        stopper_length = 2.0 + clearance
         socket_length = col_h - stopper_length
         tsocket = cq.Workplane("XY").box(join_depth, socket_length, join_height - clearance, centered=True)
         cutout = cq.Workplane("XY").box(join_indent + clearance, socket_length, join_indent + clearance*2 + 0.5, centered=True)
