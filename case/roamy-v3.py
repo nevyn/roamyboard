@@ -262,11 +262,11 @@ export(keys_assembly, "keys")
 export(mcu_assembly, "mcu")
 
 # Preview the full body with 6 columns
-if False:
+if True:
     for i in range(5):
         keys_module = (keys_module
-            .rotate((-col_w/2, 0, 0), (-col_w/2, 1, 0), column_angle_deg)
-            .translate((col_w + prism_displacement/2, 0, 0))
+            .rotate((col_w/2, 0, 0), (col_w/2, 1, 0), -column_angle_deg)
+            .translate((-col_w - prism_displacement/2, 0, 0))
         )
         show_object(
             keys_module, name="keys_"+str(i)
