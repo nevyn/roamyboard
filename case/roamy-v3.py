@@ -182,6 +182,7 @@ mcu_assembly = cq.Assembly()
 mcu_width = 18.0 + join_clearance
 mcu_height = 33.4
 mcu_depth = 1.5 + join_clearance
+mcu_offset_from_end = 0.8
 mcu_offset_from_bottom = 2.0
 battery_width = 30.0
 display_width = 14.2
@@ -193,7 +194,7 @@ display_inner_height = 25.2
 mcu_module = make_module_body(battery_width, right_socket = False)
 board_box = (cq.Workplane("XY")
     .box(mcu_width, mcu_height, mcu_depth)
-    .translate((0, -col_h/2 + mcu_height/2 + 0.2, -thickness/2 + floor + mcu_offset_from_bottom))
+    .translate((0, -col_h/2 + mcu_height/2 + mcu_offset_from_end, -thickness/2 + floor + mcu_offset_from_bottom))
 )
 mcu_module = mcu_module.cut(board_box)
 
@@ -214,7 +215,7 @@ mcu_module = mcu_module.cut(usb_cutout)
 # to keep the mcu in place
 stopper = (cq.Workplane("XY")
     .box(mcu_width/2, 1.0, mcu_offset_from_bottom + mcu_depth/2)
-    .translate((0, -col_h/2 + mcu_height + 0.5 + join_clearance, -thickness/2 + floor + mcu_offset_from_bottom/2))
+    .translate((0, -col_h/2 + mcu_height + mcu_offset_from_end + 1.0/2 , -thickness/2 + floor + mcu_offset_from_bottom/2))
 )
 mcu_module = mcu_module.union(stopper)
 
@@ -226,7 +227,7 @@ mcu_assembly.add(mcu_bottom, name="bottom", color=cq.Color("green"))
 if False:
     nicenano = (cq.importers.importStep("../step/nice-nano-v2-1.snapshot.2/nice-nano_v2.step")
         .rotate((0, 0, 0), (0, 0, 1), 90)
-        .translate((0, -col_h/2 + mcu_height/2 + 0.2, -thickness/2 + floor + mcu_offset_from_bottom - 0.75))
+        .translate((0, -col_h/2 + mcu_height/2 + mcu_offset_from_end, -thickness/2 + floor + mcu_offset_from_bottom - 0.75))
     )
     mcu_assembly.add(nicenano, name="nicenano")
 
