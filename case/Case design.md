@@ -73,15 +73,8 @@ Learnings/todo for next version
 	- [x] Fix showing subassemblies in a way that can be enabled/disabled
 - [ ] Use this to create the MCU module
 	- [x] Make it not have a right socket
-	- [ ] Harness attachment
-	- [ ] Display window
 	- [x] USB cutout
 	- [x] MCU attachment
-- [ ] Use this to create the terminator module
-	- [ ] Make it not have a left groove
-	- [ ] Harness attachment
-- [ ] Order
-	- [ ] M2 6mm screws
 After print:
 - [x] The hole in the top plate should be wider than the screw's 2mm so it only grabs onto the bottom
 - [x] Clearance still isn't great. Look into having an asymmetrical clearance the way it was in 3.1
@@ -91,7 +84,20 @@ Let's try this weird clearance which is more like 3.1.
 ![[proto 3.6 clearance.png]]
 ![[proto 3.6.png]]
 
-
+Learnings
+- [ ] The rails are STILL too tight. Loosen clearance again. Maybe make the wings even bigger?
+- [ ] The supports are killing me. Small details keep breaking. Figure out a better printing solution.
+- [ ] The tongue is too weak, it breaks. Make it thicker.
+Todos
+- [ ] Create the terminator module
+	- [ ] Make it not have a left groove
+	- [ ] Harness attachment
+- [ ] Continue on the MCU module
+	- [ ] Harness attachment
+	- [ ] Display window
+- [ ] Order
+	- [ ] M2 6mm screws
+## 3.7
 # Version 2
 Curvature. How much is the right curvature? I could math it. Or wing it. Still working in the same OnShape file. Here's V1 compared to wingin' it for v2:
 ![[curvature1.png]]
