@@ -170,8 +170,8 @@ for i in range(keys):
 
 keys_assembly = cq.Assembly()
 (keys_top, keys_bottom) = split_body(keys_module)
-keys_assembly.add(keys_top, name="top", color=cq.Color("red"))
-keys_assembly.add(keys_bottom, name="bottom", color=cq.Color("orange"))
+keys_assembly.add(keys_top, name="top", color=cq.Color("green1"))
+keys_assembly.add(keys_bottom, name="bottom", color=cq.Color("orange1"))
 
 ########################################################
 # MCU module
@@ -221,8 +221,8 @@ mcu_module = mcu_module.union(stopper)
 
 # Assembly
 (mcu_top, mcu_bottom) = split_body(mcu_module)
-mcu_assembly.add(mcu_top, name="top", color=cq.Color("blue"))
-mcu_assembly.add(mcu_bottom, name="bottom", color=cq.Color("green"))
+mcu_assembly.add(mcu_top, name="top", color=cq.Color("green2"))
+mcu_assembly.add(mcu_bottom, name="bottom", color=cq.Color("orange2"))
 
 if False:
     nicenano = (cq.importers.importStep("../step/nice-nano-v2-1.snapshot.2/nice-nano_v2.step")
@@ -230,6 +230,17 @@ if False:
         .translate((0, -col_h/2 + mcu_height/2 + mcu_offset_from_end, -thickness/2 + floor + mcu_offset_from_bottom - 0.75))
     )
     mcu_assembly.add(nicenano, name="nicenano")
+
+########################################################
+# Terminator module
+########################################################
+terminator_assembly = cq.Assembly()
+terminator_width = 12.0
+
+terminator_module = make_module_body(terminator_width, left_socket = False)
+(terminator_top, terminator_bottom) = split_body(terminator_module)
+terminator_assembly.add(terminator_top, name="top", color=cq.Color("green3"))
+terminator_assembly.add(terminator_bottom, name="bottom", color=cq.Color("orange3"))
 
 
 ########################################################
@@ -255,15 +266,19 @@ def show_recursive_assembly(asm: cq.Assembly, base_name: str = "", parent_loc = 
 full_assembly = cq.Assembly()
 full_assembly.add(keys_assembly, name="keys")
 full_assembly.add(mcu_assembly, name="mcu")
+full_assembly.add(terminator_assembly, name="terminator")
 full_assembly.constrain("keys/bottom?left_mate", "mcu/bottom?right_mate", "Plane")
 full_assembly.constrain("keys/bottom?left_mate", "mcu/bottom?right_mate", "Axis")
+full_assembly.constrain("keys/bottom?right_mate", "terminator/bottom?left_mate", "Plane")
+full_assembly.constrain("keys/bottom?right_mate", "terminator/bottom?left_mate", "Axis")
 full_assembly.solve()
 show_recursive_assembly(full_assembly, "roamy")
 export(keys_assembly, "keys")
 export(mcu_assembly, "mcu")
+export(terminator_assembly, "terminator")
 
 # Preview the full body with 6 columns
-if True:
+if False:
     for i in range(5):
         keys_module = (keys_module
             .rotate((col_w/2, 0, 0), (col_w/2, 1, 0), -column_angle_deg)

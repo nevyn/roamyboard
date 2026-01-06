@@ -90,7 +90,7 @@ Learnings
 - [ ] The tongue is too weak, it breaks. Make it thicker.
 Todos
 - [ ] Create the terminator module
-	- [ ] Make it not have a left groove
+	- [x] Make it not have a left groove
 	- [ ] Harness attachment
 - [ ] Continue on the MCU module
 	- [ ] Harness attachment
