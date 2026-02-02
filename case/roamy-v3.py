@@ -22,9 +22,9 @@ choc_cut = 13.8
 
 # Join (simple rectangular tongue/groove, rotated to create the angle)
 join_depth = 1.4 # how far the socket extends from the body
-join_height = 6.0 # how high the socket is, in the same dimension as thickness
+join_height = 8.0 # how high the socket is, in the same dimension as thickness
 join_indent = 0.6 
-join_clearance = 0.3 # how many mm of clearance to add to the tsocket to fit the groove
+join_clearance = 0.4 # how many mm of clearance to add to the tsocket to fit the groove
 
 interconnect_width = 22.86 + join_clearance # width of https://www.electrokit.com/upload/quick/dc/ae/ae5d_41022086.pdf (along y axis)
 interconnect_height = 2.5 + join_clearance # height (along z)
@@ -33,7 +33,7 @@ interconnect_distance_from_bottom = 6.0
 ########################################################
 # Generic module body
 ########################################################
-def make_module_body(col_w, left_socket = True, right_socket = True):
+def make_module_body(col_w, left_socket = True, right_socket = True, extra_screw_inset = 0.0):
     # -------- Main body --------
     # outer shell
     body = (cq.Workplane("XY")
@@ -73,7 +73,7 @@ def make_module_body(col_w, left_socket = True, right_socket = True):
         stopper_length = 2.0 + clearance
         socket_length = col_h - stopper_length
         tsocket = cq.Workplane("XY").box(join_depth, socket_length, join_height - clearance, centered=True)
-        cutout = cq.Workplane("XY").box(join_indent + clearance, socket_length, join_indent + clearance*2 + 0.5, centered=True)
+        cutout = cq.Workplane("XY").box(join_indent + clearance, socket_length, join_indent + clearance*2 + 1.3, centered=True)
         tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, join_height/2 - join_indent/2)))
         tsocket = tsocket.cut(cutout.translate((-join_depth/2 + join_indent/2, 0, -join_height/2 + join_indent/2)))
         tsocket = tsocket.translate((0, stopper_length/2, 0))
@@ -98,8 +98,8 @@ def make_module_body(col_w, left_socket = True, right_socket = True):
         ## Locking mechanism
         # Add a small block that locks at the top of the socket. Cut a U-shaped groove out of the body so 
         # the lock can be pushed back and release the next module.
-        u_groove_depth = 2.2
-        u_groove_length = 8.0
+        u_groove_depth = 2.8
+        u_groove_length = 12.0
         u_groove_inset = 1.0
         u_groove = (cq.Workplane("XY")
             .box(u_groove_depth, u_groove_length, join_height - 2)
@@ -112,9 +112,9 @@ def make_module_body(col_w, left_socket = True, right_socket = True):
         body = body.cut(u_groove)
         tongue = (cq.Workplane("XY")
             # sorry, I ran out of patience to not use magic numbers :/
-            .box(locking_depth*0.7, 1, join_height - 2 - u_groove_inset)
-            .cut(cq.Workplane("XY").box(3, 1, 3).rotate((0, 0, 0), (0, 0, 1), 40).translate((-1, 0.2, 0))) # angled cutout to allow next module to slide in
-            .translate((-col_w/2 + 1.3, col_h/2 - 0.5 + join_clearance, 0))
+            .box(locking_depth*0.9, 1, join_height - 2 - u_groove_inset)
+            .cut(cq.Workplane("XY").box(5, 1, 5).rotate((0, 0, 0), (0, 0, 1), 40).translate((-1, 0.2, 0))) # angled cutout to allow next module to slide in
+            .translate((-col_w/2 + 1.7, col_h/2 - 0.5 + join_clearance, 0))
         )
         body = body.union(tongue)
 
@@ -123,7 +123,7 @@ def make_module_body(col_w, left_socket = True, right_socket = True):
     screw_hole_inset = 5.0
     body = (body.faces(">Z").workplane()
         .center(-col_w/2 + centerline_x_offset, col_h/2)
-        .rect(col_w - screw_hole_inset - 2.0, col_h - screw_hole_inset, forConstruction=True)
+        .rect(col_w - screw_hole_inset - extra_screw_inset, col_h - screw_hole_inset, forConstruction=True)
         .vertices().tag("screw_holes")
         .hole(2.0, 13.0) # m2 screw holes, 12mm screws (too long, but it's what I have at hand)
         .workplaneFromTagged("screw_holes")
@@ -154,7 +154,7 @@ def split_body(body):
 ########################################################
 # Keyswitch module
 ########################################################
-keys_module = make_module_body(col_w)
+keys_module = make_module_body(col_w, extra_screw_inset=4.0)
 
 # -------- Key cutouts (through top) --------
 y0 = -col_h/2 + 12.0
@@ -192,7 +192,7 @@ display_inner_height = 25.2
 mcu_module_width = battery_width
 
 ### Internals
-mcu_module = make_module_body(mcu_module_width, right_socket = False)
+mcu_module = make_module_body(mcu_module_width, right_socket = False, extra_screw_inset=4.0)
 board_box = (cq.Workplane("XY")
     .box(mcu_width, mcu_height, mcu_depth)
     .translate((0, -col_h/2 + mcu_height/2 + mcu_offset_from_end, -thickness/2 + floor + mcu_offset_from_bottom))

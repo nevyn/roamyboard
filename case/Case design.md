@@ -85,17 +85,17 @@ Let's try this weird clearance which is more like 3.1.
 ![[proto 3.6.png]]
 
 Learnings
-- [ ] The rails are STILL too tight. Loosen clearance again. Maybe make the wings even bigger?
+- [x] The rails are STILL too tight. Loosen clearance again. Maybe make the wings even bigger?
 - [ ] The supports are killing me. Small details keep breaking. Figure out a better printing solution.
-- [ ] The tongue is too weak, it breaks. Make it thicker.
+- [x] The tongue is too weak, it breaks. Make it thicker.
 - [ ] The USB/MCU slot is too narrow, so the MCU won't fit.
 - [ ] The battery doesn't fit. Make the enclosure wider.
 Todos
-- [ ] Create the terminator module
+- [x] Create the terminator module
 	- [x] Make it not have a left groove
-	- [ ] Harness attachment
+	- [x] Harness attachment
 - [ ] Continue on the MCU module
-	- [ ] Harness attachment
+	- [x] Harness attachment
 	- [ ] Display window
 - [ ] Order
 	- [ ] M2 6mm screws
