@@ -229,20 +229,22 @@ harness_fastener = (cq.Workplane("XY")
      # cutout for the harness
     .rect(fastener_width - fastener_inset, fastener_length - fastener_inset)
     .extrude(fastener_depth)
+)
+mcu_fastener = (harness_fastener
     # grab the outermost edges and round them
     .edges(">X").fillet(2.0)
 )
 # attach the harness_fastener to the >X face of the module
-lower_fastener = (harness_fastener
+lower_fastener = (mcu_fastener
     .rotate((0, 0, 0), (0, 1, 0), column_angle_deg)
     .translate((mcu_module_width/2 + fastener_width/2, -col_h/2 + fastener_length/2, -thickness/2 - 0.6))
 )
-upper_fastener = (harness_fastener
+upper_fastener = (mcu_fastener
     .rotate((0, 0, 0), (0, 1, 0), column_angle_deg)
     .translate((mcu_module_width/2 + fastener_width/2, +col_h/2 - fastener_length/2, -thickness/2 - 0.6))
 )
-mcu_module = mcu_module.union(upper_fastener)
 mcu_module = mcu_module.union(lower_fastener)
+mcu_module = mcu_module.union(upper_fastener)
 
 # Assembly
 (mcu_top, mcu_bottom) = split_body(mcu_module)
@@ -263,6 +265,23 @@ terminator_assembly = cq.Assembly()
 terminator_width = 12.0
 
 terminator_module = make_module_body(terminator_width, left_socket = False)
+
+# Add fasteners to the terminator module as well
+terminator_fastener = (harness_fastener
+    # grab the outermost edges and round them
+    .edges("<X").fillet(2.0)
+)
+lower_fastener = (terminator_fastener
+    .translate((-terminator_width/2 - fastener_width/2, -col_h/2 + fastener_length/2, -thickness/2))
+)
+upper_fastener = (terminator_fastener
+    .translate((-terminator_width/2 - fastener_width/2, +col_h/2 - fastener_length/2, -thickness/2))
+)
+terminator_module = terminator_module.union(lower_fastener)
+terminator_module = terminator_module.union(upper_fastener)
+
+
+# Assembly
 (terminator_top, terminator_bottom) = split_body(terminator_module)
 terminator_assembly.add(terminator_top, name="top", color=cq.Color("green3"))
 terminator_assembly.add(terminator_bottom, name="bottom", color=cq.Color("orange3"))
