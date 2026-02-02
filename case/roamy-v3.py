@@ -46,15 +46,18 @@ def make_module_body(col_w, left_socket = True, right_socket = True):
     # -------- Angled sides --------
     # make a triangular prism, and add it to the right side of the body. This way, each added column 
     # contributes to an overall curvature of the full keyboard.
-    body = (body.faces("<Y").workplane()
-        .center(col_w/2, 0)
-        .moveTo(0, -thickness/2)
-        .lineTo(0, thickness/2)
-        .lineTo(prism_displacement, thickness/2)
-        .close()
-        .extrude(-col_h)
-        .faces(">X").tag("left_mate")
-    )
+    if right_socket:
+        body = (body.faces("<Y").workplane()
+            .center(col_w/2, 0)
+            .moveTo(0, -thickness/2)
+            .lineTo(0, thickness/2)
+            .lineTo(prism_displacement, thickness/2)
+            .close()
+            .extrude(-col_h)
+            .faces(">X").tag("left_mate")
+        )
+    else:
+        body = body.faces(">X").tag("left_mate")
 
     # -------- Inner body --------
     # inner shell, that makes the body hollow
@@ -189,9 +192,10 @@ display_width = 14.2
 display_height = 36.2
 display_inner_width = 10.6
 display_inner_height = 25.2
+mcu_module_width = battery_width
 
 ### Internals
-mcu_module = make_module_body(battery_width, right_socket = False)
+mcu_module = make_module_body(mcu_module_width, right_socket = False)
 board_box = (cq.Workplane("XY")
     .box(mcu_width, mcu_height, mcu_depth)
     .translate((0, -col_h/2 + mcu_height/2 + mcu_offset_from_end, -thickness/2 + floor + mcu_offset_from_bottom))
@@ -219,12 +223,23 @@ stopper = (cq.Workplane("XY")
 )
 mcu_module = mcu_module.union(stopper)
 
+fastener_length = 20.0 # along y, the long side of the module
+fastener_width = 10.0 # along x, out from the edge of the module
+fastener_inset = 6.0 # how much space for the harness inside the handle
+fastener_depth = thickness
+harness_fastener = (cq.Workplane("XY")
+    .rect(fastener_width, fastener_length) # outer handle
+    .extrude(fastener_depth)
+    .translate((mcu_module_width/2 + fastener_depth, 0, 0))
+)
+#mcu_module = mcu_module.union(harness_fastener)
+
 # Assembly
 (mcu_top, mcu_bottom) = split_body(mcu_module)
 mcu_assembly.add(mcu_top, name="top", color=cq.Color("green2"))
 mcu_assembly.add(mcu_bottom, name="bottom", color=cq.Color("orange2"))
 
-if False:
+if True:
     nicenano = (cq.importers.importStep("../step/nice-nano-v2-1.snapshot.2/nice-nano_v2.step")
         .rotate((0, 0, 0), (0, 0, 1), 90)
         .translate((0, -col_h/2 + mcu_height/2 + mcu_offset_from_end, -thickness/2 + floor + mcu_offset_from_bottom - 0.75))
@@ -278,7 +293,7 @@ export(mcu_assembly, "mcu")
 export(terminator_assembly, "terminator")
 
 # Preview the full body with 6 columns
-if False:
+if True:
     for i in range(5):
         keys_module = (keys_module
             .rotate((col_w/2, 0, 0), (col_w/2, 1, 0), -column_angle_deg)

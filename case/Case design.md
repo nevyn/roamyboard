@@ -88,6 +88,8 @@ Learnings
 - [ ] The rails are STILL too tight. Loosen clearance again. Maybe make the wings even bigger?
 - [ ] The supports are killing me. Small details keep breaking. Figure out a better printing solution.
 - [ ] The tongue is too weak, it breaks. Make it thicker.
+- [ ] The USB/MCU slot is too narrow, so the MCU won't fit.
+- [ ] The battery doesn't fit. Make the enclosure wider.
 Todos
 - [ ] Create the terminator module
 	- [x] Make it not have a left groove
@@ -98,6 +100,8 @@ Todos
 - [ ] Order
 	- [ ] M2 6mm screws
 ## 3.7
+
+
 # Version 2
 Curvature. How much is the right curvature? I could math it. Or wing it. Still working in the same OnShape file. Here's V1 compared to wingin' it for v2:
 ![[curvature1.png]]
