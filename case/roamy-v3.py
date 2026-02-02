@@ -184,12 +184,12 @@ mcu_height = 33.4
 mcu_depth = 1.5 + join_clearance
 mcu_offset_from_end = 0.8
 mcu_offset_from_bottom = 2.0
-battery_width = 30.0
+battery_width = 32.0
 display_width = 14.2
 display_height = 36.2
 display_inner_width = 10.6
 display_inner_height = 25.2
-mcu_module_width = battery_width
+mcu_module_width = battery_width + side_wall*2
 
 ### Internals
 mcu_module = make_module_body(mcu_module_width, right_socket = False, extra_screw_inset=4.0)

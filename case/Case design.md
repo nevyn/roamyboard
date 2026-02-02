@@ -89,7 +89,7 @@ Learnings
 - [ ] The supports are killing me. Small details keep breaking. Figure out a better printing solution.
 - [x] The tongue is too weak, it breaks. Make it thicker.
 - [ ] The USB/MCU slot is too narrow, so the MCU won't fit.
-- [ ] The battery doesn't fit. Make the enclosure wider.
+- [x] The battery doesn't fit. Make the enclosure wider.
 Todos
 - [x] Create the terminator module
 	- [x] Make it not have a left groove
