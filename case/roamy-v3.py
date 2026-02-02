@@ -46,18 +46,15 @@ def make_module_body(col_w, left_socket = True, right_socket = True):
     # -------- Angled sides --------
     # make a triangular prism, and add it to the right side of the body. This way, each added column 
     # contributes to an overall curvature of the full keyboard.
-    if right_socket:
-        body = (body.faces("<Y").workplane()
-            .center(col_w/2, 0)
-            .moveTo(0, -thickness/2)
-            .lineTo(0, thickness/2)
-            .lineTo(prism_displacement, thickness/2)
-            .close()
-            .extrude(-col_h)
-            .faces(">X").tag("left_mate")
-        )
-    else:
-        body = body.faces(">X").tag("left_mate")
+    body = (body.faces("<Y").workplane()
+        .center(col_w/2, 0)
+        .moveTo(0, -thickness/2)
+        .lineTo(0, thickness/2)
+        .lineTo(prism_displacement, thickness/2)
+        .close()
+        .extrude(-col_h)
+        .faces(">X").tag("left_mate")
+    )
 
     # -------- Inner body --------
     # inner shell, that makes the body hollow
