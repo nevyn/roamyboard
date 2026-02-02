@@ -179,9 +179,9 @@ keys_assembly.add(keys_bottom, name="bottom", color=cq.Color("orange1"))
 mcu_assembly = cq.Assembly()
 
 # Parameters
-mcu_width = 18.0 + join_clearance
-mcu_height = 33.4
-mcu_depth = 1.5 + join_clearance
+mcu_width = 18.0 + join_clearance*2
+mcu_height = 33.4 + join_clearance
+mcu_depth = 1.5 + join_clearance*4
 mcu_offset_from_end = 0.8
 mcu_offset_from_bottom = 2.0
 battery_width = 32.0
@@ -207,7 +207,7 @@ support_under_mcu = (cq.Workplane("XY")
 mcu_module = mcu_module.union(support_under_mcu)
 
 usb_cutout = (cq.Workplane("XZ")
-    .rect(9.0 + join_clearance, 3.3 + join_clearance, centered=True).extrude(-edge_wall)
+    .rect(9.0 + join_clearance*2, 3.3 + join_clearance*2, centered=True).extrude(-edge_wall)
     .edges("|Y").fillet(1.0)
     .translate((0, -col_h/2, -thickness/2 + floor + mcu_offset_from_bottom))
 )
@@ -219,6 +219,9 @@ stopper = (cq.Workplane("XY")
     .translate((0, -col_h/2 + mcu_height + mcu_offset_from_end + 1.0/2 , -thickness/2 + floor + mcu_offset_from_bottom/2))
 )
 mcu_module = mcu_module.union(stopper)
+
+
+# Harness fastener
 
 fastener_length = 30.0 # along y, the long side of the module
 fastener_width = 10.0 # along x, out from the edge of the module

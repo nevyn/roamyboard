@@ -88,7 +88,7 @@ Learnings
 - [x] The rails are STILL too tight. Loosen clearance again. Maybe make the wings even bigger?
 - [ ] The supports are killing me. Small details keep breaking. Figure out a better printing solution.
 - [x] The tongue is too weak, it breaks. Make it thicker.
-- [ ] The USB/MCU slot is too narrow, so the MCU won't fit.
+- [x] The USB/MCU slot is too narrow, so the MCU won't fit.
 - [x] The battery doesn't fit. Make the enclosure wider.
 Todos
 - [x] Create the terminator module
