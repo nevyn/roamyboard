@@ -106,11 +106,11 @@ Todos
 ![[proto 3.7 close.png]]
 ![[proto 3.7 irl.jpeg]]
 Learnings
-- [ ] WTF, I changed clearance to 0.4 and it's STILL too tight‽ I can just barely make it work by shaving off debris
+- [x] WTF, I changed clearance to 0.4 and it's STILL too tight‽ I can just barely make it work by shaving off debris
 - [x] Make the tongue longer so it attaches better
 - [x] About 2mm TOO MUCH clearance for the battery
 - [x] MCU is a LITTLE loose. I could make the distance to the stopper maybe 0.2mm shorter.
-- [ ] Tree supports are great. Everything came off super easily without breaking.
+- [x] Tree supports are great. Everything came off super easily without breaking.
 
 ## 3.8
 

@@ -24,10 +24,11 @@ choc_cut = 13.8
 join_depth = 1.4 # how far the socket extends from the body
 join_height = 8.0 # how high the socket is, in the same dimension as thickness
 join_indent = 0.6 
-join_clearance = 0.4 # how many mm of clearance to add to the tsocket to fit the groove
+join_clearance = 0.45 # how many mm of clearance to add to the tsocket to fit the groove
+general_clearance = 0.4 # standard clearance for everything else
 
-interconnect_width = 22.86 + join_clearance # width of https://www.electrokit.com/upload/quick/dc/ae/ae5d_41022086.pdf (along y axis)
-interconnect_height = 2.5 + join_clearance # height (along z)
+interconnect_width = 22.86 + general_clearance # width of https://www.electrokit.com/upload/quick/dc/ae/ae5d_41022086.pdf (along y axis)
+interconnect_height = 2.5 + general_clearance # height (along z)
 interconnect_distance_from_bottom = 6.0
 
 ########################################################
@@ -179,9 +180,9 @@ keys_assembly.add(keys_bottom, name="bottom", color=cq.Color("orange1"))
 mcu_assembly = cq.Assembly()
 
 # Parameters
-mcu_width = 18.0 + join_clearance*2
-mcu_height = 33.4 + join_clearance
-mcu_depth = 1.5 + join_clearance*4
+mcu_width = 18.0 + general_clearance*2
+mcu_height = 33.4 + general_clearance
+mcu_depth = 1.5 + general_clearance*4
 mcu_offset_from_end = 0.8
 mcu_offset_from_bottom = 2.0
 battery_width = 30.5
@@ -207,7 +208,7 @@ support_under_mcu = (cq.Workplane("XY")
 mcu_module = mcu_module.union(support_under_mcu)
 
 usb_cutout = (cq.Workplane("XZ")
-    .rect(9.0 + join_clearance*2, 3.3 + join_clearance*2, centered=True).extrude(-edge_wall)
+    .rect(9.0 + general_clearance*2, 3.3 + general_clearance*2, centered=True).extrude(-edge_wall)
     .edges("|Y").fillet(1.0)
     .translate((0, -col_h/2, -thickness/2 + floor + mcu_offset_from_bottom))
 )
