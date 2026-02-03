@@ -83,6 +83,7 @@ After print:
 Let's try this weird clearance which is more like 3.1.
 ![[proto 3.6 clearance.png]]
 ![[proto 3.6.png]]
+![[proto 3.6 irl.jpeg]]
 
 Learnings
 - [x] The rails are STILL too tight. Loosen clearance again. Maybe make the wings even bigger?
