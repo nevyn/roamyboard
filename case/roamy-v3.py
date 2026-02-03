@@ -112,9 +112,9 @@ def make_module_body(col_w, left_socket = True, right_socket = True, extra_screw
         body = body.cut(u_groove)
         tongue = (cq.Workplane("XY")
             # sorry, I ran out of patience to not use magic numbers :/
-            .box(locking_depth*0.9, 1, join_height - 2 - u_groove_inset)
+            .box(locking_depth*1.1, 1, join_height - 2 - u_groove_inset)
             .cut(cq.Workplane("XY").box(5, 1, 5).rotate((0, 0, 0), (0, 0, 1), 40).translate((-1, 0.2, 0))) # angled cutout to allow next module to slide in
-            .translate((-col_w/2 + 1.7, col_h/2 - 0.5 + join_clearance, 0))
+            .translate((-col_w/2 + 1.5, col_h/2 - 0.5 + join_clearance, 0))
         )
         body = body.union(tongue)
 
