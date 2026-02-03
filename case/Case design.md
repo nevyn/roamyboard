@@ -101,6 +101,17 @@ Todos
 	- [ ] M2 6mm screws
 ## 3.7
 
+![[proto 3.7.png]]
+![[proto 3.7 close.png]]
+![[proto 3.7 irl.jpeg]]
+Learnings
+- [ ] WTF, I changed clearance to 0.4 and it's STILL too tight‽ I can just barely make it work by shaving off debris
+- [ ] About 2mm TOO MUCH clearance for the battery
+- [ ] MCU is a LITTLE loose. I could make the distance to the stopper maybe 0.2mm shorter.
+- [ ] Tree supports are great. Everything came off super easily without breaking.
+
+## 3.8
+
 
 # Version 2
 Curvature. How much is the right curvature? I could math it. Or wing it. Still working in the same OnShape file. Here's V1 compared to wingin' it for v2:
