@@ -216,7 +216,7 @@ mcu_module = mcu_module.cut(usb_cutout)
 # to keep the mcu in place
 stopper = (cq.Workplane("XY")
     .box(mcu_width/2, 1.0, mcu_offset_from_bottom + mcu_depth/2)
-    .translate((0, -col_h/2 + mcu_height + mcu_offset_from_end + 1.0/2 , -thickness/2 + floor + mcu_offset_from_bottom/2))
+    .translate((0, -col_h/2 + mcu_height + mcu_offset_from_end + 1.0/2 - 0.2 , -thickness/2 + floor + mcu_offset_from_bottom/2))
 )
 mcu_module = mcu_module.union(stopper)
 
