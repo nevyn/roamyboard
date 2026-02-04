@@ -113,7 +113,11 @@ Learnings
 - [x] Tree supports are great. Everything came off super easily without breaking.
 
 ## 3.8
-
+![[proto 3.8 irl.png]]
+Learnings
+- [ ] It's perfect.
+- [ ] Actually, I could add a rounding at the bottom of the T socket so that it slides into the groove more easily.
+- [ ] And... I need more depth into the column to fit all the electronics :S I might have to print new lower halves.
 
 # Version 2
 Curvature. How much is the right curvature? I could math it. Or wing it. Still working in the same OnShape file. Here's V1 compared to wingin' it for v2:
