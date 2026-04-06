@@ -30,6 +30,8 @@ Each module has decoupling capacitors for both the 165 and NeoPixel data lines.
 ### Terminator module
 The leftmost column module has minimal electronics to provide a passive termination that causes the MCU's key-scan chain to report end-of-chain.
 
+This is performed by simply tying pin 5 (DATA) high, so that when the last column's 165 pulls serial input from it, it gets all-ones, which will subsequently set the highest bit as 1, which the MCU can then interpret as "this is the dummy terminal module and we can ignore the whole byte and also stop reading".
+
 ## Bill Of Materials
 
 | Identifier     | Count                | Description                                                |
@@ -40,3 +42,46 @@ The leftmost column module has minimal electronics to provide a passive terminat
 | ??             | 1 x module count - 1 | Pogo pin for module interconnect (female)                  |
 
 ## Schematic
+
+MCU module
+* nice!nano connects to:
+	* Battery
+	* pin ? to interconnect pin 1 (+5V)
+	* pin ? to interconnect pin 2 (+3.3V)
+	* pin ? to interconnect pin 3 (GND)
+	* pin ? to interconnect pin 4 (CLK)
+	* pin ? to interconnect pin 5 (DATA)
+	* pin ? to interconnect pin 6 (PL)
+	* ... ignore the rest for now
+
+Key module
+* From incoming interconnect (right side)
+	* Pin 1 (+5V) through to outgoing interconnect pin 1
+	* Pin 2 (+3.3V)...
+		* through to outgoing interconnect pin 2, and
+		* to the left leg of all the key switches, and
+	* Pin 3 (GND)...
+		* to the 165's pin 8 (GND), and
+		* through to outgoing interconnect pin 3
+	* Pin 4 (CLK) ...
+		* through to outgoing interconnect pin 4
+		* to the 165's pin 2 (CLK)
+	* Pin 5 (DATA) to the 165's pin 9 (QH, Serial Output)
+	* Pin 6 (PL)...
+		* through to outgoing interconnect pin 6, and
+		* to the 165's pin 1 (SH/LD aka PL)
+* From the 165
+	* Pin 11 (A) to bottom-most key switch's right leg, AND through a 10K resistor to ground
+	* Pin 12 (B) to key #2 AND pull-down resistor
+	* Pin 13 (C) to key #3 AND pull-down resistor
+	* Pin 14 (D) to key #4 AND pull-down resistor
+	* Pin 3 (E) to key #5 AND pull-down resistor, or GND if key unavailable
+	* Pin 4 (F) to key #6 AND pull-down resistor, or GND if key unavailable
+	* Pin 5 (G) to key #7 AND pull-down resistor, or GND if key unavailable
+	* Pin 6 (H) to GND
+	* Pin 15 (CLK INH) to GND
+	* Pin 9 (Serial Input) to outgoing interconnect pin 5
+
+Terminator module
+* From incoming interconnect
+	* Pin 2 (+3.3V) to the same interconnect pin 5 (DATA)
