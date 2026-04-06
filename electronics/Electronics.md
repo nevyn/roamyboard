@@ -55,20 +55,21 @@ MCU module
 	* ... ignore the rest for now
 
 Key module
-* From incoming interconnect (right side)
-	* Pin 1 (+5V) through to outgoing interconnect pin 1
+* From MCU-facing interconnect (right side)
+	* Pin 1 (+5V) through to terminal-facing (left side) interconnect  pin 1
 	* Pin 2 (+3.3V)...
-		* through to outgoing interconnect pin 2, and
+		* through to left interconnect pin 2, and
+		* to the 165's pin 16 (VCC)
 		* to the left leg of all the key switches, and
 	* Pin 3 (GND)...
 		* to the 165's pin 8 (GND), and
-		* through to outgoing interconnect pin 3
+		* through to left interconnect pin 3
 	* Pin 4 (CLK) ...
-		* through to outgoing interconnect pin 4
+		* through to left interconnect pin 4
 		* to the 165's pin 2 (CLK)
 	* Pin 5 (DATA) to the 165's pin 9 (QH, Serial Output)
 	* Pin 6 (PL)...
-		* through to outgoing interconnect pin 6, and
+		* through to left interconnect pin 6, and
 		* to the 165's pin 1 (SH/LD aka PL)
 * From the 165
 	* Pin 11 (A) to bottom-most key switch's right leg, AND through a 10K resistor to ground
@@ -80,7 +81,7 @@ Key module
 	* Pin 5 (G) to key #7 AND pull-down resistor, or GND if key unavailable
 	* Pin 6 (H) to GND
 	* Pin 15 (CLK INH) to GND
-	* Pin 9 (Serial Input) to outgoing interconnect pin 5
+	* Pin 10 (SER, Serial Input) to left interconnect pin 5
 
 Terminator module
 * From incoming interconnect
