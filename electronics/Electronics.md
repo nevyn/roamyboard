@@ -42,6 +42,7 @@ This is performed by simply tying pin 5 (DATA) high, so that when the last colum
 | ??             | 1 x module count - 1 | Pogo pin for module interconnect (female)                  |
 
 ## Schematic
+![[KeyModuleSchematic.png]]
 
 MCU module
 * nice!nano connects to:
