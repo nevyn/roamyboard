@@ -2872,7 +2872,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_DIP:DIP-16_W7.62mm"
 			(at 118.11 80.01 0)
 			(hide yes)
 			(show_name no)
@@ -2995,7 +2995,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 88.9 102.362 90)
 			(hide yes)
 			(show_name no)
@@ -3154,7 +3154,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
 			(at 78.74 96.52 0)
 			(hide yes)
 			(show_name no)
@@ -3389,7 +3389,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
 			(at 78.74 73.66 0)
 			(hide yes)
 			(show_name no)
@@ -3423,10 +3423,10 @@
 			)
 		)
 		(pin "2"
-			(uuid "57fbb93e-fe6a-4120-abeb-95a884b6203b")
+			(uuid "57fbb93e-fe6a-4120-abeb-95a884b6203c")
 		)
 		(pin "1"
-			(uuid "e9c08d47-19c8-4424-b092-57175be357df")
+			(uuid "e9c08d47-19c8-4424-b092-57175be357e0")
 		)
 		(instances
 			(project "KeyModule"
@@ -3548,7 +3548,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x09_P2.54mm_Vertical"
 			(at 48.26 85.09 0)
 			(hide yes)
 			(show_name no)
@@ -3728,7 +3728,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 88.9 83.058 90)
 			(hide yes)
 			(show_name no)
@@ -3809,7 +3809,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 88.9 113.792 90)
 			(hide yes)
 			(show_name no)
@@ -3843,10 +3843,10 @@
 			)
 		)
 		(pin "1"
-			(uuid "c263c610-da4b-4926-95c5-e5600cc7c918")
+			(uuid "c263c610-da4b-4926-95c5-e5600cc7c919")
 		)
 		(pin "2"
-			(uuid "90b5dbcd-772a-4820-8914-09afe4b5d3fe")
+			(uuid "90b5dbcd-772a-4820-8914-09afe4b5d3ff")
 		)
 		(instances
 			(project "KeyModule"
@@ -4126,7 +4126,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 88.9 90.932 90)
 			(hide yes)
 			(show_name no)
@@ -4320,7 +4320,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "0520c202-dbac-4dad-a222-130f3d974c74")
+			(uuid "0520c202-dbac-4dad-a222-130f3d974c75")
 		)
 		(instances
 			(project "KeyModule"
@@ -4634,7 +4634,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "0520c202-dbac-4dad-a222-130f3d974c74")
+			(uuid "0520c202-dbac-4dad-a222-130f3d974c76")
 		)
 		(instances
 			(project "KeyModule"
@@ -4679,7 +4679,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x09_P2.54mm_Vertical"
 			(at 149.86 85.09 0)
 			(hide yes)
 			(show_name no)
@@ -4713,31 +4713,31 @@
 			)
 		)
 		(pin "2"
-			(uuid "58ecc2a4-4069-457d-8523-090edd96ceb3")
+			(uuid "58ecc2a4-4069-457d-8523-090edd96ceb4")
 		)
 		(pin "1"
-			(uuid "e4891c06-f9f1-4422-a762-09302064ab01")
+			(uuid "e4891c06-f9f1-4422-a762-09302064ab02")
 		)
 		(pin "9"
-			(uuid "ebffa452-3a0e-4218-8819-f8cc46ca1315")
+			(uuid "ebffa452-3a0e-4218-8819-f8cc46ca1316")
 		)
 		(pin "3"
-			(uuid "95919e43-88fb-4249-8708-9b59d7f47f95")
+			(uuid "95919e43-88fb-4249-8708-9b59d7f47f96")
 		)
 		(pin "6"
-			(uuid "f8c57ace-69ac-4926-82f9-71ece52e25fe")
+			(uuid "f8c57ace-69ac-4926-82f9-71ece52e25ff")
 		)
 		(pin "4"
-			(uuid "6bdfae51-f0e9-40de-b1c1-aa7b5fc55235")
+			(uuid "6bdfae51-f0e9-40de-b1c1-aa7b5fc55236")
 		)
 		(pin "5"
-			(uuid "bedd2da0-d79c-4833-8fd9-4b7f031cee53")
+			(uuid "bedd2da0-d79c-4833-8fd9-4b7f031cee54")
 		)
 		(pin "7"
-			(uuid "9ec3da94-cfcf-40b4-94c2-f3597a636748")
+			(uuid "9ec3da94-cfcf-40b4-94c2-f3597a636749")
 		)
 		(pin "8"
-			(uuid "93f33951-b268-436f-a821-6a42debfa7cc")
+			(uuid "93f33951-b268-436f-a821-6a42debfa7cd")
 		)
 		(instances
 			(project "KeyModule"
@@ -4781,7 +4781,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
 			(at 88.9 71.628 90)
 			(hide yes)
 			(show_name no)
@@ -4861,7 +4861,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
 			(at 78.74 85.09 0)
 			(hide yes)
 			(show_name no)
@@ -4895,10 +4895,10 @@
 			)
 		)
 		(pin "2"
-			(uuid "57fbb93e-fe6a-4120-abeb-95a884b6203b")
+			(uuid "57fbb93e-fe6a-4120-abeb-95a884b6203d")
 		)
 		(pin "1"
-			(uuid "e9c08d47-19c8-4424-b092-57175be357df")
+			(uuid "e9c08d47-19c8-4424-b092-57175be357e1")
 		)
 		(instances
 			(project "KeyModule"
@@ -4941,7 +4941,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
 			(at 78.74 107.95 0)
 			(hide yes)
 			(show_name no)
@@ -4975,10 +4975,10 @@
 			)
 		)
 		(pin "2"
-			(uuid "57fbb93e-fe6a-4120-abeb-95a884b6203b")
+			(uuid "57fbb93e-fe6a-4120-abeb-95a884b6203e")
 		)
 		(pin "1"
-			(uuid "e9c08d47-19c8-4424-b092-57175be357df")
+			(uuid "e9c08d47-19c8-4424-b092-57175be357e2")
 		)
 		(instances
 			(project "KeyModule"
@@ -5177,7 +5177,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
 			(at 78.74 62.23 0)
 			(hide yes)
 			(show_name no)
@@ -5211,10 +5211,10 @@
 			)
 		)
 		(pin "2"
-			(uuid "57fbb93e-fe6a-4120-abeb-95a884b6203b")
+			(uuid "57fbb93e-fe6a-4120-abeb-95a884b6203f")
 		)
 		(pin "1"
-			(uuid "e9c08d47-19c8-4424-b092-57175be357df")
+			(uuid "e9c08d47-19c8-4424-b092-57175be357e3")
 		)
 		(instances
 			(project "KeyModule"
