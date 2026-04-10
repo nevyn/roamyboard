@@ -4,6 +4,16 @@ A pants-mounted keyboard that I can use while walking and sitting. Original idea
 
 Made by [Nevyn Bengtsson](mailto:hello@nevyn.dev) 2012-2026 (this is not the first iteration 😅).
 
+My current approach is to make _modular column modules_ that become angled to curve around the leg by having one diagonal side that then clicks into the next module, creating a curve per column. A nice!nano in a rightmost MCU column module, and a terminator in the leftmost column; and then a belt attaches through the side modules to strap around the leg.
+
+![latest prototype](Images/proto%203.8%20irl.png)
+
+But why‽ Because I think so much better when I'm moving. So I want to code while I move. So I need an input method that works while I'm moving. 
+
+I will also need a wearable [[Computer]] and [[Head mounted display]] to go with this setup for that to be possible, but that's for later.
+
+This repo is also an Obsidian project, which is why it has wiki syntax here and there.
+
 # How to work on this shit
 
 ## Case
@@ -28,7 +38,7 @@ url: "https://scottokeebs.com/blogs/keyboards/scottochoczard-handwired-keyboard"
 ![](https://www.youtube.com/watch?v=LXfdxxXyiFE)
 
 The hardware and layout is based on [![](https://typeractive.xyz/cdn/shop/files/favicon-typeractive_1_32x32.png?v=1640412698)Typeractive.xyzBuild - Wireless Corne and Lily58 Keyboard Kits](https://typeractive.xyz/pages/build/lily58). It’s wireless, based on the nice!nano just like the ScottoChoczard, but has a more conventional 4-row layout so I don’t have to go as deep in layers.
-![[Lily58 example.png]]
+![Lily58 example](Images/Lily58%20example.png)
 
 # Parts
 ## Firmware and layout
@@ -40,8 +50,10 @@ Read more in [[Layout]].
 
 ## Wiring
 
-It'll probably end up looking something like ScottoChoczard:
-![[choczard wiring.png]]
+~~It'll probably end up looking something like ScottoChoczard~~:
+![choczard wiring](Images/choczard%20wiring.png)
+
+Actually, screw the handwiring. I'm making PCBs in [[Electronics]]!!!
 ## Case
 
 A hard shell 3d print of some sort. Read more in [[Case design]].
