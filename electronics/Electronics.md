@@ -64,6 +64,7 @@ Key module
 		* to the left leg of all the key switches, and
 	* Pin 3 (GND)...
 		* to the 165's pin 8 (GND), and
+		* to all the pulldown resistors, and
 		* through to left interconnect pin 3
 	* Pin 4 (CLK) ...
 		* through to left interconnect pin 4
