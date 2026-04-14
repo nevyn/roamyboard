@@ -1,5 +1,7 @@
 > 💡 This document describes the electrical wiring of the [[Modular Design (v3)]]. 
 
+> ✅ **Design status:** Validated on a hand-wired single-column prototype. The shift-register chain, the terminator sentinel trick, and the M5StickC-based test firmware are all confirmed working.
+![[prototype column.png]]
 ## Concepts
 ### Column modules and interconnects
 
@@ -31,6 +33,17 @@ Each module has decoupling capacitors for both the 165 and NeoPixel data lines.
 The leftmost column module has minimal electronics to provide a passive termination that causes the MCU's key-scan chain to report end-of-chain.
 
 This is performed by simply tying pin 5 (DATA) high, so that when the last column's 165 pulls serial input from it, it gets all-ones, which will subsequently set the highest bit as 1, which the MCU can then interpret as "this is the dummy terminal module and we can ignore the whole byte and also stop reading".
+
+### End-of-chain detection protocol
+Each key module has the 74HC165's H input (pin 6) tied to GND, so bit 7 of every real column's byte is always 0. The terminator feeds all-ones (0xFF) into the chain. The MCU therefore scans by clocking out bytes one at a time, using a simple rule:
+
+- **Byte has bit 7 set (0xFF)** → this is the sentinel from the terminator. Stop reading, chain is done.
+- **Byte has bit 7 clear** → this is a real column. Bits 0–6 encode key states.
+
+This makes the number of columns dynamic — no hardcoded column count, no configuration. The MCU just keeps reading until it hits the sentinel.
+
+### Bit ordering
+After parallel load (PL pulse), the 74HC165 shifts bits out of QH in this order: **H first, then G, F, E, D, C, B, A last**. This matters for firmware: the first bit the MCU reads from a real column corresponds to input H (which in our design is always 0), and the last bit corresponds to input A (key #1 / the bottom key).
 
 ## Bill Of Materials
 
