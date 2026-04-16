@@ -197,3 +197,11 @@ Then the real test: tied +3.3V to the left-side DATA pin to simulate the termina
 ## PCB design
 
 Ok, now I know how to make a schematic and a footprint list, but I want to print PCBs so I don't have to spend five hours hand-soldering protoboards. So, that's the next leg on this journey.
+
+### PCB v1.0
+*2026-04-14*
+![[pcb_v1_front.png]]
+![[pcb_v1_back.png]]
+
+Will this work? Only key switches on the front, and then the shift register, resistors and pin headers on the back. The headers will be pogo pins/receptacles, not regular pins like this.
+The pins on the headers are riding VERY close to the key switch holes... No idea if it'll work. Now, routing!!
