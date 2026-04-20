@@ -205,3 +205,29 @@ Ok, now I know how to make a schematic and a footprint list, but I want to print
 
 Will this work? Only key switches on the front, and then the shift register, resistors and pin headers on the back. The headers will be pogo pins/receptacles, not regular pins like this.
 The pins on the headers are riding VERY close to the key switch holes... No idea if it'll work. Now, routing!!
+
+### PCB v1.1
+
+Raj is showing me how to configure KiCad
+* Minimum clearance, track width, connection width, annular width the same: 0.2mm to be able to get the cheapest "Min trach/spacing" on PCBWay (8/8 mil ≈ 0.2mm)
+* hole to hole clearance should be at least the same as the hole size, or maybe even at least 0.5mm
+* minimum via diameter is hole size plus copper, so 0.3+0.2+0.2 = 0.7
+* copper to edge, pcbway lets us do down to 0.2, but 0.3 is a safer minimum
+* You don't need to route ground. Just do ground fill (hit B to refill all zones)
+	* Turn off "Draw Zone Fills" to not get distracted by it
+	* Just re-fill zones after changing anything
+
+For the pin situation... I think we're going to have to give up on pogo pins :( Let's do SMD pins, sets of 3, so we get mechanical connections. 
+* Pins
+	* Data sheet: https://content.harwin.com/m/0e0398fdb977d498/original/DRG-02613-Technical-Drawing-Datasheet-M20-791R-pdf.pdf
+	* Product, wrong pin count: https://www.digikey.se/en/products/detail/harwin-inc/M20-7910642R/6559284
+* Then I need socket too
+* Try to have it 
+
+TODO:
+- [ ] Fix up footprint for 3 pins
+- [ ] Also make footprint for male side
+- [ ] Change footprint in schematic
+- [ ] Reroute with new footprints
+
+![[3x3-pins.png]]

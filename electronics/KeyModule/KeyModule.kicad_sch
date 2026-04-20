@@ -2137,19 +2137,19 @@
 		(uuid "012c44b0-4738-4284-bb70-a24ac6131f96")
 	)
 	(junction
-		(at 92.71 78.74)
+		(at 92.71 81.28)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "0ae76cec-63a7-494a-bbdd-bce51c521364")
 	)
 	(junction
-		(at 68.58 101.6)
+		(at 68.58 67.31)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "4f1f03af-ccb0-4e3a-8bf1-f9252dfd680f")
+		(uuid "321aa780-ae05-4705-b855-ca0c1892ad90")
 	)
 	(junction
-		(at 92.71 90.17)
+		(at 92.71 95.25)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "6fd71c0f-b98b-4eb2-977c-a1d69051f0cd")
@@ -2179,19 +2179,13 @@
 		(uuid "a222e298-2c54-439a-845b-76514341c511")
 	)
 	(junction
-		(at 92.71 101.6)
+		(at 92.71 109.22)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ac735559-b12b-498c-b703-53d404306d99")
 	)
 	(junction
-		(at 68.58 90.17)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b1fc2645-b294-45aa-aa05-2d8e79237bc8")
-	)
-	(junction
-		(at 92.71 113.03)
+		(at 92.71 124.46)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "c01574a8-dded-4ad3-8bb1-8a7c9398bf45")
@@ -2203,16 +2197,22 @@
 		(uuid "c5924ea3-8585-4c8d-a4bf-969ae6c179bd")
 	)
 	(junction
-		(at 68.58 78.74)
+		(at 68.58 109.22)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "c9a854b6-b42c-4ff3-9b8f-beef4e772d7d")
+		(uuid "deb002a6-f6bf-471c-bb01-cf0b8c298776")
 	)
 	(junction
-		(at 68.58 67.31)
+		(at 68.58 95.25)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "d6b03a2d-b5eb-4992-9dbc-cfa0a5308578")
+		(uuid "df32b2ea-d4e2-4fc4-b3e7-34e5ca68259c")
+	)
+	(junction
+		(at 68.58 81.28)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "ff16fcf3-43b8-4fcc-b077-578fed538c87")
 	)
 	(no_connect
 		(at 130.81 67.31)
@@ -2220,7 +2220,17 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 101.6) (xy 68.58 101.6)
+			(xy 97.79 77.47) (xy 97.79 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0791a44e-a70f-4344-b750-71ec6f286601")
+	)
+	(wire
+		(pts
+			(xy 73.66 109.22) (xy 68.58 109.22)
 		)
 		(stroke
 			(width 0)
@@ -2230,7 +2240,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 90.17) (xy 92.71 92.71)
+			(xy 92.71 95.25) (xy 92.71 97.79)
 		)
 		(stroke
 			(width 0)
@@ -2250,7 +2260,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 78.74) (xy 83.82 78.74)
+			(xy 92.71 81.28) (xy 83.82 81.28)
 		)
 		(stroke
 			(width 0)
@@ -2260,7 +2270,7 @@
 	)
 	(wire
 		(pts
-			(xy 95.25 72.39) (xy 95.25 90.17)
+			(xy 95.25 72.39) (xy 95.25 95.25)
 		)
 		(stroke
 			(width 0)
@@ -2270,7 +2280,7 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 113.03) (xy 68.58 113.03)
+			(xy 73.66 124.46) (xy 68.58 124.46)
 		)
 		(stroke
 			(width 0)
@@ -2290,7 +2300,17 @@
 	)
 	(wire
 		(pts
-			(xy 93.98 69.85) (xy 93.98 78.74)
+			(xy 68.58 109.22) (xy 68.58 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "29852422-bdd0-4e04-a7a3-5ca65160a64e")
+	)
+	(wire
+		(pts
+			(xy 93.98 69.85) (xy 93.98 81.28)
 		)
 		(stroke
 			(width 0)
@@ -2320,7 +2340,7 @@
 	)
 	(wire
 		(pts
-			(xy 95.25 90.17) (xy 92.71 90.17)
+			(xy 95.25 95.25) (xy 92.71 95.25)
 		)
 		(stroke
 			(width 0)
@@ -2330,7 +2350,7 @@
 	)
 	(wire
 		(pts
-			(xy 93.98 78.74) (xy 92.71 78.74)
+			(xy 93.98 81.28) (xy 92.71 81.28)
 		)
 		(stroke
 			(width 0)
@@ -2340,7 +2360,7 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 90.17) (xy 68.58 90.17)
+			(xy 73.66 95.25) (xy 68.58 95.25)
 		)
 		(stroke
 			(width 0)
@@ -2360,16 +2380,6 @@
 	)
 	(wire
 		(pts
-			(xy 105.41 77.47) (xy 97.79 77.47)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4e1e3b09-a41c-4071-be1f-a17ed113918d")
-	)
-	(wire
-		(pts
 			(xy 68.58 67.31) (xy 68.58 60.96)
 		)
 		(stroke
@@ -2380,23 +2390,13 @@
 	)
 	(wire
 		(pts
-			(xy 83.82 113.03) (xy 92.71 113.03)
+			(xy 83.82 124.46) (xy 92.71 124.46)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "5382cf30-fb57-4500-86f1-1d659dd09a06")
-	)
-	(wire
-		(pts
-			(xy 68.58 113.03) (xy 68.58 101.6)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "55756582-d678-4559-a4d6-98f074dd01ab")
 	)
 	(wire
 		(pts
@@ -2410,7 +2410,7 @@
 	)
 	(wire
 		(pts
-			(xy 96.52 101.6) (xy 92.71 101.6)
+			(xy 96.52 109.22) (xy 92.71 109.22)
 		)
 		(stroke
 			(width 0)
@@ -2420,7 +2420,7 @@
 	)
 	(wire
 		(pts
-			(xy 96.52 74.93) (xy 96.52 101.6)
+			(xy 96.52 74.93) (xy 96.52 109.22)
 		)
 		(stroke
 			(width 0)
@@ -2460,6 +2460,16 @@
 	)
 	(wire
 		(pts
+			(xy 68.58 95.25) (xy 68.58 109.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8351c0ae-640f-47f2-80d3-0211ea4e7e7a")
+	)
+	(wire
+		(pts
 			(xy 105.41 97.79) (xy 105.41 105.41)
 		)
 		(stroke
@@ -2470,7 +2480,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 113.03) (xy 97.79 113.03)
+			(xy 92.71 124.46) (xy 97.79 124.46)
 		)
 		(stroke
 			(width 0)
@@ -2490,26 +2500,6 @@
 	)
 	(wire
 		(pts
-			(xy 68.58 90.17) (xy 68.58 101.6)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "98d159ba-af1d-4b52-87b2-33547627a791")
-	)
-	(wire
-		(pts
-			(xy 105.41 74.93) (xy 96.52 74.93)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "98e230d3-9b26-4a53-8927-abc2d1e0bcd8")
-	)
-	(wire
-		(pts
 			(xy 92.71 67.31) (xy 92.71 69.85)
 		)
 		(stroke
@@ -2517,16 +2507,6 @@
 			(type default)
 		)
 		(uuid "99e8358b-6b00-4bb9-ab29-4583270c2f3d")
-	)
-	(wire
-		(pts
-			(xy 97.79 77.47) (xy 97.79 113.03)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a3383d60-cc66-4ccd-85ae-765562d84924")
 	)
 	(wire
 		(pts
@@ -2540,7 +2520,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 101.6) (xy 83.82 101.6)
+			(xy 92.71 109.22) (xy 83.82 109.22)
 		)
 		(stroke
 			(width 0)
@@ -2560,7 +2540,17 @@
 	)
 	(wire
 		(pts
-			(xy 68.58 67.31) (xy 68.58 78.74)
+			(xy 97.79 77.47) (xy 105.41 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bee44dde-5a9d-4832-be1b-7482842d87b5")
+	)
+	(wire
+		(pts
+			(xy 68.58 67.31) (xy 68.58 81.28)
 		)
 		(stroke
 			(width 0)
@@ -2570,7 +2560,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 90.17) (xy 83.82 90.17)
+			(xy 92.71 95.25) (xy 83.82 95.25)
 		)
 		(stroke
 			(width 0)
@@ -2600,7 +2590,17 @@
 	)
 	(wire
 		(pts
-			(xy 68.58 78.74) (xy 68.58 90.17)
+			(xy 96.52 74.93) (xy 105.41 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d35ba73b-0e06-4a5b-baa2-81f77fd59780")
+	)
+	(wire
+		(pts
+			(xy 68.58 81.28) (xy 68.58 95.25)
 		)
 		(stroke
 			(width 0)
@@ -2610,7 +2610,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 78.74) (xy 92.71 81.28)
+			(xy 92.71 81.28) (xy 92.71 83.82)
 		)
 		(stroke
 			(width 0)
@@ -2630,7 +2630,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 101.6) (xy 92.71 104.14)
+			(xy 92.71 109.22) (xy 92.71 111.76)
 		)
 		(stroke
 			(width 0)
@@ -2640,7 +2640,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 113.03) (xy 92.71 115.57)
+			(xy 92.71 124.46) (xy 92.71 127)
 		)
 		(stroke
 			(width 0)
@@ -2670,7 +2670,7 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 78.74) (xy 68.58 78.74)
+			(xy 73.66 81.28) (xy 68.58 81.28)
 		)
 		(stroke
 			(width 0)
@@ -2905,6 +2905,39 @@
 				)
 			)
 		)
+		(property "Ideal Part Number" "74HC165D,653"
+			(at 118.11 80.01 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" "https://www.digikey.se/sv/products/detail/nexperia-usa-inc/74HC165D-653/763013"
+			(at 118.11 80.01 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" "Nexperia USA Inc."
+			(at 118.11 80.01 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "186b8426-cb09-499b-b060-4a5934ea719f")
 		)
@@ -2965,7 +2998,7 @@
 	(symbol
 		(lib_name "R_2")
 		(lib_id "Device:R")
-		(at 88.9 104.14 270)
+		(at 88.9 111.76 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -2976,7 +3009,7 @@
 		(fields_autoplaced yes)
 		(uuid "13fed0fb-65b3-48e7-a4d0-826aba88f018")
 		(property "Reference" "R4"
-			(at 88.9 97.79 90)
+			(at 88.9 105.41 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -2986,7 +3019,7 @@
 			)
 		)
 		(property "Value" "10K"
-			(at 88.9 100.33 90)
+			(at 88.9 107.95 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -2996,7 +3029,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 88.9 102.362 90)
+			(at 88.9 109.982 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3007,7 +3040,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 88.9 104.14 0)
+			(at 88.9 111.76 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3018,7 +3051,40 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 88.9 104.14 0)
+			(at 88.9 111.76 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Ideal Part Number" ""
+			(at 88.9 111.76 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 88.9 111.76 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 88.9 111.76 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3068,6 +3134,7 @@
 		)
 		(property "Value" "GND"
 			(at 97.79 82.5499 90)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3124,7 +3191,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_Push")
-		(at 78.74 101.6 0)
+		(at 78.74 109.22 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -3135,7 +3202,7 @@
 		(fields_autoplaced yes)
 		(uuid "270a699c-b8b8-4f47-aa28-eb66b0aa3c94")
 		(property "Reference" "SW4"
-			(at 78.74 93.98 0)
+			(at 78.74 101.6 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3145,7 +3212,7 @@
 			)
 		)
 		(property "Value" "SW_Push"
-			(at 78.74 96.52 0)
+			(at 78.74 104.14 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3155,7 +3222,7 @@
 			)
 		)
 		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
-			(at 78.74 96.52 0)
+			(at 78.74 104.14 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3166,7 +3233,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 78.74 96.52 0)
+			(at 78.74 104.14 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3177,7 +3244,40 @@
 			)
 		)
 		(property "Description" "Push button switch, generic, two pins"
-			(at 78.74 101.6 0)
+			(at 78.74 109.22 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Ideal Part Number" ""
+			(at 78.74 109.22 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 78.74 109.22 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 78.74 109.22 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3204,7 +3304,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 85.09 81.28 0)
+		(at 85.09 83.82 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -3214,7 +3314,7 @@
 		(dnp no)
 		(uuid "359321eb-42a4-47ac-b569-90ee79222ddf")
 		(property "Reference" "#PWR05"
-			(at 85.09 87.63 0)
+			(at 85.09 90.17 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3225,7 +3325,8 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 85.09 88.9 0)
+			(at 85.09 91.44 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3235,7 +3336,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 85.09 81.28 0)
+			(at 85.09 83.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3246,7 +3347,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 85.09 81.28 0)
+			(at 85.09 83.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3257,7 +3358,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 85.09 81.28 0)
+			(at 85.09 83.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3359,7 +3460,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_Push")
-		(at 78.74 78.74 0)
+		(at 78.74 81.28 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -3370,7 +3471,7 @@
 		(fields_autoplaced yes)
 		(uuid "411d8208-81df-4621-a8e7-d742cba155e0")
 		(property "Reference" "SW2"
-			(at 78.74 71.12 0)
+			(at 78.74 73.66 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3380,7 +3481,7 @@
 			)
 		)
 		(property "Value" "SW_Push"
-			(at 78.74 73.66 0)
+			(at 78.74 76.2 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3390,7 +3491,7 @@
 			)
 		)
 		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
-			(at 78.74 73.66 0)
+			(at 78.74 76.2 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3401,7 +3502,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 78.74 73.66 0)
+			(at 78.74 76.2 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3412,7 +3513,40 @@
 			)
 		)
 		(property "Description" "Push button switch, generic, two pins"
-			(at 78.74 78.74 0)
+			(at 78.74 81.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Ideal Part Number" ""
+			(at 78.74 81.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 78.74 81.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 78.74 81.28 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3439,7 +3573,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 85.09 92.71 0)
+		(at 85.09 97.79 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -3449,7 +3583,7 @@
 		(dnp no)
 		(uuid "44d565b7-bd6b-4fe1-8332-d3d3d7143f4c")
 		(property "Reference" "#PWR06"
-			(at 85.09 99.06 0)
+			(at 85.09 104.14 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3460,7 +3594,8 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 85.09 100.33 0)
+			(at 85.09 105.41 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3470,7 +3605,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 85.09 92.71 0)
+			(at 85.09 97.79 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3481,7 +3616,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 85.09 92.71 0)
+			(at 85.09 97.79 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3492,7 +3627,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 85.09 92.71 0)
+			(at 85.09 97.79 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3581,6 +3716,39 @@
 				)
 			)
 		)
+		(property "Ideal Part Number" ""
+			(at 48.26 85.09 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 48.26 85.09 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 48.26 85.09 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "58ecc2a4-4069-457d-8523-090edd96ceb3")
 		)
@@ -3642,6 +3810,7 @@
 		)
 		(property "Value" "GND"
 			(at 59.69 80.0099 90)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3698,7 +3867,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 88.9 81.28 90)
+		(at 88.9 83.82 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -3709,16 +3878,6 @@
 		(fields_autoplaced yes)
 		(uuid "5554dbdc-3cf5-4a9b-ae64-01f2efea4bf9")
 		(property "Reference" "R2"
-			(at 88.9 74.93 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10K"
 			(at 88.9 77.47 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3728,8 +3887,18 @@
 				)
 			)
 		)
+		(property "Value" "10K"
+			(at 88.9 80.01 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 88.9 83.058 90)
+			(at 88.9 85.598 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3740,7 +3909,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 88.9 81.28 0)
+			(at 88.9 83.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3751,7 +3920,40 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 88.9 81.28 0)
+			(at 88.9 83.82 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Ideal Part Number" ""
+			(at 88.9 83.82 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 88.9 83.82 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 88.9 83.82 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3779,7 +3981,7 @@
 	(symbol
 		(lib_name "R_3")
 		(lib_id "Device:R")
-		(at 88.9 115.57 270)
+		(at 88.9 127 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -3790,7 +3992,7 @@
 		(fields_autoplaced yes)
 		(uuid "56f46a1e-95ed-4b9d-b6f1-be9e4c4d964b")
 		(property "Reference" "R5"
-			(at 88.9 109.22 90)
+			(at 88.9 120.65 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3800,7 +4002,7 @@
 			)
 		)
 		(property "Value" "10K"
-			(at 88.9 111.76 90)
+			(at 88.9 123.19 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -3810,7 +4012,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 88.9 113.792 90)
+			(at 88.9 125.222 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3821,7 +4023,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 88.9 115.57 0)
+			(at 88.9 127 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3832,7 +4034,40 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 88.9 115.57 0)
+			(at 88.9 127 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Ideal Part Number" ""
+			(at 88.9 127 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 88.9 127 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 88.9 127 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4096,7 +4331,7 @@
 	(symbol
 		(lib_name "R_4")
 		(lib_id "Device:R")
-		(at 88.9 92.71 270)
+		(at 88.9 97.79 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4107,7 +4342,7 @@
 		(fields_autoplaced yes)
 		(uuid "7e702661-619e-4be0-9112-1c2b89aa92da")
 		(property "Reference" "R3"
-			(at 88.9 86.36 90)
+			(at 88.9 91.44 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4117,7 +4352,7 @@
 			)
 		)
 		(property "Value" "10K"
-			(at 88.9 88.9 90)
+			(at 88.9 93.98 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4127,7 +4362,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 88.9 90.932 90)
+			(at 88.9 96.012 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4138,7 +4373,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 88.9 92.71 0)
+			(at 88.9 97.79 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4149,7 +4384,40 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 88.9 92.71 0)
+			(at 88.9 97.79 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Ideal Part Number" ""
+			(at 88.9 97.79 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 88.9 97.79 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 88.9 97.79 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4199,6 +4467,7 @@
 		)
 		(property "Value" "GND"
 			(at 118.11 110.49 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4412,7 +4681,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 85.09 104.14 0)
+		(at 85.09 111.76 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4423,7 +4692,7 @@
 		(fields_autoplaced yes)
 		(uuid "b4fa86f2-c50f-47e9-af66-ae8727208afe")
 		(property "Reference" "#PWR07"
-			(at 85.09 110.49 0)
+			(at 85.09 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4434,7 +4703,8 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 85.09 109.22 0)
+			(at 85.09 116.84 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4444,7 +4714,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 85.09 104.14 0)
+			(at 85.09 111.76 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4455,7 +4725,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 85.09 104.14 0)
+			(at 85.09 111.76 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4466,7 +4736,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 85.09 104.14 0)
+			(at 85.09 111.76 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4490,7 +4760,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 85.09 115.57 0)
+		(at 85.09 127 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4501,7 +4771,7 @@
 		(fields_autoplaced yes)
 		(uuid "b6cc6c82-9cee-400b-aac7-42a2aebd50dd")
 		(property "Reference" "#PWR08"
-			(at 85.09 121.92 0)
+			(at 85.09 133.35 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4512,7 +4782,8 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 85.09 120.65 0)
+			(at 85.09 132.08 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4522,7 +4793,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 85.09 115.57 0)
+			(at 85.09 127 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4533,7 +4804,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 85.09 115.57 0)
+			(at 85.09 127 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4544,7 +4815,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 85.09 115.57 0)
+			(at 85.09 127 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4712,6 +4983,39 @@
 				)
 			)
 		)
+		(property "Ideal Part Number" ""
+			(at 149.86 85.09 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 149.86 85.09 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 149.86 85.09 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "58ecc2a4-4069-457d-8523-090edd96ceb4")
 		)
@@ -4814,6 +5118,39 @@
 				)
 			)
 		)
+		(property "Ideal Part Number" ""
+			(at 88.9 69.85 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 88.9 69.85 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 88.9 69.85 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "1e1ceb46-85f1-4410-968b-98a50f2ec72c")
 		)
@@ -4831,7 +5168,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_Push")
-		(at 78.74 90.17 0)
+		(at 78.74 95.25 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4842,7 +5179,7 @@
 		(fields_autoplaced yes)
 		(uuid "d8d18e61-6b40-44f3-a091-951c90f393a9")
 		(property "Reference" "SW3"
-			(at 78.74 82.55 0)
+			(at 78.74 87.63 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4852,7 +5189,7 @@
 			)
 		)
 		(property "Value" "SW_Push"
-			(at 78.74 85.09 0)
+			(at 78.74 90.17 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4862,7 +5199,7 @@
 			)
 		)
 		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
-			(at 78.74 85.09 0)
+			(at 78.74 90.17 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4873,7 +5210,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 78.74 85.09 0)
+			(at 78.74 90.17 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4884,7 +5221,40 @@
 			)
 		)
 		(property "Description" "Push button switch, generic, two pins"
-			(at 78.74 90.17 0)
+			(at 78.74 95.25 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Ideal Part Number" ""
+			(at 78.74 95.25 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 78.74 95.25 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 78.74 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4911,7 +5281,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_Push")
-		(at 78.74 113.03 0)
+		(at 78.74 124.46 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4922,7 +5292,7 @@
 		(fields_autoplaced yes)
 		(uuid "e09d847f-cd1c-4a58-b8f2-9a3ed8d23e04")
 		(property "Reference" "SW5"
-			(at 78.74 105.41 0)
+			(at 78.74 116.84 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4932,7 +5302,7 @@
 			)
 		)
 		(property "Value" "SW_Push"
-			(at 78.74 107.95 0)
+			(at 78.74 119.38 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4942,7 +5312,7 @@
 			)
 		)
 		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
-			(at 78.74 107.95 0)
+			(at 78.74 119.38 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4953,7 +5323,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 78.74 107.95 0)
+			(at 78.74 119.38 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4964,7 +5334,40 @@
 			)
 		)
 		(property "Description" "Push button switch, generic, two pins"
-			(at 78.74 113.03 0)
+			(at 78.74 124.46 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Ideal Part Number" ""
+			(at 78.74 124.46 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 78.74 124.46 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 78.74 124.46 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5013,6 +5416,7 @@
 		)
 		(property "Value" "GND"
 			(at 85.09 77.47 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5210,6 +5614,39 @@
 				)
 			)
 		)
+		(property "Ideal Part Number" ""
+			(at 78.74 67.31 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Order Link" ""
+			(at 78.74 67.31 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Vendor" ""
+			(at 78.74 67.31 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "57fbb93e-fe6a-4120-abeb-95a884b6203f")
 		)
@@ -5250,6 +5687,7 @@
 		)
 		(property "Value" "GND"
 			(at 137.16 80.0099 90)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
