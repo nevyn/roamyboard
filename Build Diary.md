@@ -221,12 +221,13 @@ For the pin situation... I think we're going to have to give up on pogo pins :( 
 * Pins
 	* Data sheet: https://content.harwin.com/m/0e0398fdb977d498/original/DRG-02613-Technical-Drawing-Datasheet-M20-791R-pdf.pdf
 	* Product, wrong pin count: https://www.digikey.se/en/products/detail/harwin-inc/M20-7910642R/6559284
+	* Product, 3 pins: https://www.digikey.se/en/products/detail/harwin-inc/M20-7910342R/6559281
 * Then I need socket too
-* Try to have it 
+* This means I have to completely redo the module chassi to be something that clicks together from the side, instead of slides in from the top :( Don't know how I'm going to be able to do that with enough mechanical strength to not break... also, since there is an angle, I'm going to have to BEND THE PINS of the male connectors :( And just HOPE that that actually mates when I redesign the case and put everything together...
 
 TODO:
-- [ ] Fix up footprint for 3 pins
-- [ ] Also make footprint for male side
+- [ ] Fix up footprint for 3 pins instead of 2 pins
+- [ ] Also make footprint for male side ()
 - [ ] Change footprint in schematic
 - [ ] Reroute with new footprints
 
