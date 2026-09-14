@@ -66,6 +66,21 @@ After parallel load (PL pulse), the 74HC165 shifts bits out of QH in this order:
 | Harwin M20-7910342R   | 3 x module count  | 1×3 horizontal SMT socket (female), left board edge        |
 | Harwin M20-8890345R   | 3 x module count  | 1×3 horizontal SMT pin header (male), right board edge     |
 
+### Board geometry at the joint
+
+Numbers the key module PCB and the case both build on (the case still has to be redrawn for them):
+
+| Item | Value | Why |
+| ---- | ----- | --- |
+| Board width | 16.5 mm | choc hotswap footprint needs 6.75 mm left and 9.55 mm right of the key center; keys stay centered on the case, the board is just narrower |
+| Header origin (pad row) | 4.1 mm inside the right edge | body face flush with the board edge, all 6 mm of pin overhang |
+| Socket origin (pad row) | 9.15 mm inside the left edge | mouth overhangs the board by 2.0 mm, flush with a 1.8 mm wall plus 0.2 mm clearance |
+| Board-to-board gap | 4.0 mm | two 1.8 mm walls plus clearance; gives 4.0 mm pin insertion, 1.5 mm past the socket contact point |
+| Pin bend | 2.0 mm from the header body, 8° | at the joint plane; the jig in case/roamy-v3.py bends this |
+| Connector rows | y = 65, 84 and 122 mm in the PCB file | the gaps between keys 5/4, 4/3 and 2/1; the 3/2 gap holds the 165 and its pull-downs |
+
+The connectors overlap the keyswitch courtyards on the back by design: the courtyard is the switch body on the front, and on the back the only obstacles are the hotswap socket and the locating pins, which the rows above clear by at least 1 mm.
+
 KiCad footprints for both live in `KeyModule/Library.pretty` and are generated from the datasheet dimensions by `tools/harwin_footprints.py`; edit the script, not the `.kicad_mod` files.
 
 ## Schematic
