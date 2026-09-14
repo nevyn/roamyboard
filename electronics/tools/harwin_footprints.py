@@ -48,8 +48,12 @@ def pad(n, x, w, h):
             f" (layers \"F.Cu\" \"F.Mask\" \"F.Paste\") (roundrect_rratio 0.15) (uuid \"{uid()}\"))")
 
 
-def footprint(name, descr, datasheet, n, pad_h, body_w, body_d, pad_center_from_body, extra_fab, extra_depth):
-    """extra_fab: list of fab lines drawn beyond the body; extra_depth: how far they reach past it."""
+def footprint(name, descr, datasheet, n, pad_h, body_w, body_d, pad_center_from_body, extra_fab, extra_depth, pin1_at_plus_x=False):
+    """extra_fab: list of fab lines drawn beyond the body; extra_depth: how far they reach past it.
+
+    Sockets sit on the left board edge and headers on the right, both on the back, so their
+    pin rows run in opposite directions; the header numbers its pads from +x so that pin 1
+    of both lands at the same end of the module."""
     xs = [(i - (n - 1) / 2) * PITCH for i in range(n)]
     body_y1 = -pad_center_from_body            # body face on the tail side
     body_y0 = body_y1 - body_d
@@ -58,6 +62,7 @@ def footprint(name, descr, datasheet, n, pad_h, body_w, body_d, pad_center_from_
     cy1 = pad_h / 2 + COURTYARD
     cx = max(half_w, xs[-1] + 0.51) + COURTYARD
     silk_y = pad_h / 2 + 0.3                   # silk stays clear of the pads
+    pin1_x = xs[-1] if pin1_at_plus_x else xs[0]
     parts = [
         f"(footprint \"{name}\"",
         "\t(version 20260206)", "\t(generator \"harwin_footprints.py\")", "\t(generator_version \"10.0\")",
@@ -75,8 +80,8 @@ def footprint(name, descr, datasheet, n, pad_h, body_w, body_d, pad_center_from_
         line((-half_w, body_y0), (-half_w, body_y1), "F.SilkS", SILK_W),
         line((half_w, body_y0), (half_w, body_y1), "F.SilkS", SILK_W),
         line((-half_w, body_y0), (half_w, body_y0), "F.SilkS", SILK_W),
-        line((xs[0] - 0.6, silk_y), (xs[0] - 0.6, silk_y + 0.8), "F.SilkS", SILK_W),
-        *[pad(i + 1, x, 1.02, pad_h) for i, x in enumerate(xs)],
+        line((pin1_x - 0.6, silk_y), (pin1_x - 0.6, silk_y + 0.8), "F.SilkS", SILK_W),
+        *[pad(n - i if pin1_at_plus_x else i + 1, x, 1.02, pad_h) for i, x in enumerate(xs)],
         f"\t(fp_text user \"${{REFERENCE}}\" (at 0 {(body_y0 + body_y1) / 2:.2f} 0) (layer \"F.Fab\")"
         f" (uuid \"{uid()}\") (effects (font (size 0.5 0.5) (thickness 0.1))))",
         ")",
@@ -112,7 +117,7 @@ def header(n):
         descr=f"Harwin M20-889{n:02d}45R, 1x{n} 2.54mm SIL pin header, horizontal SMT, pins overhang board edge",
         datasheet="https://content.harwin.com/asset/bcd8efee-7ad9-4ddd-8fcc-2925970fdfe6/DRG-02615-Technical-Drawing-Datasheet-M20-889-pdf.pdf",
         n=n, pad_h=3.17, body_w=body_w, body_d=2.50, pad_center_from_body=1.60,
-        extra_fab=pins, extra_depth=6.00,
+        extra_fab=pins, extra_depth=6.00, pin1_at_plus_x=True,
     )
 
 
