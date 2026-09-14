@@ -189,3 +189,11 @@ Here's Gergo for reference:
 As for metrics, Raj says:
 > I’d recommend not trying to design in every little detail. Maybe start with a rough shape with holes for switches. The choc keys are 14x14 square. Should be 1mm deep wall for the clips to work
 
+## 4.0 (planned)
+The PCB design in [[Electronics]] fixes what the case has to become:
+- [ ] PCB pocket for a 16.5 x 100 mm board, connectors on its underside, 2.5 mm tall
+- [ ] Side walls 1.2 mm so the column pitch lands near 19.3 mm (the 3.3 walls + gap of v3 gave 24 mm with this board)
+- [ ] Three slots through the slanted (right) wall for the header pins, three pockets in the flat (left) wall for the socket mouths, rows at 25, 44 and 82 mm from the top end
+- [ ] Modules click straight together; the T-slot tongue and groove goes away
+- [ ] Pin bend jig printed from build/roamy_pin_jig_base.stl and _ram.stl
+

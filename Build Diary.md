@@ -237,3 +237,14 @@ TODO:
 *2026-09-14*
 
 Came back after five months. The hand-made 3-pin footprint was a 2-pin one with a third pad glued on, so it was 1.27 mm off-center. Replaced both connector footprints with ones generated from the Harwin drawings (`electronics/tools/harwin_footprints.py`): socket M20-7910342R for the left edge, pin header M20-8890345R for the right edge. Next: swap the twelve placeholder footprints on the board for the real ones, fix the schematic connectors (still 1×9), and reroute.
+
+### Placed
+*2026-09-14, later*
+
+Connectors placed in the gaps between keys, board narrowed to 16.5 mm (see the geometry table in [[Electronics]]). Old routing is stale and gets redone.
+
+TODO:
+- [ ] Reroute the key module
+- [ ] Case v4 for the PCB: pocket for a 16.5 mm board, 1.2 mm side walls (column pitch ~19.3 mm), three pin slots through the slanted wall, three socket pockets in the flat wall, click joint instead of the T-slot. Numbers in [[Electronics]].
+- [ ] Print the pin bend jig (build/roamy_pin_jig_*.stl) and bend one header to check springback
+

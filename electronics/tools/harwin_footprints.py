@@ -84,6 +84,8 @@ def footprint(name, descr, datasheet, n, pad_h, body_w, body_d, pad_center_from_
         *[pad(n - i if pin1_at_plus_x else i + 1, x, 1.02, pad_h) for i, x in enumerate(xs)],
         f"\t(fp_text user \"${{REFERENCE}}\" (at 0 {(body_y0 + body_y1) / 2:.2f} 0) (layer \"F.Fab\")"
         f" (uuid \"{uid()}\") (effects (font (size 0.5 0.5) (thickness 0.1))))",
+        f"\t(model \"${{KIPRJMOD}}/Library.3dshapes/{name.removesuffix('_Horizontal_SMD')}.step\""
+        " (offset (xyz 0 0 0)) (scale (xyz 1 1 1)) (rotate (xyz 0 0 0)))",
         ")",
     ]
     (OUT / f"{name}.kicad_mod").write_text("\n".join(parts) + "\n")
