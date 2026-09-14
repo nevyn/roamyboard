@@ -18,7 +18,7 @@ The 9 signals are distributed across **three 1×3 connector pairs** — top, mid
 - Matching 9-pin pogo-pin connectors were prohibitively expensive (~$10 per pin header, 12+ per keyboard)
 - Three 1×3 connectors fit within the keyswitch courtyard constraints on the PCB, whereas a single 1×9 did not
 
-Connectors used: **Harwin M20-791R series** pin header (male) and matching socket. See [datasheet](https://content.harwin.com/m/0e0398fdb977d498/original/DRG-02613-Technical-Drawing-Datasheet-M20-791R-pdf.pdf). The connectors are laid flat and protrude past the board edge so modules can click into each other straight-on.
+Connectors used: **Harwin M20-889** pin header (male, [DRG-02615](https://content.harwin.com/asset/bcd8efee-7ad9-4ddd-8fcc-2925970fdfe6/DRG-02615-Technical-Drawing-Datasheet-M20-889-pdf.pdf)) on the right edge, mating with the **Harwin M20-791** socket (female, [DRG-02613](https://content.harwin.com/m/0e0398fdb977d498/original/DRG-02613-Technical-Drawing-Datasheet-M20-791R-pdf.pdf)) on the left edge. Both are 1×3, horizontal SMT, mounted on the back of the board, laid flat so the pins and the socket mouth protrude past the board edge and modules click into each other straight-on. Because adjacent modules meet at the case's 8° joint angle, the pins are bent 8° after soldering so they enter the next module's sockets along its board plane. See [[Images/module-joint.svg]].
 
 v3.0 pinout (1 = topmost pin within each connector):
 ```
@@ -60,10 +60,10 @@ After parallel load (PL pulse), the 74HC165 shifts bits out of QH in this order:
 | -------------- | ------------------------ | ---------------------------------------------------------- |
 | nice!nano v2.9 | 1                        |                                                            |
 | 74HC165        | 1 x key module count     | Shift register for reporting key states over a serial line |
-| Harwin M20-7910342R   | 3 x module count  | 1×3 horizontal SMT socket (female), mounts at board edge   |
-| Harwin M20-8890345*   | 3 x module count  | 1×3 horizontal SMT pin header (male), mating partner       |
+| Harwin M20-7910342R   | 3 x module count  | 1×3 horizontal SMT socket (female), left board edge        |
+| Harwin M20-8890345R   | 3 x module count  | 1×3 horizontal SMT pin header (male), right board edge     |
 
-_*Male part number to be verified against Harwin's ordering code before purchase — the horizontal SMT male series uses an ambiguous suffix pattern in the catalog._
+KiCad footprints for both live in `KeyModule/Library.pretty` and are generated from the datasheet dimensions by `tools/harwin_footprints.py`; edit the script, not the `.kicad_mod` files.
 
 ## Schematic
 ![[KeyModuleSchematic.png]]

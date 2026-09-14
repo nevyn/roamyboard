@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 780" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#333"/>
+    </marker>
+    <g id="keymod">
+      <rect x="0" y="0" width="80" height="180" fill="#2f7d4f" stroke="#1d5233"/>
+      <g fill="#333">
+        <rect x="-8" y="16" width="30" height="22"/><rect x="-8" y="84" width="30" height="22"/><rect x="-8" y="152" width="30" height="22"/>
+        <rect x="68" y="16" width="12" height="22"/><rect x="68" y="84" width="12" height="22"/><rect x="68" y="152" width="12" height="22"/>
+      </g>
+      <g fill="#c9a227">
+        <rect x="80" y="20" width="14" height="3"/><rect x="80" y="26" width="14" height="3"/><rect x="80" y="32" width="14" height="3"/>
+        <rect x="80" y="88" width="14" height="3"/><rect x="80" y="94" width="14" height="3"/><rect x="80" y="100" width="14" height="3"/>
+        <rect x="80" y="156" width="14" height="3"/><rect x="80" y="162" width="14" height="3"/><rect x="80" y="168" width="14" height="3"/>
+      </g>
+      <rect x="30" y="110" width="20" height="28" fill="#555"/>
+      <text x="40" y="70" fill="#fff" text-anchor="middle" font-size="11">key</text>
+      <text x="40" y="84" fill="#fff" text-anchor="middle" font-size="11">module</text>
+    </g>
+  </defs>
+  <rect width="1000" height="780" fill="#fbfbf8"/>
+  <text x="20" y="28" font-size="18" font-weight="bold" fill="#222">Roamyboard column-module joint</text>
+  <text x="20" y="48" fill="#555">Not to scale. Joint angle drawn at 18° for legibility; the case design uses 8° (case/roamy-v3.py: column_angle_deg).</text>
+
+  <!-- ============ Panel 1: end view ============ -->
+  <text x="20" y="90" font-size="15" font-weight="bold" fill="#222">End view, looking along the columns (keys up, leg below)</text>
+
+  <g transform="translate(40,170) scale(2)">
+    <!-- Module A: case 0..130 x, 0..60 y, right side slanted so the case narrows toward the leg -->
+    <polygon points="0,0 130,0 110.5,60 0,60" fill="#e9e4d6" stroke="#8a7d5c" stroke-width="0.8"/>
+    <rect x="40" y="-22" width="55" height="10" rx="2" fill="#c9c2ad" stroke="#8a7d5c" stroke-width="0.5"/>
+    <rect x="50" y="-12" width="35" height="12" fill="#d9d3c2" stroke="#8a7d5c" stroke-width="0.5"/>
+    <rect x="20" y="0" width="100" height="8" fill="#2f7d4f"/>
+    <!-- A's socket on the left edge, mouth flush with the case face -->
+    <rect x="0" y="8" width="42.5" height="12.5" fill="#333"/>
+    <rect x="1.5" y="12.4" width="14" height="3.6" fill="#fbfbf8"/>
+    <!-- A's pin header on the right edge -->
+    <rect x="102" y="8" width="12.5" height="12.5" fill="#333"/>
+    <!-- ghost: an unbent pin -->
+    <line x1="116.5" y1="14" x2="146" y2="14" stroke="#c9a227" stroke-width="0.8" stroke-dasharray="2 2"/>
+
+    <!-- Module B, rotated about A's top-right corner; its vertical left face lies on A's slanted face -->
+    <g transform="translate(130,0) rotate(18)">
+      <polygon points="0,0 130,0 110.5,60 0,60" fill="#e9e4d6" stroke="#8a7d5c" stroke-width="0.8"/>
+      <rect x="40" y="-22" width="55" height="10" rx="2" fill="#c9c2ad" stroke="#8a7d5c" stroke-width="0.5"/>
+      <rect x="50" y="-12" width="35" height="12" fill="#d9d3c2" stroke="#8a7d5c" stroke-width="0.5"/>
+      <rect x="20" y="0" width="100" height="8" fill="#2f7d4f"/>
+      <!-- B's socket drawn as a section so the pin shows inside; red tick = contact point 2.5 mm in -->
+      <rect x="0" y="8" width="42.5" height="12.5" fill="#333"/>
+      <rect x="0" y="12.4" width="33" height="3.6" fill="#f4f1e8"/>
+      <line x1="12.5" y1="12" x2="12.5" y2="16.4" stroke="#b33" stroke-width="1"/>
+      <rect x="102" y="8" width="12.5" height="12.5" fill="#333"/>
+      <line x1="114.5" y1="14" x2="144.5" y2="14" stroke="#c9a227" stroke-width="3.2"/>
+    </g>
+    <!-- A's pins: straight out of the body, bent at the joint, then along B's board plane into B's socket -->
+    <polyline points="114.5,14 117,14 143.5,22.6" fill="none" stroke="#c9a227" stroke-width="3.2" stroke-linejoin="round"/>
+
+    <!-- joint angle -->
+    <line x1="130" y1="0" x2="215" y2="0" stroke="#b33" stroke-width="0.5" stroke-dasharray="2 2"/>
+    <path d="M 200,0 A 70,70 0 0 1 196.6,21.6" fill="none" stroke="#b33" stroke-width="0.7"/>
+
+    <!-- numbered tags -->
+    <g font-size="7" font-weight="bold" fill="#fff" text-anchor="middle">
+      <g transform="translate(-10,14)"><circle r="5" fill="#b33"/><text y="2.5">1</text></g>
+      <g transform="translate(60,-30)"><circle r="5" fill="#b33"/><text y="2.5">2</text></g>
+      <g transform="translate(108,30)"><circle r="5" fill="#b33"/><text y="2.5">3</text></g>
+      <g transform="translate(128,34)"><circle r="5" fill="#b33"/><text y="2.5">4</text></g>
+      <g transform="translate(150,64)"><circle r="5" fill="#b33"/><text y="2.5">5</text></g>
+      <g transform="translate(154,8)"><circle r="5" fill="#b33"/><text y="2.5">6</text></g>
+      <g transform="translate(212,12)"><circle r="5" fill="#b33"/><text y="2.5">7</text></g>
+      <g transform="translate(120,90)"><circle r="5" fill="#b33"/><text y="2.5">8</text></g>
+    </g>
+    <g stroke="#b33" stroke-width="0.5" fill="none">
+      <line x1="-5" y1="14" x2="1" y2="14"/>
+      <line x1="60" y1="-25" x2="60" y2="-1"/>
+      <line x1="108" y1="25" x2="108" y2="20"/>
+      <line x1="125" y1="30" x2="118" y2="16"/>
+      <line x1="145" y1="62" x2="121" y2="30"/>
+      <line x1="149" y1="10" x2="146" y2="13"/>
+      <line x1="120" y1="85" x2="120" y2="20.5"/>
+    </g>
+  </g>
+
+  <g transform="translate(600,150)" fill="#333">
+    <text y="0" font-weight="bold">Legend</text>
+    <text y="24"><tspan fill="#b33" font-weight="bold">1</tspan>  M20-791 socket (female), mouth flush with the case face</text>
+    <text y="46"><tspan fill="#b33" font-weight="bold">2</tspan>  PCB; all connectors sit on the back, keys on the front</text>
+    <text y="68"><tspan fill="#b33" font-weight="bold">3</tspan>  M20-889 pin header (male), 6 mm pins overhang the edge</text>
+    <text y="90"><tspan fill="#b33" font-weight="bold">4</tspan>  pins bent to the joint angle where they leave the case</text>
+    <text y="112"><tspan fill="#b33" font-weight="bold">5</tspan>  slanted case side = pin side of every module</text>
+    <text y="134"><tspan fill="#b33" font-weight="bold">6</tspan>  dashed: an unbent pin would jam in the socket wall</text>
+    <text y="156"><tspan fill="#b33" font-weight="bold">7</tspan>  joint angle (8° real); modules form an arc, keys outward</text>
+    <text y="178"><tspan fill="#b33" font-weight="bold">8</tspan>  M20-791 socket of the next module; red tick = contact</text>
+    <text y="196">    point, 2.5 mm inside the mouth</text>
+    <text y="232" fill="#555">Left neighbour of every module is closer to the terminator,</text>
+    <text y="250" fill="#555">right neighbour closer to the MCU.</text>
+  </g>
+
+  <!-- ============ Panel 2: plan view ============ -->
+  <text x="20" y="440" font-size="15" font-weight="bold" fill="#222">Plan view of the PCBs, seen from the back (component side)</text>
+  <text x="20" y="460" fill="#555">Key module: 20 x 100 mm board, three 1x3 sockets on the left edge, three 1x3 headers on the right edge.</text>
+
+  <g transform="translate(120,500)">
+    <rect x="0" y="0" width="30" height="180" fill="#2f7d4f" stroke="#1d5233"/>
+    <text x="15" y="95" fill="#fff" text-anchor="middle" font-size="11" transform="rotate(-90 15 95)">terminator</text>
+    <g fill="#c9a227">
+      <rect x="30" y="20" width="14" height="3"/><rect x="30" y="26" width="14" height="3"/><rect x="30" y="32" width="14" height="3"/>
+      <rect x="30" y="88" width="14" height="3"/><rect x="30" y="94" width="14" height="3"/><rect x="30" y="100" width="14" height="3"/>
+      <rect x="30" y="156" width="14" height="3"/><rect x="30" y="162" width="14" height="3"/><rect x="30" y="168" width="14" height="3"/>
+    </g>
+    <use href="#keymod" x="60"/>
+    <use href="#keymod" x="170"/>
+    <text x="280" y="95" fill="#555">... more key modules, then the MCU module</text>
+
+    <line x1="60" y1="27" x2="60" y2="-10" stroke="#333" marker-start="url(#arr)"/>
+    <text x="70" y="-14" fill="#333">1x3 socket, three per left edge (top / middle / bottom)</text>
+    <line x1="146" y1="163" x2="146" y2="200" stroke="#333" marker-start="url(#arr)"/>
+    <text x="156" y="204" fill="#333">1x3 pin header, three per right edge; 9 signals per joint</text>
+  </g>
+
+  <text x="20" y="760" fill="#555">Signals: +5V, +3.3V, GND, /PL, CLK, DATA, NeoPixel, SDA, SCL (INT as spare). Which pin carries which is still TBD in Electronics.md.</text>
+</svg>

@@ -226,9 +226,14 @@ For the pin situation... I think we're going to have to give up on pogo pins :( 
 * This means I have to completely redo the module chassi to be something that clicks together from the side, instead of slides in from the top :( Don't know how I'm going to be able to do that with enough mechanical strength to not break... also, since there is an angle, I'm going to have to BEND THE PINS of the male connectors :( And just HOPE that that actually mates when I redesign the case and put everything together...
 
 TODO:
-- [ ] Fix up footprint for 3 pins instead of 2 pins
-- [ ] Also make footprint for male side ()
+- [x] Fix up footprint for 3 pins instead of 2 pins
+- [x] Also make footprint for male side ()
 - [ ] Change footprint in schematic
 - [ ] Reroute with new footprints
 
 ![[3x3-pins.png]]
+
+### Footprints, take two
+*2026-09-14*
+
+Came back after five months. The hand-made 3-pin footprint was a 2-pin one with a third pad glued on, so it was 1.27 mm off-center. Replaced both connector footprints with ones generated from the Harwin drawings (`electronics/tools/harwin_footprints.py`): socket M20-7910342R for the left edge, pin header M20-8890345R for the right edge. Next: swap the twelve placeholder footprints on the board for the real ones, fix the schematic connectors (still 1×9), and reroute.
