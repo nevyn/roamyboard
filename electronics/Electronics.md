@@ -26,10 +26,10 @@ v3.0 pinout. J_LEFT*n* are the sockets, J_RIGHT*n* the pin headers; pin 1 is the
 | Connector | Pin 1 | Pin 2 | Pin 3 |
 | --------- | ----- | ----- | ----- |
 | J_LEFT1 / J_RIGHT1 (top) | +5V | +3.3V | GND |
-| J_LEFT2 / J_RIGHT2 (middle) | CLK | DATA | /PL |
+| J_LEFT2 / J_RIGHT2 (middle) | CLK | /PL | DATA |
 | J_LEFT3 / J_RIGHT3 (bottom) | LED | SDA | SCL |
 
-DATA is the one signal that does not pass straight through: J_LEFT2 pin 2 is the 165's serial input and J_RIGHT2 pin 2 its serial output. INT was dropped; 9 pins is all three 1×3 connectors carry.
+DATA is the one signal that does not pass straight through: J_LEFT2 pin 3 is the 165's serial input and J_RIGHT2 pin 3 its serial output. It sits on the bottom pin because the two pass-through tracks above it would block every other way off the pad. INT was dropped; 9 pins is all three 1×3 connectors carry.
 ### MCU module
 The MCU module contains a nice!nano 2.0, battery, USB-C for wired connection and charging, and power switch. Possibly also an OLED display, and maybe a rotary encoder for settings (pairing, switching between profiles, controlling lighting, etc).
 

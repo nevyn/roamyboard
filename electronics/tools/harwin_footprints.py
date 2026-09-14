@@ -14,6 +14,7 @@ from pathlib import Path
 OUT = Path(__file__).resolve().parent.parent / "KeyModule" / "Library.pretty"
 PITCH = 2.54
 COURTYARD = 0.25
+ROW_COURTYARD = 0.05
 SILK_W = 0.12
 FAB_W = 0.10
 
@@ -60,7 +61,7 @@ def footprint(name, descr, datasheet, n, pad_h, body_w, body_d, pad_center_from_
     half_w = body_w / 2
     cy0 = body_y0 - extra_depth - COURTYARD
     cy1 = pad_h / 2 + COURTYARD
-    cx = max(half_w, xs[-1] + 0.51) + COURTYARD
+    cx = max(half_w, xs[-1] + 0.51) + ROW_COURTYARD   # the body sits 0.25 mm from key parts along the column
     silk_y = pad_h / 2 + 0.3                   # silk stays clear of the pads
     pin1_x = xs[-1] if pin1_at_plus_x else xs[0]
     parts = [

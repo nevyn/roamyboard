@@ -2955,7 +2955,7 @@
 		)
 		(uuid "867f1505-e682-48de-b5f9-b92034f6ecef")
 	)
-	(label "DATA_IN"
+	(label "PL"
 		(at 53.34 85.09 0)
 		(effects
 			(font
@@ -2965,7 +2965,7 @@
 		)
 		(uuid "955ec608-a369-4653-9fdf-da64493c8471")
 	)
-	(label "PL"
+	(label "DATA_IN"
 		(at 53.34 87.63 0)
 		(effects
 			(font
@@ -2975,7 +2975,7 @@
 		)
 		(uuid "95c3d957-2118-499a-aaca-b933d98982b1")
 	)
-	(label "DATA_OUT"
+	(label "PL"
 		(at 144.78 85.09 180)
 		(effects
 			(font
@@ -3015,7 +3015,7 @@
 		)
 		(uuid "fa198e6d-8d34-42b5-abab-7633f1cf7284")
 	)
-	(label "PL"
+	(label "DATA_OUT"
 		(at 144.78 87.63 180)
 		(effects
 			(font
