@@ -13,5 +13,6 @@ It's also a ridiculously modular design, since this means you can practically ma
 	- The leftmost column is the terminator (see [[Electronics]])
 		- It also has the leftmost fastener for the harness
 	- Modules are not intended to be connected/disconnected while powered.
-- Each column module mechanically joins together by sliding into grooves on the previous module's left side. Similar to Switch Joycons.
-	- This connector mechanic in the enclosure ensures alignment of the pogo pins
+- Each column module joins to the next by clicking straight on. Three 1×3 pin headers (male on one side, sockets on the other) at the top, middle, and bottom of the board edge carry the 9-signal interconnect (see [[Electronics]]). 
+	- The enclosure chassis reinforces the mechanical joint so the solder joints don't carry the load
+	- _Earlier iterations explored a Joycon-style slide-rail and pogo-pin connectors, but both were abandoned: pogo pins of the right pitch were prohibitively expensive, and the slide-rail geometry couldn't coexist with the PCB's keyswitch courtyards._

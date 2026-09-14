@@ -7,17 +7,26 @@
 
 Each column is its own module. There are three kinds of modules: MCU, Key and Terminator. The MCU is the rightmost, terminator the leftmost, and an arbitrary number of key modules in between.
 
-The interconnect between each module has pins for:
-- 5 VCC, 3.3 VCC and GND pins
+The interconnect between each module has 9 signals total:
+- Power: +5V, +3.3V, GND
 - Key input: /PL, CLK and DATA for the shift register
 - NeoPixel data line, to control RGB LEDs
 - Future proofing: three pins for I2C (SDA, SCL and INT). Useful if we want touch pad, etc
 
-v3.0 pinout is suggested to be this reduced set of pins, where 1 is the topmost pin
+The 9 signals are distributed across **three 1×3 connector pairs** — top, middle, and bottom of the board. This approach was chosen over a single 9-pin connector because:
+- Distributing the connection across three points along the board edge provides better mechanical stability between modules than a single point would
+- Matching 9-pin pogo-pin connectors were prohibitively expensive (~$10 per pin header, 12+ per keyboard)
+- Three 1×3 connectors fit within the keyswitch courtyard constraints on the PCB, whereas a single 1×9 did not
+
+Connectors used: **Harwin M20-791R series** pin header (male) and matching socket. See [datasheet](https://content.harwin.com/m/0e0398fdb977d498/original/DRG-02613-Technical-Drawing-Datasheet-M20-791R-pdf.pdf). The connectors are laid flat and protrude past the board edge so modules can click into each other straight-on.
+
+v3.0 pinout (1 = topmost pin within each connector):
 ```
-1     2     3     4     5     6      7     8    9
-+5V   +3.3V GND   CLK   DATA  /PL    LED   SDA  SCL   
+Top connector    Middle connector    Bottom connector
+1  2  3          1  2  3             1  2  3
+?  ?  ?          ?  ?  ?             ?  ?  ?
 ```
+_Pin assignments per connector: TBD — to be documented based on final PCB routing._
 ### MCU module
 The MCU module contains a nice!nano 2.0, battery, USB-C for wired connection and charging, and power switch. Possibly also an OLED display, and maybe a rotary encoder for settings (pairing, switching between profiles, controlling lighting, etc).
 
@@ -26,7 +35,7 @@ i2c pull-ups live in the MCU module, as does the neopixel series resistor.
 
 Each key module holds a 74HC165 shift register, to be able to transmit all of its up to seven keys in a serial stream on pin 5, controlled by pin 4 and 6. Each module also has neopixel RGB LEDs, one under each key, and key switch sockets so the user can use any switch they want.
 
-Modules connect via pogo pins on the right side and pads on the left side that accept the next module. The connector mechanic in the enclosure ensures alignment of the pogo pins.
+Modules connect via three pin headers (male, M20-791R) on the right side and matching sockets on the left side. The connectors are laid flat on the PCB and jut out past the board edge so modules click straight into each other. The enclosure chassis reinforces the joint mechanically so stress isn't borne by the solder joints.
 
 Each module has decoupling capacitors for both the 165 and NeoPixel data lines.
 ### Terminator module
@@ -47,12 +56,14 @@ After parallel load (PL pulse), the 74HC165 shifts bits out of QH in this order:
 
 ## Bill Of Materials
 
-| Identifier     | Count                | Description                                                |
-| -------------- | -------------------- | ---------------------------------------------------------- |
-| nice!nano v2.9 | 1                    |                                                            |
-| 74HC165        | 1 x key module count | Shift register for reporting key states over a serial line |
-| ??             | 1 x module count - 1 | Pogo pin for module interconnect (male)                    |
-| ??             | 1 x module count - 1 | Pogo pin for module interconnect (female)                  |
+| Identifier     | Count                    | Description                                                |
+| -------------- | ------------------------ | ---------------------------------------------------------- |
+| nice!nano v2.9 | 1                        |                                                            |
+| 74HC165        | 1 x key module count     | Shift register for reporting key states over a serial line |
+| Harwin M20-7910342R   | 3 x module count  | 1×3 horizontal SMT socket (female), mounts at board edge   |
+| Harwin M20-8890345*   | 3 x module count  | 1×3 horizontal SMT pin header (male), mating partner       |
+
+_*Male part number to be verified against Harwin's ordering code before purchase — the horizontal SMT male series uses an ambiguous suffix pattern in the catalog._
 
 ## Schematic
 ![[KeyModuleSchematic.png]]
