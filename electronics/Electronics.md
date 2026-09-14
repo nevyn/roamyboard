@@ -18,15 +18,18 @@ The 9 signals are distributed across **three 1×3 connector pairs** — top, mid
 - Matching 9-pin pogo-pin connectors were prohibitively expensive (~$10 per pin header, 12+ per keyboard)
 - Three 1×3 connectors fit within the keyswitch courtyard constraints on the PCB, whereas a single 1×9 did not
 
-Connectors used: **Harwin M20-889** pin header (male, [DRG-02615](https://content.harwin.com/asset/bcd8efee-7ad9-4ddd-8fcc-2925970fdfe6/DRG-02615-Technical-Drawing-Datasheet-M20-889-pdf.pdf)) on the right edge, mating with the **Harwin M20-791** socket (female, [DRG-02613](https://content.harwin.com/m/0e0398fdb977d498/original/DRG-02613-Technical-Drawing-Datasheet-M20-791R-pdf.pdf)) on the left edge. Both are 1×3, horizontal SMT, mounted on the back of the board, laid flat so the pins and the socket mouth protrude past the board edge and modules click into each other straight-on. Because adjacent modules meet at the case's 8° joint angle, the pins are bent 8° after soldering so they enter the next module's sockets along its board plane. See [[Images/module-joint.svg]].
+Connectors used: **Harwin M20-889** pin header (male, [DRG-02615](https://content.harwin.com/asset/bcd8efee-7ad9-4ddd-8fcc-2925970fdfe6/DRG-02615-Technical-Drawing-Datasheet-M20-889-pdf.pdf)) on the right edge, mating with the **Harwin M20-791** socket (female, [DRG-02613](https://content.harwin.com/m/0e0398fdb977d498/original/DRG-02613-Technical-Drawing-Datasheet-M20-791R-pdf.pdf)) on the left edge. Both are 1×3, horizontal SMT, mounted on the back of the board, laid flat so the pins and the socket mouth protrude past the board edge and modules click into each other straight-on. Because adjacent modules meet at the case's 8° joint angle, the pins are bent 8° after soldering so they enter the next module's sockets along its board plane.
+![[module-joint.svg]]
 
-v3.0 pinout (1 = topmost pin within each connector):
-```
-Top connector    Middle connector    Bottom connector
-1  2  3          1  2  3             1  2  3
-?  ?  ?          ?  ?  ?             ?  ?  ?
-```
-_Pin assignments per connector: TBD — to be documented based on final PCB routing._
+v3.0 pinout. J_LEFT*n* are the sockets, J_RIGHT*n* the pin headers; pin 1 is the topmost pin of each connector and the same signal sits on the same pin on both edges, so every signal passes straight through the module:
+
+| Connector | Pin 1 | Pin 2 | Pin 3 |
+| --------- | ----- | ----- | ----- |
+| J_LEFT1 / J_RIGHT1 (top) | +5V | +3.3V | GND |
+| J_LEFT2 / J_RIGHT2 (middle) | CLK | DATA | /PL |
+| J_LEFT3 / J_RIGHT3 (bottom) | LED | SDA | SCL |
+
+DATA is the one signal that does not pass straight through: J_LEFT2 pin 2 is the 165's serial input and J_RIGHT2 pin 2 its serial output. INT was dropped; 9 pins is all three 1×3 connectors carry.
 ### MCU module
 The MCU module contains a nice!nano 2.0, battery, USB-C for wired connection and charging, and power switch. Possibly also an OLED display, and maybe a rotary encoder for settings (pairing, switching between profiles, controlling lighting, etc).
 

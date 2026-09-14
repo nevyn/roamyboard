@@ -291,6 +291,68 @@ terminator_assembly.add(terminator_bottom, name="bottom", color=cq.Color("orange
 
 
 ########################################################
+# Pin bend jig
+########################################################
+# Bends the pins of a Harwin M20-889 1x3 header (electronics/Electronics.md) to the joint
+# angle before the header is soldered. The header body sits in a pocket, its pins lie on a
+# flat land for jig_bend_offset mm, then the ram presses them down onto the sloped floor.
+jig_body_w, jig_body_d, jig_body_h = 7.62, 2.50, 2.50  # header body: x along the pin row, y along the pins, z height
+jig_pin_sq, jig_pin_len, jig_tail_len = 0.64, 6.0, 3.0
+jig_bend_offset = 2.0   # straight pin length before the bend: the case wall thickness at PCB height
+jig_overbend_deg = 2.0  # brass springs back a little; bend past the joint angle by this much
+jig_fit = 0.15
+
+def make_pin_bend_jig():
+    base_w, base_d, base_h = 20.0, 18.0, 12.0
+    land_z = 6.0                                        # flat land under the straight pin part
+    pocket_w = jig_body_w + 2*jig_fit
+    body_floor_z = land_z - (jig_body_h - jig_pin_sq)/2  # so the pin underside rests on the land
+    y_face = -3.0                                       # header body front face; pins start here
+    y_bend = y_face + jig_bend_offset
+    ramp_len = jig_pin_len - jig_bend_offset + 1.0
+    ramp_drop = ramp_len * math.tan(math.radians(column_angle_deg + jig_overbend_deg))
+
+    base = cq.Workplane("XY").box(base_w, base_d, base_h, centered=(True, True, False))
+    body_pocket = (cq.Workplane("XY")
+        .box(pocket_w, jig_body_d + 2*jig_fit, base_h, centered=(True, False, False))
+        .translate((0, y_face - jig_body_d - 2*jig_fit, body_floor_z))
+    )
+    tail_relief = (cq.Workplane("XY")
+        .box(pocket_w, jig_tail_len + 1.0, base_h, centered=(True, False, False))
+        .translate((0, y_face - jig_body_d - 2*jig_fit - jig_tail_len - 1.0, body_floor_z - 2.0))
+    )
+    ram_slot = (cq.Workplane("XY")
+        .box(pocket_w, y_bend + ramp_len - y_face, base_h, centered=(True, False, False))
+        .translate((0, y_face, land_z))
+    )
+    ramp = (cq.Workplane("YZ")
+        .polyline([(y_bend, land_z), (y_bend + ramp_len, land_z), (y_bend + ramp_len, land_z - ramp_drop)]).close()
+        .extrude(pocket_w/2, both=True)
+    )
+    base = base.cut(body_pocket).cut(tail_relief).cut(ram_slot).cut(ramp)
+
+    # Ram: flat over the land, sloped over the ramp, always one pin thickness above the floor.
+    top_z = base_h + 5.0
+    y0, y1 = y_face + 0.25, y_bend + ramp_len - 0.25
+    ram = (cq.Workplane("YZ")
+        .polyline([
+            (y0, land_z + jig_pin_sq),
+            (y_bend, land_z + jig_pin_sq),
+            (y1, land_z + jig_pin_sq - (y1 - y_bend) * math.tan(math.radians(column_angle_deg + jig_overbend_deg))),
+            (y1, top_z),
+            (y0, top_z),
+        ]).close()
+        .extrude(pocket_w/2 - jig_fit, both=True)
+    )
+    return base, ram
+
+jig_base, jig_ram = make_pin_bend_jig()
+jig_assembly = cq.Assembly()
+jig_assembly.add(jig_base, name="base", color=cq.Color("gray"))
+jig_assembly.add(jig_ram.translate((0, 0, 10.0)), name="ram", color=cq.Color("blue"))
+
+
+########################################################
 # Meta work: previewing and printing
 ########################################################
 
@@ -323,6 +385,9 @@ show_recursive_assembly(full_assembly, "roamy")
 export(keys_assembly, "keys")
 export(mcu_assembly, "mcu")
 export(terminator_assembly, "terminator")
+cq.exporters.export(jig_base, "../build/roamy_pin_jig_base.stl")
+cq.exporters.export(jig_ram, "../build/roamy_pin_jig_ram.stl")
+show_recursive_assembly(jig_assembly, "jig")
 
 # Preview the full body with 6 columns
 if False:

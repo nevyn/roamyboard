@@ -15,4 +15,6 @@ It's also a ridiculously modular design, since this means you can practically ma
 	- Modules are not intended to be connected/disconnected while powered.
 - Each column module joins to the next by clicking straight on. Three 1×3 pin headers (male on one side, sockets on the other) at the top, middle, and bottom of the board edge carry the 9-signal interconnect (see [[Electronics]]). 
 	- The enclosure chassis reinforces the mechanical joint so the solder joints don't carry the load
+	- The pins are bent to the joint angle so they enter the next module's sockets along its board plane:
+	  ![[module-joint.svg]]
 	- _Earlier iterations explored a Joycon-style slide-rail and pogo-pin connectors, but both were abandoned: pogo pins of the right pitch were prohibitively expensive, and the slide-rail geometry couldn't coexist with the PCB's keyswitch courtyards._
