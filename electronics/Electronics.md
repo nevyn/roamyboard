@@ -5,7 +5,7 @@
 ## Concepts
 ### Column modules and interconnects
 
-Each column is its own module. There are three kinds of modules: MCU, Key and Terminator. The MCU is the rightmost, terminator the leftmost, and an arbitrary number of key modules in between.
+Each column is its own module. There are three kinds of modules: MCU, Key and Terminator. The MCU is the rightmost, terminator the leftmost, and an arbitrary number of key modules in between. A fourth kind, a trackpad column, is sketched in [[Touch module]] for later.
 
 The interconnect between each module has 9 signals total:
 - Power: +5V, +3.3V, GND
