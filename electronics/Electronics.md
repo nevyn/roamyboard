@@ -63,6 +63,7 @@ After parallel load (PL pulse), the 74HC165 shifts bits out of QH in this order:
 | -------------- | ------------------------ | ---------------------------------------------------------- |
 | nice!nano v2.9 | 1                        |                                                            |
 | 74HC165        | 1 x key module count     | Shift register for reporting key states over a serial line |
+| 100 nF 0805    | 1 x key module count     | Decoupling for the 165, on the front next to it             |
 | Harwin M20-7910342R   | 3 x module count  | 1×3 horizontal SMT socket (female), left board edge        |
 | Harwin M20-8890345R   | 3 x module count  | 1×3 horizontal SMT pin header (male), right board edge     |
 
