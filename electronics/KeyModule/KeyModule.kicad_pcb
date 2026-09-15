@@ -184,7 +184,7 @@
 				)
 			)
 		)
-		(property "Ideal Part Number" ""
+		(property "Ideal Part Number" "0805W8F1002T5E"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -196,7 +196,7 @@
 				)
 			)
 		)
-		(property "Order Link" ""
+		(property "Order Link" "https://www.lcsc.com/product-detail/C17414.html"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -208,11 +208,23 @@
 				)
 			)
 		)
-		(property "Vendor" ""
+		(property "Vendor" "LCSC"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "b610cd42-e89e-4a8e-bae6-07b143b21c3d")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC Part #" "C17414"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "056665cf-f9a1-44dc-8aa8-c81026e8f773")
 			(effects
 				(font
 					(size 1 1)
@@ -1433,7 +1445,7 @@
 				)
 			)
 		)
-		(property "Ideal Part Number" ""
+		(property "Ideal Part Number" "CC0805KRX7R9BB104"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1445,7 +1457,7 @@
 				)
 			)
 		)
-		(property "Order Link" ""
+		(property "Order Link" "https://www.lcsc.com/product-detail/C49678.html"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1457,11 +1469,23 @@
 				)
 			)
 		)
-		(property "Vendor" ""
+		(property "Vendor" "LCSC"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "ab9a74f3-2969-4d33-a08b-020acf8aefc3")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC Part #" "C49678"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c0c3137b-2159-4e10-864e-c5a30a01cac2")
 			(effects
 				(font
 					(size 1 1)
@@ -1620,7 +1644,7 @@
 				)
 			)
 		)
-		(property "Ideal Part Number" ""
+		(property "Ideal Part Number" "0805W8F1002T5E"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1632,7 +1656,7 @@
 				)
 			)
 		)
-		(property "Order Link" ""
+		(property "Order Link" "https://www.lcsc.com/product-detail/C17414.html"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1644,11 +1668,23 @@
 				)
 			)
 		)
-		(property "Vendor" ""
+		(property "Vendor" "LCSC"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "6fc18942-74db-486b-90c4-f863fbd5e215")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC Part #" "C17414"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f0ef9c44-15ac-4250-8eb9-0be0e92b32ec")
 			(effects
 				(font
 					(size 1 1)
@@ -1807,7 +1843,7 @@
 				)
 			)
 		)
-		(property "Ideal Part Number" ""
+		(property "Ideal Part Number" "0805W8F1002T5E"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1819,7 +1855,7 @@
 				)
 			)
 		)
-		(property "Order Link" ""
+		(property "Order Link" "https://www.lcsc.com/product-detail/C17414.html"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -1831,11 +1867,23 @@
 				)
 			)
 		)
-		(property "Vendor" ""
+		(property "Vendor" "LCSC"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "03c53a5a-3962-4265-a95a-e2e75d41c122")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC Part #" "C17414"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2a93725e-e673-4a50-8bde-5a62206a1e25")
 			(effects
 				(font
 					(size 1 1)
@@ -2348,7 +2396,7 @@
 				)
 			)
 		)
-		(property "Ideal Part Number" ""
+		(property "Ideal Part Number" "0805W8F1002T5E"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2360,7 +2408,7 @@
 				)
 			)
 		)
-		(property "Order Link" ""
+		(property "Order Link" "https://www.lcsc.com/product-detail/C17414.html"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2372,11 +2420,23 @@
 				)
 			)
 		)
-		(property "Vendor" ""
+		(property "Vendor" "LCSC"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "5c6eb35f-611c-447e-8c5a-72ece169cf3e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC Part #" "C17414"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1bded293-605b-4f37-9cf3-a5b99feed384")
 			(effects
 				(font
 					(size 1 1)
@@ -2889,7 +2949,7 @@
 				)
 			)
 		)
-		(property "Ideal Part Number" ""
+		(property "Ideal Part Number" "0805W8F1002T5E"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2901,7 +2961,7 @@
 				)
 			)
 		)
-		(property "Order Link" ""
+		(property "Order Link" "https://www.lcsc.com/product-detail/C17414.html"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2913,11 +2973,23 @@
 				)
 			)
 		)
-		(property "Vendor" ""
+		(property "Vendor" "LCSC"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "08c2f7f0-261a-48bb-a6b4-d56f9e2ccd49")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC Part #" "C17414"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "39bf7d85-669d-4e8c-92bb-330e502feb5a")
 			(effects
 				(font
 					(size 1 1)
@@ -3087,7 +3159,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://www.harwin.com/products/M20-8890345R"
+		(property "Order Link" "https://www.digikey.com/en/products/detail/harwin-inc/M20-8890345R/6565723"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3100,7 +3172,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Vendor" "Harwin"
+		(property "Vendor" "DigiKey"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3114,6 +3186,18 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
+		(property "LCSC Part #" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "fb3f70d3-81c2-49bf-b94f-19d51d729524")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(path "/b519749c-6b4a-41af-871e-cf0010554be2")
 		(sheetname "/")
 		(sheetfile "KeyModule.kicad_sch")
@@ -3487,7 +3571,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://www.digikey.se/en/products/detail/harwin-inc/M20-7910342R/6559281"
+		(property "Order Link" "https://jlcpcb.com/partdetail/Harwin-M207910342R/C3321821"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3500,7 +3584,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Vendor" "Harwin"
+		(property "Vendor" "LCSC"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3514,6 +3598,18 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
+		(property "LCSC Part #" "C3321821"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d5b0cabe-f53d-4912-beaa-31c3f5415328")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(path "/3ffc81b7-612f-49ad-b775-854db44cb05a")
 		(sheetname "/")
 		(sheetfile "KeyModule.kicad_sch")
@@ -3767,7 +3863,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://www.digikey.se/en/products/detail/harwin-inc/M20-7910342R/6559281"
+		(property "Order Link" "https://jlcpcb.com/partdetail/Harwin-M207910342R/C3321821"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3780,7 +3876,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Vendor" "Harwin"
+		(property "Vendor" "LCSC"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3794,6 +3890,18 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
+		(property "LCSC Part #" "C3321821"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "820c9df3-1bec-457e-9540-20b54b4184ca")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(path "/d00c4745-fdaa-4141-af22-08938d145f51")
 		(sheetname "/")
 		(sheetfile "KeyModule.kicad_sch")
@@ -4047,7 +4155,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://www.digikey.se/en/products/detail/harwin-inc/M20-7910342R/6559281"
+		(property "Order Link" "https://jlcpcb.com/partdetail/Harwin-M207910342R/C3321821"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -4060,7 +4168,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Vendor" "Harwin"
+		(property "Vendor" "LCSC"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -4074,6 +4182,18 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
+		(property "LCSC Part #" "C3321821"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "698cc960-b737-48fb-9529-cbde37762ac6")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(path "/e7240ff4-4b31-46ee-a109-69761ef501b5")
 		(sheetname "/")
 		(sheetfile "KeyModule.kicad_sch")
@@ -4327,7 +4447,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://www.harwin.com/products/M20-8890345R"
+		(property "Order Link" "https://www.digikey.com/en/products/detail/harwin-inc/M20-8890345R/6565723"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -4340,7 +4460,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Vendor" "Harwin"
+		(property "Vendor" "DigiKey"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -4354,6 +4474,18 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
+		(property "LCSC Part #" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "06d45377-6db5-413c-b468-20352a6cb4de")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(path "/73c387d3-bae7-49dd-ae84-886fbb6ab93d")
 		(sheetname "/")
 		(sheetfile "KeyModule.kicad_sch")
@@ -4736,7 +4868,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Vendor" "Nexperia USA Inc."
+		(property "Vendor" "LCSC"
 			(at 0 0 270)
 			(unlocked yes)
 			(layer "B.Fab")
@@ -4750,7 +4882,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://www.digikey.se/sv/products/detail/nexperia-usa-inc/74HC165D-653/763013"
+		(property "Order Link" "https://www.lcsc.com/product-detail/C5613.html"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -4764,6 +4896,18 @@
 			)
 		)
 		(property ki_fp_filters "DIP?16* SO*16*3.9x9.9mm*P1.27mm* SSOP*16*5.3x6.2mm*P0.65mm* TSSOP*16*4.4x5mm*P0.65*")
+		(property "LCSC Part #" "C5613"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1c7a964b-2e70-42fd-998a-1f3bc15721d6")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(path "/00c8e00f-167a-48b6-a8de-532e989b09b8")
 		(sheetname "/")
 		(sheetfile "KeyModule.kicad_sch")
@@ -5231,7 +5375,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://www.harwin.com/products/M20-8890345R"
+		(property "Order Link" "https://www.digikey.com/en/products/detail/harwin-inc/M20-8890345R/6565723"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -5244,7 +5388,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Vendor" "Harwin"
+		(property "Vendor" "DigiKey"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -5258,6 +5402,18 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
+		(property "LCSC Part #" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "5711fe05-c4d9-4357-9339-0484e0ff4073")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(path "/82c22379-0f00-4412-ae5e-01b724575ed2")
 		(sheetname "/")
 		(sheetfile "KeyModule.kicad_sch")
