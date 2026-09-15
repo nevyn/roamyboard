@@ -3105,7 +3105,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "M20-8890345R"
+		(property "Value" "HX PZ2.54-1x3P WT"
 			(at 0 10.95 270)
 			(unlocked yes)
 			(layer "B.Fab")
@@ -3146,7 +3146,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Ideal Part Number" "M20-8890345R"
+		(property "Ideal Part Number" "HX PZ2.54-1x3P WT"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3159,7 +3159,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://www.digikey.com/en/products/detail/harwin-inc/M20-8890345R/6565723"
+		(property "Order Link" "https://www.lcsc.com/product-detail/C46061676.html"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3172,7 +3172,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Vendor" "DigiKey"
+		(property "Vendor" "LCSC"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3186,7 +3186,7 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
-		(property "LCSC Part #" ""
+		(property "LCSC Part #" "C46061676"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3517,7 +3517,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "M20-7910342R"
+		(property "Value" "HX PM2.54-1x3P WT"
 			(at 0 12 90)
 			(unlocked yes)
 			(layer "B.Fab")
@@ -3558,7 +3558,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Ideal Part Number" "M20-7910342R"
+		(property "Ideal Part Number" "HX PM2.54-1x3P WT"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3571,7 +3571,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://jlcpcb.com/partdetail/Harwin-M207910342R/C3321821"
+		(property "Order Link" "https://www.lcsc.com/product-detail/C46061767.html"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3598,7 +3598,7 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
-		(property "LCSC Part #" "C3321821"
+		(property "LCSC Part #" "C46061767"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -3809,7 +3809,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "M20-7910342R"
+		(property "Value" "HX PM2.54-1x3P WT"
 			(at 0 12 90)
 			(unlocked yes)
 			(layer "B.Fab")
@@ -3850,7 +3850,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Ideal Part Number" "M20-7910342R"
+		(property "Ideal Part Number" "HX PM2.54-1x3P WT"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3863,7 +3863,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://jlcpcb.com/partdetail/Harwin-M207910342R/C3321821"
+		(property "Order Link" "https://www.lcsc.com/product-detail/C46061767.html"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -3890,7 +3890,7 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
-		(property "LCSC Part #" "C3321821"
+		(property "LCSC Part #" "C46061767"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -4101,7 +4101,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "M20-7910342R"
+		(property "Value" "HX PM2.54-1x3P WT"
 			(at 0 12 90)
 			(unlocked yes)
 			(layer "B.Fab")
@@ -4142,7 +4142,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Ideal Part Number" "M20-7910342R"
+		(property "Ideal Part Number" "HX PM2.54-1x3P WT"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -4155,7 +4155,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://jlcpcb.com/partdetail/Harwin-M207910342R/C3321821"
+		(property "Order Link" "https://www.lcsc.com/product-detail/C46061767.html"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -4182,7 +4182,7 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
-		(property "LCSC Part #" "C3321821"
+		(property "LCSC Part #" "C46061767"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -4393,7 +4393,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "M20-8890345R"
+		(property "Value" "HX PZ2.54-1x3P WT"
 			(at 0 10.95 270)
 			(unlocked yes)
 			(layer "B.Fab")
@@ -4434,7 +4434,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Ideal Part Number" "M20-8890345R"
+		(property "Ideal Part Number" "HX PZ2.54-1x3P WT"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -4447,7 +4447,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://www.digikey.com/en/products/detail/harwin-inc/M20-8890345R/6565723"
+		(property "Order Link" "https://www.lcsc.com/product-detail/C46061676.html"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -4460,7 +4460,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Vendor" "DigiKey"
+		(property "Vendor" "LCSC"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -4474,7 +4474,7 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
-		(property "LCSC Part #" ""
+		(property "LCSC Part #" "C46061676"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -5321,7 +5321,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "M20-8890345R"
+		(property "Value" "HX PZ2.54-1x3P WT"
 			(at 0 10.95 270)
 			(unlocked yes)
 			(layer "B.Fab")
@@ -5362,7 +5362,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Ideal Part Number" "M20-8890345R"
+		(property "Ideal Part Number" "HX PZ2.54-1x3P WT"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -5375,7 +5375,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Order Link" "https://www.digikey.com/en/products/detail/harwin-inc/M20-8890345R/6565723"
+		(property "Order Link" "https://www.lcsc.com/product-detail/C46061676.html"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -5388,7 +5388,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Vendor" "DigiKey"
+		(property "Vendor" "LCSC"
 			(at 0 0 270)
 			(layer "B.Fab")
 			(hide yes)
@@ -5402,7 +5402,7 @@
 			)
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
-		(property "LCSC Part #" ""
+		(property "LCSC Part #" "C46061676"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)

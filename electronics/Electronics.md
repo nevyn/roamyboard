@@ -18,7 +18,7 @@ The 9 signals are distributed across **three 1×3 connector pairs** — top, mid
 - Matching 9-pin pogo-pin connectors were prohibitively expensive (~$10 per pin header, 12+ per keyboard)
 - Three 1×3 connectors fit within the keyswitch courtyard constraints on the PCB, whereas a single 1×9 did not
 
-Connectors used: **Harwin M20-889** pin header (male, [DRG-02615](https://content.harwin.com/asset/bcd8efee-7ad9-4ddd-8fcc-2925970fdfe6/DRG-02615-Technical-Drawing-Datasheet-M20-889-pdf.pdf)) on the right edge, mating with the **Harwin M20-791** socket (female, [DRG-02613](https://content.harwin.com/m/0e0398fdb977d498/original/DRG-02613-Technical-Drawing-Datasheet-M20-791R-pdf.pdf)) on the left edge. Both are 1×3, horizontal SMT, mounted on the back of the board, laid flat so the pins and the socket mouth protrude past the board edge and modules click into each other straight-on. Because adjacent modules meet at the case's 8° joint angle, the pins are bent 8° after soldering so they enter the next module's sockets along its board plane.
+Connectors used: **hanxia HX PZ2.54-1x3P WT** pin header (male, LCSC C46061676) on the right edge, mating with the **hanxia HX PM2.54-1x3P WT** socket (female, LCSC C46061767) on the left edge. Both are 1×3, 2.54 mm pitch, horizontal SMT, mounted on the back of the board and laid flat so the pins and the socket mouth protrude past the board edge and modules click into each other straight-on. Body 8.5 × 2.5 mm on the socket, 2.5 × 2.5 mm plus 6 mm pins on the header, pin axis 1.25 mm above the board. The same footprints fit the Harwin M20-791 / M20-889 pair ([DRG-02613](https://content.harwin.com/m/0e0398fdb977d498/original/DRG-02613-Technical-Drawing-Datasheet-M20-791R-pdf.pdf), [DRG-02615](https://content.harwin.com/asset/bcd8efee-7ad9-4ddd-8fcc-2925970fdfe6/DRG-02615-Technical-Drawing-Datasheet-M20-889-pdf.pdf)), which have the same bodies and pins with thicker gold and a published 300-cycle life at ten times the price; the footprints are drawn from the Harwin drawings and carry their names. Because adjacent modules meet at the case's 8° joint angle, the pins are bent 8° after soldering so they enter the next module's sockets along its board plane.
 ![[module-joint.svg]]
 
 v3.0 pinout. J_LEFT*n* are the sockets, J_RIGHT*n* the pin headers; pin 1 is the topmost pin of each connector and the same signal sits on the same pin on both edges, so every signal passes straight through the module:
@@ -64,8 +64,8 @@ After parallel load (PL pulse), the 74HC165 shifts bits out of QH in this order:
 | nice!nano v2.9 | 1                        |                                                            |
 | 74HC165        | 1 x key module count     | Shift register for reporting key states over a serial line |
 | 100 nF 0805    | 1 x key module count     | Decoupling for the 165, on the front next to it             |
-| Harwin M20-7910342R   | 3 x module count  | 1×3 horizontal SMT socket (female), left board edge        |
-| Harwin M20-8890345R   | 3 x module count  | 1×3 horizontal SMT pin header (male), right board edge     |
+| hanxia HX PM2.54-1x3P WT | 3 x module count | 1×3 horizontal SMT socket (female), left board edge; Harwin M20-7910342R fits the same pads |
+| hanxia HX PZ2.54-1x3P WT | 3 x module count | 1×3 horizontal SMT pin header (male), right board edge; Harwin M20-8890345R fits the same pads |
 
 ### Board geometry at the joint
 
