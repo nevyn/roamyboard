@@ -10,7 +10,7 @@ The correct pattern rotated 180° is the rev 1 pattern mirrored top-to-bottom, s
 
 ## Footprint
 
-Vendored copy of daprice's footprint is at `KeyModule/Library.pretty/Kailh_choc_v1_hotswap_daprice.kicad_mod` (KiCad 5 syntax with `tstamp`; KiCad 10 loads it). Its pads, footprint coordinates, y down:
+Vendored copy of daprice's footprint (github.com/daprice/keyswitches.pretty; the repo root had no LICENSE file when fetched, so redraw from the Kailh numbers in the table below if licensing matters) is at `KeyModule/Library.pretty/Kailh_choc_v1_hotswap_daprice.kicad_mod` (KiCad 5 syntax with `tstamp`; KiCad 10 loads it). Its pads, footprint coordinates, y down:
 
 | Feature | Position | Size |
 | --- | --- | --- |
