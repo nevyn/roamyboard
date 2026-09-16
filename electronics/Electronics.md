@@ -75,7 +75,7 @@ Generated files in `KeyModule/fab/` carry a revision in their name (`KeyModule-v
 | --- | --- | --- |
 | v3 | 2026-09-16 | first order, JLCPCB Y3-13547444A; switch footprint mirrored, replaced in the same order by v4 |
 | v4 | 2026-09-16 | rev 2 layout: own Choc footprint, socket above each key, board 16.85 mm, rerouted; never uploaded (peg holes 1.70 mm) |
-| v5 | 2026-09-16 | v4 with 1.90 mm peg holes and contact holes at the drawing's 5.90 / 3.80 mm |
+| v5 | 2026-09-16 | v4 with 1.90 mm peg holes and contact holes at the drawing's 5.90 / 3.80 mm; uploaded as the replacement file, JLCPCB item Y4-13547444A, 20 pcs |
 
 ### Board geometry at the joint
 
