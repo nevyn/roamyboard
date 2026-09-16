@@ -6,7 +6,7 @@
 	(paper "A4")
 	(title_block
 		(title "roamyboard key module")
-		(rev "v4")
+		(rev "v5")
 		(company "nevyn.dev")
 	)
 	(lib_symbols

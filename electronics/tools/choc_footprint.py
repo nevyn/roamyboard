@@ -1,8 +1,8 @@
 """Kailh Choc v1 (PG1350) hotswap footprint for a switch inserted from the front.
 
 Hole pattern from the Kailh PG1350 drawing, in the orientation this board uses
-(the drawing's pattern rotated 180 degrees): contact holes at (0, -5.95) and
-(5, -3.75). The socket sits on the back; pad 1 is the outboard pad on the +x
+(the drawing's pattern rotated 180 degrees): contact holes at (0, -5.9) and
+(5, -3.8). The socket sits on the back; pad 1 is the outboard pad on the +x
 side so that it can carry the +3.3V rail along the board edge.
 """
 import uuid
@@ -12,12 +12,12 @@ OUT = Path(__file__).resolve().parent.parent / "KeyModule" / "Library.pretty"
 NAME = "Kailh_choc_v1_hotswap"
 MODELS = "${KIPRJMOD}/Library.3dshapes/"
 
-HOLE_A = (0.0, -5.95)      # contact hole on the centre line
-HOLE_B = (5.0, -3.75)      # contact hole toward +x
+HOLE_A = (0.0, -5.9)       # contact hole on the centre line
+HOLE_B = (5.0, -3.8)       # contact hole toward +x
 PAD_OFFSET = 3.275         # socket pad centre from its hole centre
 PAD = 2.6
 BOSS = 3.429
-LEG = 1.7018
+LEG = 1.9                  # peg is 1.8; the drawing asks for 1.9
 BODY = 13.8                # housing at board level; 15.0 at the rim
 
 def uid():
