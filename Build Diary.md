@@ -256,3 +256,10 @@ Ordered 20 boards, then noticed the switch 3D model's pins miss the socket cups.
 Rev 2: the correct pattern rotated 180 degrees equals our pattern mirrored top-to-bottom, so the board keeps its width and the +3.3V pad stays on the right edge; the socket goes above each key, the connector rows and U1 move up about 8 mm, everything is rerouted. Use daprice's footprint at 180 degrees. Lesson: check a footprint's handedness against the part drawing, not against its own 3D model.
 
 Execution plan for rev 2: [[Rev 2 plan]].
+
+### Rev 2 laid out
+*2026-09-16, afternoon*
+
+JLCPCB support enabled "replace file" on the order, so rev 2 goes into the same order instead of a new one. The switch footprint is now our own (`tools/choc_footprint.py`, from the Kailh drawing, holes in the orientation that puts the socket above each key), the socket 3D model turned out to need only a 180° rotation, not a mirror, and the board is rerouted: DRC and ERC clean, parity clean, board 16.85 mm wide, connector rows at 58.1 / 77.1 / 115.1, U1 between keys 3 and 2. Deviations from the plan are recorded at the end of [[Rev 2 plan]]. Fab files regenerated in `electronics/KeyModule/fab/`.
+
+Left to do when parts arrive: look at the bottom of a Choc for a small nub beside the pegs; the footprint has no hole for one.

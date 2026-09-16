@@ -3585,7 +3585,7 @@
 				)
 			)
 		)
-		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
+		(property "Footprint" "Library:Kailh_choc_v1_hotswap"
 			(at 78.74 104.14 0)
 			(hide yes)
 			(show_name no)
@@ -3984,7 +3984,7 @@
 				)
 			)
 		)
-		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
+		(property "Footprint" "Library:Kailh_choc_v1_hotswap"
 			(at 78.74 76.2 0)
 			(hide yes)
 			(show_name no)
@@ -5981,7 +5981,7 @@
 				)
 			)
 		)
-		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
+		(property "Footprint" "Library:Kailh_choc_v1_hotswap"
 			(at 78.74 90.17 0)
 			(hide yes)
 			(show_name no)
@@ -6094,7 +6094,7 @@
 				)
 			)
 		)
-		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
+		(property "Footprint" "Library:Kailh_choc_v1_hotswap"
 			(at 78.74 119.38 0)
 			(hide yes)
 			(show_name no)
@@ -6494,7 +6494,7 @@
 				)
 			)
 		)
-		(property "Footprint" "kbd:keyswitch_choc12_hotswap_1u"
+		(property "Footprint" "Library:Kailh_choc_v1_hotswap"
 			(at 78.74 62.23 0)
 			(hide yes)
 			(show_name no)

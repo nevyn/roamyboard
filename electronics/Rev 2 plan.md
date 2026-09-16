@@ -1,4 +1,4 @@
-> 💡 Execution plan for key module rev 2, written 2026-09-16 so it can be carried out in a fresh session. Background in [[Build Diary]] ("The switch footprint is mirrored") and geometry in [[Electronics]].
+> 💡 Execution plan for key module rev 2, written 2026-09-16 so it can be carried out in a fresh session. **Executed the same day; deviations are listed at the end.** Background in [[Build Diary]] ("The switch footprint is mirrored") and geometry in [[Electronics]].
 
 ## What is wrong in rev 1
 
@@ -71,3 +71,13 @@ Same nets as rev 1 (see Electronics.md pinout table: row 2 is CLK / PL / DATA). 
 2. Regenerate `fab/KeyModule-gerbers.zip` and `fab/KeyModule-bom.csv` (BOM is unchanged: same sockets, same parts).
 3. Electronics.md: board width, connector rows, "socket above each key"; the module-joint drawing is unaffected.
 4. Order at JLCPCB with "confirm production file" on; verify the upload is byte-identical to the repo zip apart from timestamps before saving to cart.
+
+## As executed (2026-09-16)
+
+- Footprint drawn natively from the numbers above instead of vendoring daprice's file: `tools/choc_footprint.py` writes `Library.pretty/Kailh_choc_v1_hotswap.kicad_mod` with the holes already in the 180° orientation, so the switches sit at rotation 0. Pad 1 (+3.3V) is the outboard pad on +x. The third-pin hole is dropped: the kbd switch model has no such pin and the hole would sit under the next connector's body anyway; check a real switch for a nub at (-5.22, 4.2) from its centre when they arrive.
+- Chirality proof passed: the switch model's pins at 3D (0, 5.9) and (5, 3.8) coincide with the new holes. The socket model needs no mirroring: rotate (0 0 180), offset z -3.4 puts its cups on the holes and its bosses toward the board. Both STEP files are copied into `Library.3dshapes` (foostan/kbd, MIT).
+- Rows landed at y = 58.1, 77.1 and 115.1 (not 57.8 / 76.8 / 114.9): the socket courtyard is 7.97 mm wide and the switch's centre-boss courtyard reaches 1.96 mm below the key centre.
+- U1 at y = 96.7 (not 95.75): with the top pin row at 95.75 no track fits between the SW3 centre boss and the pins 1..3 pads (0.3 mm hole clearance plus 0.2 mm copper clearance). Its courtyard now ends 0.08 mm above the SW2 socket courtyard.
+- Routing (all 0.25 mm, vias 0.7/0.3): +3.3V trunk on the back at x 86.5 through every socket pad 1 (0.3 mm from the U1 pin 9 pad); U1 pin 16 fed by a back track under the SOIC body along y 96.7. CLK and PL take front lanes at x 74.5 and 75.0, left of the switch holes. D4 and DATA_IN share the back corridor between the SW3 holes (x 80.3 and 79.8). D2 and D3 use front lanes at x 74.0 and 73.5; D3 walks around the SW4 leg at x 73.45. DATA_OUT and D0 run along the right edge on the front (x 86.3 and 85.0). D1 threads between the SW2 holes at x 80.4. Front tracks must keep 0.3 mm from every through-hole too; that cost the first attempt.
+- Zone: thermal spokes 0.3 mm and minimum fill thickness 0.25 mm; with 0.2 mm the filler left a 0.18 mm sliver that DRC reports as a too-narrow connection, without a position.
+- Ground stitching: 15 vias, one inside the front pocket that the D3 lanes close around R4 and one inside the back strip between the U1 rows.
