@@ -67,6 +67,15 @@ After parallel load (PL pulse), the 74HC165 shifts bits out of QH in this order:
 | hanxia HX PM2.54-1x3P WT | 3 x module count | 1×3 horizontal SMT socket (female), left board edge; Harwin M20-7910342R fits the same pads |
 | hanxia HX PZ2.54-1x3P WT | 3 x module count | 1×3 horizontal SMT pin header (male), right board edge; Harwin M20-8890345R fits the same pads |
 
+### Fab file revisions
+
+Generated files in `KeyModule/fab/` carry a revision in their name (`KeyModule-v4-gerbers.zip`, `KeyModule-v4-bom.csv`); the same revision is in the KiCad title block and on the back silkscreen below the last key. Bump it every time a new set is generated, even for a small change, so an upload can be matched to a file.
+
+| Revision | Date | What |
+| --- | --- | --- |
+| v3 | 2026-09-16 | first order, JLCPCB Y3-13547444A; switch footprint mirrored, replaced in the same order by v4 |
+| v4 | 2026-09-16 | rev 2 layout: own Choc footprint, socket above each key, board 16.85 mm, rerouted |
+
 ### Board geometry at the joint
 
 Numbers the key module PCB and the case both build on (the case still has to be redrawn for them):

@@ -68,7 +68,7 @@ Same nets as rev 1 (see Electronics.md pinout table: row 2 is CLK / PL / DATA). 
 ## After routing
 
 1. DRC clean, parity clean, ERC clean; render top and bottom; look at the switch model pins against the socket cups from below.
-2. Regenerate `fab/KeyModule-gerbers.zip` and `fab/KeyModule-bom.csv` (BOM is unchanged: same sockets, same parts).
+2. Regenerate the fab zip and BOM in `fab/` under a new revision name (BOM is unchanged: same sockets, same parts).
 3. Electronics.md: board width, connector rows, "socket above each key"; the module-joint drawing is unaffected.
 4. Order at JLCPCB with "confirm production file" on; verify the upload is byte-identical to the repo zip apart from timestamps before saving to cart.
 
