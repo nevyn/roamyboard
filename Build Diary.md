@@ -248,3 +248,10 @@ TODO:
 - [ ] Case v4 for the PCB: pocket for a 16.5 mm board, 1.2 mm side walls (column pitch ~19.3 mm), three pin slots through the slanted wall, three socket pockets in the flat wall, click joint instead of the T-slot. Numbers in [[Electronics]].
 - [ ] Print the pin bend jig (build/roamy_pin_jig_*.stl) and bend one header to check springback
 
+### The switch footprint is mirrored
+*2026-09-16*
+
+Ordered 20 boards, then noticed the switch 3D model's pins miss the socket cups. Checked against Kailh's PG1350 drawing (bottom view and pattern-side PCB layout) and daprice's `Kailh_socket_PG1350` footprint: a Choc inserted from the front needs its second contact to the left of the first, at (0, 5.95) and (-5, 3.75). Our kbd footprint has it on the right. foostan's boards place that footprint on the back layer, which mirrors it into the right handedness; ours sat on the front, and moving the pads to the back for the sockets did not fix the pattern. The boards in production cannot take sockets or switches. They still validate the interconnect, the bent pins, the 165 chain and the case fit.
+
+Rev 2: the correct pattern rotated 180 degrees equals our pattern mirrored top-to-bottom, so the board keeps its width and the +3.3V pad stays on the right edge; the socket goes above each key, the connector rows and U1 move up about 8 mm, everything is rerouted. Use daprice's footprint at 180 degrees. Lesson: check a footprint's handedness against the part drawing, not against its own 3D model.
+
