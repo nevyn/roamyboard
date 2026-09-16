@@ -663,7 +663,7 @@
 				(xyz 0 180 0)
 			)
 		)
-		(model "${KICAD_KBD_DIR}/kicad-packages3D/kbd.3dshapes/kailh_choc.step"
+		(model "${KICAD_KBD_DIR}/kicad-packages3D/kbd.3dshapes/kailh_choc_kicad.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -1017,7 +1017,7 @@
 				(xyz 0 180 0)
 			)
 		)
-		(model "${KICAD_KBD_DIR}/kicad-packages3D/kbd.3dshapes/kailh_choc.step"
+		(model "${KICAD_KBD_DIR}/kicad-packages3D/kbd.3dshapes/kailh_choc_kicad.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -1371,7 +1371,7 @@
 				(xyz 0 180 0)
 			)
 		)
-		(model "${KICAD_KBD_DIR}/kicad-packages3D/kbd.3dshapes/kailh_choc.step"
+		(model "${KICAD_KBD_DIR}/kicad-packages3D/kbd.3dshapes/kailh_choc_kicad.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -2322,7 +2322,7 @@
 				(xyz 0 180 0)
 			)
 		)
-		(model "${KICAD_KBD_DIR}/kicad-packages3D/kbd.3dshapes/kailh_choc.step"
+		(model "${KICAD_KBD_DIR}/kicad-packages3D/kbd.3dshapes/kailh_choc_kicad.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -2875,7 +2875,7 @@
 				(xyz 0 180 0)
 			)
 		)
-		(model "${KICAD_KBD_DIR}/kicad-packages3D/kbd.3dshapes/kailh_choc.step"
+		(model "${KICAD_KBD_DIR}/kicad-packages3D/kbd.3dshapes/kailh_choc_kicad.step"
 			(offset
 				(xyz 0 0 0)
 			)
