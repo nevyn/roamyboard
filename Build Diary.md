@@ -255,3 +255,4 @@ Ordered 20 boards, then noticed the switch 3D model's pins miss the socket cups.
 
 Rev 2: the correct pattern rotated 180 degrees equals our pattern mirrored top-to-bottom, so the board keeps its width and the +3.3V pad stays on the right edge; the socket goes above each key, the connector rows and U1 move up about 8 mm, everything is rerouted. Use daprice's footprint at 180 degrees. Lesson: check a footprint's handedness against the part drawing, not against its own 3D model.
 
+Execution plan for rev 2: [[Rev 2 plan]].
