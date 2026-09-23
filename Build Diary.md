@@ -263,3 +263,8 @@ Execution plan for rev 2: [[Rev 2 plan]].
 JLCPCB support enabled "replace file" on the order, so rev 2 goes into the same order instead of a new one. The switch footprint is now our own (`tools/choc_footprint.py`, from the Kailh drawing, holes in the orientation that puts the socket above each key), the socket 3D model turned out to need only a 180° rotation, not a mirror, and the board is rerouted: DRC and ERC clean, parity clean, board 16.85 mm wide, connector rows at 58.1 / 77.1 / 115.1, U1 between keys 3 and 2. Deviations from the plan are recorded at the end of [[Rev 2 plan]]. Fab files regenerated in `electronics/KeyModule/fab/`, now named by revision (v4). A clean-context review against the Kailh drawing then caught the locating-peg holes at 1.70 mm for a 1.80 mm peg, inherited from daprice's footprint; v5 drills them at the drawing's 1.90 mm and puts the contact holes at the drawing's 5.90 / 3.80. v5 is what goes to JLCPCB.
 
 A product photo of a Choc's underside shows one thick peg, two thin pegs and two metal legs, nothing else, so the footprint has no hole for a third pin.
+
+### v5 boards in hand
+*2026-09-23*
+
+Purple v5 boards arrived, components not yet. A Choc drops into the holes and its keycap sits right; the pegs and centre boss are loose, as Kailh's 1.9 / 3.43 mm holes make them. Retention will come from the hotswap socket's spring contacts and from a lip or plate in case v4 that catches the switch's side clips; only if that is not enough does v6 go to 1.8 mm peg holes.
