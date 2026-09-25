@@ -24,7 +24,9 @@ passives = [(83.6, 60.0, 0), (72.3, 81.0, 90), (76.25, 99.4, 0), (79.6, 99.9, 90
 # Connectors (electronics/tools/harwin_footprints.py, Electronics.md)
 socket_w, socket_overhang = 7.87, 2.0
 header_w, header_pad_len, header_pin_sq, header_pin_len = 7.62, 3.17, 0.64, 6.0
-pin_axis_z = 1.25                                    # pin centreline above the board back
+header_body = 2.5                                    # square body; hanxia PZ2.54 hangs it past the board edge
+header_body_pocket = 3.5                             # room past the edge for the body and its tail bend
+header_axis_z = 2.3                                  # hanxia PZ2.54 tail jog: pin centreline above the board back
 pitch = 2.54
 
 fit = 0.15
@@ -43,7 +45,7 @@ def build(header_tilt_deg):
     top = base_t + board_t                           # z of the board back
     edge_left, edge_right = X(board_x0), X(board_x1)  # +X and -X board edges in the jig frame
 
-    plate_x0, plate_x1 = edge_right - header_pin_len - 3.0, edge_left + socket_overhang + 2.5
+    plate_x0, plate_x1 = edge_right - header_body_pocket - header_pin_len - 3.0, edge_left + socket_overhang + 2.5
     plate_y0, plate_y1 = min(Y(board_y0), Y(board_y1)) - 4.0, max(Y(board_y0), Y(board_y1)) + 4.0
     plate = (cq.Workplane("XY").box(plate_x1 - plate_x0, plate_y1 - plate_y0, top, centered=False)
              .translate((plate_x0, plate_y0, 0)))
@@ -65,12 +67,17 @@ def build(header_tilt_deg):
                 .translate((edge_left, Y(r), top - 0.05)))
         guide = guide.cut(slot)
 
-    # Header pins beyond the -X edge: one slot per pin, pivoted about the pad's inboard end for the tilt
+    # Header side beyond the -X edge: an open pocket for the body that hangs past the edge, then one slot per
+    # pin, pivoted about the pad's inboard end for the tilt
     comb = (cq.Workplane("XY").box(edge_right - pocket_fit - plate_x0, plate_y1 - plate_y0, guide_h, centered=False)
             .translate((plate_x0, plate_y0, top)))
+    for r in rows:
+        pocket = (cq.Workplane("XY").box(header_body_pocket + 0.5 + pocket_fit, header_w + 2 * fit + 0.4, guide_h + 1, centered=(False, True, False))
+                  .translated((edge_right - header_body_pocket - 0.5, Y(r), top - 0.05)))
+        comb = comb.cut(pocket)
     pivot_x = X(header_x - header_pad_len / 2)      # inboard end of the header pads
-    floor_z = top + pin_axis_z - header_pin_sq / 2 - 0.05
-    slot_len = pivot_x - (edge_right - header_pin_len - 0.5)
+    floor_z = top + header_axis_z - header_pin_sq / 2 - 0.05
+    slot_len = pivot_x - (edge_right - header_body_pocket - header_pin_len - 0.5)
     for r in rows:
         for k in (-1, 0, 1):
             slot = (cq.Workplane("XY").box(slot_len, header_pin_sq + 2 * fit, guide_h + 4, centered=(False, True, False))
@@ -83,11 +90,11 @@ def build(header_tilt_deg):
         t = (cq.Workplane("XY").workplane(offset=top + guide_h - 0.6).center(x, y)
              .text(text, 2.5, 1.0, kind="bold", halign="center", valign="center"))
         return t
-    comb_mid = (plate_x0 + edge_right) / 2
+    comb_mid = (plate_x0 + edge_right - header_body_pocket) / 2
     jig = jig.cut(engrave("SW5", comb_mid, plate_y1 - 2.0)).cut(engrave("SW1", comb_mid, plate_y0 + 2.0))
     jig = jig.cut(engrave(f"{header_tilt_deg:g}", (edge_left + plate_x1) / 2, plate_y0 + 2.0))
 
-    tip_rise = (pivot_x - (edge_right - header_pin_len)) * math.sin(math.radians(header_tilt_deg))
+    tip_rise = (pivot_x - (edge_right - header_body_pocket - header_pin_len)) * math.sin(math.radians(header_tilt_deg))
     body_rise = (pivot_x - edge_right) * math.sin(math.radians(header_tilt_deg))
     foot_gap = header_pad_len * math.sin(math.radians(header_tilt_deg))
     print(f"tilt {header_tilt_deg} deg: pin tip {tip_rise:.2f} mm higher than flat, header outer end {body_rise:.2f} mm off the board, "
