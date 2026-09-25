@@ -268,3 +268,8 @@ A product photo of a Choc's underside shows one thick peg, two thin pegs and two
 *2026-09-23*
 
 Purple v5 boards arrived, components not yet. A Choc drops into the holes and its keycap sits right; the pegs and centre boss are loose, as Kailh's 1.9 / 3.43 mm holes make them. Retention will come from the hotswap socket's spring contacts and from a lip or plate in case v4 that catches the switch's side clips; only if that is not enough does v6 go to 1.8 mm peg holes.
+
+### It works
+*2026-09-25*
+
+First v5 module assembled and read on the first try: the shift-register test firmware on an M5Stick clocks the 74HC165 and every key shows up. Handedness, sockets, pull-downs and the chain wiring are all confirmed on hardware.
