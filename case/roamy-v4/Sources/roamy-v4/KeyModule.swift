@@ -182,13 +182,16 @@ struct ChocCutoutCoupon: Geometry3D {
     var body: any Geometry3D {
         let sizes = [13.7, 13.8, 13.9, 14.0, 14.1, 14.2]
         let pitch = 19.05
-        Box(x: pitch * Double(sizes.count) + 4, y: pitch + 4, z: P.plateThickness)
+        let margin = 5.0                      // room for the switch flange (15 mm) and a label below each hole
+        Box(x: pitch * Double(sizes.count) + 4, y: pitch + 2 * margin, z: P.plateThickness)
             .subtracting {
                 for (i, s) in sizes.enumerated() {
+                    let cx = 2 + pitch * (Double(i) + 0.5)
                     Box(x: s, y: s, z: P.plateThickness + 2).aligned(at: .centerXY)
-                        .translated(x: 2 + pitch * (Double(i) + 0.5), y: 2 + pitch / 2, z: -1)
-                    Text(String(format: "%.1f", s)).extruded(height: 0.4).aligned(at: .centerXY)
-                        .translated(x: 2 + pitch * (Double(i) + 0.5), y: 1.6, z: P.plateThickness - 0.4)
+                        .translated(x: cx, y: margin + pitch / 2, z: -1)
+                    Text(String(format: "%.1f", s)).withFontSize(3.0)
+                        .extruded(height: 0.5).aligned(at: .centerXY)
+                        .translated(x: cx, y: 1.8, z: P.plateThickness - 0.4)
                 }
             }
     }
