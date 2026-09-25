@@ -44,7 +44,7 @@ def build(header_tilt_deg):
     edge_left, edge_right = X(board_x0), X(board_x1)  # +X and -X board edges in the jig frame
 
     plate_x0, plate_x1 = edge_right - header_pin_len - 3.0, edge_left + socket_overhang + 2.5
-    plate_y0, plate_y1 = Y(board_y0) - 4.0, Y(board_y1) + 4.0
+    plate_y0, plate_y1 = min(Y(board_y0), Y(board_y1)) - 4.0, max(Y(board_y0), Y(board_y1)) + 4.0
     plate = (cq.Workplane("XY").box(plate_x1 - plate_x0, plate_y1 - plate_y0, top, centered=False)
              .translate((plate_x0, plate_y0, 0)))
     board_pocket = (cq.Workplane("XY").box(bw + 2 * pocket_fit, bl + 2 * pocket_fit, board_t + 1, centered=(True, True, False))
