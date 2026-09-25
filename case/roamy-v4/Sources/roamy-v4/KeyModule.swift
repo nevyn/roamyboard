@@ -122,8 +122,8 @@ struct JointLevers: Geometry3D {
         // root block from the panel's inner face to the beam
         let overlap = 0.4   // into the panel skin, so the root and the panel are one body
         let panelInner = i == 0 ? P.panelThickness - overlap : P.outerLength - P.panelThickness + overlap
-        let root = Box(x: 2.0, y: abs(y - panelInner) + P.leverThickness / 2, z: P.leverHeight)
-            .translated(x: P.leverRootX - 1.0, y: min(panelInner, y - P.leverThickness / 2), z: P.leverZ + 0.3)
+        let root = Box(x: 3.0, y: abs(y - panelInner) + P.leverThickness / 2, z: P.leverHeight)
+            .translated(x: P.leverRootX - 1.5, y: min(panelInner, y - P.leverThickness / 2), z: P.leverZ + 0.3)
         return beam.adding { root }
     }
 

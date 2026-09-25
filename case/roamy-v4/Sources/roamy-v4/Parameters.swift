@@ -50,22 +50,22 @@ enum P {
     static let socketSideTabYs = [61.4, 99.4, 118.5]   // gaps between switch housings, clear of R4
 
     // Joint levers: a rigid beam per module end, carried by a spring panel in the end wall
-    static let leverThickness = 1.2           // along y
-    static let leverHeight = 2.0
-    static let leverReach = 3.5               // past this module's header face; the barb lives here
-    static let leverBarb = 0.5
-    static let leverBarbRamp = 1.0
+    static let leverThickness = 2.0           // along y
+    static let leverHeight = 3.0
+    static let leverReach = 4.0               // past this module's header face; the barb lives here
+    static let leverBarb = 0.7
+    static let leverBarbRamp = 1.4
     static let leverCatchAngle = 90.0°         // 90 locks; about 60 pulls apart by hand
-    static let leverInset = 2.8               // from the board end, along y; clear of the corner screws and the SW5 hotswap socket
-    static let leverZ = 2.0                   // underside above the module's underside
+    static let leverInset = 2.5               // from the board end, along y; clear of the corner screws and the SW5 hotswap socket
+    static let leverZ = 1.8                   // underside above the module's underside; 0.3 above the floor top
     static let leverTravel = 0.8              // sideways travel that frees the barb
     static let leverClearance = 0.3
-    static let panelThickness = 1.0           // end-wall spring panel, thinned from the inside
+    static let panelThickness = 1.2           // end-wall spring panel, thinned from the inside
     static let panelSlot = 0.4
     static let panelX0 = 2.6                  // hinge line, near the socket-wall corner
     static let panelX1 = 17.6                 // free end, leaving the corner block for its screw
-    static let panelZ0 = 1.9
-    static let panelZ1 = 4.7
+    static let panelZ0 = 1.7
+    static let panelZ1 = 4.9
     static let leverRootX = 16.0              // where the lever leaves the panel, module x
 
     // Derived
