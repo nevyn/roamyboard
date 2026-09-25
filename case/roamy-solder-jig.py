@@ -73,7 +73,7 @@ def build(header_tilt_deg):
             .translate((plate_x0, plate_y0, top)))
     for r in rows:
         pocket = (cq.Workplane("XY").box(header_body_pocket + 0.5 + pocket_fit, header_w + 2 * fit + 0.4, guide_h + 1, centered=(False, True, False))
-                  .translated((edge_right - header_body_pocket - 0.5, Y(r), top - 0.05)))
+                  .translate((edge_right - header_body_pocket - 0.5, Y(r), top - 0.05)))
         comb = comb.cut(pocket)
     pivot_x = X(header_x - header_pad_len / 2)      # inboard end of the header pads
     floor_z = top + header_axis_z - header_pin_sq / 2 - 0.05
