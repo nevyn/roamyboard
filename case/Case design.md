@@ -193,7 +193,7 @@ As for metrics, Raj says:
 Redesigned from scratch in Cadova (Swift): `case/roamy-v4/`, see its README. The v3 script stays for reference; its T-slot, prism and clearance work does not carry over.
 
 What the key module is now:
-- Top shell with the switch openings (13.9 mm to start, Kailh says 13.8 in a 1.3 plate; the coupon model decides) and both side walls; the board goes in from below with its connectors, through wall slots that are open toward the floor. A flat floor screws on from below with four M2 screws into the end walls. Open the floor and everything is visible.
+- Top shell with the switch openings (13.7 mm: the coupon print showed 13.7 gives the snuggest click on this printer, 13.6 might still work; Kailh draws 13.8 in a 1.3 plate) and both side walls; the board goes in from below with its connectors, through wall slots that are open toward the floor. A flat floor screws on from below with four M2 screws into the end walls. Open the floor and everything is visible.
 - The board is held between ledges hanging from the ceiling (full width at both ends, continuous along the header side, tabs between switch housings on the socket side where the housing sits 0.05 mm from the board edge) and the floor pillars under its bare end margins.
 - Walls 1.8 mm, 0.2 mm board clearance: 4.0 mm between boards as Electronics.md assumes, 20.85 mm column pitch. The header wall's outer face leans 8° about the pin axis so the next module's flat socket wall sits flush.
 - Two joint levers per module, one at each end under the board. Each is a rigid 1.2 × 2.0 mm beam growing out of a spring panel in the end wall: the panel is that wall thinned to 1.0 mm from x 2.6 to 18.6, hinged along its socket-side edge and free on the other three (0.4 mm slots). The lever runs out through a channel in the header wall and 3.5 mm past the face, barb 0.5 mm facing the module end, catching inside the neighbour's socket wall through a bottom-open window. Press the end panel and the lever swings 0.8 mm inward and lets go; the barb ramp does the same during insertion. Panel strain is under 1 %, so PLA is fine. `leverCatchAngle` 90° locks; about 60° makes a pull-apart detent.
@@ -202,7 +202,7 @@ What the key module is now:
 
 Checked before printing anything: cross-sections and point probes of the generated meshes confirm the pins enter the neighbour's socket slot, the hooks pass its windows with the barb region free behind the wall, the floors of two modules continue into the arc, and the ledges and posts land on bare board.
 
-Printing: shell on its socket-wall side (`key-module-print` lays it that way): the levers stand up, the plate and end walls are vertical, nothing needs support. Floor flat. Print `choc-cutout-coupon` first and set `switchCutout` to the hole that clicks.
+Printing: shell on its socket-wall side (`key-module-print` lays it that way): the levers stand up, the plate and end walls are vertical, nothing needs support. Floor flat. `choc-cutout-coupon` is how `switchCutout` was chosen; reprint it after a printer or filament change.
 
 Untested, first print will tell: hook stiffness in PLA (2.3 % strain at full deflection is at the limit; PETG is safer), the 0.94-mm-class clearances at the wall slots, the 13.9 mm switch opening.
 

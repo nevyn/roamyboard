@@ -25,7 +25,7 @@ enum P {
     static let jointAngle = 8.0°               // between neighbouring modules; header pins leave at this angle
 
     // Switch and plate
-    static let switchCutout = 13.9            // Choc v1 body is 13.8; clips grip a 1.3 plate
+    static let switchCutout = 13.7            // coupon 2026-09-25: 13.7 clicks snug on this printer; Kailh draws 13.8
     static let plateThickness = 1.3
     static let plateToBoard = 2.2             // plate top to board top, Choc v1 plate mount
 
