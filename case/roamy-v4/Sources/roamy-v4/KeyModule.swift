@@ -31,6 +31,15 @@ struct KeyModuleShell: Geometry3D {
                         .aligned(at: .centerY)
                         .translated(x: Frame.pocketX1 - 0.5, y: Frame.by(r), z: 0)
                 }
+                // channels around this module's own hooks, so they can flex
+                for i in 0..<JointHooks.hookYs.count { JointHooks.channel(index: i) }
+                // poke holes through the end walls onto the neighbour's barbs, to release
+                for i in 0..<JointHooks.hookYs.count {
+                    let y0 = i == 0 ? -1.0 : P.outerLength - P.endWall - 1.0
+                    Cylinder(diameter: P.pokeHole, height: P.endWall + 2)
+                        .rotated(x: -90°)
+                        .translated(x: P.wall + P.boardClearance + P.hookClearance + P.hookBarbRamp / 2, y: y0, z: P.hookZ + P.hookHeight / 2)
+                }
                 // windows for the previous module's hooks
                 for y in JointHooks.hookYs {
                     Box(x: P.wall + 1.5, y: P.hookThickness + 2 * P.hookClearance, z: P.hookZ + P.hookHeight + 0.6)
@@ -89,22 +98,35 @@ struct ScrewPosts: Geometry3D {
 /// on the inside of the neighbour's socket wall; pressing the hooks inward releases them.
 struct JointHooks: Geometry3D {
     static var hookYs: [Double] { [Frame.by(P.boardOriginY + P.hookInset), Frame.by(P.boardOriginY + P.boardLength - P.hookInset)] }
+    static func outward(_ i: Int) -> Double { i == 0 ? -1.0 : 1.0 }
+
+    /// One hook in the neighbour's frame: the beam from its root inside this module to the barb.
+    static func hook(index i: Int) -> any Geometry3D {
+        let catchX = P.wall + P.boardClearance + P.hookClearance
+        let catchRise = P.hookBarb / tan(P.hookCatchAngle.radians)
+        return Box(x: P.hookRoot + P.hookReach, y: P.hookThickness, z: P.hookHeight)
+            .aligned(at: .centerY)
+            .translated(x: -P.hookRoot)
+            .adding {
+                Polygon([[catchX - catchRise, 0], [catchX, P.hookBarb], [catchX + P.hookBarbRamp, 0]])
+                    .extruded(height: P.hookHeight)
+                    .scaled(y: outward(i))
+                    .translated(y: outward(i) * P.hookThickness / 2)
+            }
+            .translated(y: hookYs[i], z: P.hookZ)
+            .transformed(Frame.neighbour)
+    }
+
+    /// The room a hook needs to flex: a channel through the header wall and cavity around the beam.
+    static func channel(index i: Int) -> any Geometry3D {
+        Box(x: P.hookRoot + 1.0, y: P.hookThickness + 2 * P.hookClearance, z: P.hookHeight + 2 * P.hookClearance)
+            .aligned(at: .centerY, .centerZ)
+            .translated(x: -P.hookRoot - 1.0, y: hookYs[i], z: P.hookZ + P.hookHeight / 2)
+            .transformed(Frame.neighbour)
+    }
+
     var body: any Geometry3D {
-        for (i, y) in Self.hookYs.enumerated() {
-            let outward = i == 0 ? -1.0 : 1.0
-            let catchX = P.wall + P.boardClearance + P.hookClearance
-            Box(x: P.hookReach + 1.0, y: P.hookThickness, z: P.hookHeight)
-                .aligned(at: .centerY)
-                .translated(x: -1.0)
-                .adding {
-                    Polygon([[catchX, 0], [catchX, P.hookBarb], [catchX + P.hookBarbRamp, 0]])
-                        .extruded(height: P.hookHeight)
-                        .scaled(y: outward)
-                        .translated(y: outward * P.hookThickness / 2)
-                }
-                .translated(y: y, z: P.hookZ)
-                .transformed(Frame.neighbour)
-        }
+        for i in 0..<Self.hookYs.count { Self.hook(index: i) }
     }
 }
 

@@ -33,8 +33,8 @@ enum P {
     static let wall = 1.8
     static let endWall = 2.0
     static let boardClearance = 0.2
-    static let floorThickness = 1.7
-    static let cavityBelowBoard = 4.5         // room for 8-degree headers, sockets and hooks
+    static let floorThickness = 1.5
+    static let cavityBelowBoard = 3.6         // 8-degree header body floats 3.3 below the board
     static let ledgeWidth = 1.0
     static let ledgeLength = 2.0              // end ledges, along y
     static let postDiameter = 3.6
@@ -43,18 +43,21 @@ enum P {
     // Joint hooks, under the board at the module ends
     static let hookThickness = 1.2            // along y; the beam flexes this way
     static let hookHeight = 2.0
-    static let hookReach = 8.0                // past this module's header face
-    static let hookBarb = 0.6
+    static let hookReach = 3.5                // past this module's header face; the barb lives here
+    static let hookRoot = 6.0                 // behind the header face, inside this module: the flexing length
+    static let hookBarb = 0.5
+    static let hookCatchAngle = 90.0°          // 90 locks; about 60 pulls apart by hand
+    static let pokeHole = 2.0                 // through the end wall, onto the barb
     static let hookInset = 2.0                // from the board end, along y; clear of the SW5 hotswap socket
     static let hookClearance = 0.3
-    static let hookBarbRamp = 1.2
+    static let hookBarbRamp = 1.0
     static let hookZ = 2.0                    // hook underside above the floor's underside
     static let postInset = 1.5                // post centre inside the end wall's inner face
-    static let postFractions = [0.55, 0.85]   // across the pocket; clear of the previous module's hooks
+    static let postFractions = [0.3, 0.6]     // across the pocket; clear of both modules' hooks
     static let screwDepth = 5.0
     static let screwClearance = 2.2
     static let screwHeadDiameter = 4.0
-    static let screwHeadDepth = 1.0
+    static let screwHeadDepth = 0.8
     static let socketSideTabYs = [61.4, 99.4, 118.5]   // gaps between switch housings, clear of R4
 
     // Derived
