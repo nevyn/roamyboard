@@ -34,10 +34,11 @@ base_t = 3.0                                         # jig floor under the board
 guide_h = 4.5                                        # connector guide walls above the board back
 
 def build(header_tilt_deg):
-    # Jig frame: the board is flipped about its long axis, X = -(x - centre), Y = y - centre, z up = board back.
+    # Jig frame, board front down, seen from above: the KiCad front-view pattern (y down) turned 180 degrees,
+    # so X = centre - x and Y = centre - y; z up = board back.
     cx, cy = (board_x0 + board_x1) / 2, (board_y0 + board_y1) / 2
     def X(x): return cx - x
-    def Y(y): return y - cy
+    def Y(y): return cy - y
     bw, bl = board_x1 - board_x0, board_y1 - board_y0
     top = base_t + board_t                           # z of the board back
     edge_left, edge_right = X(board_x0), X(board_x1)  # +X and -X board edges in the jig frame
@@ -83,7 +84,7 @@ def build(header_tilt_deg):
              .text(text, 2.5, 1.0, kind="bold", halign="center", valign="center"))
         return t
     comb_mid = (plate_x0 + edge_right) / 2
-    jig = jig.cut(engrave("SW1", comb_mid, plate_y1 - 2.0)).cut(engrave("SW5", comb_mid, plate_y0 + 2.0))
+    jig = jig.cut(engrave("SW5", comb_mid, plate_y1 - 2.0)).cut(engrave("SW1", comb_mid, plate_y0 + 2.0))
     jig = jig.cut(engrave(f"{header_tilt_deg:g}", (edge_left + plate_x1) / 2, plate_y0 + 2.0))
 
     tip_rise = (pivot_x - (edge_right - header_pin_len)) * math.sin(math.radians(header_tilt_deg))
