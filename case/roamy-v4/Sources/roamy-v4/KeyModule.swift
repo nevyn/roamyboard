@@ -97,50 +97,46 @@ struct SpringPanels {
 }
 
 /// Rigid levers, one per module end, rooted in the spring panel and reaching past the header face
-/// into the neighbour's socket wall. Built in the neighbour's frame so they lie level once the
-/// modules meet at the joint angle. The barb faces the module end.
+/// into the neighbour's socket wall. Level in this module's frame; the neighbour's window is tall
+/// enough for the joint angle. The barb faces the module end.
 struct JointLevers: Geometry3D {
     static var leverYs: [Double] { [Frame.by(P.boardOriginY + P.leverInset), Frame.by(P.boardOriginY + P.boardLength - P.leverInset)] }
     static func outward(_ i: Int) -> Double { i == 0 ? -1.0 : 1.0 }
-    static var rootBehindFace: Double { Frame.headerFaceX(z: P.leverZ + P.leverHeight / 2) - P.leverRootX }
+    static var faceX: Double { Frame.headerFaceX(z: P.leverZ + P.leverHeight / 2) }
 
     static func lever(index i: Int) -> any Geometry3D {
         let y = leverYs[i]
-        let catchX = P.wall + P.boardClearance + P.leverClearance
+        let catchX = faceX + P.wall + P.boardClearance + P.leverClearance
         let catchRise = P.leverBarb / tan(P.leverCatchAngle.radians)
-        let beam = Box(x: rootBehindFace + P.leverReach, y: P.leverThickness, z: P.leverHeight)
+        let panelInner = i == 0 ? P.panelThickness - 0.4 : P.outerLength - P.panelThickness + 0.4
+        return Box(x: faceX + P.leverReach - P.leverRootX, y: P.leverThickness, z: P.leverHeight)
             .aligned(at: .centerY)
-            .translated(x: -rootBehindFace)
+            .translated(x: P.leverRootX, y: y, z: P.leverZ)
             .adding {
                 Polygon([[catchX - catchRise, 0], [catchX, P.leverBarb], [catchX + P.leverBarbRamp, 0]])
                     .extruded(height: P.leverHeight)
                     .scaled(y: outward(i))
-                    .translated(y: outward(i) * P.leverThickness / 2)
+                    .translated(y: y + outward(i) * P.leverThickness / 2, z: P.leverZ)
+                // root block from the panel skin to the beam
+                Box(x: 3.0, y: abs(y - panelInner) + P.leverThickness / 2, z: P.leverHeight)
+                    .translated(x: P.leverRootX - 1.5, y: min(panelInner, y - P.leverThickness / 2), z: P.leverZ)
             }
-            .translated(y: y, z: P.leverZ)
-            .transformed(Frame.neighbour)
-        // root block from the panel's inner face to the beam
-        let overlap = 0.4   // into the panel skin, so the root and the panel are one body
-        let panelInner = i == 0 ? P.panelThickness - overlap : P.outerLength - P.panelThickness + overlap
-        let root = Box(x: 3.0, y: abs(y - panelInner) + P.leverThickness / 2, z: P.leverHeight)
-            .translated(x: P.leverRootX - 1.5, y: min(panelInner, y - P.leverThickness / 2), z: P.leverZ + 0.3)
-        return beam.adding { root }
     }
 
     /// Room for the lever to swing: a channel through the header wall, wider on the inward side.
     static func channel(index i: Int) -> any Geometry3D {
         let inward = -outward(i)
-        return Box(x: rootBehindFace + 1.0, y: P.leverThickness + 2 * P.leverClearance + P.leverTravel, z: P.leverHeight + 2 * P.leverClearance)
-            .aligned(at: .centerZ)
-            .translated(x: -rootBehindFace - 1.0, y: leverYs[i] - P.leverThickness / 2 - P.leverClearance + (inward < 0 ? -P.leverTravel : 0), z: P.leverZ + P.leverHeight / 2)
-            .transformed(Frame.neighbour)
+        return Box(x: faceX + 1.0 - P.leverRootX, y: P.leverThickness + 2 * P.leverClearance + P.leverTravel, z: P.leverHeight + 2 * P.leverClearance)
+            .translated(x: P.leverRootX, y: leverYs[i] - P.leverThickness / 2 - P.leverClearance + (inward < 0 ? -P.leverTravel : 0), z: P.leverZ - P.leverClearance)
     }
 
-    /// Window in this module's socket wall for the previous module's lever, open toward the floor.
+    /// Window in this module's socket wall for the previous module's lever, open toward the floor and
+    /// tall enough for a lever arriving at the joint angle.
     static func window(index i: Int) -> any Geometry3D {
         let inward = -outward(i)
         let w = P.leverThickness + 2 * P.leverClearance + P.leverTravel
-        return Box(x: P.wall + 1.5, y: w, z: P.leverZ + P.leverHeight + 0.6)
+        let rise = (P.leverReach + P.wall) * sin(P.jointAngle.radians)
+        return Box(x: P.wall + 1.5, y: w, z: P.leverZ + P.leverHeight + rise + 0.4)
             .translated(x: -0.5, y: leverYs[i] - P.leverThickness / 2 - P.leverClearance + (inward < 0 ? -P.leverTravel : 0), z: 0)
     }
 

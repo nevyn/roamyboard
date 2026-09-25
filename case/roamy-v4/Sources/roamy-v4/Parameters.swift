@@ -39,7 +39,7 @@ enum P {
     static let ledgeLength = 2.0              // end ledges, along y
     static let cornerScrewXs = [1.3, 19.0]    // vertical screws in the end walls' corner blocks
     static let cornerScrewY = 2.0             // from the outer end face
-    static let pillarXs = [8.0, 13.0]         // floor pillars under the board's bare end margins
+    static let pillarXs = [6.0, 11.0]         // floor pillars under the board's bare end margins, clear of both levers
     static let pillarY = 6.0                  // from the outer end face: under the board margin, clear of the levers and the SW5 socket
     static let pillarDiameter = 3.0
     static let screwHole = 1.6                // M2 self-tapping
