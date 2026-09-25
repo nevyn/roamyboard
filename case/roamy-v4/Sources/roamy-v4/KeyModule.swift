@@ -39,15 +39,9 @@ struct KeyModuleShell: Geometry3D {
             }
             .adding {
                 Ledges()
-                ScrewPosts()
                 JointLevers()
             }
-            .subtracting {
-                // screw holes last: they straddle the wall and the post
-                for p in ScrewPosts.posts {
-                    Cylinder(diameter: P.screwHole, height: P.screwDepth).translated(x: p.screwX, y: p.y, z: P.floorThickness - 0.01)
-                }
-            }
+            .subtracting { CornerScrews.holes() }
     }
 }
 
@@ -67,23 +61,15 @@ struct Ledges: Geometry3D {
     }
 }
 
-/// D-shaped posts fused to the long walls near each end, under the board's bare margins. M2
-/// screws come up through the floor, centred on the wall face, so wall and post share the thread;
-/// the post tops push the board against the ledges.
-struct ScrewPosts: Geometry3D {
-    struct Post { let x: Double; let y: Double; let side: Double; let screwX: Double }   // side: -1 socket wall, +1 header wall
-    static var posts: [Post] {
-        [P.postY, P.outerLength - P.postY].map { Post(x: Frame.pocketX0, y: $0, side: -1, screwX: Frame.pocketX0) }
-        + P.headerPostYs.map { Post(x: Frame.pocketX1, y: Frame.by($0), side: 1, screwX: Frame.pocketX1 - P.headerScrewInset) }
+/// Vertical M2 screw holes in the corner blocks of the end walls, from the floor up.
+struct CornerScrews {
+    static var positions: [(Double, Double)] {
+        [P.cornerScrewY, P.outerLength - P.cornerScrewY].flatMap { y in P.cornerScrewXs.map { ($0, y) } }
     }
-    var body: any Geometry3D {
-        let h = P.boardBottomZ - P.floorThickness
-        for p in Self.posts {
-            if p.side < 0 {
-                Cylinder(diameter: 2 * P.postRadius, height: h).translated(x: p.x, y: p.y, z: P.floorThickness)
-            } else {
-                Box(x: P.headerPostDepth + 1.0, y: P.headerPostWidth, z: h).aligned(at: .centerY)
-                    .translated(x: p.x - P.headerPostDepth, y: p.y, z: P.floorThickness)
+    static func holes() -> any Geometry3D {
+        Union {
+            for (x, y) in positions {
+                Cylinder(diameter: P.screwHole, height: P.screwDepth).translated(x: x, y: y, z: P.floorThickness - 0.01)
             }
         }
     }
@@ -163,15 +149,24 @@ struct JointLevers: Geometry3D {
     }
 }
 
-/// Flat floor screwed on from below. Its outline follows the shell at floor height.
+/// Flat floor screwed on from below into the end-wall corners. Pillars under the board's bare
+/// end margins push it up against the ledges; they arrive with the floor, after the board.
 struct KeyModuleFloor: Geometry3D {
     var body: any Geometry3D {
         OuterPrism()
             .intersecting { Box(x: 100, y: 200, z: P.floorThickness).translated(x: -20, y: -20) }
+            .adding {
+                for y in [P.pillarY, P.outerLength - P.pillarY] {
+                    for x in P.pillarXs {
+                        Cylinder(diameter: P.pillarDiameter, height: P.boardBottomZ - 0.1 - P.floorThickness + 0.01)
+                            .translated(x: x, y: y, z: P.floorThickness - 0.01)
+                    }
+                }
+            }
             .subtracting {
-                for p in ScrewPosts.posts {
-                    Cylinder(diameter: P.screwClearance, height: P.floorThickness + 1).translated(x: p.screwX, y: p.y, z: -0.5)
-                    Cylinder(diameter: P.screwHeadDiameter, height: P.screwHeadDepth + 0.5).translated(x: p.screwX, y: p.y, z: -0.5)
+                for (x, y) in CornerScrews.positions {
+                    Cylinder(diameter: P.screwClearance, height: P.floorThickness + 1).translated(x: x, y: y, z: -0.5)
+                    Cylinder(diameter: P.screwHeadDiameter, height: P.screwHeadDepth + 0.5).translated(x: x, y: y, z: -0.5)
                 }
             }
     }

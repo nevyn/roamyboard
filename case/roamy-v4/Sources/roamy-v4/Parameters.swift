@@ -31,18 +31,17 @@ enum P {
 
     // Shell
     static let wall = 1.8
-    static let endWall = 2.0
+    static let endWall = 4.0                  // thick enough for the vertical M2 screws in its corners
     static let boardClearance = 0.2
     static let floorThickness = 1.5
     static let cavityBelowBoard = 3.6         // 8-degree header body floats 3.3 below the board
     static let ledgeWidth = 1.0
     static let ledgeLength = 2.0              // end ledges, along y
-    static let postRadius = 2.0               // D-posts on the socket wall near each end
-    static let postY = 7.3                    // from the outer end face; clear of the lever windows and the SW5 socket
-    static let headerPostYs = [64.1, 121.1]   // board y; the header wall is bare between a header body and the next +3.3V pad
-    static let headerPostDepth = 2.5          // into the cavity
-    static let headerPostWidth = 3.0
-    static let headerScrewInset = 0.4         // screw centre inside the wall's inner face, the outer face leans away
+    static let cornerScrewXs = [1.3, 19.0]    // vertical screws in the end walls' corner blocks
+    static let cornerScrewY = 2.0             // from the outer end face
+    static let pillarXs = [8.0, 13.0]         // floor pillars under the board's bare end margins
+    static let pillarY = 6.0                  // from the outer end face: under the board margin, clear of the levers and the SW5 socket
+    static let pillarDiameter = 3.0
     static let screwHole = 1.6                // M2 self-tapping
     static let screwDepth = 5.0
     static let screwClearance = 2.2
@@ -57,17 +56,17 @@ enum P {
     static let leverBarb = 0.5
     static let leverBarbRamp = 1.0
     static let leverCatchAngle = 90.0°         // 90 locks; about 60 pulls apart by hand
-    static let leverInset = 2.0               // from the board end, along y; clear of the SW5 hotswap socket
+    static let leverInset = 2.8               // from the board end, along y; clear of the corner screws and the SW5 hotswap socket
     static let leverZ = 2.0                   // underside above the module's underside
     static let leverTravel = 0.8              // sideways travel that frees the barb
     static let leverClearance = 0.3
     static let panelThickness = 1.0           // end-wall spring panel, thinned from the inside
     static let panelSlot = 0.4
     static let panelX0 = 2.6                  // hinge line, near the socket-wall corner
-    static let panelX1 = 18.6                 // free end, just short of the header wall
+    static let panelX1 = 17.6                 // free end, leaving the corner block for its screw
     static let panelZ0 = 1.9
     static let panelZ1 = 4.7
-    static let leverRootX = 17.0              // where the lever leaves the panel, module x
+    static let leverRootX = 16.0              // where the lever leaves the panel, module x
 
     // Derived
     static var pocketWidth: Double { boardWidth + 2 * boardClearance }

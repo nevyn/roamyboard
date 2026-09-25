@@ -29,7 +29,6 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
 }
 
 await Project(packageRelative: "../../build/roamy-v4/check") {
-    await Model("dbg-posts", options: .format3D(.stl)) { ScrewPosts() }
     await Model("dbg-channel", options: .format3D(.stl)) { JointLevers.channel(index: 0) }
     await Model("dbg-lever", options: .format3D(.stl)) { JointLevers.lever(index: 0) }
 }
