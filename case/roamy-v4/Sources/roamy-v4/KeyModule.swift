@@ -42,6 +42,12 @@ struct KeyModuleShell: Geometry3D {
                 ScrewPosts()
                 JointLevers()
             }
+            .subtracting {
+                // screw holes last: they straddle the wall and the post
+                for p in ScrewPosts.posts {
+                    Cylinder(diameter: P.screwHole, height: P.screwDepth).translated(x: p.screwX, y: p.y, z: P.floorThickness - 0.01)
+                }
+            }
     }
 }
 
@@ -74,14 +80,10 @@ struct ScrewPosts: Geometry3D {
         let h = P.boardBottomZ - P.floorThickness
         for p in Self.posts {
             if p.side < 0 {
-                Cylinder(diameter: 2 * P.postRadius, height: h).translated(x: p.x, y: p.y)
-                    .subtracting { Cylinder(diameter: P.screwHole, height: P.screwDepth).translated(x: p.screwX, y: p.y, z: -0.01) }
-                    .translated(z: P.floorThickness)
+                Cylinder(diameter: 2 * P.postRadius, height: h).translated(x: p.x, y: p.y, z: P.floorThickness)
             } else {
                 Box(x: P.headerPostDepth + 1.0, y: P.headerPostWidth, z: h).aligned(at: .centerY)
-                    .translated(x: p.x - P.headerPostDepth, y: p.y)
-                    .subtracting { Cylinder(diameter: P.screwHole, height: P.screwDepth).translated(x: p.screwX, y: p.y, z: -0.01) }
-                    .translated(z: P.floorThickness)
+                    .translated(x: p.x - P.headerPostDepth, y: p.y, z: P.floorThickness)
             }
         }
     }
