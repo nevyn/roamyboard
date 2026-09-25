@@ -1,0 +1,9 @@
+# roamy-v4 case
+
+Cadova (Swift) model of the v4 case: one printable module per `Model`, parameters in `Sources/roamy-v4/Parameters.swift`, board and connector numbers from `electronics/Electronics.md`.
+
+```
+swift run            # writes build/roamy-v4/*.3mf and build/roamy-v4/check/*.stl
+```
+
+Open the 3MF files in Cadova Viewer (https://github.com/tomasf/CadovaViewer); it reloads when `swift run` rewrites them. `key-module` shows shell, floor and a board mock-up in place; `key-module-print` has the shell plate-down and the floor beside it; `two-modules` has a neighbour attached at the joint angle. The STL copies exist for headless checks (sections and point probes) and are not for printing.

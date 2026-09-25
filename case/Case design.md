@@ -189,14 +189,21 @@ Here's Gergo for reference:
 As for metrics, Raj says:
 > I’d recommend not trying to design in every little detail. Maybe start with a rough shape with holes for switches. The choc keys are 14x14 square. Should be 1mm deep wall for the clips to work
 
-## 4.0 (planned)
-The PCB design in [[Electronics]] fixes what the case has to become:
-- [ ] PCB pocket for a 16.5 x 100 mm board, connectors on its underside, 2.5 mm tall
-- [ ] Side walls 1.2 mm so the column pitch lands near 19.3 mm (the 3.3 walls + gap of v3 gave 24 mm with this board)
-- [ ] Three slots through the slanted (right) wall for the header pins, three pockets in the flat (left) wall for the socket mouths, rows at 25, 44 and 82 mm from the top end
-- [ ] Modules click straight together; the T-slot tongue and groove goes away
-- [x] Pin bend jig printed: bends the wrong way and the plastic gives before the brass does; superseded by the soldering jig below
+## 4.0
+Redesigned from scratch in Cadova (Swift): `case/roamy-v4/`, see its README. The v3 script stays for reference; its T-slot, prism and clearance work does not carry over.
 
+What the key module is now:
+- Top shell with the switch openings (13.9 mm, 1.3 mm plate so the Choc clips grip) and both side walls; the board goes in from below with its connectors, through wall slots that are open toward the floor. A flat floor screws on from below with four M2 screws into posts grown out of the end walls. Open the floor and everything is visible.
+- The board is held between ledges hanging from the ceiling (full width at both ends, continuous along the header side, tabs between switch housings on the socket side where the housing sits 0.05 mm from the board edge) and the post tops under its bare end margins.
+- Walls 1.8 mm, 0.2 mm board clearance: 4.0 mm between boards as Electronics.md assumes, 20.85 mm column pitch. The header wall's outer face leans 8° about the pin axis so the next module's flat socket wall sits flush.
+- Two cantilever hooks per joint under the board at the module ends, built in the neighbour's frame so they lie level once the modules meet at 8°, barbs facing the ends, catching inside the neighbour's socket wall through bottom-open windows. Press inward to release. 1.2 × 2.0 mm beams, 8 mm reach, 0.6 mm barb.
+- Stack: floor 1.7, cavity 4.5 under the board (8° headers float 0.8, hotswap sockets 1.8, hooks 2.0), board 1.6, 0.9 to the ceiling, plate 1.3; 10.0 mm tall.
+
+Checked before printing anything: cross-sections and point probes of the generated meshes confirm the pins enter the neighbour's socket slot, the hooks pass its windows with the barb region free behind the wall, the floors of two modules continue into the arc, and the ledges and posts land on bare board.
+
+Printing: shell plate-down (`key-module-print`), the hooks need supports (tree supports worked in v3); floor flat.
+
+Untested, first print will tell: hook stiffness in PLA (2.3 % strain at full deflection is at the limit; PETG is safer), the 0.94-mm-class clearances at the wall slots, the 13.9 mm switch opening.
 
 ## Soldering jig
 

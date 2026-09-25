@@ -2,3 +2,5 @@
 build
 *-backups
 ~*
+.build/
+__pycache__/
