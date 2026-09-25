@@ -195,5 +195,11 @@ The PCB design in [[Electronics]] fixes what the case has to become:
 - [ ] Side walls 1.2 mm so the column pitch lands near 19.3 mm (the 3.3 walls + gap of v3 gave 24 mm with this board)
 - [ ] Three slots through the slanted (right) wall for the header pins, three pockets in the flat (left) wall for the socket mouths, rows at 25, 44 and 82 mm from the top end
 - [ ] Modules click straight together; the T-slot tongue and groove goes away
-- [ ] Pin bend jig printed from build/roamy_pin_jig_base.stl and _ram.stl
+- [x] Pin bend jig printed: bends the wrong way and the plastic gives before the brass does; superseded by the soldering jig below
 
+
+## Soldering jig
+
+`case/roamy-solder-jig.py` (CadQuery) writes `build/roamy_solder_jig_0deg.stl` and `_8deg.stl`. Solder the front passives first, then lay the board front down in the pocket ("SW1" and "SW5" mark the ends, headers toward the labels) and solder the back: sockets, headers, U1, hotswap sockets. Beyond the edges, open-topped slots hold the three socket mouths at their 2.0 mm overhang and the nine header pins at the pin axis height, so the connectors are located by the parts that mate, not by eye.
+
+The 8° version holds the header pins at the joint angle so the header is soldered tilted and its pins stay straight. The pin foot then touches its pad only at the inboard end: 0.44 mm gap at the body, header outer end 0.79 mm above the board, pin tips 1.63 mm higher than flat. The joint is a wedge fillet and the case wall carries the load. Print both, try 0° first for the positioning problem alone.

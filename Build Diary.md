@@ -273,3 +273,8 @@ Purple v5 boards arrived, components not yet. A Choc drops into the holes and it
 *2026-09-25*
 
 First v5 module assembled and read on the first try: the shift-register test firmware on an M5Stick clocks the 74HC165 and every key shows up. Handedness, sockets, pull-downs and the chain wiring are all confirmed on hardware.
+
+### Soldering jig
+*2026-09-25*
+
+Assembling the first module by hand showed three things: the pin bend jig bends in the wrong direction, a printed jig is too soft to bend the brass pins anyway, and headers and sockets placed by eye do not line up well enough to mate across columns. Replacement: a soldering jig that holds the board front down and locates the socket mouths and the header pins in slots beyond the board edges, with a variant that holds the header pins at 8° so nothing needs bending. Numbers and usage in [[Case design]].
