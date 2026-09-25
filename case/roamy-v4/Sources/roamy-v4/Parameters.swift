@@ -37,28 +37,37 @@ enum P {
     static let cavityBelowBoard = 3.6         // 8-degree header body floats 3.3 below the board
     static let ledgeWidth = 1.0
     static let ledgeLength = 2.0              // end ledges, along y
-    static let postDiameter = 3.6
+    static let postRadius = 2.0               // D-posts on the socket wall near each end
+    static let postY = 7.3                    // from the outer end face; clear of the lever windows and the SW5 socket
+    static let headerPostYs = [64.1, 121.1]   // board y; the header wall is bare between a header body and the next +3.3V pad
+    static let headerPostDepth = 2.5          // into the cavity
+    static let headerPostWidth = 3.0
+    static let headerScrewInset = 0.4         // screw centre inside the wall's inner face, the outer face leans away
     static let screwHole = 1.6                // M2 self-tapping
-
-    // Joint hooks, under the board at the module ends
-    static let hookThickness = 1.2            // along y; the beam flexes this way
-    static let hookHeight = 2.0
-    static let hookReach = 3.5                // past this module's header face; the barb lives here
-    static let hookRoot = 6.0                 // behind the header face, inside this module: the flexing length
-    static let hookBarb = 0.5
-    static let hookCatchAngle = 90.0°          // 90 locks; about 60 pulls apart by hand
-    static let pokeHole = 2.0                 // through the end wall, onto the barb
-    static let hookInset = 2.0                // from the board end, along y; clear of the SW5 hotswap socket
-    static let hookClearance = 0.3
-    static let hookBarbRamp = 1.0
-    static let hookZ = 2.0                    // hook underside above the floor's underside
-    static let postInset = 1.5                // post centre inside the end wall's inner face
-    static let postFractions = [0.3, 0.6]     // across the pocket; clear of both modules' hooks
     static let screwDepth = 5.0
     static let screwClearance = 2.2
     static let screwHeadDiameter = 4.0
     static let screwHeadDepth = 0.8
     static let socketSideTabYs = [61.4, 99.4, 118.5]   // gaps between switch housings, clear of R4
+
+    // Joint levers: a rigid beam per module end, carried by a spring panel in the end wall
+    static let leverThickness = 1.2           // along y
+    static let leverHeight = 2.0
+    static let leverReach = 3.5               // past this module's header face; the barb lives here
+    static let leverBarb = 0.5
+    static let leverBarbRamp = 1.0
+    static let leverCatchAngle = 90.0°         // 90 locks; about 60 pulls apart by hand
+    static let leverInset = 2.0               // from the board end, along y; clear of the SW5 hotswap socket
+    static let leverZ = 2.0                   // underside above the module's underside
+    static let leverTravel = 0.8              // sideways travel that frees the barb
+    static let leverClearance = 0.3
+    static let panelThickness = 1.0           // end-wall spring panel, thinned from the inside
+    static let panelSlot = 0.4
+    static let panelX0 = 2.6                  // hinge line, near the socket-wall corner
+    static let panelX1 = 18.6                 // free end, just short of the header wall
+    static let panelZ0 = 1.9
+    static let panelZ1 = 4.7
+    static let leverRootX = 17.0              // where the lever leaves the panel, module x
 
     // Derived
     static var pocketWidth: Double { boardWidth + 2 * boardClearance }

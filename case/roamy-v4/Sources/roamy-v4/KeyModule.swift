@@ -31,26 +31,16 @@ struct KeyModuleShell: Geometry3D {
                         .aligned(at: .centerY)
                         .translated(x: Frame.pocketX1 - 0.5, y: Frame.by(r), z: 0)
                 }
-                // channels around this module's own hooks, so they can flex
-                for i in 0..<JointHooks.hookYs.count { JointHooks.channel(index: i) }
-                // poke holes through the end walls onto the neighbour's barbs, to release
-                for i in 0..<JointHooks.hookYs.count {
-                    let y0 = i == 0 ? -1.0 : P.outerLength - P.endWall - 1.0
-                    Cylinder(diameter: P.pokeHole, height: P.endWall + 2)
-                        .rotated(x: -90°)
-                        .translated(x: P.wall + P.boardClearance + P.hookClearance + P.hookBarbRamp / 2, y: y0, z: P.hookZ + P.hookHeight / 2)
-                }
-                // windows for the previous module's hooks
-                for y in JointHooks.hookYs {
-                    Box(x: P.wall + 1.5, y: P.hookThickness + 2 * P.hookClearance, z: P.hookZ + P.hookHeight + 0.6)
-                        .aligned(at: .centerY)
-                        .translated(x: -0.5, y: y, z: 0)
+                for i in 0..<2 {
+                    JointLevers.channel(index: i)
+                    JointLevers.window(index: i)
+                    SpringPanels.cuts(index: i)
                 }
             }
             .adding {
                 Ledges()
                 ScrewPosts()
-                JointHooks()
+                JointLevers()
             }
     }
 }
@@ -71,62 +61,103 @@ struct Ledges: Geometry3D {
     }
 }
 
-/// Posts under the board's bare end margins, grown out of the end walls; M2 screws come up
-/// through the floor into them, and their tops push the board against the ledges.
+/// D-shaped posts fused to the long walls near each end, under the board's bare margins. M2
+/// screws come up through the floor, centred on the wall face, so wall and post share the thread;
+/// the post tops push the board against the ledges.
 struct ScrewPosts: Geometry3D {
-    static var positions: [(Double, Double, Double)] {   // x, y, direction toward the end wall
-        let xs = P.postFractions.map { Frame.pocketX0 + P.pocketWidth * $0 }
-        return xs.map { ($0, Frame.pocketY0 + P.postInset, -1.0) } + xs.map { ($0, Frame.pocketY1 - P.postInset, 1.0) }
+    struct Post { let x: Double; let y: Double; let side: Double; let screwX: Double }   // side: -1 socket wall, +1 header wall
+    static var posts: [Post] {
+        [P.postY, P.outerLength - P.postY].map { Post(x: Frame.pocketX0, y: $0, side: -1, screwX: Frame.pocketX0) }
+        + P.headerPostYs.map { Post(x: Frame.pocketX1, y: Frame.by($0), side: 1, screwX: Frame.pocketX1 - P.headerScrewInset) }
     }
     var body: any Geometry3D {
         let h = P.boardBottomZ - P.floorThickness
-        for (x, y, toward) in Self.positions {
-            Cylinder(diameter: P.postDiameter, height: h)
-                .adding {
-                    Box(x: P.postDiameter, y: P.postInset + 0.5, z: h)
-                        .aligned(at: .centerX)
-                        .translated(y: toward > 0 ? 0 : -(P.postInset + 0.5))
-                }
-                .subtracting { Cylinder(diameter: P.screwHole, height: P.screwDepth).translated(z: -0.01) }
-                .translated(x: x, y: y, z: P.floorThickness)
+        for p in Self.posts {
+            if p.side < 0 {
+                Cylinder(diameter: 2 * P.postRadius, height: h).translated(x: p.x, y: p.y)
+                    .subtracting { Cylinder(diameter: P.screwHole, height: P.screwDepth).translated(x: p.screwX, y: p.y, z: -0.01) }
+                    .translated(z: P.floorThickness)
+            } else {
+                Box(x: P.headerPostDepth + 1.0, y: P.headerPostWidth, z: h).aligned(at: .centerY)
+                    .translated(x: p.x - P.headerPostDepth, y: p.y)
+                    .subtracting { Cylinder(diameter: P.screwHole, height: P.screwDepth).translated(x: p.screwX, y: p.y, z: -0.01) }
+                    .translated(z: P.floorThickness)
+            }
         }
     }
 }
 
-/// Cantilever hooks on the header side, built in the neighbour's frame so they lie level in the
-/// neighbour once the modules meet at the joint angle. The barb faces the module end and catches
-/// on the inside of the neighbour's socket wall; pressing the hooks inward releases them.
-struct JointHooks: Geometry3D {
-    static var hookYs: [Double] { [Frame.by(P.boardOriginY + P.hookInset), Frame.by(P.boardOriginY + P.boardLength - P.hookInset)] }
-    static func outward(_ i: Int) -> Double { i == 0 ? -1.0 : 1.0 }
+/// Spring panels: a strip of each end wall, hinged along a vertical line at the socket-wall
+/// corner and free on its other edges, thinned from the inside. Pressing it swings the lever it
+/// carries inward and frees the barb.
+struct SpringPanels {
+    static func outer(_ i: Int) -> Double { i == 0 ? 0 : P.outerLength }     // outer face y
+    static func dir(_ i: Int) -> Double { i == 0 ? 1.0 : -1.0 }               // from the outer face into the module
+    static func cuts(index i: Int) -> any Geometry3D {
+        let y0 = outer(i), d = dir(i)
+        let slotW = P.panelSlot
+        return Union {
+        // thin the panel from the inside
+        Box(x: P.panelX1 - P.panelX0, y: P.endWall - P.panelThickness + 0.01, z: P.panelZ1 - P.panelZ0)
+            .translated(x: P.panelX0, y: d > 0 ? P.panelThickness : y0 - P.endWall, z: P.panelZ0)
+        // slots around the free end and the top and bottom edges, through the wall
+        Box(x: slotW, y: P.endWall + 2, z: P.panelZ1 - P.panelZ0 + 2 * slotW).translated(x: P.panelX1, y: y0 - 1 - (d < 0 ? P.endWall : 0), z: P.panelZ0 - slotW)
+        Box(x: P.panelX1 - P.panelX0 + slotW, y: P.endWall + 2, z: slotW).translated(x: P.panelX0, y: y0 - 1 - (d < 0 ? P.endWall : 0), z: P.panelZ0 - slotW)
+        Box(x: P.panelX1 - P.panelX0 + slotW, y: P.endWall + 2, z: slotW).translated(x: P.panelX0, y: y0 - 1 - (d < 0 ? P.endWall : 0), z: P.panelZ1)
+        }
+    }
+}
 
-    /// One hook in the neighbour's frame: the beam from its root inside this module to the barb.
-    static func hook(index i: Int) -> any Geometry3D {
-        let catchX = P.wall + P.boardClearance + P.hookClearance
-        let catchRise = P.hookBarb / tan(P.hookCatchAngle.radians)
-        return Box(x: P.hookRoot + P.hookReach, y: P.hookThickness, z: P.hookHeight)
+/// Rigid levers, one per module end, rooted in the spring panel and reaching past the header face
+/// into the neighbour's socket wall. Built in the neighbour's frame so they lie level once the
+/// modules meet at the joint angle. The barb faces the module end.
+struct JointLevers: Geometry3D {
+    static var leverYs: [Double] { [Frame.by(P.boardOriginY + P.leverInset), Frame.by(P.boardOriginY + P.boardLength - P.leverInset)] }
+    static func outward(_ i: Int) -> Double { i == 0 ? -1.0 : 1.0 }
+    static var rootBehindFace: Double { Frame.headerFaceX(z: P.leverZ + P.leverHeight / 2) - P.leverRootX }
+
+    static func lever(index i: Int) -> any Geometry3D {
+        let y = leverYs[i]
+        let catchX = P.wall + P.boardClearance + P.leverClearance
+        let catchRise = P.leverBarb / tan(P.leverCatchAngle.radians)
+        let beam = Box(x: rootBehindFace + P.leverReach, y: P.leverThickness, z: P.leverHeight)
             .aligned(at: .centerY)
-            .translated(x: -P.hookRoot)
+            .translated(x: -rootBehindFace)
             .adding {
-                Polygon([[catchX - catchRise, 0], [catchX, P.hookBarb], [catchX + P.hookBarbRamp, 0]])
-                    .extruded(height: P.hookHeight)
+                Polygon([[catchX - catchRise, 0], [catchX, P.leverBarb], [catchX + P.leverBarbRamp, 0]])
+                    .extruded(height: P.leverHeight)
                     .scaled(y: outward(i))
-                    .translated(y: outward(i) * P.hookThickness / 2)
+                    .translated(y: outward(i) * P.leverThickness / 2)
             }
-            .translated(y: hookYs[i], z: P.hookZ)
+            .translated(y: y, z: P.leverZ)
+            .transformed(Frame.neighbour)
+        // root block from the panel's inner face to the beam
+        let overlap = 0.4   // into the panel skin, so the root and the panel are one body
+        let panelInner = i == 0 ? P.panelThickness - overlap : P.outerLength - P.panelThickness + overlap
+        let root = Box(x: 2.0, y: abs(y - panelInner) + P.leverThickness / 2, z: P.leverHeight)
+            .translated(x: P.leverRootX - 1.0, y: min(panelInner, y - P.leverThickness / 2), z: P.leverZ + 0.3)
+        return beam.adding { root }
+    }
+
+    /// Room for the lever to swing: a channel through the header wall, wider on the inward side.
+    static func channel(index i: Int) -> any Geometry3D {
+        let inward = -outward(i)
+        return Box(x: rootBehindFace + 1.0, y: P.leverThickness + 2 * P.leverClearance + P.leverTravel, z: P.leverHeight + 2 * P.leverClearance)
+            .aligned(at: .centerZ)
+            .translated(x: -rootBehindFace - 1.0, y: leverYs[i] - P.leverThickness / 2 - P.leverClearance + (inward < 0 ? -P.leverTravel : 0), z: P.leverZ + P.leverHeight / 2)
             .transformed(Frame.neighbour)
     }
 
-    /// The room a hook needs to flex: a channel through the header wall and cavity around the beam.
-    static func channel(index i: Int) -> any Geometry3D {
-        Box(x: P.hookRoot + 1.0, y: P.hookThickness + 2 * P.hookClearance, z: P.hookHeight + 2 * P.hookClearance)
-            .aligned(at: .centerY, .centerZ)
-            .translated(x: -P.hookRoot - 1.0, y: hookYs[i], z: P.hookZ + P.hookHeight / 2)
-            .transformed(Frame.neighbour)
+    /// Window in this module's socket wall for the previous module's lever, open toward the floor.
+    static func window(index i: Int) -> any Geometry3D {
+        let inward = -outward(i)
+        let w = P.leverThickness + 2 * P.leverClearance + P.leverTravel
+        return Box(x: P.wall + 1.5, y: w, z: P.leverZ + P.leverHeight + 0.6)
+            .translated(x: -0.5, y: leverYs[i] - P.leverThickness / 2 - P.leverClearance + (inward < 0 ? -P.leverTravel : 0), z: 0)
     }
 
     var body: any Geometry3D {
-        for i in 0..<Self.hookYs.count { Self.hook(index: i) }
+        for i in 0..<Self.leverYs.count { Self.lever(index: i) }
     }
 }
 
@@ -136,9 +167,26 @@ struct KeyModuleFloor: Geometry3D {
         OuterPrism()
             .intersecting { Box(x: 100, y: 200, z: P.floorThickness).translated(x: -20, y: -20) }
             .subtracting {
-                for (x, y, _) in ScrewPosts.positions {
-                    Cylinder(diameter: P.screwClearance, height: P.floorThickness + 1).translated(x: x, y: y, z: -0.5)
-                    Cylinder(diameter: P.screwHeadDiameter, height: P.screwHeadDepth + 0.5).translated(x: x, y: y, z: -0.5)
+                for p in ScrewPosts.posts {
+                    Cylinder(diameter: P.screwClearance, height: P.floorThickness + 1).translated(x: p.screwX, y: p.y, z: -0.5)
+                    Cylinder(diameter: P.screwHeadDiameter, height: P.screwHeadDepth + 0.5).translated(x: p.screwX, y: p.y, z: -0.5)
+                }
+            }
+    }
+}
+
+/// Coupon: a plate with Choc openings from 13.7 to 14.2 mm, to find the size that clicks on this printer.
+struct ChocCutoutCoupon: Geometry3D {
+    var body: any Geometry3D {
+        let sizes = [13.7, 13.8, 13.9, 14.0, 14.1, 14.2]
+        let pitch = 19.05
+        Box(x: pitch * Double(sizes.count) + 4, y: pitch + 4, z: P.plateThickness)
+            .subtracting {
+                for (i, s) in sizes.enumerated() {
+                    Box(x: s, y: s, z: P.plateThickness + 2).aligned(at: .centerXY)
+                        .translated(x: 2 + pitch * (Double(i) + 0.5), y: 2 + pitch / 2, z: -1)
+                    Text(String(format: "%.1f", s)).extruded(height: 0.4).aligned(at: .centerXY)
+                        .translated(x: 2 + pitch * (Double(i) + 0.5), y: 1.6, z: P.plateThickness - 0.4)
                 }
             }
     }
