@@ -52,13 +52,13 @@ enum P {
     // Joint levers: a rigid beam per module end, carried by a spring panel in the end wall
     static let leverThickness = 2.0           // along y
     static let leverHeight = 3.0
-    static let leverReach = 4.0               // past this module's header face; the barb lives here
-    static let leverBarb = 0.7
-    static let leverBarbRamp = 1.4
+    static let leverReach = 5.0               // past this module's header face; the barb lives here
+    static let leverBarb = 1.2                // sideways, the full lever height; catches 0.9 of the neighbour's wall
+    static let leverBarbRamp = 2.0
     static let leverCatchAngle = 90.0°         // 90 locks; about 60 pulls apart by hand
     static let leverInset = 2.5               // from the board end, along y; clear of the corner screws and the SW5 hotswap socket
     static let leverZ = 1.8                   // underside above the module's underside; 0.3 above the floor top
-    static let leverTravel = 0.8              // sideways travel that frees the barb
+    static let leverTravel = 1.5              // sideways travel that frees the barb
     static let leverClearance = 0.3
     static let panelThickness = 1.2           // end-wall spring panel, thinned from the inside
     static let panelSlot = 0.4
