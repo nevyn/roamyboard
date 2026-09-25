@@ -283,3 +283,8 @@ Assembling the first module by hand showed three things: the pin bend jig bends 
 *2026-09-25, evening*
 
 Started the case over in Swift with Cadova instead of extending the CadQuery script: the joint, the board and the way the board enters the case all changed, so nothing but parameters carried over. The key module is a top shell plus a screwed-on floor, connectors through bottom-open wall slots, cantilever hooks between modules, headers at 8°. Design and numbers in [[Case design]] under 4.0. Verified with mesh sections rather than prints so far.
+
+### The hanxia header is the wrong shape
+*2026-09-25, late*
+
+Soldering in the jig showed the header body wants to hang past the board edge. The hanxia drawings explain it: the PZ2.54 header's tails jog 2.30 mm, the PM2.54 socket's 1.30 mm, so on coplanar boards the header pins run 1.0 mm further from the board than the socket bore. The Harwin pair, which the footprints were drawn from, has both at 1.25. Jig fixed for the hanxia body; case print aborted until the header choice is settled. Numbers in [[Electronics]].
