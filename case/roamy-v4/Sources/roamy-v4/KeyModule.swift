@@ -86,8 +86,9 @@ struct SpringPanels {
         let slotW = P.panelSlot
         return Union {
         // thin the panel from the inside
-        Box(x: P.panelX1 - P.panelX0, y: P.endWall - P.panelThickness + 0.01, z: P.panelZ1 - P.panelZ0)
-            .translated(x: P.panelX0, y: d > 0 ? P.panelThickness : y0 - P.endWall, z: P.panelZ0)
+        // thinning overlaps the slots; cuts that only touch leave a zero-thickness sheet behind
+        Box(x: P.panelX1 - P.panelX0 + slotW, y: P.endWall - P.panelThickness + 0.01, z: P.panelZ1 - P.panelZ0 + 2 * slotW)
+            .translated(x: P.panelX0, y: d > 0 ? P.panelThickness : y0 - P.endWall, z: P.panelZ0 - slotW)
         // slots around the free end and the top and bottom edges, through the wall
         Box(x: slotW, y: P.endWall + 2, z: P.panelZ1 - P.panelZ0 + 2 * slotW).translated(x: P.panelX1, y: y0 - 1 - (d < 0 ? P.endWall : 0), z: P.panelZ0 - slotW)
         Box(x: P.panelX1 - P.panelX0 + slotW, y: P.endWall + 2, z: slotW).translated(x: P.panelX0, y: y0 - 1 - (d < 0 ? P.endWall : 0), z: P.panelZ0 - slotW)
@@ -134,8 +135,8 @@ struct JointLevers: Geometry3D {
     /// Room for the lever to swing: a channel through the header wall, wider on the inward side.
     static func channel(index i: Int) -> any Geometry3D {
         let inward = -outward(i)
-        return Box(x: faceX + 1.0 - P.leverRootX, y: P.leverThickness + 2 * P.leverClearance + P.leverTravel, z: P.leverHeight + 2 * P.leverClearance)
-            .translated(x: P.leverRootX, y: leverYs[i] - P.leverThickness / 2 - P.leverClearance + (inward < 0 ? -P.leverTravel : 0), z: P.leverZ - P.leverClearance)
+        return Box(x: faceX + 1.0 - P.leverRootX, y: P.leverThickness + 2 * P.leverClearance + P.leverTravel, z: P.leverHeight + 2 * P.leverClearance + 1.0)
+            .translated(x: P.leverRootX, y: leverYs[i] - P.leverThickness / 2 - P.leverClearance + (inward < 0 ? -P.leverTravel : 0), z: P.leverZ - P.leverClearance - 1.0)
     }
 
     /// Window in this module's socket wall for the previous module's lever, open toward the floor.

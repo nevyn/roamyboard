@@ -7,9 +7,9 @@ await Project(packageRelative: "../../build/roamy-v4") {
         BoardMockup().inPart(name: "Board")
     }
     await Model("key-module-print") {
-        // shell on its socket-wall side: the levers stand up, nothing needs support
-        KeyModuleShell().rotated(y: -90°).translated(x: P.height).inPart(name: "Shell")
-        KeyModuleFloor().translated(x: P.height + 10).inPart(name: "Floor")
+        // shell plate-down: walls, slots and ledges print clean; only the two levers need support
+        KeyModuleShell().rotated(x: 180°).translated(y: P.outerLength, z: P.height).inPart(name: "Shell")
+        KeyModuleFloor().translated(x: P.outerWidth + 12).inPart(name: "Floor")
     }
     await Model("choc-cutout-coupon") { ChocCutoutCoupon() }
     await Model("two-modules") {

@@ -202,7 +202,7 @@ What the key module is now:
 
 Checked before printing anything: cross-sections and point probes of the generated meshes confirm the pins enter the neighbour's socket slot, the hooks pass its windows with the barb region free behind the wall, the floors of two modules continue into the arc, and the ledges and posts land on bare board.
 
-Printing: shell on its socket-wall side (`key-module-print` lays it that way): the levers stand up, the plate and end walls are vertical, nothing needs support. Floor flat. `choc-cutout-coupon` is how `switchCutout` was chosen; reprint it after a printer or filament change.
+Printing: shell plate-down (`key-module-print` lays it that way): walls rise vertically, the wall slots and the panel recesses are open-topped, the ledges sit on the plate. Only the two levers need support, from the plate's underside inside the cavity and from the bed past the header face; supports elsewhere off. On its side the header wall becomes a slab hanging over the cavity and needs supports along its whole length, which is worse. Floor flat. `choc-cutout-coupon` is how `switchCutout` was chosen; reprint it after a printer or filament change.
 
 Untested, first print will tell: hook stiffness in PLA (2.3 % strain at full deflection is at the limit; PETG is safer), the 0.94-mm-class clearances at the wall slots, the 13.9 mm switch opening.
 
