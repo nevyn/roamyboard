@@ -16,6 +16,11 @@ await Project(packageRelative: "../../build/roamy-v4") {
         KeyModuleShell().transformed(PrintPose.shell).inPart(name: "Shell")
         KeyModuleFloor().transformed(PrintPose.floor).translated(x: 30).inPart(name: "Floor")
     }
+    await Model("solder-jig") {
+        SolderJig().inPart(name: "Jig")
+        BoardMockup(switches: false).inPart(name: "Board")
+    }
+    await Model("solder-jig-print") { SolderJig().transformed(SolderJig.printPose) }
     await Model("three-modules") {
         KeyModuleShell().inPart(name: "Left shell")
         KeyModuleFloor().inPart(name: "Left floor", color: .blue)
@@ -35,5 +40,7 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
     await Model("right-shell", options: .format3D(.stl)) { KeyModuleShell().transformed(Joint.neighbourTransform) }
     await Model("right-floor", options: .format3D(.stl)) { KeyModuleFloor().transformed(Joint.neighbourTransform) }
     await Model("right-board", options: .format3D(.stl)) { BoardMockup().transformed(Joint.neighbourTransform) }
+    await Model("jig", options: .format3D(.stl)) { SolderJig() }
+    await Model("jig-print", options: .format3D(.stl)) { SolderJig().transformed(SolderJig.printPose) }
     await Model("shell-print", options: .format3D(.stl)) { KeyModuleShell().transformed(PrintPose.shell) }
 }

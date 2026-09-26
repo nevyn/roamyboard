@@ -8,7 +8,7 @@ import subprocess, sys, pathlib, trimesh
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 CHECK, OUT = ROOT / "build/roamy-v4/check", ROOT / "build/roamy-v4/render"
 COLOURS = {"shell": (210, 190, 140), "right-shell": (230, 150, 80), "floor": (90, 130, 210), "right-floor": (90, 130, 210),
-           "board": (40, 140, 70), "bare-board": (40, 140, 70), "right-board": (40, 140, 70), "shell-print": (210, 190, 140)}
+           "board": (40, 140, 70), "bare-board": (40, 140, 70), "right-board": (40, 140, 70), "shell-print": (210, 190, 140), "jig": (200, 200, 205), "jig-print": (200, 200, 205)}
 
 # name: parts, camera direction (from camera toward the model), up, optional y-clip (keep y below)
 VIEWS = {
@@ -19,6 +19,8 @@ VIEWS = {
     "under-end":   (["shell", "bare-board", "right-shell"], "0.2,0.8,1", "+Z", 16),
     "top":         (["shell", "right-shell"], "0,0.3,-1", "+Y", None),
     "print":       (["shell-print"], "0.4,1,-0.6", "+Z", None),
+    "jig":         (["jig-print"], "0.35,0.8,-1", "+Z", None),
+    "jig-header":  (["jig", "bare-board"], "0.5,0.6,1", "+Z", 30),
 }
 
 def render(name):

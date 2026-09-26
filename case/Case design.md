@@ -211,6 +211,11 @@ Untested: flap stiffness and tooth hold in PLA vs PETG, the 0.1 guide clearance 
 
 ## Soldering jig
 
-`case/roamy-solder-jig.py` (CadQuery) writes `build/roamy_solder_jig_0deg.stl` and `_8deg.stl`. Solder the front passives first, then lay the board front down in the pocket ("SW1" and "SW5" mark the ends, headers toward the labels) and solder the back: sockets, headers, U1, hotswap sockets. Beyond the edges, open-topped slots hold the three socket mouths at their 2.0 mm overhang and the nine header pins at the pin axis height, so the connectors are located by the parts that mate, not by eye.
+`SolderJig` in `case/roamy-v4` (models `solder-jig` with the board mock-up, `solder-jig-print` to print), built in the module frame from the same numbers as the case, so connectors land where the case expects them. Replaces the CadQuery jig, which held the header pins at the misread 2.3 mm axis and had no stop along the pins.
 
-The 8° version holds the header pins at the joint angle so the header is soldered tilted and its pins stay straight. The pin foot then touches its pad only at the inboard end: 0.44 mm gap at the body, header outer end 0.79 mm above the board, pin tips 1.63 mm higher than flat. The joint is a wedge fillet and the case wall carries the load. Print both, try 0° first for the positioning problem alone.
+Solder the front passives first, then lay the board front down in the pocket (SW5 and SW1 engraved at the matching ends, header side toward the labels) and solder the back.
+- Sockets: nest floor in the board plane (the body rests on the board), 0.1 mm side fit, stop against the mouth at the 2.0 mm overhang. Push each socket against its stop and tack one pad.
+- Headers: a cradle under the body tilted 8° about the inboard end of the pads, a slot under each pin (0.08 fit), and a stop touching the body's outer edge on its board side. Lay the header in, push it outward against the stop, tack. The foot then touches its pad at the inboard end with 0.32 mm under its other end; pin tips sit 1.85 mm lower than flat. The joint is a wedge fillet; the case carries the load.
+- Every cut is open toward the component side, so the soldered board lifts straight out.
+
+Checked on the meshes: no overlap with the populated board mock-up; lifting it along its normal touches nothing; moving it 0.05 mm against either stop or into the jig overlaps, so the stops and floors are in contact. Prints base down with no overhangs.
