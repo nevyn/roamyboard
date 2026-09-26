@@ -140,7 +140,7 @@ struct MCUStops: Geometry3D {
 }
 
 /// Floor of the MCU module, screwed on like the key module's: pillars under the board's end margins, locating tabs, a
-/// rib that presses the nice!nano against the shell's post on its port, a seat for the battery jack, and reliefs for the
+/// rib that presses the nice!nano against the shell's post on its port, a tongue that closes the port's slot, a seat for the battery jack, and reliefs for the
 /// switch's and button's pegs. Everything that locates the parts sideways hangs from the shell, so they go into the
 /// upturned shell before the floor closes it.
 struct MCUFloor: Geometry3D {
@@ -170,6 +170,7 @@ struct MCUFloor: Geometry3D {
                 // nice!nano: rib under its middle; the shell holds it at the sides, behind and above
                 MCU.place(Box(x: P.nanoWidth / 2, y: P.nanoLength / 2, z: P.nanoRise + 0.01),
                           x: MCU.nanoX + P.nanoWidth / 4, d: MCU.nanoD + P.nanoLength / 4, level: rim - 0.01)
+                MCUParts.usbTongue
                 // battery jack: seat and cheeks
                 let j = P.jackBody
                 MCU.place(Box(x: j.u + 2.7, y: j.y, z: P.jackSeat + 0.01), x: MCU.jackX - 1.35, d: MCU.jackD, level: rim - 0.01)
@@ -257,6 +258,13 @@ enum MCUParts {
                     Rectangle(x: 13.4, y: 7.6).aligned(at: .center).rounded(radius: 1.5)
                         .extruded(height: 5).rotated(x: -90°).translated(x: cx, y: face, z: cz)
                 })
+    }
+    /// The floor's tongue that closes the USB-C slot to 0.1 under the port, out to the port's face, short of the
+    /// overmould's recess.
+    static var usbTongue: any Geometry3D {
+        let slot = P.portWidth + 0.6 - 0.2, face = P.nanoLength + P.portOverhang
+        return nanoPlaced(Box(x: slot, y: face - P.nanoLength + 0.8, z: P.nanoRise - 0.1 + 0.01)
+            .translated(x: (P.nanoWidth - slot) / 2, y: P.nanoLength - 0.8, z: -P.nanoRise - 0.01))
     }
     /// Pockets in the free wall's inner face for the switch and the button, open toward the floor, and their openings.
     static var freeWallPockets: any Geometry3D {

@@ -168,6 +168,9 @@ for part, move, what in held:
     expect(overlap(part, nano, move) > 1e-3, f"MCU module: the nano is held {what}")
 worst = max(overlap(P["mcu-shell"], P["mcu-parts"], -up * d) for d in np.arange(0, 12, 0.25))
 expect(worst < 1e-3, f"MCU module: every part drops into the upturned shell (largest overlap {worst:.4f} mm³)")
-expect(overlap(P["mcu-shell"], P["mcu-usb-plug"]) < 1e-3, "MCU module: a USB-C plug's overmould clears the end wall")
+tongue = man("mcu-tongue")
+expect(overlap(tongue, nano, -up * 0.15) > 1e-3 and overlap(tongue, P["mcu-floor"]) > 0.9 * tongue.volume(),
+       "MCU module: the floor's tongue holds the port from below")
+expect(overlap(P["mcu-shell"] + P["mcu-floor"], P["mcu-usb-plug"]) < 1e-3, "MCU module: a USB-C plug's overmould clears the end wall")
 
 sys.exit(1 if failures else 0)
