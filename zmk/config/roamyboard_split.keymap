@@ -2,8 +2,8 @@
  * Placeholder keymap for the split roamyboard, so that a socket board with a few key
  * modules types. It stays until the real layout is designed (zmk/Layout.md).
  *
- * Positions are 5 rows of 30 keymap columns: row * 30 + column. Each row below
- * takes two lines, columns 0 to 14 and then 15 to 29. The typing block
+ * Positions are 5 rows of 30 keymap columns: row * 30 + column, one line per row,
+ * with a gap between the left half (0 to 14) and the right half (15 to 29). The typing block
  * sits in columns 9 to 20, on the 6 key modules nearest the middle of each half.
  * Keys of key modules that are not attached never fire.
  *
@@ -21,16 +21,11 @@
         base {
             display-name = "Base";
             bindings = <
-            &none     &none    &none      &none     &none     &none      &none  &none  &none  &kp ESC    &kp N1    &kp N2    &kp N3  &kp N4     &kp N5
-            &kp N6    &kp N7   &kp N8     &kp N9    &kp N0    &kp GRAVE  &none  &none  &none  &none      &none     &none     &none   &none      &none
-            &none     &none    &none      &none     &none     &none      &none  &none  &none  &kp TAB    &kp Q     &kp W     &kp E   &kp R      &kp T
-            &kp Y     &kp U    &kp I      &kp O     &kp P     &kp MINUS  &none  &none  &none  &none      &none     &none     &none   &none      &none
-            &none     &none    &none      &none     &none     &none      &none  &none  &none  &kp LCTRL  &kp A     &kp S     &kp D   &kp F      &kp G
-            &kp H     &kp J    &kp K      &kp L     &kp SEMI  &kp SQT    &none  &none  &none  &none      &none     &none     &none   &none      &none
-            &none     &none    &none      &none     &none     &none      &none  &none  &none  &kp LSHFT  &kp Z     &kp X     &kp C   &kp V      &kp B
-            &kp N     &kp M    &kp COMMA  &kp DOT   &kp FSLH  &kp RSHFT  &none  &none  &none  &none      &none     &none     &none   &none      &none
-            &none     &none    &none      &none     &none     &none      &none  &none  &none  &kp EQUAL  &kp LALT  &kp LGUI  &mo 1   &kp SPACE  &kp LBKT
-            &kp RBKT  &kp RET  &mo 1      &kp BSPC  &kp RGUI  &kp BSLH   &none  &none  &none  &none      &none     &none     &none   &none      &none
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp ESC    &kp N1    &kp N2    &kp N3  &kp N4     &kp N5        &kp N6    &kp N7   &kp N8     &kp N9    &kp N0    &kp GRAVE  &none  &none  &none  &none  &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp TAB    &kp Q     &kp W     &kp E   &kp R      &kp T         &kp Y     &kp U    &kp I      &kp O     &kp P     &kp MINUS  &none  &none  &none  &none  &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp LCTRL  &kp A     &kp S     &kp D   &kp F      &kp G         &kp H     &kp J    &kp K      &kp L     &kp SEMI  &kp SQT    &none  &none  &none  &none  &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp LSHFT  &kp Z     &kp X     &kp C   &kp V      &kp B         &kp N     &kp M    &kp COMMA  &kp DOT   &kp FSLH  &kp RSHFT  &none  &none  &none  &none  &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp EQUAL  &kp LALT  &kp LGUI  &mo 1   &kp SPACE  &kp LBKT      &kp RBKT  &kp RET  &mo 1      &kp BSPC  &kp RGUI  &kp BSLH   &none  &none  &none  &none  &none  &none  &none  &none  &none
             >;
         };
 
@@ -38,16 +33,11 @@
         system {
             display-name = "System";
             bindings = <
-            &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &trans  &bt BT_CLR
-            &trans  &trans  &trans  &studio_unlock  &bootloader  &sys_reset  &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans
-            &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans
-            &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans
-            &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans
-            &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans
-            &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans
-            &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans
-            &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans
-            &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans
+            &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &trans  &bt BT_CLR      &trans  &trans  &trans  &studio_unlock  &bootloader  &sys_reset  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+            &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans          &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+            &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans          &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+            &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans          &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+            &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans          &trans  &trans  &trans  &trans          &trans       &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
     };
