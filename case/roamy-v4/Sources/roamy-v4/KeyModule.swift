@@ -33,7 +33,7 @@ struct KeyModuleShell: Geometry3D {
                     GuideHole(end: end)
                     ScrewHoles(end: end)
                 }
-                // revision on the SW5 end wall's inner face, below the end ledge, read from the pocket
+                // revision on the SW1 end wall's inner face, below the end ledge, read from the pocket
                 engraving("shell \(Revision.label(Revision.shell))", size: 4.0)
                     .scaled(x: -1)
                     .rotated(x: 90°)
@@ -49,12 +49,12 @@ struct KeyModuleShell: Geometry3D {
 }
 
 enum ColumnEnd: CaseIterable {
-    case sw5, sw1
+    case sw1, sw5
     /// y at depth d into the end wall from its outer face.
-    func y(_ d: Double) -> Double { self == .sw5 ? d : P.outerLength - d }
-    /// A y-z section given at the SW5 end, placed at this end.
+    func y(_ d: Double) -> Double { self == .sw1 ? d : P.outerLength - d }
+    /// A y-z section given at the SW1 end, placed at this end.
     func section(_ points: [Vector2D]) -> [Vector2D] { points.map { Vector2D(y($0.x), $0.y) } }
-    /// An x-y outline given at the SW5 end, placed at this end.
+    /// An x-y outline given at the SW1 end, placed at this end.
     func plan(_ points: [Vector2D]) -> [Vector2D] { points.map { Vector2D($0.x, y($0.y)) } }
 }
 

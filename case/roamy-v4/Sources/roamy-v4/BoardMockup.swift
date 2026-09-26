@@ -6,10 +6,10 @@ struct BoardMockup: Geometry3D {
     var switches = true
     var body: any Geometry3D {
         Box(x: P.boardWidth, y: P.boardLength, z: P.boardThickness)
-            .translated(x: Frame.bx(P.boardOriginX), y: Frame.by(P.boardOriginY), z: 0)
+            .translated(x: Frame.bx(P.boardOriginX), y: Frame.by(P.boardOriginY + P.boardLength), z: 0)
             .colored(.green)
         for y in P.keyYs {   // hotswap socket above each key on the back; switch body on the front
-            Box(x: 9.0, y: 6.7, z: 1.8).translated(x: Frame.bx(P.keyX - 2.0), y: Frame.by(y - 8.2), z: -1.8).colored(.black)
+            Box(x: 9.0, y: 6.7, z: 1.8).translated(x: Frame.bx(P.keyX - 2.0), y: Frame.by(y - 1.5), z: -1.8).colored(.black)
             if switches {
                 Box(x: P.switchCutout - 0.1, y: P.switchCutout - 0.1, z: P.plateToBoard).aligned(at: .centerXY)
                     .translated(x: Frame.bx(P.keyX), y: Frame.by(y), z: P.boardTopZ).colored(.white, alpha: 0.5)

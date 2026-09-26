@@ -203,7 +203,7 @@ What the key module is now (first-iteration track, `case-v4-first-iteration`):
   - Two M2s per end from the floor, between flap and pin.
 - Replaces the cantilever hooks: no part sticks out on its own except the guide pins, and nothing needs support.
 
-Checked on the generated meshes (manifold booleans): no overlap between any pair of parts of two joined modules; header pins overlap the neighbour's socket bodies by exactly 9 × 5.6 mm (coaxial); sliding the neighbour on along its board plane collides only where the tooth rides the pin, the last 2.3 mm; the bare board rises out of the shell along its normal without touching it.
+Checked on the generated meshes (`tools/check.py`, manifold booleans): board positions match KiCad's own 3D export; no overlap between any pair of parts of two joined modules; header pins overlap the neighbour's socket bodies by exactly 9 × 5.6 mm (coaxial); sliding the neighbour on along its board plane collides only where the tooth rides the pin, the last 2.3 mm; the bare board rises out of the shell along its normal without touching it.
 
 Printing: shell top-down (`key-module-print` places it on the top plane). Only overhangs are the 0.8 mm pocket rims and the tooth ends. Floor bottom-down.
 
@@ -217,7 +217,7 @@ Solder the front passives first, then lay the board front down in the pocket (SW
 - Sockets: nest floor in the board plane (the body rests on the board), 0.1 mm side fit, stop against the mouth at the 2.0 mm overhang. Push each socket against its stop and tack one pad.
 - Headers: a cradle under the body tilted 8° about the inboard end of the pads, a slot under each pin (0.08 fit), and a stop touching the body's outer edge on its board side. Lay the header in, push it outward against the stop, tack. The foot then touches its pad at the inboard end with 0.32 mm under its other end; pin tips sit 1.85 mm lower than flat. The joint is a wedge fillet; the case carries the load.
 - Front passive pockets 4.4 × 3.0 × 1.6 mm, room for the solder fillets (r1's 3.6 × 2.4 × 1.2 was too tight).
-- Engraved "8° jig r3"; `Revision` in the package numbers every printed part.
+- Engraved "8° jig r4"; `Revision` in the package numbers every printed part.
 - Every cut is open toward the component side, so the soldered board lifts straight out.
 
 Checked on the meshes: no overlap with the populated board mock-up; lifting it along its normal touches nothing; moving it 0.05 mm against either stop or into the jig overlaps, so the stops and floors are in contact. Prints base down with no overhangs.

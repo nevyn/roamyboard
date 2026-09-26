@@ -293,3 +293,8 @@ Soldering in the jig showed the header body wants to hang past the board edge. T
 *2026-09-26*
 
 The 2.3 mm pin axis came from reading the hanxia drawings' 2.30 and 1.30 as tail jogs; they are foot lengths along the pin. Calipers: both bodies flush with their feet, 2.43 thick (datasheet 2.50), a mated pair lies flat on the table. Axis 1.25 mm from the board, both parts, as on the Harwin. Case v4 and the jig rebuilt on that. The tilted header still seats the neighbour about 1.1 mm lower at the seam, since that comes from the pivot, not the axis height.
+
+### Mirrored
+*2026-09-26*
+
+The first Cadova jig came off the printer as a mirror image: passive pockets on the wrong side, sockets and headers swapped, the same mistake the CadQuery jig made. KiCad's y points down in the front view; taking it as the model's y with the front facing up reflects the board. The case had it too: its connector openings sat where the mirrored board would have them. Board y is now reversed in `Frame.by`, and `tools/check.py` compares every model against KiCad's own 3D export, which a mirrored model fails. Shell and floor r1/r2 and jig r1–r3 are mirror images; use shell r3, floor r3, jig r4 or later.

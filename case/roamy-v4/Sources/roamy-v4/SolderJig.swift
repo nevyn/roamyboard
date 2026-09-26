@@ -23,8 +23,8 @@ struct SolderJig: Geometry3D {
 
     static var x0: Double { -3.0 }
     static var x1: Double { Frame.headerEdgeX + P.headerBodyDepth + P.pinLength + 4.0 }
-    static var y0: Double { Frame.by(P.boardOriginY) - border }
-    static var y1: Double { Frame.by(P.boardOriginY + P.boardLength) + border }
+    static var y0: Double { Frame.by(P.boardOriginY + P.boardLength) - border }
+    static var y1: Double { Frame.by(P.boardOriginY) + border }
     static var bottom: Double { P.boardThickness + base }
 
     /// A point of the untilted header (x from the pivot, z from the board's back), as soldered.
@@ -47,7 +47,7 @@ struct SolderJig: Geometry3D {
             .subtracting {
                 // board, and everything above its back
                 Box(x: P.boardWidth + 2 * Self.boardFit, y: P.boardLength + 2 * Self.boardFit, z: 20 + P.boardThickness)
-                    .translated(x: edgeS - Self.boardFit, y: Frame.by(P.boardOriginY) - Self.boardFit, z: -20)
+                    .translated(x: edgeS - Self.boardFit, y: Frame.by(P.boardOriginY + P.boardLength) - Self.boardFit, z: -20)
                 for (x, y, turned) in Self.passives {
                     let (l, w, d) = Self.passivePocket
                     Box(x: turned ? w : l, y: turned ? l : w, z: d + 0.01).aligned(at: .centerXY)

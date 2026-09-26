@@ -2,10 +2,12 @@ import Foundation
 import Cadova
 
 /// Module frame: x across the column from the socket mouth plane, y along the column from the outer face of
-/// the SW5 end wall, z up from the board's back. Board-frame numbers from Electronics.md map through `bx`/`by`.
+/// the SW1 end wall, z up from the board's back toward its front. Board-frame numbers (KiCad, seen from the
+/// front, y pointing down) map through `bx`/`by`; y is reversed, since taking it as is with the front up
+/// mirrors the board.
 enum Frame {
     static func bx(_ x: Double) -> Double { P.wall + P.boardClearance + (x - P.boardOriginX) }
-    static func by(_ y: Double) -> Double { P.endWall + P.boardClearance + (y - P.boardOriginY) }
+    static func by(_ y: Double) -> Double { P.endWall + P.boardClearance + (P.boardOriginY + P.boardLength - y) }
     static var pocketX0: Double { P.wall }
     static var pocketX1: Double { P.wall + P.pocketWidth }
     static var pocketY0: Double { P.endWall }
