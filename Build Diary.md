@@ -298,3 +298,8 @@ The 2.3 mm pin axis came from reading the hanxia drawings' 2.30 and 1.30 as tail
 *2026-09-26*
 
 The first Cadova jig came off the printer as a mirror image: passive pockets on the wrong side, sockets and headers swapped, the same mistake the CadQuery jig made. KiCad's y points down in the front view; taking it as the model's y with the front facing up reflects the board. The case had it too: its connector openings sat where the mirrored board would have them. Board y is now reversed in `Frame.by`, and `tools/check.py` compares every model against KiCad's own 3D export, which a mirrored model fails. Shell and floor r1/r2 and jig r1–r3 are mirror images; use shell r3, floor r3, jig r4 or later.
+
+### Two columns
+*2026-09-26*
+
+Two key modules in r3 cases, headers soldered in jig r4: the socket mouths sit flush in the wall, the header pins run parallel to the guide pins, switches seat snug, the columns mate and click, and the chain works electrically. The floor would not go on (r3 had no locating tabs; the tightest spot is 0.3 mm under the tilted header bodies). r4/r5 add floor tabs, corner screws, bridged counterbores, a print membrane over the switch openings, fins under the guide pins, and screw holes that take an M2.
