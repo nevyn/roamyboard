@@ -1,0 +1,96 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Key scan for one half of roamyboard: a chain of 74HC165 shift registers, one per
+  key module, read over SPI. After a /PL pulse the chain shifts out one byte per key
+  module, nearest the MCU module first, input H first. The terminator module feeds
+  0xFF, so the first byte with bit 7 set ends the chain. The driver counts the key
+  modules on every scan, and reports keys only while that count is stable.
+  docs/firmware.md describes the protocol and the column mapping.
+
+  The node is a child of the SPI bus that the chain's CLK (SCK) and DATA (MISO)
+  are wired to. It has no chip select; reg is <0>. The SPI mode comes from the
+  spi-cpol and spi-cpha properties; leave both out for mode 0, the mode that
+  docs/firmware.md explains.
+
+  Reported coordinates: row 0 is the top key of a key module (input rows - 1), the
+  last row its bottom key (input A, SW1). Columns are keymap columns within this
+  half, 0 to columns - 1; the matrix transform's col-offset places them in the
+  keymap.
+
+compatible: "roamyboard,kscan-165-chain"
+
+include: [kscan.yaml, spi-device.yaml]
+
+properties:
+  load-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      The /PL (SH/LD) line of the chain. Flag it GPIO_ACTIVE_LOW; the driver
+      asserts it for 1 us before each read to load the switch states.
+
+  columns:
+    type: int
+    required: true
+    description: |
+      Number of keymap columns that this half owns: 30 for a unibody, 15 for each
+      half of a split. Key modules that map outside these columns are ignored.
+
+  anchor:
+    type: string
+    required: true
+    enum:
+      - "mcu"
+      - "terminator"
+    description: |
+      The end of the half that keymap columns are counted from. "mcu": the key
+      module nearest the MCU module is keymap column columns - 1, and the mapping
+      does not depend on the key module count. "terminator": the key module
+      nearest the terminator module is keymap column 0, so every key module's
+      keymap column changes when a key module is added or removed.
+
+  rows:
+    type: int
+    default: 5
+    description: |
+      Keys per key module, 1 to 7. Row r reads 74HC165 input number rows - 1 - r,
+      counting A as 0: with 5, rows 0 to 4 are SW5 (input E) to SW1 (input A).
+
+  max-key-modules:
+    type: int
+    default: 32
+    description: |
+      Longest chain that the driver can read. Each scan reads max-key-modules + 1
+      bytes; a chain whose sentinel is not among them is a fault.
+
+  stable-scans:
+    type: int
+    default: 3
+    description: |
+      Number of consecutive scans that must observe the same key module count
+      before the driver accepts it. While the observed count differs from the
+      accepted one, the driver reports no key events. When a new count is
+      accepted, the driver first releases every key that it reports pressed.
+
+  debounce-press-ms:
+    type: int
+    default: 5
+    description: Debounce time for key press in milliseconds. Use 0 for eager debouncing.
+
+  debounce-release-ms:
+    type: int
+    default: 5
+    description: Debounce time for key release in milliseconds.
+
+  debounce-scan-period-ms:
+    type: int
+    default: 1
+    description: |
+      Time between scans in milliseconds while any key is pressed or debouncing,
+      or while a new key module count is settling.
+
+  poll-period-ms:
+    type: int
+    default: 10
+    description: Time between scans in milliseconds while the chain is idle.

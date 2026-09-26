@@ -1,0 +1,12 @@
+/*
+ * roamyboard as a unibody: one MCU module, one chain, all 30 keymap columns.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <roamyboard.dtsi>
+
+&roamyboard_chain {
+    columns = <30>;
+    anchor = "mcu";
+};
