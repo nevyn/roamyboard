@@ -76,15 +76,15 @@ struct SolderJig: Geometry3D {
                 }
                 // orientation marks, readable from above once the jig is turned over
                 for (label, y) in [("SW5", Frame.by(P.keyYs[0])), ("SW1", Frame.by(P.keyYs[4]))] {
-                    engraving(label)
+                    engraving(label, size: 4.0)
                         .scaled(y: -1)
-                        .translated(x: (edgeH + Self.x1) / 2 + 1, y: y, z: Self.headerBlockTop - 0.4)
+                        .translated(x: (edgeH + Self.boardFit + Self.x1) / 2, y: y, z: Self.headerBlockTop - 0.6)
                 }
                 // tilt and revision, along the column between the middle rows
                 engraving("\(Int(P.jointAngle.degrees))° jig \(Revision.label(Revision.jig))")
                     .rotated(z: 90°)
                     .scaled(y: -1)
-                    .translated(x: (edgeH + Self.x1) / 2 + 1, y: Frame.by(P.keyYs[2]), z: Self.headerBlockTop - 0.4)
+                    .translated(x: (edgeH + Self.boardFit + Self.x1) / 2, y: Frame.by((P.rowYs[1] + P.rowYs[2]) / 2), z: Self.headerBlockTop - 0.6)
             }
     }
 

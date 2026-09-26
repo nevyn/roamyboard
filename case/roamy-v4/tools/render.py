@@ -22,6 +22,7 @@ VIEWS = {
     "jig":         (["jig-print"], "0.35,0.8,-1", "+Z", None),
     "shell-under": (["shell"], "0,0,1", "-X", None),
     "floor-top":   (["floor"], "0,0,-1", "-X", None),
+    "shell-label": (["shell"], "0,-1,0.35", "+Z", 12),
     "hdr-under":   (["shell", "board"], "-0.6,0.5,1", "+Z", 70),
     "hdr-jig":     (["jig", "board"], "-0.6,0.5,1", "+Z", 70),
     "jig-header":  (["jig", "bare-board"], "0.5,0.6,1", "+Z", 30),

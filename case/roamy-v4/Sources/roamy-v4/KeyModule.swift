@@ -33,10 +33,11 @@ struct KeyModuleShell: Geometry3D {
                     GuideHole(end: end)
                     ScrewHoles(end: end)
                 }
-                // revision, in the ceiling between the third and fourth switch, read from below
-                engraving("shell \(Revision.label(Revision.shell))", size: 2.5)
+                // revision on the SW5 end wall's inner face, below the end ledge, read from the pocket
+                engraving("shell \(Revision.label(Revision.shell))", size: 4.0)
                     .scaled(x: -1)
-                    .translated(x: Frame.bx(P.keyX), y: Frame.by((P.keyYs[2] + P.keyYs[3]) / 2), z: P.ceilingZ - 0.6)
+                    .rotated(x: 90°)
+                    .translated(x: Frame.pocketX0 + P.pocketWidth / 2, y: Frame.pocketY0 + 0.4, z: -0.6)
             }
             .adding {
                 Ledges()
@@ -163,8 +164,8 @@ struct KeyModuleFloor: Geometry3D {
             .subtracting {
                 // revision on the inside face, following the floor's tilt
                 let o = Joint.corner(Joint.socketFace, Joint.rim) + Joint.along * 10, u = Joint.up, t = Joint.along
-                engraving("floor \(Revision.label(Revision.floor))")
-                    .translated(z: -0.4)
+                engraving("floor \(Revision.label(Revision.floor))", size: 6.0)
+                    .translated(z: -0.6)
                     .transformed(Transform3D([[t.x, 0, u.x, o.x], [0, 1, 0, P.outerLength / 2], [t.y, 0, u.y, o.y], [0, 0, 0, 1]]))
                 for end in ColumnEnd.allCases {
                     for x in P.screwXs {

@@ -5,15 +5,15 @@ import Cadova
 /// hanxia drawings in electronics/datasheets; switch figures from the Kailh Choc v1 plate-mount convention.
 /// Revision engraved on each printed part. Bump a part's number whenever its geometry changes.
 enum Revision {
-    static let shell = 1
-    static let floor = 1
-    static let jig = 2          // r1: first Cadova jig; r2: larger passive pockets for solder fillets
-    static let coupon = 2       // r1: 13.7–14.2; r2: from 13.5
+    static let shell = 2        // r2: larger revision text, on the end wall
+    static let floor = 2        // r2: larger revision text
+    static let jig = 3          // r1: first Cadova jig; r2: larger passive pockets for solder fillets; r3: larger text
+    static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
 }
 
-/// Engraving text, 3 mm, on the xy plane, extruded 1 mm upward from z = 0.
-func engraving(_ text: String, size: Double = 3.0) -> any Geometry3D {
+/// Engraving text on the xy plane, extruded 1 mm upward from z = 0. Engrave 0.6 deep.
+func engraving(_ text: String, size: Double = 5.0) -> any Geometry3D {
     Text(text).withFont("DejaVu Sans", style: "Bold", size: size)
         .withTextAlignment(horizontal: .center, vertical: .center)
         .extruded(height: 1.0)

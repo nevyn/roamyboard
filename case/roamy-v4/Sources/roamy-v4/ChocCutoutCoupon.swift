@@ -10,9 +10,9 @@ struct ChocCutoutCoupon: Geometry3D {
         let margin = 5.0                      // room for the switch flange (15 mm) and a label below each hole
         Box(x: pitch * Double(sizes.count) + 4, y: pitch + 2 * margin, z: P.plateThickness)
             .subtracting {
-                Text("coupon \(Revision.label(Revision.coupon))").withFontSize(3.0)
+                Text("coupon \(Revision.label(Revision.coupon))").withFontSize(4.0)
                     .extruded(height: 0.5).aligned(at: .centerXY)
-                    .translated(x: pitch * Double(sizes.count) / 2 + 2, y: pitch + 2 * margin - 1.8, z: P.plateThickness - 0.4)
+                    .translated(x: pitch * Double(sizes.count) / 2 + 2, y: pitch + 2 * margin - 2.3, z: P.plateThickness - 0.4)
                 for (i, s) in sizes.enumerated() {
                     let cx = 2 + pitch * (Double(i) + 0.5)
                     Box(x: s, y: s, z: P.plateThickness + 2).aligned(at: .centerXY)
