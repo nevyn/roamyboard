@@ -19,8 +19,7 @@ struct TerminatorModule: Geometry3D {
     static var freeFace: Vector2D { Vector2D(Joint.pivot.x - P.footClearance - EmbedPockets.groove - P.terminatorWall, 0) }
 
     static var outline: any Geometry3D {
-        let f = freeFace
-        let onFree = { (level: Double) in f + Joint.up * (level - Joint.level(f)) }
+        let onFree = { (level: Double) in Joint.onPerpendicular(x: freeFace.x, level: level) }
         return alongColumn([onFree(Joint.bottom), Joint.corner(Joint.headerFace, Joint.bottom),
                             Joint.corner(Joint.headerFace, Joint.top), onFree(Joint.top)])
     }
@@ -60,7 +59,7 @@ struct TerminatorModule: Geometry3D {
             }
             .adding {
                 Self.joint.added
-                for end in ColumnEnd.allCases { Lug(face: Self.freeFace, outward: -1, end: end) }
+                for end in ColumnEnd.allCases { Lug(faceX: Self.freeFace.x, outward: -1, end: end) }
             }
     }
 }

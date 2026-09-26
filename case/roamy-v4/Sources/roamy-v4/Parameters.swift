@@ -9,6 +9,8 @@ enum Revision {
     static let floor = 5        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores; r5: 2.4 screw clearance
     static let jig = 4          // r1: first Cadova jig; r2: larger passive pockets; r3: larger text; r4: un-mirrored
     static let terminator = 1
+    static let mcuShell = 1
+    static let mcuFloor = 1
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
 }
@@ -116,6 +118,42 @@ enum P {
     static let lugLength = 30.0               // along the column, flush with each column end
     static let lugWall = 3.0                  // around the strap slot
     static let lugRounding = 2.0              // outer vertical edges
+
+    // MCU module. nice!nano v2 measured 2026-09-26; other parts from their vendors' drawings (Case design.md).
+    static let usbEnd = ColumnEnd.sw5         // the nice!nano's end; the battery lies at the other
+    static let nanoWidth = 18.15
+    static let nanoLength = 33.4              // board, without the USB-C port
+    static let nanoHeight = 2.75              // tallest part but the port, from the board's underside
+    static let portOverhang = 0.86            // 34.26 overall
+    static let portWidth = 8.94
+    static let portHeight = 3.3
+    static let portDepth = 7.35               // into the board, for the mock-up only
+    static let nanoRise = 2.0                 // on a rib, clear of wires soldered underneath
+    static let batteryWidth = 30.0            // electrokit 41016063, 750 mAh
+    static let batteryLength = 48.0
+    static let batteryThickness = 5.0
+    static let batterySlack = 0.5             // each side, and above: room to swell
+    static let viewWidth = 14.0               // nice!view, header along one short edge
+    static let viewLength = 36.0
+    static let viewBackParts = 1.0            // below its 1.0 PCB
+    static let viewPCB = 1.0
+    static let viewGlass = 0.9
+    static let viewActiveInset = (header: 4.6, far: 6.1, side: 1.6)
+    static let viewAir = 0.2                  // over the socket board
+    static let viewLip = 0.6                  // plate over the glass's edges
+    static let windowMargin = 0.4             // window past the active area
+    static let switchBody = (u: 2.6, y: 6.7, h: 1.4)       // Alps SSSS811101, slider toward the free face
+    static let switchSlider = (u: 1.5, y: 1.3, h: 1.1, travel: 1.5)
+    static let resetBody = (u: 3.5, y: 4.7, h: 1.65)       // Panasonic EVQPUC02K, side-operated
+    static let resetActuator = (u: 1.0, y: 2.6, h: 1.4)    // hangs from the body's top face
+    static let jackBody = (u: 5.9, y: 7.6, h: 4.8)         // JST S2B-PH-K-S, mating face toward the battery
+    static let jackPins = 6.25                // from the mating face
+    static let jackTails = 3.4
+    static let jackSeat = 2.0
+    static let freeWallPocket = (switch: 0.8, reset: 0.6)  // how far each body sits into the free wall
+    static let bayEndWall = 1.6               // end walls beside the socket strip's
+    static let outerScrewInset = (x: 2.6, y: 4.1)          // from the free wall's inner face and the end face
+    static let bossDiameter = 5.6
 
     // Derived
     static var pocketWidth: Double { boardWidth + 2 * boardClearance }

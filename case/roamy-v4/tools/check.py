@@ -7,6 +7,8 @@
 - Solder jig: no overlap with the board, straight lift-out, stops in contact.
 - Terminator module: its header side meets the contract, the embedded headers fit their pockets, lie below the
   embed pause and sit in the neighbour's sockets; nothing collides with the neighbour, joined or during slide-on.
+- MCU module: its socket side meets the contract; shell, floor, socket board and parts don't overlap; it joins the
+  last key module like a key module does; the socket board drops in; screws bite; a USB-C plug fits.
 - JointSide contract: within the body, a joint side's cuts and parts stay in its reserved blocks, the shell has no
   features of its own there, and nothing but the joint's own parts sits in its keep-out.
 Needs trimesh, manifold3d, lxml (scripts/setup-cloud.sh) and kicad-cli. Exits non-zero on a failure.
@@ -136,5 +138,27 @@ worst = max(worst, overlap(P["terminator-embedded"], P["right-shell"]))
 expect(worst < 1e-3, f"terminator: no overlap with its neighbour ({worst:.4f} mm³)")
 pins = overlap(P["terminator-embedded"], P["right-board"])
 expect(abs(pins - 6 * 0.64 ** 2 * 5.615) < 0.1, f"terminator: header pins in the neighbour's sockets: {pins:.2f} mm³ (6 × 0.64² × 5.6)")
+
+# MCU module: key module frame; right-* places it as the neighbour of the key module at the origin
+for n in ["mcu-shell", "mcu-floor", "mcu-parts", "socket-board", "right-mcu-shell", "right-mcu-floor", "right-socket-board", "mcu-usb-plug"]:
+    P[n] = man(n)
+contract("mcu-shell", man("mcu-outline"), ("socket",))
+pairs = [("mcu-shell", "mcu-floor"), ("mcu-shell", "socket-board"), ("mcu-floor", "socket-board"),
+         ("mcu-parts", "mcu-shell"), ("mcu-parts", "mcu-floor"), ("mcu-parts", "socket-board")]
+worst = max((overlap(P[a], P[b]), a, b) for a, b in pairs)
+expect(worst[0] < 1e-3, f"MCU module: largest overlap {worst[0]:.4f} mm³ ({worst[1]} × {worst[2]})")
+pairs = [(a, b) for a in ("shell", "floor", "board") for b in ("right-mcu-shell", "right-mcu-floor", "right-socket-board") if (a, b) != ("board", "right-socket-board")]
+worst = max((overlap(P[a], P[b]), a, b) for a, b in pairs)
+expect(worst[0] < 1e-3, f"MCU module joined to a key module: largest overlap {worst[0]:.4f} mm³ ({worst[1]} × {worst[2]})")
+pins = overlap(P["board"], P["right-socket-board"])
+expect(abs(pins - 9 * 0.64 ** 2 * 5.615) < 0.1, f"MCU module: header pins in its sockets: {pins:.2f} mm³ (9 × 0.64² × 5.6)")
+touch = [d for d in np.arange(0, 9, 0.25) if overlap(P["shell"], P["right-mcu-shell"], along * d) > 1e-3]
+expect(touch and max(touch) <= 3.0, f"MCU module slide-on: touches only within {max(touch, default=0):.2f} mm of home (tooth)")
+worst = max(overlap(P["mcu-shell"], P["socket-board"], (0, 0, -d)) for d in np.arange(0, 16, 0.25))
+expect(worst < 1e-3, f"MCU module: socket board drops into the shell (largest overlap {worst:.4f} mm³)")
+shanks = [man(f"mcu-shank-{i}") for i in range(6)]
+expect(max(overlap(P["mcu-floor"], s_) for s_ in shanks) < 1e-3, "MCU module: 6 M2 shanks clear the floor")
+expect(min(overlap(P["mcu-shell"], s_) for s_ in shanks) > 0.5, "MCU module: every shank bites into the shell")
+expect(overlap(P["mcu-shell"], P["mcu-usb-plug"]) < 1e-3, "MCU module: a USB-C plug's overmould clears the end wall")
 
 sys.exit(1 if failures else 0)

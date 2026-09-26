@@ -5,6 +5,8 @@ print(String(format: "joint centre (%.2f, %.2f), skew %.2f°, height %.2f, top %
              Joint.centre.x, Joint.centre.y, Joint.skew.degrees, Joint.top - Joint.bottom,
              Joint.corner(Joint.socketFace, Joint.top).y, Joint.corner(Joint.headerFace, Joint.top).y,
              Joint.corner(Joint.socketFace, Joint.rim).y, Joint.corner(Joint.headerFace, Joint.rim).y))
+print(String(format: "MCU module: top %.2f above the key modules' (view), %.2f thick; free face at x %.2f",
+             MCU.top - Joint.top, MCU.top - Joint.bottom, MCU.freeFaceX))
 print(String(format: "terminator: pause at %.2f mm print height, %.2f mm printed over the pockets",
              TerminatorModule.pauseHeight, TerminatorModule.pauseLevel - Joint.bottom))
 
@@ -31,6 +33,19 @@ await Project(packageRelative: "../../build/roamy-v4") {
         BoardMockup().transformed(Joint.neighbourTransform).inPart(name: "Key module board")
     }
     await Model("terminator-print") { TerminatorModule().transformed(PrintPose.shell) }
+    await Model("mcu-module") {   // with the last key module, whose neighbour it is
+        let n = Joint.neighbourTransform
+        MCUShell().transformed(n).inPart(name: "Shell")
+        MCUFloor().transformed(n).inPart(name: "Floor", color: .blue)
+        MCUParts.socketBoard.transformed(n).inPart(name: "Socket board")
+        MCUParts.all.transformed(n).inPart(name: "Parts", color: .orange)
+        KeyModuleShell().inPart(name: "Key module shell", color: .gray)
+        BoardMockup().inPart(name: "Key module board")
+    }
+    await Model("mcu-module-print") {
+        MCUShell().transformed(PrintPose.topDown(top: MCU.top)).inPart(name: "Shell")
+        MCUFloor().transformed(PrintPose.floor).translated(x: 70).inPart(name: "Floor")
+    }
     await Model("three-modules") {
         KeyModuleShell().inPart(name: "Left shell")
         KeyModuleFloor().inPart(name: "Left floor", color: .blue)
@@ -67,6 +82,20 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
         TerminatorModule.joint.added.transformed(PrintPose.shell)
     }
     await Model("terminator-embedded-print", options: .format3D(.stl)) { TerminatorEmbedded().transformed(PrintPose.shell) }
+    await Model("mcu-shell", options: .format3D(.stl)) { MCUShell() }
+    await Model("mcu-floor", options: .format3D(.stl)) { MCUFloor() }
+    await Model("mcu-outline", options: .format3D(.stl)) { alongColumn(MCU.section(from: Joint.rim, to: MCU.top)) }
+    await Model("mcu-parts", options: .format3D(.stl)) { MCUParts.all }
+    await Model("socket-board", options: .format3D(.stl)) { MCUParts.socketBoard }
+    await Model("right-mcu-shell", options: .format3D(.stl)) { MCUShell().transformed(Joint.neighbourTransform) }
+    await Model("right-mcu-floor", options: .format3D(.stl)) { MCUFloor().transformed(Joint.neighbourTransform) }
+    await Model("right-socket-board", options: .format3D(.stl)) { MCUParts.socketBoard.transformed(Joint.neighbourTransform) }
+    await Model("mcu-shell-print", options: .format3D(.stl)) { MCUShell().transformed(PrintPose.topDown(top: MCU.top)) }
+    await Model("mcu-floor-print", options: .format3D(.stl)) { MCUFloor().transformed(PrintPose.floor) }
+    for (i, shank) in MCUFixtures.shanks.enumerated() {
+        await Model("mcu-shank-\(i)", options: .format3D(.stl)) { shank }
+    }
+    await Model("mcu-usb-plug", options: .format3D(.stl)) { MCUFixtures.plug }
     // the JointSide contract: what each side owns, cuts, adds and keeps clear
     await Model("shell-outline", options: .format3D(.stl)) { alongColumn(keystone(from: Joint.rim, to: Joint.top)) }
     for (name, joint) in [("header", HeaderSideJoint() as any JointSide), ("socket", SocketSideJoint())] {
