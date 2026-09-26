@@ -8,6 +8,7 @@ enum Revision {
     static let shell = 6        // r2: larger revision text, on the end wall; r3: un-mirrored (r1, r2 are mirror images); r4: corner screws, print aids; r5: 1.8 screw pilots; r6: seat chamfer, no print aids
     static let floor = 5        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores; r5: 2.4 screw clearance
     static let jig = 4          // r1: first Cadova jig; r2: larger passive pockets; r3: larger text; r4: un-mirrored
+    static let terminator = 1
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
 }
@@ -105,6 +106,16 @@ enum P {
     static let toothBase = 2.0
     static let toothEngagement = 0.6          // into the guide pin's notch
     static let toothCatchAngle = 45.0°        // 45 pulls apart by hand; 90 locks until the flap is pried out
+
+    // Terminator module: headers embedded at a print pause, and lugs on free faces
+    static let embedClearance = 0.15          // header body and pins in their pockets
+    static let footClearance = 0.6            // feet, solder and the wire between them
+    static let wireDiameter = 1.3             // insulated, under the feet
+    static let terminatorWall = 1.6           // behind the feet, to the free face
+    static let lugReach = 10.0                // out from the free face
+    static let lugLength = 30.0               // along the column, flush with each column end
+    static let lugWall = 3.0                  // around the strap slot
+    static let lugRounding = 2.0              // outer vertical edges
 
     // Derived
     static var pocketWidth: Double { boardWidth + 2 * boardClearance }

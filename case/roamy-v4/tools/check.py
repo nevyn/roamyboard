@@ -5,6 +5,8 @@
 - The bare board rises out of the shell along its normal without contact.
 - Sliding a neighbour on along its board plane touches only where the latch tooth rides the guide pin.
 - Solder jig: no overlap with the board, straight lift-out, stops in contact.
+- Terminator module: its header side meets the contract, the embedded headers fit their pockets, lie below the
+  embed pause and sit in the neighbour's sockets; nothing collides with the neighbour, joined or during slide-on.
 - JointSide contract: within the body, a joint side's cuts and parts stay in its reserved blocks, the shell has no
   features of its own there, and nothing but the joint's own parts sits in its keep-out.
 Needs trimesh, manifold3d, lxml (scripts/setup-cloud.sh) and kicad-cli. Exits non-zero on a failure.
@@ -38,7 +40,8 @@ def expect(ok, text):
     if not ok:
         failures.append(text)
 
-P = {n: man(n) for n in ["shell", "floor", "board", "bare-board", "right-shell", "right-floor", "right-board", "jig"]}
+P = {n: man(n) for n in ["shell", "floor", "board", "bare-board", "right-shell", "right-floor", "right-board", "jig",
+                             "terminator", "terminator-embedded", "terminator-embedded-print"]}
 
 # KiCad cross-check. glTF is right-handed: x = KiCad x, y toward the front, z = KiCad y. Turn it front-up and
 # place the board where the case holds it; nothing here goes through Frame.bx/by.
@@ -87,6 +90,9 @@ others = max(overlap(P[x], P[y], along * d) for d in np.arange(0.25, 9, 0.25)
 expect(others < 1e-3 and touch and max(touch) <= 3.0,
        f"slide-on: shells touch only within {max(touch, default=0):.2f} mm of home (tooth), nothing else touches")
 
+touch = [d for d in np.arange(0, 9, 0.25) if overlap(P["terminator"], P["right-shell"], along * d) > 1e-3]
+expect(touch and max(touch) <= 3.0, f"terminator slide-on: touches only within {max(touch, default=0):.2f} mm of home (tooth)")
+
 for move, what in [((0.15, 0, 0), "+x"), ((-0.15, 0, 0), "-x"), ((0, 0.15, 0), "+y"), ((0, -0.15, 0), "-y")]:
     expect(overlap(P["shell"], P["floor"], move) > 1e-3, f"floor: tabs locate it in the shell ({what} 0.15 mm collides)")
 # M2 screws: shank through the floor's clearance, biting into the shell's pilot hole
@@ -104,17 +110,31 @@ for move, what in [((-0.05, 0, 0), "socket mouth stops"), ((0.05, 0, 0), "header
 
 # JointSide contract. Inside reserved, the shell is the outline minus the joint's cuts plus its parts; outside the body,
 # the keep-out holds nothing but the joint's parts.
-outline = man("shell-outline")
-for side in ("header", "socket"):
-    j = {k: man(f"{side}-joint-{k}") for k in ("reserved", "removed", "added", "keep-out")}
-    region = outline ^ j["reserved"]
-    expected = (region - j["removed"]) + (j["added"] ^ j["reserved"])
-    got = P["shell"] ^ j["reserved"]
-    stray = (got - expected).volume() + (expected - got).volume()
-    expect(stray < 1e-3, f"{side} joint side: shell matches the joint inside reserved ({stray:.4f} mm³ differ)")
-    spill = (((j["removed"] + j["added"]) ^ outline) - j["reserved"]).volume()
-    expect(spill < 1e-3, f"{side} joint side: its cuts and parts stay in reserved within the body ({spill:.4f} mm³ outside)")
-    intrusion = ((P["shell"] - j["added"]) ^ j["keep-out"]).volume()
-    expect(intrusion < 1e-3, f"{side} joint side: keep-out clear of the shell ({intrusion:.4f} mm³)")
+def contract(host, outline, sides):
+    for side in sides:
+        j = {k: man(f"{side}-joint-{k}") for k in ("reserved", "removed", "added", "keep-out")}
+        region = outline ^ j["reserved"]
+        expected = (region - j["removed"]) + (j["added"] ^ j["reserved"])
+        got = P[host] ^ j["reserved"]
+        stray = (got - expected).volume() + (expected - got).volume()
+        expect(stray < 1e-3, f"{host}, {side} joint side: matches the joint inside reserved ({stray:.4f} mm³ differ)")
+        spill = (((j["removed"] + j["added"]) ^ outline) - j["reserved"]).volume()
+        expect(spill < 1e-3, f"{host}, {side} joint side: its cuts and parts stay in reserved within the body ({spill:.4f} mm³ outside)")
+        intrusion = ((P[host] - j["added"]) ^ j["keep-out"]).volume()
+        expect(intrusion < 1e-3, f"{host}, {side} joint side: keep-out clear of the {host} ({intrusion:.4f} mm³)")
+
+contract("shell", man("shell-outline"), ("header", "socket"))
+
+# Terminator module: key module frame, neighbour at the joint pose (right-*)
+contract("terminator", man("terminator-outline"), ("header",))
+expect(overlap(P["terminator"], P["terminator-embedded"]) < 1e-3, "terminator: headers and wire fit their pockets")
+pause = float((CHECK / "terminator-pause.txt").read_text())
+top = P["terminator-embedded-print"].bounding_box()[5]
+expect(top <= pause, f"terminator: embedded parts below the pause ({top:.2f} ≤ {pause:.2f} mm)")
+worst = max(overlap(P["terminator"], P[n]) for n in ["right-shell", "right-board", "right-floor"])
+worst = max(worst, overlap(P["terminator-embedded"], P["right-shell"]))
+expect(worst < 1e-3, f"terminator: no overlap with its neighbour ({worst:.4f} mm³)")
+pins = overlap(P["terminator-embedded"], P["right-board"])
+expect(abs(pins - 6 * 0.64 ** 2 * 5.615) < 0.1, f"terminator: header pins in the neighbour's sockets: {pins:.2f} mm³ (6 × 0.64² × 5.6)")
 
 sys.exit(1 if failures else 0)

@@ -25,18 +25,30 @@ struct BoardMockup: Geometry3D {
         for r in P.rowYs {
             Box(x: P.socketDepth, y: P.socketWidth, z: P.bodyHeight).aligned(at: .centerY)
                 .translated(x: 0, y: Frame.by(r), z: -P.bodyFloat - P.bodyHeight).colored(.gray)
-            // header, built untilted with x from the pivot, then tilted about it
-            let body0 = P.headerTailReach
-            Box(x: P.headerBodyDepth, y: P.headerWidth, z: P.bodyHeight).aligned(at: .centerY)
-                .translated(x: body0, y: Frame.by(r), z: -P.bodyFloat - P.bodyHeight)
-                .adding {
-                    for k in -1...1 {
-                        Box(x: P.pinLength + 0.3, y: P.pinSquare, z: P.pinSquare).aligned(at: .centerY, .centerZ)
-                            .translated(x: body0 + P.headerBodyDepth - 0.3, y: Frame.by(r) + Double(k) * P.pinPitch, z: P.pinAxisZ)
+            TiltedHeader(rowY: r).colored(.orange)
+        }
+    }
+}
+
+/// A header as soldered in the 8° jig at connector row `rowY` (board frame): body and pins, and optionally the
+/// feet that lie on the board's back behind the body. Built untilted with x from the pivot, then tilted about it.
+struct TiltedHeader: Geometry3D {
+    let rowY: Double
+    var feet = false
+    var body: any Geometry3D {
+        let body0 = P.headerTailReach
+        Box(x: P.headerBodyDepth, y: P.headerWidth, z: P.bodyHeight).aligned(at: .centerY)
+            .translated(x: body0, y: Frame.by(rowY), z: -P.bodyFloat - P.bodyHeight)
+            .adding {
+                for k in -1...1 {
+                    Box(x: P.pinLength + 0.3, y: P.pinSquare, z: P.pinSquare).aligned(at: .centerY, .centerZ)
+                        .translated(x: body0 + P.headerBodyDepth - 0.3, y: Frame.by(rowY) + Double(k) * P.pinPitch, z: P.pinAxisZ)
+                    if feet {
+                        Box(x: body0 + 0.3, y: P.pinSquare, z: P.pinSquare).aligned(at: .centerY)
+                            .translated(y: Frame.by(rowY) + Double(k) * P.pinPitch, z: -P.pinSquare)
                     }
                 }
-                .transformed(Transform3D([[Joint.c, 0, Joint.s, Joint.pivot.x], [0, 1, 0, 0], [-Joint.s, 0, Joint.c, 0], [0, 0, 0, 1]]))
-                .colored(.orange)
-        }
+            }
+            .transformed(Joint.headerTilt)
     }
 }

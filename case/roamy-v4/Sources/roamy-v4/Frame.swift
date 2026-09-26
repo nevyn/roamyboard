@@ -43,6 +43,9 @@ enum Joint {
         return Transform3D([[c, 0, s, t.x], [0, 1, 0, 0], [-s, 0, c, t.y], [0, 0, 0, 1]])
     }
 
+    /// `tilt` in 3D: a header built untilted with x from the pivot, into the module frame.
+    static var headerTilt: Transform3D { Transform3D([[c, 0, s, pivot.x], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]]) }
+
     /// Fixed point of `neighbour`: the arc's centre.
     static var centre: Vector2D {
         // (I - R)(p - F) = R m, R the tilt rotation, m the mouth offset along x
