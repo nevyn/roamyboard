@@ -8,9 +8,9 @@
     GPIO25 -> CLK
     GPIO0  -> SH/LD (active low)
 
-  Chaining:
-    QH of chip0 -> DS of chip1 -> DS of chip2 -> ...
-    Read order will be "furthest chip first" (standard shift-chain behavior).
+  Chaining (chip0 is the one wired to the M5Stick):
+    ... -> QH of chip2 -> SER of chip1, QH of chip1 -> SER of chip0
+    Read order is chip0 first, then chip1, ...; within a chip H first, A last.
 
   Configure how many bits/chips you want here:
 */
