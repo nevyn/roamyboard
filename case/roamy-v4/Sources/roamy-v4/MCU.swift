@@ -80,6 +80,10 @@ struct MCUShell: Geometry3D {
             .adding {
                 Ledges(ceilingZ: Joint.z(level: MCU.ceiling + 0.3, x: Frame.pocketX0))
                 MCU.joint.added
+                // holds the nice!nano down on the top of its USB-C port
+                let portTop = Joint.rim + P.nanoRise + P.portHeight + 0.1
+                MCU.place(Box(x: 6, y: 4, z: MCU.ceiling - portTop + 0.5),
+                          x: MCU.nanoX + (P.nanoWidth - 6) / 2, d: MCU.nanoD + P.nanoLength - 4.5, level: portTop)
                 for end in ColumnEnd.allCases {
                     Cylinder(diameter: P.bossDiameter, height: MCU.ceiling - Joint.rim + 0.5)
                         .transformed(Joint.levelFrame(x: MCU.outerScrewX, y: end.y(P.outerScrewInset.y), level: Joint.rim))
@@ -149,10 +153,15 @@ struct MCUFloor: Geometry3D {
                         MCU.place(Box(x: 6, y: t, z: post), x: x, d: d, level: rim - 0.01)
                     }
                 }
-                // nice!nano: rib under its middle, stop behind it
+                // nice!nano: rib under its middle, stop behind it, guides at its sides that reach 0.6 up the board's edge
                 let w = P.nanoWidth, l = P.nanoLength
                 MCU.place(Box(x: w / 2, y: l / 2, z: P.nanoRise + 0.01), x: MCU.nanoX + w / 4, d: MCU.nanoD + l / 4, level: rim - 0.01)
                 MCU.place(Box(x: w / 2, y: 1.0, z: P.nanoRise + 1.5), x: MCU.nanoX + w / 4, d: MCU.nanoD - 1.1, level: rim - 0.01)
+                for x in [MCU.nanoX - 0.15 - 1.2, MCU.nanoX + w + 0.15] {
+                    for d in [MCU.nanoD + 2, MCU.nanoD + l - 12] {   // the front pair clear of the screw boss
+                        MCU.place(Box(x: 1.2, y: 4, z: P.nanoRise + 0.6), x: x, d: d, level: rim - 0.01)
+                    }
+                }
                 // battery jack: seat and cheeks
                 let j = P.jackBody
                 MCU.place(Box(x: j.u + 2.7, y: j.y, z: P.jackSeat + 0.01), x: MCU.jackX - 1.35, d: MCU.jackD, level: rim - 0.01)

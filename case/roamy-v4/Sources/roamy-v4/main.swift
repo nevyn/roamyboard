@@ -95,6 +95,7 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
     for (i, shank) in MCUFixtures.shanks.enumerated() {
         await Model("mcu-shank-\(i)", options: .format3D(.stl)) { shank }
     }
+    await Model("mcu-nano", options: .format3D(.stl)) { MCUParts.nano }
     await Model("mcu-usb-plug", options: .format3D(.stl)) { MCUFixtures.plug }
     // the JointSide contract: what each side owns, cuts, adds and keeps clear
     await Model("shell-outline", options: .format3D(.stl)) { alongColumn(keystone(from: Joint.rim, to: Joint.top)) }
