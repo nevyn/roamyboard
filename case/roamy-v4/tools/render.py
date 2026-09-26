@@ -20,6 +20,8 @@ VIEWS = {
     "top":         (["shell", "right-shell"], "0,0.3,-1", "+Y", None),
     "print":       (["shell-print"], "0.4,1,-0.6", "+Z", None),
     "jig":         (["jig-print"], "0.35,0.8,-1", "+Z", None),
+    "shell-under": (["shell"], "0,0,1", "-X", None),
+    "floor-top":   (["floor"], "0,0,-1", "-X", None),
     "hdr-under":   (["shell", "board"], "-0.6,0.5,1", "+Z", 70),
     "hdr-jig":     (["jig", "board"], "-0.6,0.5,1", "+Z", 70),
     "jig-header":  (["jig", "bare-board"], "0.5,0.6,1", "+Z", 30),

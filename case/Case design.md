@@ -216,6 +216,8 @@ Untested: flap stiffness and tooth hold in PLA vs PETG, the 0.1 guide clearance 
 Solder the front passives first, then lay the board front down in the pocket (SW5 and SW1 engraved at the matching ends, header side toward the labels) and solder the back.
 - Sockets: nest floor in the board plane (the body rests on the board), 0.1 mm side fit, stop against the mouth at the 2.0 mm overhang. Push each socket against its stop and tack one pad.
 - Headers: a cradle under the body tilted 8° about the inboard end of the pads, a slot under each pin (0.08 fit), and a stop touching the body's outer edge on its board side. Lay the header in, push it outward against the stop, tack. The foot then touches its pad at the inboard end with 0.32 mm under its other end; pin tips sit 1.85 mm lower than flat. The joint is a wedge fillet; the case carries the load.
+- Front passive pockets 4.4 × 3.0 × 1.6 mm, room for the solder fillets (r1's 3.6 × 2.4 × 1.2 was too tight).
+- Engraved "8° jig r2"; `Revision` in the package numbers every printed part.
 - Every cut is open toward the component side, so the soldered board lifts straight out.
 
 Checked on the meshes: no overlap with the populated board mock-up; lifting it along its normal touches nothing; moving it 0.05 mm against either stop or into the jig overlaps, so the stops and floors are in contact. Prints base down with no overhangs.

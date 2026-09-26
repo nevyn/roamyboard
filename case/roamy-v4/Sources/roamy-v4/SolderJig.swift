@@ -19,7 +19,7 @@ struct SolderJig: Geometry3D {
     // Front passives, board frame: x, y, rotated 90°. Pocket 0805 plus fillets.
     static let passives: [(Double, Double, Bool)] = [(83.6, 60.0, false), (72.3, 81.0, true), (76.25, 99.4, false),
                                                      (79.6, 99.9, true), (82.95, 99.4, false), (76.0, 118.4, false)]
-    static let passivePocket = (length: 3.6, width: 2.4, depth: 1.2)
+    static let passivePocket = (length: 4.4, width: 3.0, depth: 1.6)   // 0805 plus solder fillets
 
     static var x0: Double { -3.0 }
     static var x1: Double { Frame.headerEdgeX + P.headerBodyDepth + P.pinLength + 4.0 }
@@ -76,12 +76,15 @@ struct SolderJig: Geometry3D {
                 }
                 // orientation marks, readable from above once the jig is turned over
                 for (label, y) in [("SW5", Frame.by(P.keyYs[0])), ("SW1", Frame.by(P.keyYs[4]))] {
-                    Text(label).withFont("DejaVu Sans", style: "Bold", size: 3.0)
-                        .withTextAlignment(horizontal: .center, vertical: .center)
-                        .extruded(height: 0.6)
+                    engraving(label)
                         .scaled(y: -1)
-                        .translated(x: (edgeH + Self.x1) / 2 + 1, y: y, z: Self.headerBlockTop - 0.01)
+                        .translated(x: (edgeH + Self.x1) / 2 + 1, y: y, z: Self.headerBlockTop - 0.4)
                 }
+                // tilt and revision, along the column between the middle rows
+                engraving("\(Int(P.jointAngle.degrees))° jig \(Revision.label(Revision.jig))")
+                    .rotated(z: 90°)
+                    .scaled(y: -1)
+                    .translated(x: (edgeH + Self.x1) / 2 + 1, y: Frame.by(P.keyYs[2]), z: Self.headerBlockTop - 0.4)
             }
     }
 
