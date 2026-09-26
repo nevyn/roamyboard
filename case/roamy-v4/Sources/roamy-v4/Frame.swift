@@ -106,3 +106,14 @@ func keystone(from lower: Double, to upper: Double) -> [Vector2D] {
     [Joint.corner(Joint.socketFace, lower), Joint.corner(Joint.headerFace, lower),
      Joint.corner(Joint.headerFace, upper), Joint.corner(Joint.socketFace, upper)]
 }
+
+/// A column end, for features built at the SW1 end and mirrored to the SW5 end.
+enum ColumnEnd: CaseIterable {
+    case sw1, sw5
+    /// y at depth d into the end wall from its outer face.
+    func y(_ d: Double) -> Double { self == .sw1 ? d : P.outerLength - d }
+    /// A y-z section given at the SW1 end, placed at this end.
+    func section(_ points: [Vector2D]) -> [Vector2D] { points.map { Vector2D(y($0.x), $0.y) } }
+    /// An x-y outline given at the SW1 end, placed at this end.
+    func plan(_ points: [Vector2D]) -> [Vector2D] { points.map { Vector2D($0.x, y($0.y)) } }
+}

@@ -5,6 +5,8 @@
 - The bare board rises out of the shell along its normal without contact.
 - Sliding a neighbour on along its board plane touches only where the latch tooth rides the guide pin.
 - Solder jig: no overlap with the board, straight lift-out, stops in contact.
+- JointSide contract: within the body, a joint side's cuts and parts stay in its reserved blocks, the shell has no
+  features of its own there, and nothing but the joint's own parts sits in its keep-out.
 Needs trimesh, manifold3d, lxml (scripts/setup-cloud.sh) and kicad-cli. Exits non-zero on a failure.
 """
 import math, pathlib, re, subprocess, sys, tempfile
@@ -19,6 +21,8 @@ BOARD_X0, BOARD_Y0, BOARD_LENGTH = 70.55, 40.0, 100.0
 failures = []
 
 def man(name):
+    if (CHECK / f"{name}.stl").stat().st_size <= 84:          # binary STL header and a zero count: nothing
+        return m3d.Manifold()
     t = trimesh.load(CHECK / f"{name}.stl", process=True)
     return m3d.Manifold(m3d.Mesh(vert_properties=np.asarray(t.vertices, dtype=np.float32),
                                  tri_verts=np.asarray(t.faces, dtype=np.uint32)))
@@ -97,5 +101,20 @@ worst = max(overlap(P["jig"], P["bare-board"], (0, 0, -d)) for d in np.arange(0,
 expect(worst < 1e-3, f"jig: board lifts straight out (largest overlap {worst:.4f} mm³)")
 for move, what in [((-0.05, 0, 0), "socket mouth stops"), ((0.05, 0, 0), "header stops"), ((0, 0, 0.05), "floors")]:
     expect(overlap(P["jig"], P["bare-board"], move) > 1e-3, f"jig: {what} in contact")
+
+# JointSide contract. Inside reserved, the shell is the outline minus the joint's cuts plus its parts; outside the body,
+# the keep-out holds nothing but the joint's parts.
+outline = man("shell-outline")
+for side in ("header", "socket"):
+    j = {k: man(f"{side}-joint-{k}") for k in ("reserved", "removed", "added", "keep-out")}
+    region = outline ^ j["reserved"]
+    expected = (region - j["removed"]) + (j["added"] ^ j["reserved"])
+    got = P["shell"] ^ j["reserved"]
+    stray = (got - expected).volume() + (expected - got).volume()
+    expect(stray < 1e-3, f"{side} joint side: shell matches the joint inside reserved ({stray:.4f} mm³ differ)")
+    spill = (((j["removed"] + j["added"]) ^ outline) - j["reserved"]).volume()
+    expect(spill < 1e-3, f"{side} joint side: its cuts and parts stay in reserved within the body ({spill:.4f} mm³ outside)")
+    intrusion = ((P["shell"] - j["added"]) ^ j["keep-out"]).volume()
+    expect(intrusion < 1e-3, f"{side} joint side: keep-out clear of the shell ({intrusion:.4f} mm³)")
 
 sys.exit(1 if failures else 0)

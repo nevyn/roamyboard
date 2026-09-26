@@ -2,10 +2,10 @@ import Foundation
 import Cadova
 
 /// Top shell of a key module: plate with the switch openings and pockets, walls with bottom-open connector
-/// slots, ledges that stop the board from above, and the joint: guide pins on the header side, holes with
-/// spring flaps on the socket side. Open at the bottom, so the board drops in from below;
-/// `KeyModuleFloor` closes it.
+/// slots, ledges that stop the board from above, and joint hardware on both sides (`HeaderSideJoint`,
+/// `SocketSideJoint`). Open at the bottom, so the board drops in from below; `KeyModuleFloor` closes it.
 struct KeyModuleShell: Geometry3D {
+    static let joints: [any JointSide] = [HeaderSideJoint(), SocketSideJoint()]
     /// Print pose only: a one-layer membrane over each switch opening at the pocket floor, so the pocket rim
     /// prints on it instead of over air (cut it out after printing), and a break-away fin under each guide pin.
     var printAids = false
@@ -33,10 +33,8 @@ struct KeyModuleShell: Geometry3D {
                         .aligned(at: .centerY)
                         .translated(x: Frame.pocketX1 - 0.5, y: Frame.by(r), z: -20)
                 }
-                for end in ColumnEnd.allCases {
-                    GuideHole(end: end)
-                    ScrewHoles(end: end)
-                }
+                for joint in Self.joints { joint.removed }
+                for end in ColumnEnd.allCases { ScrewHoles(end: end) }
                 // revision on the SW1 end wall's inner face, below the end ledge, read from the pocket
                 engraving("shell \(Revision.label(Revision.shell))", size: 4.0)
                     .scaled(x: -1)
@@ -45,102 +43,10 @@ struct KeyModuleShell: Geometry3D {
             }
             .adding {
                 Ledges()
-                for end in ColumnEnd.allCases {
-                    GuidePin(end: end).transformed(Joint.neighbourTransform)
-                    if printAids { GuidePinFin(end: end) }
+                for joint in Self.joints {
+                    joint.added
+                    if printAids { joint.printAids }
                 }
-            }
-    }
-}
-
-enum ColumnEnd: CaseIterable {
-    case sw1, sw5
-    /// y at depth d into the end wall from its outer face.
-    func y(_ d: Double) -> Double { self == .sw1 ? d : P.outerLength - d }
-    /// A y-z section given at the SW1 end, placed at this end.
-    func section(_ points: [Vector2D]) -> [Vector2D] { points.map { Vector2D(y($0.x), $0.y) } }
-    /// An x-y outline given at the SW1 end, placed at this end.
-    func plan(_ points: [Vector2D]) -> [Vector2D] { points.map { Vector2D($0.x, y($0.y)) } }
-}
-
-/// Guide pin section: flat sides, 45° gables above and below, so it prints without support in any
-/// orientation and centres in its hole both ways.
-func guideSection(grow g: Double = 0, scale k: Double = 1) -> [Vector2D] {
-    let w = (P.guideWidth * k) / 2 + g, h = (P.guideFlat * k) / 2 + g, gable = (P.guideWidth * k) / 2 + g
-    let y = P.guideY, z = P.guideZ
-    return [[y - w, z - h], [y, z - h - gable], [y + w, z - h], [y + w, z + h], [y, z + h + gable], [y - w, z + h]]
-}
-
-/// Tooth on the flap's inner face, in plan (x, depth into the end wall): 45° lead-in toward the
-/// neighbour, catch face at `toothCatchAngle`.
-func toothPlan(grow g: Double = 0) -> [Vector2D] {
-    let x0 = P.toothX - P.toothBase / 2 - g, x1 = P.toothX + P.toothBase / 2 + g
-    let d0 = P.flapThickness - 0.01, h = P.guideClearance + P.toothEngagement + g
-    let catchRun = h / tan(P.toothCatchAngle.radians)
-    return [[x0, d0], [x1, d0], [x1 - catchRun, d0 + h], [x0 + h, d0 + h]]
-}
-
-/// The neighbour's guide pin, in the neighbour's frame (x from its socket face): it roots in this module's
-/// end wall and reaches into the neighbour's hole, notched for the flap's tooth.
-struct GuidePin: Geometry3D {
-    let end: ColumnEnd
-    var body: any Geometry3D {
-        let tip = P.guideReach, taperStart = tip - P.guideTaper
-        acrossColumn(end.section(guideSection()), from: -P.guideRoot, to: taperStart)
-            .adding {
-                acrossColumn(end.section(guideSection()), from: taperStart - 0.01, to: taperStart)
-                    .adding { acrossColumn(end.section(guideSection(scale: P.guideTipScale)), from: tip - 0.01, to: tip) }
-                    .convexHull()
-            }
-            .subtracting {
-                // notch: the tooth grown by the clearance, run 0.3 further toward the root so the faces close first
-                Polygon(end.plan(toothPlan(grow: P.guideClearance))).extruded(height: 20).translated(z: -10)
-                Polygon(end.plan(toothPlan(grow: P.guideClearance))).extruded(height: 20).translated(x: -0.3, z: -10)
-            }
-    }
-}
-
-/// Print aid: a break-away fin under each guide pin, from its top ridge to this module's top plane, which lies on
-/// the bed in the print pose. The pin prints nearly flat and would otherwise droop toward its tip.
-struct GuidePinFin: Geometry3D {
-    let end: ColumnEnd
-    var body: any Geometry3D {
-        let apex = P.guideZ + P.guideFlat / 2 + P.guideWidth / 2
-        let tipApex = P.guideZ + (P.guideFlat / 2 + P.guideWidth / 2) * P.guideTipScale
-        let ridge = [Vector2D(-0.2, apex), Vector2D(P.guideReach - P.guideTaper, apex),
-                     Vector2D(P.guideReach - 0.2, tipApex + (apex - tipApex) * 0.2 / P.guideTaper)].map(Joint.neighbour)
-        let top = [ridge[2].x, ridge[0].x].map { Vector2D($0, Joint.z(level: Joint.top, x: $0)) }
-        alongColumn(ridge + top, from: min(end.y(P.guideY - P.finThickness / 2), end.y(P.guideY + P.finThickness / 2)),
-                    length: P.finThickness)
-    }
-}
-
-/// Hole for the previous module's guide pin, and the spring flap over it: the end wall's outer skin, cut free
-/// behind and at its free edge, hinged on the socket-face side. Top and bottom edges are the module's own
-/// top and rim, so the flap prints standing on the bed and bends within its layers.
-struct GuideHole: Geometry3D {
-    let end: ColumnEnd
-    var body: any Geometry3D {
-        let slit = [P.flapThickness, P.flapThickness + P.flapSlit]
-        let holeApex = P.guideZ + P.guideFlat / 2 + P.guideWidth / 2 + P.guideClearance
-        acrossColumn(end.section(guideSection(grow: P.guideClearance)), from: -1, to: P.guideReach + 0.3)
-            .adding {
-                // relief along the top ridge for the guide pin fin's break-off scar
-                acrossColumn(end.section([[P.guideY - 0.4, holeApex - 0.4], [P.guideY + 0.4, holeApex - 0.4], [P.guideY, holeApex + 0.3]]),
-                             from: -1, to: P.guideReach + 0.3)
-                // slit behind the flap, through top and rim
-                Polygon(end.plan([[P.flapHinge, slit[0]], [P.flapFreeEdge + P.flapSlot, slit[0]],
-                                  [P.flapFreeEdge + P.flapSlot, slit[1]], [P.flapHinge, slit[1]]]))
-                    .extruded(height: 40).translated(z: -20)
-                // free edge
-                Polygon(end.plan([[P.flapFreeEdge, -1], [P.flapFreeEdge + P.flapSlot, -1],
-                                  [P.flapFreeEdge + P.flapSlot, slit[1]], [P.flapFreeEdge, slit[1]]]))
-                    .extruded(height: 40).translated(z: -20)
-            }
-            .subtracting {
-                // the tooth stays
-                let h = P.guideFlat + P.guideWidth + 2 * P.guideClearance   // the hole's full height
-                Polygon(end.plan(toothPlan())).extruded(height: h).translated(z: P.guideZ - h / 2)
             }
     }
 }

@@ -45,4 +45,12 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
     await Model("jig-print", options: .format3D(.stl)) { SolderJig().transformed(SolderJig.printPose) }
     await Model("shell-print", options: .format3D(.stl)) { KeyModuleShell(printAids: true).transformed(PrintPose.shell) }
     await Model("floor-print", options: .format3D(.stl)) { KeyModuleFloor().transformed(PrintPose.floor) }
+    // the JointSide contract: what each side owns, cuts, adds and keeps clear
+    await Model("shell-outline", options: .format3D(.stl)) { alongColumn(keystone(from: Joint.rim, to: Joint.top)) }
+    for (name, joint) in [("header", HeaderSideJoint() as any JointSide), ("socket", SocketSideJoint())] {
+        await Model("\(name)-joint-reserved", options: .format3D(.stl)) { joint.reserved }
+        await Model("\(name)-joint-removed", options: .format3D(.stl)) { joint.removed }
+        await Model("\(name)-joint-added", options: .format3D(.stl)) { joint.added }
+        await Model("\(name)-joint-keep-out", options: .format3D(.stl)) { joint.keepOut }
+    }
 }
