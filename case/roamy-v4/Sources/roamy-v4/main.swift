@@ -1,4 +1,10 @@
+import Foundation
 import Cadova
+
+print(String(format: "joint centre (%.2f, %.2f), skew %.2f°, height %.2f, top %.2f..%.2f, floor top %.2f..%.2f (z at socket face .. header face)",
+             Joint.centre.x, Joint.centre.y, Joint.skew.degrees, Joint.top - Joint.bottom,
+             Joint.corner(Joint.socketFace, Joint.top).y, Joint.corner(Joint.headerFace, Joint.top).y,
+             Joint.corner(Joint.socketFace, Joint.rim).y, Joint.corner(Joint.headerFace, Joint.rim).y))
 
 await Project(packageRelative: "../../build/roamy-v4") {
     await Model("key-module") {
@@ -7,14 +13,16 @@ await Project(packageRelative: "../../build/roamy-v4") {
         BoardMockup().inPart(name: "Board")
     }
     await Model("key-module-print") {
-        KeyModuleShell().rotated(x: 180°).translated(z: P.height).inPart(name: "Shell")
-        KeyModuleFloor().translated(x: P.outerWidth + 10).inPart(name: "Floor")
+        KeyModuleShell().transformed(PrintPose.shell).inPart(name: "Shell")
+        KeyModuleFloor().transformed(PrintPose.floor).translated(x: 30).inPart(name: "Floor")
     }
-    await Model("two-modules") {
+    await Model("three-modules") {
         KeyModuleShell().inPart(name: "Left shell")
         KeyModuleFloor().inPart(name: "Left floor", color: .blue)
-        KeyModuleShell().transformed(Frame.neighbour).inPart(name: "Right shell", color: .orange)
         BoardMockup().inPart(name: "Left board")
+        KeyModuleShell().transformed(Joint.neighbourTransform).inPart(name: "Middle shell", color: .orange)
+        BoardMockup().transformed(Joint.neighbourTransform).inPart(name: "Middle board")
+        KeyModuleShell().transformed(Joint.neighbourTransform.concatenated(with: Joint.neighbourTransform)).inPart(name: "Right shell")
     }
 }
 
@@ -23,5 +31,9 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
     await Model("shell", options: .format3D(.stl)) { KeyModuleShell() }
     await Model("floor", options: .format3D(.stl)) { KeyModuleFloor() }
     await Model("board", options: .format3D(.stl)) { BoardMockup() }
-    await Model("right-shell", options: .format3D(.stl)) { KeyModuleShell().transformed(Frame.neighbour) }
+    await Model("bare-board", options: .format3D(.stl)) { BoardMockup(switches: false) }
+    await Model("right-shell", options: .format3D(.stl)) { KeyModuleShell().transformed(Joint.neighbourTransform) }
+    await Model("right-floor", options: .format3D(.stl)) { KeyModuleFloor().transformed(Joint.neighbourTransform) }
+    await Model("right-board", options: .format3D(.stl)) { BoardMockup().transformed(Joint.neighbourTransform) }
+    await Model("shell-print", options: .format3D(.stl)) { KeyModuleShell().transformed(PrintPose.shell) }
 }
