@@ -288,3 +288,18 @@ Started the case over in Swift with Cadova instead of extending the CadQuery scr
 *2026-09-25, late*
 
 Soldering in the jig showed the header body wants to hang past the board edge. The hanxia drawings explain it: both parts float above the board on S-tails, pin and bore axis 2.3 mm up, not the Harwin 1.25 the footprints were drawn from. I first read the socket's jog as 1.3 and called the pair mismatched; a mated pair standing on its feet proved otherwise. Jig fixed for the hanxia body. For the joint angle: the header soldered tilted 8° puts its pin line 1.1 mm further from the board at the joint plane, and the case simply seats the neighbour 1.1 mm lower there, which is one rotation about a line 8 mm inboard and keeps every module on the same arc. Case v4 rebuilt on that; numbers in [[Electronics]] and [[Case design]].
+
+### Measured, not read
+*2026-09-26*
+
+The 2.3 mm pin axis came from reading the hanxia drawings' 2.30 and 1.30 as tail jogs; they are foot lengths along the pin. Calipers: both bodies flush with their feet, 2.43 thick (datasheet 2.50), a mated pair lies flat on the table. Axis 1.25 mm from the board, both parts, as on the Harwin. Case v4 and the jig rebuilt on that. The tilted header still seats the neighbour about 1.1 mm lower at the seam, since that comes from the pivot, not the axis height.
+
+### Mirrored
+*2026-09-26*
+
+The first Cadova jig came off the printer as a mirror image: passive pockets on the wrong side, sockets and headers swapped, the same mistake the CadQuery jig made. KiCad's y points down in the front view; taking it as the model's y with the front facing up reflects the board. The case had it too: its connector openings sat where the mirrored board would have them. Board y is now reversed in `Frame.by`, and `tools/check.py` compares every model against KiCad's own 3D export, which a mirrored model fails. Shell and floor r1/r2 and jig r1–r3 are mirror images; use shell r3, floor r3, jig r4 or later.
+
+### Two columns
+*2026-09-26*
+
+Two key modules in r3 cases, headers soldered in jig r4: the socket mouths sit flush in the wall, the header pins run parallel to the guide pins, switches seat snug, the columns mate and click, and the chain works electrically. The floor would not go on (r3 had no locating tabs; the tightest spot is 0.3 mm under the tilted header bodies). r4/r5 add floor tabs, corner screws, bridged counterbores, a print membrane over the switch openings, fins under the guide pins, and screw holes that take an M2.
