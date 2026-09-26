@@ -6,6 +6,9 @@ import Cadova
 /// spring flaps on the socket side. Open at the bottom, so the board drops in from below;
 /// `KeyModuleFloor` closes it.
 struct KeyModuleShell: Geometry3D {
+    /// Print pose only: a one-layer membrane over each switch opening at the pocket floor, so the pocket rim
+    /// prints on it instead of over air (cut it out after printing), and a break-away fin under each guide pin.
+    var printAids = false
     var body: any Geometry3D {
         alongColumn(keystone(from: Joint.rim, to: Joint.top))
             .subtracting {
@@ -14,7 +17,8 @@ struct KeyModuleShell: Geometry3D {
                     .translated(x: Frame.pocketX0, y: Frame.pocketY0, z: -20)
                 for y in P.keyYs {
                     let at = Vector3D(Frame.bx(P.keyX), Frame.by(y), 0)
-                    Box(x: P.switchCutout, y: P.switchCutout, z: 10).aligned(at: .centerXY).translated(at + [0, 0, P.ceilingZ - 1])
+                    let cutTop = printAids ? P.plateTopZ - P.layer : P.plateTopZ + 10
+                    Box(x: P.switchCutout, y: P.switchCutout, z: cutTop - P.ceilingZ + 1).aligned(at: .centerXY).translated(at + [0, 0, P.ceilingZ - 1])
                     Box(x: P.switchFlange, y: P.switchFlange, z: 10).aligned(at: .centerXY).translated(at + [0, 0, P.plateTopZ])
                 }
                 // socket mouths through the socket wall, open toward the floor, up to the floating body's top
@@ -43,6 +47,7 @@ struct KeyModuleShell: Geometry3D {
                 Ledges()
                 for end in ColumnEnd.allCases {
                     GuidePin(end: end).transformed(Joint.neighbourTransform)
+                    if printAids { GuidePinFin(end: end) }
                 }
             }
     }
@@ -95,6 +100,21 @@ struct GuidePin: Geometry3D {
     }
 }
 
+/// Print aid: a break-away fin under each guide pin, from its top ridge to this module's top plane, which lies on
+/// the bed in the print pose. The pin prints nearly flat and would otherwise droop toward its tip.
+struct GuidePinFin: Geometry3D {
+    let end: ColumnEnd
+    var body: any Geometry3D {
+        let apex = P.guideZ + P.guideFlat / 2 + P.guideWidth / 2
+        let tipApex = P.guideZ + (P.guideFlat / 2 + P.guideWidth / 2) * P.guideTipScale
+        let ridge = [Vector2D(-0.2, apex), Vector2D(P.guideReach - P.guideTaper, apex),
+                     Vector2D(P.guideReach - 0.2, tipApex + (apex - tipApex) * 0.2 / P.guideTaper)].map(Joint.neighbour)
+        let top = [ridge[2].x, ridge[0].x].map { Vector2D($0, Joint.z(level: Joint.top, x: $0)) }
+        alongColumn(ridge + top, from: min(end.y(P.guideY - P.finThickness / 2), end.y(P.guideY + P.finThickness / 2)),
+                    length: P.finThickness)
+    }
+}
+
 /// Hole for the previous module's guide pin, and the spring flap over it: the end wall's outer skin, cut free
 /// behind and at its free edge, hinged on the socket-face side. Top and bottom edges are the module's own
 /// top and rim, so the flap prints standing on the bed and bends within its layers.
@@ -102,8 +122,12 @@ struct GuideHole: Geometry3D {
     let end: ColumnEnd
     var body: any Geometry3D {
         let slit = [P.flapThickness, P.flapThickness + P.flapSlit]
+        let holeApex = P.guideZ + P.guideFlat / 2 + P.guideWidth / 2 + P.guideClearance
         acrossColumn(end.section(guideSection(grow: P.guideClearance)), from: -1, to: P.guideReach + 0.3)
             .adding {
+                // relief along the top ridge for the guide pin fin's break-off scar
+                acrossColumn(end.section([[P.guideY - 0.4, holeApex - 0.4], [P.guideY + 0.4, holeApex - 0.4], [P.guideY, holeApex + 0.3]]),
+                             from: -1, to: P.guideReach + 0.3)
                 // slit behind the flap, through top and rim
                 Polygon(end.plan([[P.flapHinge, slit[0]], [P.flapFreeEdge + P.flapSlot, slit[0]],
                                   [P.flapFreeEdge + P.flapSlot, slit[1]], [P.flapHinge, slit[1]]]))
@@ -128,7 +152,7 @@ struct ScrewHoles: Geometry3D {
         for x in P.screwXs {
             let z0 = Joint.z(level: Joint.rim, x: x)
             Cylinder(diameter: P.screwHole, height: P.screwDepth + 1)
-                .translated(x: x, y: end.y(P.endWall / 2), z: z0 - 1)
+                .translated(x: x, y: end.y(P.screwY), z: z0 - 1)
         }
     }
 }
@@ -148,16 +172,38 @@ struct Ledges: Geometry3D {
     }
 }
 
-/// Floor screwed on from below, following the keystone. Pillars under the board's bare end margins push it
-/// against the ledges.
+/// Floor screwed on from below into the end walls' corners, following the keystone. Pillars under the board's
+/// bare end margins push it against the ledges; tabs along the walls locate it in the shell's opening.
 struct KeyModuleFloor: Geometry3D {
+    static func rimAt(_ x: Double) -> Double { Joint.z(level: Joint.rim, x: x) }
+
+    /// The floor's own frame: x along it, z out of its top face, origin on its bottom face at x.
+    static func frame(x: Double, y: Double) -> Transform3D {
+        let u = Joint.up, t = Joint.along
+        let o = Vector2D(x, Joint.z(level: Joint.bottom, x: x))
+        return Transform3D([[t.x, 0, u.x, o.x], [0, 1, 0, y], [t.y, 0, u.y, o.y], [0, 0, 0, 1]])
+    }
+
     var body: any Geometry3D {
+        let c = P.tabClearance, t = P.tabThickness, h = P.tabHeight
         alongColumn(keystone(from: Joint.bottom, to: Joint.rim))
             .adding {
                 for x in P.pillarXs {
                     for y in P.pillarYs {
-                        let z0 = Joint.z(level: Joint.rim, x: x) - 0.5
+                        let z0 = Self.rimAt(x) - 0.5
                         Cylinder(diameter: P.pillarDiameter, height: -z0).translated(x: x, y: Frame.by(y), z: z0)
+                    }
+                }
+                // locating tabs along the side walls between the connector rows, and along the end walls
+                for (y0, y1) in P.sideTabYs {
+                    let ya = Frame.by(y1), yb = Frame.by(y0)
+                    for x in [Frame.pocketX0 + c, Frame.pocketX1 - c - t] {
+                        Box(x: t, y: yb - ya, z: h + 0.5).translated(x: x, y: ya, z: Self.rimAt(x + t / 2) - 0.5)
+                    }
+                }
+                for (x0, x1) in P.endTabXs {
+                    for y in [Frame.pocketY0 + c, Frame.pocketY1 - c - t] {
+                        Box(x: x1 - x0, y: t, z: h + 0.5).translated(x: x0, y: y, z: Self.rimAt((x0 + x1) / 2) - 0.5)
                     }
                 }
             }
@@ -167,11 +213,18 @@ struct KeyModuleFloor: Geometry3D {
                 engraving("floor \(Revision.label(Revision.floor))", size: 6.0)
                     .translated(z: -0.6)
                     .transformed(Transform3D([[t.x, 0, u.x, o.x], [0, 1, 0, P.outerLength / 2], [t.y, 0, u.y, o.y], [0, 0, 0, 1]]))
+                // counterbores bridged in two layers (a slot, then a square), so the floor prints bottom-down without
+                // the head's ceiling drooping into the bore
                 for end in ColumnEnd.allCases {
                     for x in P.screwXs {
-                        let zb = Joint.z(level: Joint.bottom, x: x)
-                        Cylinder(diameter: P.screwClearance, height: P.floorThickness + 2).translated(x: x, y: end.y(P.endWall / 2), z: zb - 0.5)
-                        Cylinder(diameter: P.screwHeadDiameter, height: P.screwHeadDepth + 0.5).translated(x: x, y: end.y(P.endWall / 2), z: zb - 0.5)
+                        let d = P.screwHeadDepth, l = P.layer, s = P.screwClearance
+                        Cylinder(diameter: P.screwHeadDiameter, height: d + 0.5).translated(z: -0.5)
+                            .adding {
+                                Box(x: s, y: P.screwHeadDiameter, z: l).aligned(at: .centerXY).translated(z: d)
+                                Box(x: s, y: s, z: 2 * l).aligned(at: .centerXY).translated(z: d)
+                                Cylinder(diameter: s, height: P.floorThickness + 2).translated(z: d + 2 * l)
+                            }
+                            .transformed(Self.frame(x: x, y: end.y(P.screwY)))
                     }
                 }
             }

@@ -8,7 +8,7 @@ import subprocess, sys, pathlib, trimesh
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 CHECK, OUT = ROOT / "build/roamy-v4/check", ROOT / "build/roamy-v4/render"
 COLOURS = {"shell": (210, 190, 140), "right-shell": (230, 150, 80), "floor": (90, 130, 210), "right-floor": (90, 130, 210),
-           "board": (40, 140, 70), "bare-board": (40, 140, 70), "right-board": (40, 140, 70), "shell-print": (210, 190, 140), "jig": (200, 200, 205), "jig-print": (200, 200, 205)}
+           "board": (40, 140, 70), "bare-board": (40, 140, 70), "right-board": (40, 140, 70), "shell-print": (210, 190, 140), "jig": (200, 200, 205), "jig-print": (200, 200, 205), "floor-print": (90, 130, 210)}
 
 # name: parts, camera direction (from camera toward the model), up, optional y-clip (keep y below)
 VIEWS = {
@@ -23,6 +23,9 @@ VIEWS = {
     "shell-under": (["shell"], "0,0,1", "-X", None),
     "floor-top":   (["floor"], "0,0,-1", "-X", None),
     "shell-label": (["shell"], "0,-1,0.35", "+Z", 12),
+    "floor-tabs":  (["floor"], "0.35,0.6,-1", "+Z", 30),
+    "floor-under": (["floor-print"], "0.3,0.5,1", "+Z", None),
+    "fins":        (["shell-print"], "-0.5,0.6,-0.8", "+Z", 16),
     "hdr-under":   (["shell", "board"], "-0.6,0.5,1", "+Z", 70),
     "hdr-jig":     (["jig", "board"], "-0.6,0.5,1", "+Z", 70),
     "jig-header":  (["jig", "bare-board"], "0.5,0.6,1", "+Z", 30),

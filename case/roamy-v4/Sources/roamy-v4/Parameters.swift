@@ -5,8 +5,8 @@ import Cadova
 /// hanxia drawings in electronics/datasheets; switch figures from the Kailh Choc v1 plate-mount convention.
 /// Revision engraved on each printed part. Bump a part's number whenever its geometry changes.
 enum Revision {
-    static let shell = 3        // r2: larger revision text, on the end wall; r3: un-mirrored (r1, r2 are mirror images)
-    static let floor = 3        // r2: larger revision text; r3: un-mirrored
+    static let shell = 4        // r2: larger revision text, on the end wall; r3: un-mirrored (r1, r2 are mirror images); r4: corner screws, print aids
+    static let floor = 4        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores
     static let jig = 4          // r1: first Cadova jig; r2: larger passive pockets; r3: larger text; r4: un-mirrored
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
@@ -60,7 +60,7 @@ enum P {
 
     // Shell
     static let wall = 1.8                     // side walls at the board plane
-    static let endWall = 4.4                  // holds the guide pin, its hole and the spring flap
+    static let endWall = 6.6                  // guide pin, its hole and the spring flap; corner screws behind them
     static let boardClearance = 0.2
     static let floorThickness = 1.5
     static let componentClearance = 0.3       // lowest component to the floor's top
@@ -70,7 +70,15 @@ enum P {
     static let pillarXs = [6.0, 12.0]         // floor pillars under the board's bare end margins
     static let pillarYs = [41.85, 137.5]      // board frame
     static let pillarDiameter = 3.0
-    static let screwXs = [13.2, 17.4]         // vertical M2s in the end walls, between flap and guide pin
+    static let screwXs = [2.8, 18.0]          // vertical M2s in the end walls' corners
+    static let screwY = 4.9                   // from the outer end face, behind the guide hole
+    static let tabHeight = 1.0                // floor locating tabs, above the floor's top; clear of the Choc legs
+    static let tabThickness = 1.2
+    static let tabClearance = 0.1
+    static let sideTabYs: [(Double, Double)] = [(44, 52), (63.5, 72), (84, 108), (121, 134)]  // board frame, clear of the connector rows
+    static let endTabXs: [(Double, Double)] = [(2.2, 4.2), (14.2, 17.2)]                    // clear of the pillars
+    static let layer = 0.2                    // print layer: bridge steps in the floor's counterbores, the pocket membrane
+    static let finThickness = 0.45            // break-away fin under each guide pin, print pose only
     static let screwHole = 1.6                // M2 self-tapping
     static let screwDepth = 5.0
     static let screwClearance = 2.2

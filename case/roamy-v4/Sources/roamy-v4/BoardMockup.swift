@@ -11,6 +11,10 @@ struct BoardMockup: Geometry3D {
         for y in P.keyYs {   // hotswap socket above each key on the back; switch body on the front
             Box(x: 9.0, y: 6.7, z: 1.8).translated(x: Frame.bx(P.keyX - 2.0), y: Frame.by(y - 1.5), z: -1.8).colored(.black)
             if switches {
+                // legs through the board (footprint: post at the key, pegs at ±5.5), 1.4 below its back, generous
+                for (dx, d) in [(0.0, 3.3), (-5.5, 1.8), (5.5, 1.8)] {
+                    Cylinder(diameter: d, height: 1.4).translated(x: Frame.bx(P.keyX + dx), y: Frame.by(y), z: -1.4).colored(.white)
+                }
                 Box(x: P.switchCutout - 0.1, y: P.switchCutout - 0.1, z: P.plateToBoard).aligned(at: .centerXY)
                     .translated(x: Frame.bx(P.keyX), y: Frame.by(y), z: P.boardTopZ).colored(.white, alpha: 0.5)
                 Box(x: 15.0, y: 15.0, z: 3.0).aligned(at: .centerXY)

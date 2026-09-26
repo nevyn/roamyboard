@@ -13,7 +13,7 @@ await Project(packageRelative: "../../build/roamy-v4") {
         BoardMockup().inPart(name: "Board")
     }
     await Model("key-module-print") {
-        KeyModuleShell().transformed(PrintPose.shell).inPart(name: "Shell")
+        KeyModuleShell(printAids: true).transformed(PrintPose.shell).inPart(name: "Shell")
         KeyModuleFloor().transformed(PrintPose.floor).translated(x: 30).inPart(name: "Floor")
     }
     await Model("choc-cutout-coupon") { ChocCutoutCoupon() }
@@ -43,5 +43,6 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
     await Model("right-board", options: .format3D(.stl)) { BoardMockup().transformed(Joint.neighbourTransform) }
     await Model("jig", options: .format3D(.stl)) { SolderJig() }
     await Model("jig-print", options: .format3D(.stl)) { SolderJig().transformed(SolderJig.printPose) }
-    await Model("shell-print", options: .format3D(.stl)) { KeyModuleShell().transformed(PrintPose.shell) }
+    await Model("shell-print", options: .format3D(.stl)) { KeyModuleShell(printAids: true).transformed(PrintPose.shell) }
+    await Model("floor-print", options: .format3D(.stl)) { KeyModuleFloor().transformed(PrintPose.floor) }
 }

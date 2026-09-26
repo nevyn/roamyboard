@@ -12,7 +12,9 @@ import numpy as np, trimesh, manifold3d as m3d
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 CHECK, PCB = ROOT / "build/roamy-v4/check", ROOT / "electronics/KeyModule/KeyModule.kicad_pcb"
-END_WALL, CLEARANCE, WALL = 4.4, 0.2, 1.8             # Parameters.swift
+PARAMS = (ROOT / "case/roamy-v4/Sources/roamy-v4/Parameters.swift").read_text()
+END_WALL = float(re.search(r"static let endWall = ([\d.]+)", PARAMS).group(1))
+CLEARANCE, WALL = 0.2, 1.8                            # Parameters.swift
 BOARD_X0, BOARD_Y0, BOARD_LENGTH = 70.55, 40.0, 100.0
 failures = []
 
@@ -81,6 +83,15 @@ others = max(overlap(P[x], P[y], along * d) for d in np.arange(0.25, 9, 0.25)
 expect(others < 1e-3 and touch and max(touch) <= 3.0,
        f"slide-on: shells touch only within {max(touch, default=0):.2f} mm of home (tooth), nothing else touches")
 
+for move, what in [((0.15, 0, 0), "+x"), ((-0.15, 0, 0), "-x"), ((0, 0.15, 0), "+y"), ((0, -0.15, 0), "-y")]:
+    expect(overlap(P["shell"], P["floor"], move) > 1e-3, f"floor: tabs locate it in the shell ({what} 0.15 mm collides)")
+# M2 screws: shank through the floor's clearance, biting into the shell's pilot hole
+screw_x = [float(v) for v in re.search(r"static let screwXs = \[([^\]]+)\]", PARAMS).group(1).split(",")]
+screw_y = float(re.search(r"static let screwY = ([\d.]+)", PARAMS).group(1))
+length = END_WALL * 2 + BOARD_LENGTH + 2 * CLEARANCE
+shanks = [m3d.Manifold.cylinder(8, 1.0, 1.0, 32).translate([x, y, -8]) for x in screw_x for y in (screw_y, length - screw_y)]
+expect(max(overlap(P["floor"], s_) for s_ in shanks) < 1e-3, f"screws: {len(shanks)} M2 shanks clear the floor")
+expect(min(overlap(P["shell"], s_) for s_ in shanks) > 0.5, "screws: every shank bites into the shell")
 expect(overlap(P["jig"], P["bare-board"]) < 1e-3, "jig: no overlap with the board")
 worst = max(overlap(P["jig"], P["bare-board"], (0, 0, -d)) for d in np.arange(0, 12, 0.25))
 expect(worst < 1e-3, f"jig: board lifts straight out (largest overlap {worst:.4f} mm³)")
