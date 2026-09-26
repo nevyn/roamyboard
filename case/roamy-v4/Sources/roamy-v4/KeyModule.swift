@@ -18,16 +18,15 @@ struct KeyModuleShell: Geometry3D {
                         .aligned(at: .centerXY)
                         .translated(x: Frame.bx(P.keyX), y: Frame.by(y), z: P.height - P.plateThickness - 1)
                 }
-                // socket mouths through the socket wall, open toward the floor
+                // socket mouths through the socket wall, open toward the floor; the socket body floats above the board
                 for r in P.rowYs {
-                    Box(x: P.wall + 1.5, y: P.socketWidth + 2 * P.boardClearance, z: P.boardBottomZ + 0.1)
+                    Box(x: P.wall + 1.5, y: P.socketWidth + 2 * P.boardClearance, z: P.boardBottomZ - P.bodyFloat + 0.15)
                         .aligned(at: .centerY)
                         .translated(x: -0.5, y: Frame.by(r), z: 0)
                 }
-                // header pins through the header wall, open toward the floor
+                // tilted header bodies hang into the header wall: a window per row, open toward the floor
                 for r in P.rowYs {
-                    let width = 2 * P.pinPitch + P.pinSquare + 1.2
-                    Box(x: P.wall + 3, y: width, z: P.pinAxisZ + P.pinSquare / 2 + 0.4)
+                    Box(x: P.wall + 3, y: P.headerWidth + 2 * P.boardClearance, z: P.boardBottomZ - P.headerBodyTilted.zMin + 0.3)
                         .aligned(at: .centerY)
                         .translated(x: Frame.pocketX1 - 0.5, y: Frame.by(r), z: 0)
                 }
@@ -139,11 +138,12 @@ struct JointLevers: Geometry3D {
             .translated(x: P.leverRootX, y: leverYs[i] - P.leverThickness / 2 - P.leverClearance + (inward < 0 ? -P.leverTravel : 0), z: P.leverZ - P.leverClearance - 1.0)
     }
 
-    /// Window in this module's socket wall for the previous module's lever, open toward the floor.
+    /// Window in this module's socket wall for the previous module's lever, open toward the floor. That
+    /// module sits jointOffset higher than this one, so the window reaches that much higher.
     static func window(index i: Int) -> any Geometry3D {
         let inward = -outward(i)
         let w = P.leverThickness + 2 * P.leverClearance + P.leverTravel
-        return Box(x: P.wall + 1.5, y: w, z: P.leverZ + P.leverHeight + 0.6)
+        return Box(x: P.wall + 1.5, y: w, z: P.leverZ + P.leverHeight + P.jointOffset + 0.6)
             .translated(x: -0.5, y: leverYs[i] - P.leverThickness / 2 - P.leverClearance + (inward < 0 ? -P.leverTravel : 0), z: 0)
     }
 

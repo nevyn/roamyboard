@@ -1,3 +1,4 @@
+import Foundation
 import Cadova
 
 /// Numbers the case builds on. Board and connector figures come from electronics/Electronics.md;
@@ -13,16 +14,23 @@ enum P {
     static let keyYs = [51.93, 70.93, 89.86, 108.93, 128.0]
     static let rowYs = [58.1, 77.1, 115.1]    // connector rows
 
-    // Connectors on the board's underside (hanxia HX PM2.54 / PZ2.54)
+    // Connectors on the board's underside (hanxia HX PM2.54 / PZ2.54, electronics/datasheets). Both bodies
+    // float above the board on S-shaped tails; the header is soldered tilted by the joint angle in the
+    // solder jig, pivoting about the inboard end of its pads, so its pins leave at the joint angle.
     static let socketWidth = 7.87
-    static let socketHeight = 2.5
+    static let socketDepth = 8.5
     static let socketOverhang = 2.0           // mouth past the board edge, flush with the wall face
     static let headerWidth = 7.62
+    static let headerBodyDepth = 2.5
+    static let headerTailReach = 4.8          // body face to foot tip, along the board
+    static let headerPadInboardEnd = 5.685    // foot tip from the board edge: pad row 4.1 in, pads 3.17 long
     static let pinPitch = 2.54
     static let pinSquare = 0.64
     static let pinLength = 6.0
-    static let pinAxisBelowBoard = 1.25       // pin centreline below the board's back surface
-    static let jointAngle = 8.0°               // between neighbouring modules; header pins leave at this angle
+    static let bodyFloat = 1.05               // body underside above the board (to be measured)
+    static let bodyHeight = 2.5
+    static let pinAxisBelowBoard = 2.3        // pin and bore centreline from the board's back surface, untilted
+    static let jointAngle = 8.0°               // between neighbouring modules
 
     // Switch and plate
     static let switchCutout = 13.7            // coupon 2026-09-25: 13.7 clicks snug on this printer; Kailh draws 13.8
@@ -34,7 +42,7 @@ enum P {
     static let endWall = 4.0                  // thick enough for the vertical M2 screws in its corners
     static let boardClearance = 0.2
     static let floorThickness = 1.5
-    static let cavityBelowBoard = 3.6         // 8-degree header body floats 3.3 below the board
+    static let cavityBelowBoard = 4.9         // the tilted header body reaches 4.53 below the board
     static let ledgeWidth = 1.0
     static let ledgeLength = 2.0              // end ledges, along y
     static let cornerScrewXs = [1.3, 19.0]    // vertical screws in the end walls' corner blocks
@@ -76,5 +84,26 @@ enum P {
     static var boardBottomZ: Double { floorThickness + cavityBelowBoard }
     static var boardTopZ: Double { boardBottomZ + boardThickness }
     static var height: Double { boardTopZ + plateToBoard }
+
+    /// A point of the untilted header, (past the edge, below the board), after the solder-jig tilt.
+    static func tiltedHeader(_ x: Double, _ z: Double) -> (x: Double, z: Double) {
+        let a = jointAngle.radians, dx = x + headerPadInboardEnd
+        return (-headerPadInboardEnd + dx * cos(a) - z * sin(a), dx * sin(a) + z * cos(a))
+    }
+    static var headerBodyX0: Double { headerPadInboardEnd - headerTailReach }   // untilted body face inside the edge
+    /// Where the tilted pin line crosses the joint plane, below the board: the height the neighbour's bore must have there.
+    static var jointAxisBelowBoard: Double {
+        let p = tiltedHeader(-headerBodyX0 + headerBodyDepth, pinAxisBelowBoard)
+        return p.z + (wall + boardClearance - p.x) * tan(jointAngle.radians)
+    }
+    static var jointAxisZ: Double { boardBottomZ - jointAxisBelowBoard }
     static var pinAxisZ: Double { boardBottomZ - pinAxisBelowBoard }
+    /// The neighbour sits this much lower at the joint than a flat pin would put it.
+    static var jointOffset: Double { jointAxisBelowBoard - pinAxisBelowBoard }
+    /// Tilted header body extents, past the edge and below the board.
+    static var headerBodyTilted: (xMin: Double, xMax: Double, zMin: Double, zMax: Double) {
+        let c = [(-headerBodyX0, bodyFloat), (-headerBodyX0 + headerBodyDepth, bodyFloat),
+                 (-headerBodyX0, bodyFloat + bodyHeight), (-headerBodyX0 + headerBodyDepth, bodyFloat + bodyHeight)].map { tiltedHeader($0.0, $0.1) }
+        return (c.map(\.x).min()!, c.map(\.x).max()!, c.map(\.z).min()!, c.map(\.z).max()!)
+    }
 }

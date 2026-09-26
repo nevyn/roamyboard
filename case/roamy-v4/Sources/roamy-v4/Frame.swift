@@ -12,19 +12,18 @@ enum Frame {
     static var pocketY0: Double { P.endWall }
     static var pocketY1: Double { P.endWall + P.pocketLength }
 
-    /// Outer face of the header wall at height z. The face leans by the joint angle about the
-    /// pin axis, so a neighbour's flat socket wall sits flush against it.
+    /// Outer face of the header wall at height z. The face leans by the joint angle about the line where
+    /// the tilted pin crosses the joint plane, so a neighbour's flat socket wall sits flush against it.
     static func headerFaceX(z: Double) -> Double {
-        P.outerWidth + (z - P.pinAxisZ) * tan(P.jointAngle.radians)
+        P.outerWidth + (z - P.jointAxisZ) * tan(P.jointAngle.radians)
     }
 
-    /// The neighbouring module's frame, expressed in this one: rotated by the joint angle about the
-    /// line where the header face meets the pin axis. Header pins and hooks are built in the
-    /// neighbour's frame and placed with this.
+    /// The neighbouring module's frame, expressed in this one: its socket bore (pinAxisZ in its frame)
+    /// lands on this module's tilted pin line at the joint plane (jointAxisZ), rotated by the joint angle.
     static var neighbour: Transform3D {
         Transform3D.translation(z: -P.pinAxisZ)
             .rotated(y: P.jointAngle)
-            .translated(x: P.outerWidth, z: P.pinAxisZ)
+            .translated(x: P.outerWidth, z: P.jointAxisZ)
     }
 }
 
