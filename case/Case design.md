@@ -198,14 +198,14 @@ What the key module is now (first-iteration track, `case-v4-first-iteration`):
 - **Board** drops into the upturned shell; wall slots at the connector rows are open toward the floor (socket side up to the floating body's top, header side up to the tilted body's top + 0.3). Held between ceiling ledges (full width at the ends, continuous on the header side, tabs between housings on the socket side) and four floor pillars under its bare end margins.
 - **Stack** at the socket face / header face: floor 1.5, floor top 3.85 / 4.89 under the board (0.3 under the socket body and the tilted header body, which reaches 4.53), board 1.6, 0.9 to the ceiling, plate 1.3; 10.0 mm perpendicular to the top.
 - **Joint hardware**, at each column end, in 4.4 mm end walls:
-  - Guide pin on the header face, along the connector pins: 2.2 wide with flat sides and 45° gables (3.6 tall), 8.0 mm reach, 1 mm taper. It enters its hole 2.4 mm before the connector pins reach the socket mouths, so the pins arrive aligned in y and z; 0.1 clearance.
-  - Spring flap: the outer 0.8 mm skin of the neighbour's end wall over the hole, hinged near the socket face, free for 8 mm. A tooth on its inside (0.35 engagement, 45° lead-in) clicks into a notch in the pin as the faces close; the tooth rides only the last 1.2 mm. Strain at the hinge about 1.2 %, bending within the layers. `toothCatchAngle` 45° pulls apart by hand; 90° locks until the flap is pried out at its free-edge slot.
+  - Guide pin on the header face, along the connector pins: 2.2 wide with flat sides and 45° gables (3.6 tall), 11.3 mm reach, 1 mm taper. It enters its hole 5.7 mm before the connector pins reach the socket mouths, so the pins arrive aligned in y and z; 0.1 clearance.
+  - Spring flap: the outer 1.0 mm skin of the neighbour's end wall over the hole, hinged near the socket face, free for 10.2 mm. A tooth on its inside, 2.0 long, 0.6 engagement and the hole's full 3.8 height, 45° lead-in, clicks into a notch in the pin as the faces close; it rides the last 2.3 mm. Tooth 8.6 from the hinge: strain about 1.4 % at 0.7 deflection, bending within the layers; about 8 N to deflect. `toothCatchAngle` 45° pulls apart by hand; 90° locks until the flap is pried out at its free-edge slot.
   - Two M2s per end from the floor, between flap and pin.
 - Replaces the cantilever hooks: no part sticks out on its own except the guide pins, and nothing needs support.
 
-Checked on the generated meshes (manifold booleans): no overlap between any pair of parts of two joined modules; header pins overlap the neighbour's socket bodies by exactly 9 × 5.6 mm (coaxial); sliding the neighbour on along its board plane collides only where the tooth rides the pin, 0.2–1.0 mm before home; the bare board rises out of the shell along its normal without touching it.
+Checked on the generated meshes (manifold booleans): no overlap between any pair of parts of two joined modules; header pins overlap the neighbour's socket bodies by exactly 9 × 5.6 mm (coaxial); sliding the neighbour on along its board plane collides only where the tooth rides the pin, the last 2.3 mm; the bare board rises out of the shell along its normal without touching it.
 
-Printing: shell top-down (`key-module-print` places it on the top plane). Only overhangs are the 0.8 mm pocket rims and 0.26 mm² on each tooth. Floor bottom-down.
+Printing: shell top-down (`key-module-print` places it on the top plane). Only overhangs are the 0.8 mm pocket rims and the tooth ends. Floor bottom-down.
 
 Untested: flap stiffness and tooth hold in PLA vs PETG, the 0.1 guide clearance on this printer, pocket depth feel.
 

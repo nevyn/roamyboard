@@ -54,7 +54,7 @@ enum P {
     static let pillarXs = [6.0, 12.0]         // floor pillars under the board's bare end margins
     static let pillarYs = [41.85, 137.5]      // board frame
     static let pillarDiameter = 3.0
-    static let screwXs = [11.5, 16.0]         // vertical M2s in the end walls, between flap and guide pin
+    static let screwXs = [13.2, 17.4]         // vertical M2s in the end walls, between flap and guide pin
     static let screwHole = 1.6                // M2 self-tapping
     static let screwDepth = 5.0
     static let screwClearance = 2.2
@@ -66,20 +66,20 @@ enum P {
     // clicks into a notch in the pin.
     static let guideWidth = 2.2               // along y, flat sides
     static let guideFlat = 1.4                // height of the flat sides; 45° gables above and below
-    static let guideReach = 8.0               // past the header face; connector pins reach 5.6
+    static let guideReach = 11.3              // past the header face; connector pins reach 5.6
     static let guideRoot = 2.5                // embedded in this module's end wall
     static let guideTaper = 1.0
     static let guideTipScale = 0.45
     static let guideZ = 0.2                   // centre, neighbour frame (board back = 0)
     static let guideClearance = 0.1
-    static let flapThickness = 0.8            // outer skin of the end wall
+    static let flapThickness = 1.0            // outer skin of the end wall
     static let flapSlit = 0.3                 // behind the flap
     static let flapHinge = 0.6                // hinge line from the socket face, x
-    static let flapFreeEdge = 8.6
+    static let flapFreeEdge = 10.8
     static let flapSlot = 0.6                 // at the free edge; fingernail room for the 90° catch
-    static let toothX = 6.4                   // tooth centre, x
-    static let toothBase = 1.2
-    static let toothEngagement = 0.35         // into the guide pin's notch
+    static let toothX = 9.2                   // tooth centre, x: 8.6 from the hinge keeps flap strain near 1.4 %
+    static let toothBase = 2.0
+    static let toothEngagement = 0.6          // into the guide pin's notch
     static let toothCatchAngle = 45.0°        // 45 pulls apart by hand; 90 locks until the flap is pried out
 
     // Derived

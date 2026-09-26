@@ -110,7 +110,8 @@ struct GuideHole: Geometry3D {
             }
             .subtracting {
                 // the tooth stays
-                Polygon(end.plan(toothPlan())).extruded(height: P.guideFlat).translated(z: P.guideZ - P.guideFlat / 2)
+                let h = P.guideFlat + P.guideWidth + 2 * P.guideClearance   // the hole's full height
+                Polygon(end.plan(toothPlan())).extruded(height: h).translated(z: P.guideZ - h / 2)
             }
     }
 }
