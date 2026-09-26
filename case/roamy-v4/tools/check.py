@@ -8,7 +8,7 @@
 - Terminator module: its header side meets the contract, the embedded headers fit their pockets, lie below the
   embed pause and sit in the neighbour's sockets; nothing collides with the neighbour, joined or during slide-on.
 - MCU module: its socket side meets the contract; shell, floor, socket board and parts don't overlap; it joins the
-  last key module like a key module does; the socket board drops in; screws bite; the nano is held every way; a USB-C
+  last key module like a key module does; the socket board drops in; screws bite; the nano is held every way; the parts drop into the upturned shell; a USB-C
   plug fits.
 - JointSide contract: within the body, a joint side's cuts and parts stay in its reserved blocks, the shell has no
   features of its own there, and nothing but the joint's own parts sits in its keep-out.
@@ -162,10 +162,12 @@ expect(max(overlap(P["mcu-floor"], s_) for s_ in shanks) < 1e-3, "MCU module: 6 
 expect(min(overlap(P["mcu-shell"], s_) for s_ in shanks) > 0.5, "MCU module: every shank bites into the shell")
 nano, up = man("mcu-nano"), np.array([math.sin(math.radians(2.94)), 0, math.cos(math.radians(2.94))])
 held = [(P["mcu-shell"], up * 0.15, "up (port post)"), (P["mcu-floor"], -up * 0.05, "down (rib)"),
-        (P["mcu-floor"], (0.2, 0, 0), "+x (guides)"), (P["mcu-floor"], (-0.2, 0, 0), "-x (guides)"),
-        (P["mcu-floor"], (0, -0.15, 0), "back (stop)"), (P["mcu-shell"], (0, 0.15, 0), "forward (end wall)")]
+        (P["mcu-shell"], (0.2, 0, 0), "+x (guides)"), (P["mcu-shell"], (-0.2, 0, 0), "-x (guides)"),
+        (P["mcu-shell"], (0, -0.15, 0), "back (stop)"), (P["mcu-shell"], (0, 0.15, 0), "forward (end wall)")]
 for part, move, what in held:
     expect(overlap(part, nano, move) > 1e-3, f"MCU module: the nano is held {what}")
+worst = max(overlap(P["mcu-shell"], P["mcu-parts"], -up * d) for d in np.arange(0, 12, 0.25))
+expect(worst < 1e-3, f"MCU module: every part drops into the upturned shell (largest overlap {worst:.4f} mm³)")
 expect(overlap(P["mcu-shell"], P["mcu-usb-plug"]) < 1e-3, "MCU module: a USB-C plug's overmould clears the end wall")
 
 sys.exit(1 if failures else 0)

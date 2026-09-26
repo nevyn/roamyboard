@@ -80,6 +80,7 @@ struct MCUShell: Geometry3D {
             .adding {
                 Ledges(ceilingZ: Joint.z(level: MCU.ceiling + 0.3, x: Frame.pocketX0))
                 MCU.joint.added
+                MCUStops()
                 // holds the nice!nano down on the top of its USB-C port
                 let portTop = Joint.rim + P.nanoRise + P.portHeight + 0.1
                 MCU.place(Box(x: 6, y: 4, z: MCU.ceiling - portTop + 0.5),
@@ -116,9 +117,32 @@ struct MCUCavity: Geometry3D {
     }
 }
 
-/// Floor of the MCU module, screwed on like the key module's: pillars under the board's end margins, locating tabs,
-/// stops around the battery, a rib and a stop for the nice!nano, a seat for the battery jack, and reliefs for the
-/// switch's and button's pegs.
+/// Stops that hang from the plate: guides at the nice!nano's sides that reach 0.6 mm down its board edge, a stop behind
+/// it, and stops at the battery's ends, leaving its lead free to leave any side. The socket board's edge stops the
+/// battery toward the board.
+struct MCUStops: Geometry3D {
+    var body: any Geometry3D {
+        let t = P.tabThickness, w = P.nanoWidth, l = P.nanoLength, nano = Joint.rim + P.nanoRise
+        let hang = { (level: Double) in MCU.ceiling - level + 0.5 }
+        for x in [MCU.nanoX - 0.15 - t, MCU.nanoX + w + 0.15] {
+            for d in [MCU.nanoD + 2, MCU.nanoD + l - 12] {   // the front pair clear of the screw boss
+                MCU.place(Box(x: t, y: 4, z: hang(nano + 0.4)), x: x, d: d, level: nano + 0.4)
+            }
+        }
+        MCU.place(Box(x: w / 2, y: 1.0, z: hang(nano - 0.5)), x: MCU.nanoX + w / 4, d: MCU.nanoD - 1.1, level: nano - 0.5)
+        let battery = Joint.rim + 2.0, b = P.batterySlack
+        for d in [MCU.batteryD - b - t, MCU.batteryD + P.batteryLength + b] {
+            for x in [MCU.bayX0 + 4, MCU.bayX0 + P.batteryWidth - 14] {   // clear of the outer screw bosses
+                MCU.place(Box(x: 6, y: t, z: hang(battery)), x: x, d: d, level: battery)
+            }
+        }
+    }
+}
+
+/// Floor of the MCU module, screwed on like the key module's: pillars under the board's end margins, locating tabs, a
+/// rib that presses the nice!nano against the shell's post on its port, a seat for the battery jack, and reliefs for the
+/// switch's and button's pegs. Everything that locates the parts sideways hangs from the shell, so they go into the
+/// upturned shell before the floor closes it.
 struct MCUFloor: Geometry3D {
     var body: any Geometry3D {
         let c = P.tabClearance, t = P.tabThickness, h = P.tabHeight, rim = Joint.rim
@@ -143,25 +167,9 @@ struct MCUFloor: Geometry3D {
                 }
                 MCU.place(Box(x: t, y: 24, z: h + 0.5), x: MCU.freeWallX - c - t, d: 80, level: rim - 0.5)
                 MCU.place(Box(x: 20, y: t, z: h + 0.5), x: MCU.stripX1 + 2, d: P.bayEndWall + c, level: rim - 0.5)
-                // battery stops, leaving its lead free to leave any side
-                let post = 2.5, b = P.batterySlack
-                for d in [MCU.batteryD + 3, MCU.batteryD + P.batteryLength - 9] {
-                    MCU.place(Box(x: t, y: 6, z: post), x: MCU.bayX0 - t, d: d, level: rim - 0.01)
-                }
-                for d in [MCU.batteryD - b - t, MCU.batteryD + P.batteryLength + b] {
-                    for x in [MCU.bayX0 + 4, MCU.bayX0 + P.batteryWidth - 14] {   // clear of the outer screw bosses
-                        MCU.place(Box(x: 6, y: t, z: post), x: x, d: d, level: rim - 0.01)
-                    }
-                }
-                // nice!nano: rib under its middle, stop behind it, guides at its sides that reach 0.6 up the board's edge
-                let w = P.nanoWidth, l = P.nanoLength
-                MCU.place(Box(x: w / 2, y: l / 2, z: P.nanoRise + 0.01), x: MCU.nanoX + w / 4, d: MCU.nanoD + l / 4, level: rim - 0.01)
-                MCU.place(Box(x: w / 2, y: 1.0, z: P.nanoRise + 1.5), x: MCU.nanoX + w / 4, d: MCU.nanoD - 1.1, level: rim - 0.01)
-                for x in [MCU.nanoX - 0.15 - 1.2, MCU.nanoX + w + 0.15] {
-                    for d in [MCU.nanoD + 2, MCU.nanoD + l - 12] {   // the front pair clear of the screw boss
-                        MCU.place(Box(x: 1.2, y: 4, z: P.nanoRise + 0.6), x: x, d: d, level: rim - 0.01)
-                    }
-                }
+                // nice!nano: rib under its middle; the shell holds it at the sides, behind and above
+                MCU.place(Box(x: P.nanoWidth / 2, y: P.nanoLength / 2, z: P.nanoRise + 0.01),
+                          x: MCU.nanoX + P.nanoWidth / 4, d: MCU.nanoD + P.nanoLength / 4, level: rim - 0.01)
                 // battery jack: seat and cheeks
                 let j = P.jackBody
                 MCU.place(Box(x: j.u + 2.7, y: j.y, z: P.jackSeat + 0.01), x: MCU.jackX - 1.35, d: MCU.jackD, level: rim - 0.01)
@@ -237,13 +245,15 @@ enum MCUParts {
                     .translated(x: a.side - m, y: a.far - m, z: glassTop - 0.1)
             })
     }
-    /// USB-C opening through the end wall, and a recess around it for the plug's overmould.
+    /// USB-C opening through the end wall, open toward the floor, and a recess around it for the plug's overmould.
     static var usbOpening: any Geometry3D {
         let face = P.nanoLength + P.portOverhang, cx = P.nanoWidth / 2, cz = P.portHeight / 2
         return nanoPlaced(
             Rectangle(x: P.portWidth + 0.6, y: P.portHeight + 0.6).aligned(at: .center).rounded(radius: 1.0)
                 .extruded(height: 10).rotated(x: -90°).translated(x: cx, y: P.nanoLength - 0.5, z: cz)
                 .adding {
+                    // open down to the rim, so the nano drops in port first; the floor closes the slot
+                    Box(x: P.portWidth + 0.6, y: 10, z: cz + P.nanoRise + 1).translated(x: cx - (P.portWidth + 0.6) / 2, y: P.nanoLength - 0.5, z: -P.nanoRise - 1)
                     Rectangle(x: 13.4, y: 7.6).aligned(at: .center).rounded(radius: 1.5)
                         .extruded(height: 5).rotated(x: -90°).translated(x: cx, y: face, z: cz)
                 })
