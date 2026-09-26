@@ -8,6 +8,11 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 
 - **module**: One printed unit of the keyboard that couples to its neighbours side by side. Kinds: key module, MCU module, terminator module. Not: block, piece.
 - **key module**: A module carrying one column of five keys: shell, floor and board. `KeyModule*` in `case/roamy-v4`. Not: column module, column (for the part).
+- **MCU module**: The module at the header-side end of a half, carrying the nice!nano, battery and display. It has a socket side only, so no header pins stand exposed. Not: brain module, controller module.
+- **terminator module**: The module at the socket-side end of a half. It has a header side only: two headers, embedded in the print, tie DATA to +3.3V so the chain reads the end-of-chain sentinel. Not: end cap, terminator plug.
+- **MCU board**: The MCU module's planned PCB: sockets at the key module board's positions, the nice!nano and the power parts.
+- **socket board**: A spare key module board with only its sockets populated, wired to the nice!nano; it stands in for the MCU board. The MCU module takes either.
+- **lug**: A part on a module's free face that the harness attaches to. Only the MCU and terminator modules have free faces. Not: harness fastener, clip, belt clip, hook.
 - **column**: The line of keys that one key module carries, as a typing concept. The part is a key module.
 - **neighbour**: The module on a module's header side. In a pair, A is the module carrying the guide pins and headers, and B is A's neighbour, carrying the guide holes, flaps and sockets that meet them. Not: next module, left/right module.
 - **header side**, **socket side**: The two long sides of a module, named by the connector each carries. Not: left/right, male/female side.
@@ -58,3 +63,4 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **print pose**: How a part lies on the bed (`PrintPose`): the shell on its top, the floor on its bottom.
 - **painted support**: Slicer support that the user paints on by hand, only under the guide pins. `tools/overhang.py` reads the zone from `shell-print-painted-support.stl`. Not: print aid, fin (the modelled break-away fins of r4 and r5, which printed as strands).
 - **revision**: The `r<n>` engraved on each printed part, from `Revision` in `Parameters.swift`.
+- **embed pause**: A pause in a print at which parts are dropped into open pockets and then printed over, so they end up captive.
