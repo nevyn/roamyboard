@@ -5,8 +5,8 @@ import Cadova
 /// hanxia drawings in electronics/datasheets; switch figures from the Kailh Choc v1 plate-mount convention.
 /// Revision engraved on each printed part. Bump a part's number whenever its geometry changes.
 enum Revision {
-    static let shell = 4        // r2: larger revision text, on the end wall; r3: un-mirrored (r1, r2 are mirror images); r4: corner screws, print aids
-    static let floor = 4        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores
+    static let shell = 5        // r2: larger revision text, on the end wall; r3: un-mirrored (r1, r2 are mirror images); r4: corner screws, print aids; r5: 1.8 screw pilots
+    static let floor = 5        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores; r5: 2.4 screw clearance
     static let jig = 4          // r1: first Cadova jig; r2: larger passive pockets; r3: larger text; r4: un-mirrored
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
@@ -79,9 +79,9 @@ enum P {
     static let endTabXs: [(Double, Double)] = [(2.2, 4.2), (14.2, 17.2)]                    // clear of the pillars
     static let layer = 0.2                    // print layer: bridge steps in the floor's counterbores, the pocket membrane
     static let finThickness = 0.45            // break-away fin under each guide pin, print pose only
-    static let screwHole = 1.6                // M2 self-tapping
+    static let screwHole = 1.8                // M2 self-tapping; printed holes come out ~0.2 small, 1.6 was too tight
     static let screwDepth = 5.0
-    static let screwClearance = 2.2
+    static let screwClearance = 2.4
     static let screwHeadDiameter = 4.0
     static let screwHeadDepth = 0.8
 
