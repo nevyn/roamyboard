@@ -288,3 +288,8 @@ Started the case over in Swift with Cadova instead of extending the CadQuery scr
 *2026-09-25, late*
 
 Soldering in the jig showed the header body wants to hang past the board edge. The hanxia drawings explain it: both parts float above the board on S-tails, pin and bore axis 2.3 mm up, not the Harwin 1.25 the footprints were drawn from. I first read the socket's jog as 1.3 and called the pair mismatched; a mated pair standing on its feet proved otherwise. Jig fixed for the hanxia body. For the joint angle: the header soldered tilted 8° puts its pin line 1.1 mm further from the board at the joint plane, and the case simply seats the neighbour 1.1 mm lower there, which is one rotation about a line 8 mm inboard and keeps every module on the same arc. Case v4 rebuilt on that; numbers in [[Electronics]] and [[Case design]].
+
+### Measured, not read
+*2026-09-26*
+
+The 2.3 mm pin axis came from reading the hanxia drawings' 2.30 and 1.30 as tail jogs; they are foot lengths along the pin. Calipers: both bodies 2.43 thick, flush with their feet, a mated pair lies flat on the table. Axis 1.215 mm from the board, both parts. Case v4 and the jig rebuilt on that. The tilted header still seats the neighbour about 1.1 mm lower at the seam, since that comes from the pivot, not the axis height.

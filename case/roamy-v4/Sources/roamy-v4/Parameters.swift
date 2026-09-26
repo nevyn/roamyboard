@@ -14,9 +14,9 @@ enum P {
     static let keyYs = [51.93, 70.93, 89.86, 108.93, 128.0]
     static let rowYs = [58.1, 77.1, 115.1]    // connector rows
 
-    // Connectors on the board's back (hanxia HX PM2.54 / PZ2.54). Both bodies float on S-tails, pin and
-    // bore axis 2.3 below the board. The header is soldered tilted by the joint angle (solder jig),
-    // pivoting about the inboard end of its pads.
+    // Connectors on the board's back (hanxia HX PM2.54 / PZ2.54). Measured 2026-09-26: both bodies 2.43 thick
+    // and flush with the plane of their feet, so they sit on the board, pin and bore axis 1.215 below it.
+    // The header is soldered tilted by the joint angle (solder jig), pivoting about the inboard end of its pads.
     static let socketWidth = 7.87
     static let socketDepth = 8.5
     static let socketOverhang = 2.0           // mouth past the board edge
@@ -27,9 +27,9 @@ enum P {
     static let pinPitch = 2.54
     static let pinSquare = 0.64
     static let pinLength = 6.0
-    static let bodyFloat = 1.05               // body underside to the board
-    static let bodyHeight = 2.5
-    static let pinAxisBelowBoard = 2.3
+    static let bodyFloat = 0.0                // body to the board
+    static let bodyHeight = 2.43
+    static let pinAxisBelowBoard = 1.215
     static let jointAngle = 8.0°
     /// Where the neighbour's socket mouth lands on this module's header axis, past the board edge (untilted).
     /// 2.0 keeps the 4.0 mm board-to-board convention: 0.39 mm between header body and socket mouth,
