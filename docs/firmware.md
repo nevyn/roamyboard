@@ -32,7 +32,7 @@ Every scan:
 
 Row 0 is the top key. The `rows` property (default 5) sets how many inputs each key module uses, so a 7-key module needs only `rows = <7>`.
 
-The SPI bus runs in mode 0: SCK idles low, and SPIM1 samples DATA on each rising edge. The same rising edge makes the 165s shift the next bit onto QH, which appears one propagation delay (tens of ns) after the edge, so the sample still sees the old bit. If a bench board shows every key one row higher than it should and SW5 never firing, the samples come too late; add `spi-cpol;` to the chain node for mode 2, which samples on the falling edge half a clock period after each shift.
+The SPI bus runs in mode 2 (`spi-cpol`): SCK idles high, SPIM1 samples DATA on each falling edge, and the 165s shift on each rising edge, so every sample lands half a clock period after the last shift. The first falling edge samples input H of the nearest key module, which is on QH straight after /PL. Mode 0 would sample on the same rising edge that shifts, and then depend on the 165's propagation delay, which the datasheet gives no minimum for.
 
 ## Key module count
 
@@ -42,7 +42,7 @@ When a new count is accepted, the driver first releases every key that it report
 
 A scan whose bytes contain no sentinel is a **fault**: a missing terminator module, a broken DATA or /PL line, or more key modules than `max-key-modules`. The driver logs it at most every 5 s with the raw bytes and the number of faulty scans since the last report. A fault is fed to the stabilizer like a count: when it persists for `stable-scans` scans, the driver releases all keys, so that a broken chain cannot leave keys stuck on the host.
 
-The driver scans every `poll-period-ms` (10 ms) while idle, and every `debounce-scan-period-ms` (1 ms) while a key is pressed or debouncing and while a new count is settling. Debouncing uses ZMK's integrator debouncer per key: 1 ms to press, 10 ms to release (`zmk/dts/roamyboard.dtsi`).
+The driver scans every `poll-period-ms` (10 ms) while idle, and every `debounce-scan-period-ms` (1 ms) while a key is pressed or debouncing. A settling count keeps the idle pace, so `stable-scans` spans about 30 ms. Debouncing uses ZMK's integrator debouncer per key: 1 ms to press, 10 ms to release (`zmk/dts/roamyboard.dtsi`).
 
 ## Columns and anchors
 
@@ -126,6 +126,7 @@ ws=${WS:-$(mktemp -d /tmp/roamyboard-west.XXXXXX)}
 mkdir -p "$ws/config" && cp zmk/config/west.yml "$ws/config/"
 docker run --rm -v "$ws:/west" -v "$PWD:/repo:ro" -w /west zmkfirmware/zmk-build-arm:4.1 sh -c '
   [ -d .west ] || { west init -l config && west update --fetch-opt=--filter=tree:0; }
+  west zephyr-export
   west build -p -s zmk/app -d build/roamyboard -b nice_nano//zmk -S studio-rpc-usb-uart -- \
     -DZMK_CONFIG=/repo/zmk/config -DZMK_EXTRA_MODULES=/repo/zmk \
     -DSHIELD="roamyboard nice_view_adapter nice_view" \

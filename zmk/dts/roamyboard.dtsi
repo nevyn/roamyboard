@@ -237,6 +237,7 @@
         compatible = "roamyboard,kscan-165-chain";
         reg = <0>;
         spi-max-frequency = <1000000>;
+        spi-cpol; // mode 2: sample on the falling edge, between the 165's rising-edge shifts
         load-gpios = <&pro_micro 18 GPIO_ACTIVE_LOW>; // D18, P1.15
         debounce-press-ms = <1>;
         debounce-release-ms = <10>;

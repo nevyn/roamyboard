@@ -69,7 +69,8 @@ properties:
     default: 3
     description: |
       Number of consecutive scans that must observe the same key module count
-      before the driver accepts it. While the observed count differs from the
+      before the driver accepts it. Scans run every poll-period-ms while a
+      count settles, so the default accepts a count after about 30 ms. While the observed count differs from the
       accepted one, the driver reports no key events. When a new count is
       accepted, the driver first releases every key that it reports pressed.
 
@@ -87,8 +88,7 @@ properties:
     type: int
     default: 1
     description: |
-      Time between scans in milliseconds while any key is pressed or debouncing,
-      or while a new key module count is settling.
+      Time between scans in milliseconds while any key is pressed or debouncing.
 
   poll-period-ms:
     type: int

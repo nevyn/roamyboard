@@ -138,8 +138,6 @@ static bool kscan_chain_process(const struct device *dev) {
         return true;
 
     case CHAIN_SCAN_SETTLING:
-        return true;
-
     case CHAIN_SCAN_FAULT:
         return false;
 
