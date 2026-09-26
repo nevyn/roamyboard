@@ -1,0 +1,100 @@
+# Builds the ZMK firmware in zmk/ and runs its host tests.
+# ZMK's reusable build-user-config workflow cannot be used: it expects the config
+# and zephyr/module.yml at the repo root, and it checks ZMK out into ./zmk,
+# where this repo keeps its module. docs/firmware.md describes the builds.
+name: Firmware
+
+on:
+  push:
+    paths:
+      - "zmk/**"
+      - ".github/workflows/build.yml"
+  pull_request:
+    paths:
+      - "zmk/**"
+      - ".github/workflows/build.yml"
+  workflow_dispatch:
+
+jobs:
+  host-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: zmk/tests/run.sh
+
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      build_matrix: ${{ steps.fetch.outputs.build_matrix }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: fetch
+        run: echo "build_matrix=$(yq -oj -I0 zmk/build.yaml)" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: matrix
+    runs-on: ubuntu-latest
+    container:
+      image: docker.io/zmkfirmware/zmk-build-arm:4.1
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix.outputs.build_matrix) }}
+    name: Build ${{ matrix.artifact-name }}
+    env:
+      WEST_TOPDIR: /tmp/west
+      BUILD_DIR: /tmp/west/build
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Cache west modules
+        uses: actions/cache@v6
+        continue-on-error: true
+        with:
+          path: |
+            /tmp/west/modules/
+            /tmp/west/tools/
+            /tmp/west/zephyr/
+            /tmp/west/bootloader/
+            /tmp/west/zmk/
+          key: west-${{ hashFiles('zmk/config/west.yml') }}
+
+      - name: West workspace
+        run: |
+          mkdir -p "$WEST_TOPDIR/config"
+          cp zmk/config/west.yml "$WEST_TOPDIR/config/"
+          cd "$WEST_TOPDIR"
+          west init -l config
+          west update --fetch-opt=--filter=tree:0
+          west zephyr-export
+
+      - name: West build
+        env:
+          BOARD: ${{ matrix.board }}
+          SHIELD: ${{ matrix.shield }}
+          SNIPPET: ${{ matrix.snippet }}
+          CMAKE_ARGS: ${{ matrix.cmake-args }}
+        run: |
+          cd "$WEST_TOPDIR"
+          set --
+          if [ -n "$SNIPPET" ]; then set -- -S "$SNIPPET"; fi
+          # CMAKE_ARGS is split into words on purpose.
+          west build -s zmk/app -d "$BUILD_DIR" -b "$BOARD" "$@" -- \
+            -DZMK_CONFIG="$GITHUB_WORKSPACE/zmk/config" \
+            -DZMK_EXTRA_MODULES="$GITHUB_WORKSPACE/zmk" \
+            -DSHIELD="$SHIELD" $CMAKE_ARGS
+
+      - name: Kconfig and devicetree output
+        if: ${{ !cancelled() }}
+        run: |
+          grep -v -e "^#" -e "^$" "$BUILD_DIR/zephyr/.config" | sort || true
+          cat "$BUILD_DIR/zephyr/zephyr.dts" || cat -s "$BUILD_DIR/zephyr/zephyr.dts.pre" || true
+
+      - name: Collect firmware
+        run: |
+          mkdir -p "$BUILD_DIR/artifacts"
+          cp "$BUILD_DIR/zephyr/zmk.uf2" "$BUILD_DIR/artifacts/${{ matrix.artifact-name }}.uf2"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ env.BUILD_DIR }}/artifacts
