@@ -58,27 +58,41 @@ struct kscan_chain_data {
     unsigned int faults_since_log;
 };
 
-static void kscan_chain_log_fault(const struct device *dev, int err) {
-    const struct kscan_chain_config *config = dev->config;
-    struct kscan_chain_data *data = dev->data;
-
+/** Counts a faulty scan; returns whether one is due for logging, which restarts the interval. */
+static bool kscan_chain_fault_log_due(struct kscan_chain_data *data) {
     data->faults_since_log++;
     const int64_t now = k_uptime_get();
     if (now < data->next_fault_log) {
+        return false;
+    }
+    data->next_fault_log = now + FAULT_LOG_INTERVAL_MS;
+    return true;
+}
+
+static void kscan_chain_log_read_error(const struct device *dev, int err) {
+    const struct kscan_chain_config *config = dev->config;
+    struct kscan_chain_data *data = dev->data;
+
+    if (!kscan_chain_fault_log_due(data)) {
         return;
     }
-
-    if (err) {
-        LOG_ERR("Chain read on %s failed: %d (%u failed scans since the last report)",
-                config->bus.bus->name, err, data->faults_since_log);
-    } else {
-        LOG_WRN("No sentinel in the %u bytes read from the chain (%u faulty scans since the last "
-                "report, accepted key module count %d); check the terminator module and DATA",
-                (unsigned int)config->read_len, data->faults_since_log, data->chain.accepted);
-        LOG_HEXDUMP_WRN(data->buf, config->read_len, "chain bytes, nearest key module first");
-    }
+    LOG_ERR("Chain read on %s failed: %d (%u failed scans since the last report)",
+            config->bus.bus->name, err, data->faults_since_log);
     data->faults_since_log = 0;
-    data->next_fault_log = now + FAULT_LOG_INTERVAL_MS;
+}
+
+static void kscan_chain_log_missing_sentinel(const struct device *dev) {
+    const struct kscan_chain_config *config = dev->config;
+    struct kscan_chain_data *data = dev->data;
+
+    if (!kscan_chain_fault_log_due(data)) {
+        return;
+    }
+    LOG_WRN("No sentinel in the %u bytes read from the chain (%u faulty scans since the last "
+            "report, accepted key module count %d); check the terminator module and DATA",
+            (unsigned int)config->read_len, data->faults_since_log, data->chain.accepted);
+    LOG_HEXDUMP_WRN(data->buf, config->read_len, "chain bytes, nearest key module first");
+    data->faults_since_log = 0;
 }
 
 static void kscan_chain_emit(void *ctx, int row, int column, bool pressed) {
@@ -115,14 +129,14 @@ static bool kscan_chain_process(const struct device *dev) {
 
     const int err = kscan_chain_read(dev);
     if (err) {
-        kscan_chain_log_fault(dev, err);
+        kscan_chain_log_read_error(dev, err);
         return false;
     }
 
     const enum chain_scan_result result =
         chain_scan(&data->chain, data->buf, config->read_len, data->active);
     if (data->chain.observed == CHAIN_COUNT_FAULT) {
-        kscan_chain_log_fault(dev, 0);
+        kscan_chain_log_missing_sentinel(dev);
     }
 
     switch (result) {
@@ -172,6 +186,7 @@ static void kscan_chain_work_handler(struct k_work *work) {
     k_work_reschedule(&data->work, K_TIMEOUT_ABS_MS(data->scan_time));
 }
 
+/** Sets the callback. It cannot be cleared: kscan_disable_callback() stops the calls. */
 static int kscan_chain_configure(const struct device *dev, const kscan_callback_t callback) {
     struct kscan_chain_data *data = dev->data;
 

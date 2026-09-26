@@ -96,7 +96,7 @@ void chain_init(struct chain *chain, const struct chain_config *config, bool *re
  *         of key modules in front of the terminator module, or CHAIN_COUNT_FAULT if no
  *         byte in buf has it set.
  */
-int chain_count_modules(const uint8_t *buf, size_t len);
+int chain_count_key_modules(const uint8_t *buf, size_t len);
 
 /**
  * Maps a physical column to a keymap column.
@@ -112,7 +112,7 @@ int chain_keymap_column(const struct chain_config *config, int count, int physic
  * Feeds one raw read of the chain through the sentinel search and the count stabilizer
  * and, when the chain is stable, decodes the key states.
  *
- * @param buf Bytes as read from the chain, as for chain_count_modules().
+ * @param buf Bytes as read from the chain, as for chain_count_key_modules().
  * @param active Output of rows * columns flags, row-major in keymap coordinates: true for
  *               each key whose switch is closed in this read. Written only when the
  *               result is CHAIN_SCAN_KEYS.

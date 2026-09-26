@@ -20,7 +20,7 @@ void chain_init(struct chain *chain, const struct chain_config *config, bool *re
     memset(reported, 0, key_count(config) * sizeof(bool));
 }
 
-int chain_count_modules(const uint8_t *buf, size_t len) {
+int chain_count_key_modules(const uint8_t *buf, size_t len) {
     for (size_t i = 0; i < len; i++) {
         if (buf[i] & CHAIN_SENTINEL_BIT) {
             return (int)i;
@@ -63,7 +63,7 @@ static enum chain_scan_result stabilize(struct chain *chain, int observed) {
 enum chain_scan_result chain_scan(struct chain *chain, const uint8_t *buf, size_t len,
                                   bool *active) {
     const struct chain_config *config = &chain->config;
-    const enum chain_scan_result result = stabilize(chain, chain_count_modules(buf, len));
+    const enum chain_scan_result result = stabilize(chain, chain_count_key_modules(buf, len));
     if (result != CHAIN_SCAN_KEYS) {
         return result;
     }

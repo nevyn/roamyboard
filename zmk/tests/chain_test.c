@@ -106,19 +106,19 @@ static int active_total(const struct fixture *f) {
 
 static void test_sentinel_search(void) {
     const uint8_t none[] = {0x00, 0x1F, 0x7F};
-    CHECK_EQ(chain_count_modules(none, sizeof(none)), CHAIN_COUNT_FAULT);
+    CHECK_EQ(chain_count_key_modules(none, sizeof(none)), CHAIN_COUNT_FAULT);
 
     const uint8_t zero[] = {0xFF, 0xFF};
-    CHECK_EQ(chain_count_modules(zero, sizeof(zero)), 0);
+    CHECK_EQ(chain_count_key_modules(zero, sizeof(zero)), 0);
 
     const uint8_t two[] = {0x00, 0x1F, 0xFF, 0x00};
-    CHECK_EQ(chain_count_modules(two, sizeof(two)), 2);
+    CHECK_EQ(chain_count_key_modules(two, sizeof(two)), 2);
 
     /* Any byte with bit 7 set ends the chain, not only 0xFF. */
     const uint8_t partial[] = {0x01, 0x80};
-    CHECK_EQ(chain_count_modules(partial, sizeof(partial)), 1);
+    CHECK_EQ(chain_count_key_modules(partial, sizeof(partial)), 1);
 
-    CHECK_EQ(chain_count_modules(zero, 0), CHAIN_COUNT_FAULT);
+    CHECK_EQ(chain_count_key_modules(zero, 0), CHAIN_COUNT_FAULT);
 }
 
 static void test_zero_modules(void) {
