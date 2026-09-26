@@ -16,6 +16,7 @@ await Project(packageRelative: "../../build/roamy-v4") {
         KeyModuleShell().transformed(PrintPose.shell).inPart(name: "Shell")
         KeyModuleFloor().transformed(PrintPose.floor).translated(x: 30).inPart(name: "Floor")
     }
+    await Model("choc-cutout-coupon") { ChocCutoutCoupon() }
     await Model("solder-jig") {   // as used: turned over, board front down in the pocket
         SolderJig().transformed(SolderJig.printPose).inPart(name: "Jig")
         BoardMockup(switches: false).transformed(SolderJig.printPose).inPart(name: "Board")

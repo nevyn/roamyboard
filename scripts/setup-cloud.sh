@@ -46,7 +46,7 @@ fi
 step "Python packages"
 # Debian's python3-pil is built for the system Python; install a matching Pillow for this one
 pip install -q --root-user-action=ignore --ignore-installed pillow
-pip install -q --root-user-action=ignore numpy scipy trimesh manifold3d matplotlib shapely networkx rtree
+pip install -q --root-user-action=ignore numpy scipy trimesh manifold3d matplotlib shapely networkx rtree lxml
 
 step "Versions"
 swift --version 2>&1 | head -1
