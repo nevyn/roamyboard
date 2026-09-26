@@ -292,4 +292,4 @@ Soldering in the jig showed the header body wants to hang past the board edge. T
 ### Measured, not read
 *2026-09-26*
 
-The 2.3 mm pin axis came from reading the hanxia drawings' 2.30 and 1.30 as tail jogs; they are foot lengths along the pin. Calipers: both bodies 2.43 thick, flush with their feet, a mated pair lies flat on the table. Axis 1.215 mm from the board, both parts. Case v4 and the jig rebuilt on that. The tilted header still seats the neighbour about 1.1 mm lower at the seam, since that comes from the pivot, not the axis height.
+The 2.3 mm pin axis came from reading the hanxia drawings' 2.30 and 1.30 as tail jogs; they are foot lengths along the pin. Calipers: both bodies flush with their feet, 2.43 thick (datasheet 2.50), a mated pair lies flat on the table. Axis 1.25 mm from the board, both parts, as on the Harwin. Case v4 and the jig rebuilt on that. The tilted header still seats the neighbour about 1.1 mm lower at the seam, since that comes from the pivot, not the axis height.
