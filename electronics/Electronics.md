@@ -103,13 +103,7 @@ KiCad footprints for both live in `KeyModule/Library.pretty` and are generated f
 MCU module
 * nice!nano connects to:
 	* Battery
-	* pin ? to interconnect pin 1 (+5V)
-	* pin ? to interconnect pin 2 (+3.3V)
-	* pin ? to interconnect pin 3 (GND)
-	* pin ? to interconnect pin 4 (CLK)
-	* pin ? to interconnect pin 5 (/PL)
-	* pin ? to interconnect pin 6 (DATA)
-	* ... ignore the rest for now
+	* the interconnect as in the pin table in [Firmware](../docs/firmware.md#pins)
 
 Key module
 * From MCU-facing interconnect (right side)

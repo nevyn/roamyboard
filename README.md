@@ -42,11 +42,9 @@ The hardware and layout is based on [![](https://typeractive.xyz/cdn/shop/files
 
 # Parts
 ## Firmware and layout
-To begin with, I'll just use the [stock Lily58 firmware](https://docs.typeractive.xyz/build-guides/lily58-wireless/firmware). Images are stuck in `firmware/`.
+The firmware is ZMK with a custom driver for the key modules' shift register chain; the module and config live in `zmk/`. Read more in [Firmware](docs/firmware.md), and about the layout in [[Layout]].
 
-Later, I'll likely want to configure default keymap with a custom zmk build; I've thus put the [zmk config for lily58](https://github.com/typeractivexyz/lily58-wireless-view-zmk-config) in `zmk/`.
-
-Read more in [[Layout]].
+The stock Lily58 firmware images are still in `firmware/`.
 
 ## Wiring
 
