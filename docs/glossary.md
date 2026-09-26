@@ -19,7 +19,7 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **floor**: The bottom part, screwed into the shell from below. Prints bottom-down. Not: bottom plate, base, lid.
 - **board**: The key module's PCB. It drops into the upturned shell along its normal.
 - **plate**: The 1.3 mm top of the shell that the switches clip into. Not: top plate (confused with the shell).
-- **switch pocket**: The 15.3 mm recess in the plate's top that each switch's top housing sits in. **Switch opening**: the 13.7 mm hole through the plate at the pocket's floor.
+- **switch pocket**: The 15.3 mm recess in the plate's top that each switch's top housing sits in. **Switch opening**: the 13.7 mm hole through the plate at the pocket's floor. **Seat**: the ring of the pocket's floor between the opening and the pocket wall, which the top housing rests on; the **seat chamfer** bevels its inner edge. Not: pocket rim, flange.
 - **side wall**: The long wall on the header side or socket side, 1.8 mm at the board plane. Its outer face is the **header face** or **socket face**.
 - **end wall**: The 6.6 mm wall at each column end. It holds the guide hole and flap on the socket side, the guide pin's root on the header side, and two corner screws. Its outer face is the **end face**.
 - **top**, **rim**, **bottom**: The three planes of a module's outline: the shell's upper surface, where shell meets floor, and the floor's underside. Each lies perpendicular to the bisector of the header and socket faces.
@@ -55,6 +55,6 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 
 ## Printing
 
-- **fin**: A break-away web under each guide pin in the print pose, so the pin doesn't droop. Snap it off after printing.
-- **membrane**: A one-layer skin over each switch opening in the print pose, so the pocket rim prints on it. Cut it out after printing.
+- **print pose**: How a part lies on the bed (`PrintPose`): the shell on its top, the floor on its bottom.
+- **painted support**: Slicer support that the user paints on by hand, only under the guide pins. `tools/overhang.py` reads the zone from `shell-print-painted-support.stl`. Not: print aid, fin (the modelled break-away fins of r4 and r5, which printed as strands).
 - **revision**: The `r<n>` engraved on each printed part, from `Revision` in `Parameters.swift`.

@@ -13,7 +13,7 @@ await Project(packageRelative: "../../build/roamy-v4") {
         BoardMockup().inPart(name: "Board")
     }
     await Model("key-module-print") {
-        KeyModuleShell(printAids: true).transformed(PrintPose.shell).inPart(name: "Shell")
+        KeyModuleShell().transformed(PrintPose.shell).inPart(name: "Shell")
         KeyModuleFloor().transformed(PrintPose.floor).translated(x: 30).inPart(name: "Floor")
     }
     await Model("choc-cutout-coupon") { ChocCutoutCoupon() }
@@ -43,7 +43,11 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
     await Model("right-board", options: .format3D(.stl)) { BoardMockup().transformed(Joint.neighbourTransform) }
     await Model("jig", options: .format3D(.stl)) { SolderJig() }
     await Model("jig-print", options: .format3D(.stl)) { SolderJig().transformed(SolderJig.printPose) }
-    await Model("shell-print", options: .format3D(.stl)) { KeyModuleShell(printAids: true).transformed(PrintPose.shell) }
+    await Model("shell-print", options: .format3D(.stl)) { KeyModuleShell().transformed(PrintPose.shell) }
+    // parts that the slicer supports on purpose (tools/overhang.py): the joint parts, which include the guide pins
+    await Model("shell-print-painted-support", options: .format3D(.stl)) {
+        for joint in KeyModuleShell.joints { joint.added.transformed(PrintPose.shell) }
+    }
     await Model("floor-print", options: .format3D(.stl)) { KeyModuleFloor().transformed(PrintPose.floor) }
     // the JointSide contract: what each side owns, cuts, adds and keeps clear
     await Model("shell-outline", options: .format3D(.stl)) { alongColumn(keystone(from: Joint.rim, to: Joint.top)) }

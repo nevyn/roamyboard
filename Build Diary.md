@@ -303,3 +303,9 @@ The first Cadova jig came off the printer as a mirror image: passive pockets on 
 *2026-09-26*
 
 Two key modules in r3 cases, headers soldered in jig r4: the socket mouths sit flush in the wall, the header pins run parallel to the guide pins, switches seat snug, the columns mate and click, and the chain works electrically. The floor would not go on (r3 had no locating tabs; the tightest spot is 0.3 mm under the tilted header bodies). r4/r5 add floor tabs, corner screws, bridged counterbores, a print membrane over the switch openings, fins under the guide pins, and screw holes that take an M2.
+
+### Strings in the openings
+*2026-09-26*
+
+Shell r5 came off with every switch opening filled by a mat of loose strands, and the guide pins still ragged. The membrane meant to carry the seat was tilted with it, 2.9° to the bed, so it sliced into bands with nothing above them; the fins under the guide pins were one extrusion wide. Shell r6 drops both: a 0.4 mm chamfer on each opening's top edge shortens the seat's overhang from 0.8 to 0.57 mm, and the guide pins get painted slicer support. `tools/overhang.py` now slices the print poses and would have failed both r3 and r5.
+

@@ -6,9 +6,6 @@ import Cadova
 /// `SocketSideJoint`). Open at the bottom, so the board drops in from below; `KeyModuleFloor` closes it.
 struct KeyModuleShell: Geometry3D {
     static let joints: [any JointSide] = [HeaderSideJoint(), SocketSideJoint()]
-    /// Print pose only: a one-layer membrane over each switch opening at the pocket floor, so the pocket rim
-    /// prints on it instead of over air (cut it out after printing), and a break-away fin under each guide pin.
-    var printAids = false
     var body: any Geometry3D {
         alongColumn(keystone(from: Joint.rim, to: Joint.top))
             .subtracting {
@@ -17,9 +14,13 @@ struct KeyModuleShell: Geometry3D {
                     .translated(x: Frame.pocketX0, y: Frame.pocketY0, z: -20)
                 for y in P.keyYs {
                     let at = Vector3D(Frame.bx(P.keyX), Frame.by(y), 0)
-                    let cutTop = printAids ? P.plateTopZ - P.layer : P.plateTopZ + 10
-                    Box(x: P.switchCutout, y: P.switchCutout, z: cutTop - P.ceilingZ + 1).aligned(at: .centerXY).translated(at + [0, 0, P.ceilingZ - 1])
+                    Box(x: P.switchCutout, y: P.switchCutout, z: 10).aligned(at: .centerXY).translated(at + [0, 0, P.ceilingZ - 1])
                     Box(x: P.switchFlange, y: P.switchFlange, z: 10).aligned(at: .centerXY).translated(at + [0, 0, P.plateTopZ])
+                    // seat chamfer, so the seat hangs at most one extrusion width over the pocket in the print pose
+                    let c = P.seatChamfer
+                    Box(x: P.switchCutout, y: P.switchCutout, z: 0.01).aligned(at: .centerXY).translated(at + [0, 0, P.plateTopZ - c])
+                        .adding { Box(x: P.switchCutout + 2 * c + 1, y: P.switchCutout + 2 * c + 1, z: 0.01).aligned(at: .centerXY).translated(at + [0, 0, P.plateTopZ + 0.5]) }
+                        .convexHull()
                 }
                 // socket mouths through the socket wall, open toward the floor, up to the floating body's top
                 for r in P.rowYs {
@@ -43,10 +44,7 @@ struct KeyModuleShell: Geometry3D {
             }
             .adding {
                 Ledges()
-                for joint in Self.joints {
-                    joint.added
-                    if printAids { joint.printAids }
-                }
+                for joint in Self.joints { joint.added }
             }
     }
 }

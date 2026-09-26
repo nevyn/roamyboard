@@ -10,7 +10,7 @@ import Cadova
 /// ```swift
 /// outline
 ///     .subtracting { hostCuts; joint.removed }
-///     .adding { hostParts; joint.added; if printAids { joint.printAids } }
+///     .adding { hostParts; joint.added }
 /// ```
 protocol JointSide: Sendable {
     /// Joint parts, unioned after the host's cuts. They may protrude past the joint face (guide pins).
@@ -20,8 +20,6 @@ protocol JointSide: Sendable {
     /// The part of the host's body that the joint owns: one block per column end, from the joint face and the end
     /// face inward, short of the corner screws. Only its intersection with the host's outline counts.
     @GeometryBuilder3D var reserved: any Geometry3D { get }
-    /// Print-pose-only parts (break-away fins), for a host printed with its top on the bed (`PrintPose.shell`).
-    @GeometryBuilder3D var printAids: any Geometry3D { get }
     /// Space outside the body that the host must leave empty: the slab past the joint face, which the neighbour
     /// sweeps during slide-on, and finger room at the end faces where the user releases the latch. `added`
     /// may occupy it.
@@ -56,9 +54,6 @@ struct HeaderSideJoint: JointSide {
                 .transformed(Joint.neighbourTransform)
         }
     }
-    var printAids: any Geometry3D {
-        for end in ColumnEnd.allCases { GuidePinFin(end: end) }
-    }
     var keepOut: any Geometry3D {
         let f = Joint.headerFace
         beyondFace(f, outward: Vector2D(f.y, -f.x))
@@ -79,7 +74,6 @@ struct SocketSideJoint: JointSide {
                 .translated(x: -1, y: end == .sw1 ? 0 : P.outerLength - reservedDepth, z: -20)
         }
     }
-    var printAids: any Geometry3D { Empty() }
     var keepOut: any Geometry3D {
         let f = Joint.socketFace
         beyondFace(f, outward: Vector2D(-f.y, f.x))
@@ -129,21 +123,6 @@ struct GuidePin: Geometry3D {
     }
 }
 
-/// Print aid: a break-away fin under each guide pin, from its top ridge to this module's top plane, which lies on
-/// the bed in the print pose. The pin prints nearly flat and would otherwise droop toward its tip.
-struct GuidePinFin: Geometry3D {
-    let end: ColumnEnd
-    var body: any Geometry3D {
-        let apex = P.guideZ + P.guideFlat / 2 + P.guideWidth / 2
-        let tipApex = P.guideZ + (P.guideFlat / 2 + P.guideWidth / 2) * P.guideTipScale
-        let ridge = [Vector2D(-0.2, apex), Vector2D(P.guideReach - P.guideTaper, apex),
-                     Vector2D(P.guideReach - 0.2, tipApex + (apex - tipApex) * 0.2 / P.guideTaper)].map(Joint.neighbour)
-        let top = [ridge[2].x, ridge[0].x].map { Vector2D($0, Joint.z(level: Joint.top, x: $0)) }
-        alongColumn(ridge + top, from: min(end.y(P.guideY - P.finThickness / 2), end.y(P.guideY + P.finThickness / 2)),
-                    length: P.finThickness)
-    }
-}
-
 /// Hole for the previous module's guide pin, and the spring flap over it: the end wall's outer skin, cut free
 /// behind and at its free edge, hinged on the socket-face side. Top and bottom edges are the module's own
 /// top and rim, so the flap prints standing on the bed and bends within its layers.
@@ -151,12 +130,8 @@ struct GuideHole: Geometry3D {
     let end: ColumnEnd
     var body: any Geometry3D {
         let slit = [P.flapThickness, P.flapThickness + P.flapSlit]
-        let holeApex = P.guideZ + P.guideFlat / 2 + P.guideWidth / 2 + P.guideClearance
         acrossColumn(end.section(guideSection(grow: P.guideClearance)), from: -1, to: P.guideReach + 0.3)
             .adding {
-                // relief along the top ridge for the guide pin fin's break-off scar
-                acrossColumn(end.section([[P.guideY - 0.4, holeApex - 0.4], [P.guideY + 0.4, holeApex - 0.4], [P.guideY, holeApex + 0.3]]),
-                             from: -1, to: P.guideReach + 0.3)
                 // slit behind the flap, through top and rim
                 Polygon(end.plan([[P.flapHinge, slit[0]], [P.flapFreeEdge + P.flapSlot, slit[0]],
                                   [P.flapFreeEdge + P.flapSlot, slit[1]], [P.flapHinge, slit[1]]]))

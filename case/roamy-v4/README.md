@@ -12,6 +12,8 @@ Joint hardware (guide pins, guide holes, latches) sits behind `JointSide` in `Jo
 
 Mesh checks: `python3 tools/check.py` after `swift run`. It compares the board against KiCad's own 3D export (a mirrored model fails it), and checks the joined modules, the board drop-in, the slide-on, the jig fit and the `JointSide` contract. Run it before printing anything.
 
+Printability: `python3 tools/overhang.py` slices the print-pose STLs at 0.2 mm and lists what the layer below doesn't carry. Bridges pass, and so do overhangs up to about 1.5 extrusion widths; anything that droops farther fails unless it is in the painted-support zone. Needs `trimesh` and `shapely`.
+
 Headless renders (cloud sessions, CI): `python3 tools/render.py [view ...]` writes PNGs of the check STLs to `build/roamy-v4/render/`; views are listed in the script. Needs `trimesh` (pip) and `f3d`, `xvfb` (apt); `scripts/setup-cloud.sh` installs them, Swift and KiCad in a fresh cloud session.
 
 Each printed part carries its revision (`Revision` in `Parameters.swift`: shell on the SW1 end wall's inner face, floor on its inside face, jig and coupon on top). Bump a part's number whenever its geometry changes.
