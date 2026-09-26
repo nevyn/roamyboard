@@ -46,8 +46,9 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **guide hole**: The hole in B's socket-side end wall that takes the guide pin.
 - **latch**: The flap, tooth and notch together; it holds a pair against pulling apart. There are two per seam, one at each column end.
 - **flap**: The outer 1.0 mm skin of B's end wall over the guide hole, free to bend outward. It is cut free by the **slit** behind it (0.3 mm, above and below the guide hole, through top and rim) and fixed at its **hinge** near the socket face. Its other end is the **free edge**, with the **flap slot** (a fingernail gap) beyond it. Not: pull tab, tab (tabs are the floor's locating tabs and the ledge tabs), clip, lever.
-- **tooth**: The bump on the flap's inner face that drops into the notch. Its **lead-in face** points toward the seam; the guide pin pushes it outward during slide-on. Its **catch face** points away from the seam; it takes the load when the pair is pulled apart, and its angle is `toothCatchAngle`. Not: hook, barb, catch (for the whole tooth).
+- **tooth**: The bump on the flap's inner face that drops into the notch. Its **lead-in face** points toward the seam; the guide pin pushes it outward during slide-on. Its **catch face** points away from the seam; it bears on the barb when the pair is pulled apart, and its angle is `toothCatchAngle`. Not: hook, catch (for the whole tooth).
 - **notch**: The recess in the guide pin's outer face that the tooth drops into.
+- **barb**: The ridge of the guide pin between the notch and the taper. Its notch-side face meets the tooth's catch face; the barb and the tooth are the two halves of the latch's hold. Not: hook, catch, pin tip (the tip is the taper).
 - **release**: Moving the tooth out of the notch.
 - **separation**: Moving B off A, the reverse of slide-on. **Ejection**: separation driven by a mechanism rather than by hand.
 

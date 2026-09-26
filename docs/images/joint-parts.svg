@@ -177,6 +177,9 @@
 <text x="1460.2" y="274.2" font-size="13" text-anchor="start" font-weight="bold" fill="#222">notch (in the pin)</text>
 <line x1="1464.2" y1="270.2" x2="1310.3" y2="316.1" stroke="#555" stroke-width="0.9"/>
 <circle cx="1310.3" cy="316.1" r="2.2" fill="#555"/>
+<text x="1460.2" y="409.2" font-size="13" text-anchor="start" font-weight="bold" fill="#222">barb (between notch and taper)</text>
+<line x1="1464.2" y1="405.2" x2="1340.0" y2="330.9" stroke="#555" stroke-width="0.9"/>
+<circle cx="1340.0" cy="330.9" r="2.2" fill="#555"/>
 <text x="1460.2" y="252.6" font-size="13" text-anchor="start" font-weight="bold" fill="#222">taper (pin tip)</text>
 <line x1="1464.2" y1="248.6" x2="1360.3" y2="287.7" stroke="#555" stroke-width="0.9"/>
 <circle cx="1360.3" cy="287.7" r="2.2" fill="#555"/>
