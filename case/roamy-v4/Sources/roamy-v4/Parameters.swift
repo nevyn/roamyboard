@@ -9,7 +9,7 @@ enum Revision {
     static let floor = 5        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores; r5: 2.4 screw clearance
     static let jig = 4          // r1: first Cadova jig; r2: larger passive pockets; r3: larger text; r4: un-mirrored
     static let terminator = 1
-    static let mcuShell = 2     // r2: prop over the nano, view end walls, board-side tabs with wire gaps
+    static let mcuShell = 3     // r2: prop over the nano, view end walls, board-side tabs with wire gaps; r3: chambers for the switch and button
     static let mcuFloor = 1
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
@@ -146,6 +146,10 @@ enum P {
     static let switchSlider = (u: 1.5, y: 1.3, h: 1.1, travel: 1.5)
     static let resetBody = (u: 3.5, y: 4.7, h: 1.65)       // Panasonic EVQPUC02K, side-operated
     static let resetActuator = (u: 1.0, y: 2.6, h: 1.4)    // hangs from the body's top face
+    static let switchSpan = 7.7               // with its ground terminals, which stick out 0.5 at each end
+    static let switchTails = 1.2              // signal terminals past the body's back
+    static let resetSpan = 6.4                // terminal tip to tip, two at each end
+    static let chamberWall = 1.2              // around the switch and the button, so they bear the press
     static let jackBody = (u: 5.9, y: 7.6, h: 4.8)         // JST S2B-PH-K-S, mating face toward the battery
     static let jackPins = 6.25                // from the mating face
     static let jackTails = 3.4

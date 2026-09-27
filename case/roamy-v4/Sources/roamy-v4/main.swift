@@ -97,6 +97,8 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
     }
     await Model("mcu-nano", options: .format3D(.stl)) { MCUParts.nano }
     await Model("mcu-view", options: .format3D(.stl)) { MCUParts.view }
+    await Model("mcu-switch", options: .format3D(.stl)) { MCUParts.switchPart }
+    await Model("mcu-reset", options: .format3D(.stl)) { MCUParts.resetPart }
     await Model("mcu-wire-paths", options: .format3D(.stl)) { MCUFixtures.wirePaths }
     await Model("mcu-tongue", options: .format3D(.stl)) { MCUParts.usbTongue }
     await Model("mcu-usb-plug", options: .format3D(.stl)) { MCUFixtures.plug }

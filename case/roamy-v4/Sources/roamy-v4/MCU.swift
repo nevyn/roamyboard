@@ -31,7 +31,7 @@ enum MCU {
     static var batteryD: Double { 7.2 + P.batterySlack }
     static var jackD: Double { batteryD + P.batteryLength + P.batterySlack + 6.0 }   // mating face; room for the plug
     static let switchD = 62.0
-    static let resetD = 72.0
+    static let resetD = 73.0
     static var nanoD: Double { P.outerLength - P.bayEndWall - 0.1 - P.nanoLength }
     static var viewD: Double { (P.outerLength - P.viewLength) / 2 }
     static var jackX: Double { bayX0 + 3.0 }
@@ -81,6 +81,7 @@ struct MCUShell: Geometry3D {
                 Ledges(ceilingZ: Joint.z(level: MCU.ceiling + 0.3, x: Frame.pocketX0), headerSide: P.boardSideTabYs)
                 MCU.joint.added
                 MCUStops()
+                MCUChambers()
                 // holds the nice!nano down on the top of its USB-C port
                 let portTop = Joint.rim + P.nanoRise + P.portHeight + 0.1
                 MCU.place(Box(x: 6, y: 4, z: MCU.ceiling - portTop + 0.5),
@@ -152,6 +153,29 @@ struct MCUStops: Geometry3D {
                 MCU.place(Box(x: 6, y: t, z: hang(battery)), x: x, d: d, level: battery)
             }
         }
+    }
+}
+
+/// Chambers for the power switch and the reset button, hanging from the plate down to the rim behind their wall pockets:
+/// a wall behind each body takes the press, and walls beyond its terminals stop it along the column. The corners stay
+/// open for the wires, and the switch's back wall clears its signal terminals.
+struct MCUChambers: Geometry3D {
+    var body: any Geometry3D {
+        let t = P.chamberWall, h = MCU.ceiling - Joint.rim + 0.5, gap = 0.1
+        let b = P.switchBody, r = P.resetBody
+        let switchSides = P.switchSpan / 2 + 0.2, resetSides = P.resetSpan / 2 + 0.3
+        MCU.place(Union {
+            Box(x: t, y: 3, z: h - 0.5).translated(x: -gap - t, y: b.y / 2 - 1.5, z: 0.5)
+            for y in [b.y / 2 - switchSides - t, b.y / 2 + switchSides] {
+                Box(x: b.u - P.freeWallPocket.switch + gap + t + 0.5, y: t, z: h).translated(x: -gap - t, y: y)
+            }
+        }, x: MCU.switchX, d: MCU.switchD - b.y / 2, level: Joint.rim)
+        MCU.place(Union {
+            Box(x: t, y: r.y - 0.6, z: h).translated(x: -gap - t, y: 0.3)
+            for y in [r.y / 2 - resetSides - t, r.y / 2 + resetSides] {
+                Box(x: r.u - P.freeWallPocket.reset + gap + t + 0.5, y: t, z: h).translated(x: -gap - t, y: y)
+            }
+        }, x: MCU.resetX, d: MCU.resetD - r.y / 2, level: Joint.rim)
     }
 }
 
@@ -237,13 +261,21 @@ enum MCUParts {
     static var switchPart: any Geometry3D {
         let b = P.switchBody, s = P.switchSlider
         return MCU.place(Box(x: b.u, y: b.y, z: b.h)
-            .adding { Box(x: s.u, y: s.y, z: s.h).translated(x: b.u, y: (b.y - s.y) / 2, z: (b.h - s.h) / 2) },
+            .adding {
+                Box(x: s.u, y: s.y, z: s.h).translated(x: b.u, y: (b.y - s.y) / 2, z: (b.h - s.h) / 2)
+                // terminals, as envelopes at the mounting face: ground at the ends, signal behind
+                Box(x: b.u, y: P.switchSpan, z: 0.3).translated(y: (b.y - P.switchSpan) / 2)
+                Box(x: P.switchTails, y: 4.5, z: 0.3).translated(x: -P.switchTails, y: (b.y - 4.5) / 2)
+            },
             x: MCU.switchX, d: MCU.switchD - b.y / 2, level: Joint.rim)
     }
     static var resetPart: any Geometry3D {
         let b = P.resetBody, a = P.resetActuator
         return MCU.place(Box(x: b.u, y: b.y, z: b.h)
-            .adding { Box(x: a.u, y: a.y, z: a.h).translated(x: b.u, y: (b.y - a.y) / 2, z: b.h - a.h) },
+            .adding {
+                Box(x: a.u, y: a.y, z: a.h).translated(x: b.u, y: (b.y - a.y) / 2, z: b.h - a.h)
+                Box(x: b.u, y: P.resetSpan, z: 0.3).translated(y: (b.y - P.resetSpan) / 2)   // terminals at both ends
+            },
             x: MCU.resetX, d: MCU.resetD - b.y / 2, level: Joint.rim)
     }
     static var jack: any Geometry3D {
@@ -282,14 +314,15 @@ enum MCUParts {
         return nanoPlaced(Box(x: slot, y: face - P.nanoLength + 0.8, z: P.nanoRise - 0.1 + 0.01)
             .translated(x: (P.nanoWidth - slot) / 2, y: P.nanoLength - 0.8, z: -P.nanoRise - 0.01))
     }
-    /// Pockets in the free wall's inner face for the switch and the button, open toward the floor, and their openings.
+    /// Pockets in the free wall's inner face for the switch and the button, their terminals included, open toward the
+    /// floor, and their openings.
     static var freeWallPockets: any Geometry3D {
         let b = P.switchBody, s = P.switchSlider, r = P.resetBody, a = P.resetActuator
         return Union {
-            MCU.place(Box(x: b.u + 0.3, y: b.y + 0.3, z: b.h + 0.2 + 0.5).translated(x: -0.15, y: -0.15, z: -0.5)
+            MCU.place(Box(x: b.u + 0.3, y: P.switchSpan + 0.3, z: b.h + 0.2 + 0.5).translated(x: -0.15, y: (b.y - P.switchSpan) / 2 - 0.15, z: -0.5)
                 .adding { Box(x: 5, y: s.y + s.travel + 0.4, z: s.h + 0.4).translated(x: b.u - 0.1, y: (b.y - s.y - s.travel) / 2 - 0.2, z: (b.h - s.h) / 2 - 0.2) },
                 x: MCU.switchX, d: MCU.switchD - b.y / 2, level: Joint.rim)
-            MCU.place(Box(x: r.u + 0.3, y: r.y + 0.3, z: r.h + 0.2 + 0.5).translated(x: -0.15, y: -0.15, z: -0.5)
+            MCU.place(Box(x: r.u + 0.3, y: P.resetSpan + 0.3, z: r.h + 0.2 + 0.5).translated(x: -0.15, y: (r.y - P.resetSpan) / 2 - 0.15, z: -0.5)
                 .adding {   // down through the rim: the floor closes it, where a one-layer skin would print as loose strands
                     Box(x: 5, y: a.y + 0.3, z: r.h + 0.15 + 0.5).translated(x: r.u - 0.1, y: (r.y - a.y) / 2 - 0.15, z: -0.5)
                 },

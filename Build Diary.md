@@ -333,3 +333,8 @@ First print of the MCU module. It goes together, with four gaps that the mesh ch
 ![bench wiring](docs/images/bench-wiring.svg)
 
 Socket board wired, two key modules and a jumper standing in for the terminator. The log counted two key modules at rest and zero whenever a key was held; a debug dump of the raw chain bytes showed every byte going to 0xFF on a key press, which only happens if the 165s lose their supply. They had none: the wires soldered to the socket board's empty J_RIGHT1 pads no longer reached the sockets, as if the 0.25 mm tracks had broken at the pads, and the chain had been running on what leaked in through CLK and /PL. Bridged across on the board, and the first characters came out, each where the placeholder keymap puts it. The wiring diagram now taps the socket joints instead. Still open: one key module shows no GND continuity between its socket and header, yet works in either position, which a 165 can also do on leaked ground.
+
+### MCU module wired
+*2026-09-27, evening*
+
+The MCU module is wired (all but the battery and the power switch) and reads the chain. The power switch and the reset button only had slots in the free wall, with nothing behind them to push against; hot glue held them. Shell r3 gives each a chamber hanging from the plate, with a back wall to take the press and side walls beyond the terminals, and widens the wall pockets for the terminals.
