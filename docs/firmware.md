@@ -109,6 +109,8 @@ The firmware chooses the pins; the MCU board does not exist yet. Until it does, 
 
 +5V (J_LEFT1 pin 1) and the bottom connector (LED, SDA, SCL) stay unconnected for now.
 
+Solder the wires to the sockets' solder joints (J_LEFT), not to the empty header pads (J_RIGHT) or U1's pads: those reach the sockets through 0.25 mm tracks, and on the first socket board a wire tugging on a header pad broke the +3.3V and GND connections.
+
 ![Bench wiring: nice!nano underside, socket board back, nice!view, battery, power switch and reset button](images/bench-wiring.svg)
 
 Power: battery + through the JST PH jack and the power switch to the nice!nano's B+ pad, battery − to B−. The reset button closes RST to GND; a double press enters the UF2 bootloader. Neither the JST nor the electrokit datasheet says which jack pin the battery's + lands on, and the Alps drawing was not read for the switch's common terminal: check both with a meter before connecting the battery. With the switch off, USB still powers the board but the battery does not charge (read from the nice!nano schematic, untested).
