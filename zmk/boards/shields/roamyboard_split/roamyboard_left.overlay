@@ -1,0 +1,13 @@
+/*
+ * Left half of a split roamyboard, the central: keymap columns 0 to 14, filled
+ * from the MCU module at the half's right (inner) end.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <roamyboard.dtsi>
+
+&roamyboard_chain {
+    columns = <15>;
+    anchor = "mcu";
+};

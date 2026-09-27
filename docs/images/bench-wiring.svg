@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 930" width="980" height="930"><rect width="980" height="930" fill="#fff"/><rect x="60.0" y="110.0" width="77.73999999999995" height="460.23" rx="4" fill="#3d2b5a" stroke="#222"/>
+<text x="98.9" y="72.0" font-size="15" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">Socket board</text>
+<text x="98.9" y="88.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">back (connector side) up</text>
+<text x="98.9" y="102.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">SW5 end</text>
+<text x="98.9" y="584.2" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">SW1 end</text>
+<text x="52.0" y="340.115" font-size="10" fill="#555" text-anchor="middle" transform="rotate(-90 52.0 340.115)" font-family="Helvetica, Arial, sans-serif">header side</text>
+<text x="151.73999999999995" y="340.115" font-size="10" fill="#555" text-anchor="middle" transform="rotate(90 151.73999999999995 340.115)" font-family="Helvetica, Arial, sans-serif">socket side</text>
+<rect x="92.775" y="174.05499999999998" width="54.164999999999935" height="38.640000000000015" fill="#111" opacity="0.85"/>
+<rect x="92.775" y="261.4549999999999" width="54.164999999999935" height="38.64000000000004" fill="#111" opacity="0.85"/>
+<rect x="92.775" y="436.2549999999999" width="54.164999999999935" height="38.64000000000004" fill="#111" opacity="0.85"/>
+<rect x="71.68400000000003" y="179.34500000000003" width="14.581999999999999" height="4.691999999999999" fill="#c9a227"/>
+<rect x="71.68400000000003" y="191.029" width="14.581999999999999" height="4.691999999999999" fill="#c9a227"/>
+<rect x="71.68400000000003" y="202.713" width="14.581999999999999" height="4.691999999999999" fill="#c9a227"/>
+<rect x="71.68400000000003" y="266.7449999999999" width="14.581999999999999" height="4.691999999999999" fill="#c9a227"/>
+<rect x="71.68400000000003" y="278.4289999999999" width="14.581999999999999" height="4.691999999999999" fill="#c9a227"/>
+<rect x="71.68400000000003" y="290.11299999999994" width="14.581999999999999" height="4.691999999999999" fill="#c9a227"/>
+<rect x="71.68400000000003" y="441.5449999999999" width="14.581999999999999" height="4.691999999999999" fill="#c9a227"/>
+<rect x="71.68400000000003" y="453.22899999999987" width="14.581999999999999" height="4.691999999999999" fill="#c9a227"/>
+<rect x="71.68400000000003" y="464.91299999999995" width="14.581999999999999" height="4.691999999999999" fill="#c9a227"/>
+<rect x="90.93499999999997" y="179.34500000000003" width="9.2" height="4.691999999999999" fill="#c9a227"/>
+<rect x="90.93499999999997" y="191.029" width="9.2" height="4.691999999999999" fill="#c9a227"/>
+<rect x="90.93499999999997" y="202.713" width="9.2" height="4.691999999999999" fill="#c9a227"/>
+<rect x="90.93499999999997" y="266.7449999999999" width="9.2" height="4.691999999999999" fill="#c9a227"/>
+<rect x="90.93499999999997" y="278.4289999999999" width="9.2" height="4.691999999999999" fill="#c9a227"/>
+<rect x="90.93499999999997" y="290.11299999999994" width="9.2" height="4.691999999999999" fill="#c9a227"/>
+<rect x="90.93499999999997" y="441.5449999999999" width="9.2" height="4.691999999999999" fill="#c9a227"/>
+<rect x="90.93499999999997" y="453.22899999999987" width="9.2" height="4.691999999999999" fill="#c9a227"/>
+<rect x="90.93499999999997" y="464.91299999999995" width="9.2" height="4.691999999999999" fill="#c9a227"/>
+<rect x="68.85499999999999" y="347.015" width="38.40999999999997" height="47.84000000000003" fill="none" stroke="#bbb" stroke-dasharray="3 2"/>
+<text x="88.1" y="374.9" font-size="9" text-anchor="middle" font-weight="normal" fill="#ddd" font-family="Helvetica, Arial, sans-serif">U1 (empty)</text>
+<rect x="444" y="90" width="202" height="364" rx="8" fill="#1b1b1b" stroke="#000"/>
+<rect x="521.0" y="72" width="48" height="30" rx="6" fill="#aaa" stroke="#555"/>
+<text x="545.0" y="60.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">USB-C</text>
+<text x="545.0" y="46.0" font-size="15" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">nice!nano v2, underside up</text>
+<circle cx="470" cy="150" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="484.0" y="154.0" font-size="11" text-anchor="start" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">RAW</text>
+<circle cx="620" cy="150" r="7" fill="#c9a227" stroke="#17becf" stroke-width="3"/>
+<text x="606.0" y="154.0" font-size="11" text-anchor="end" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">006</text>
+<circle cx="470" cy="172" r="7" fill="#c9a227" stroke="#222222" stroke-width="3"/>
+<text x="484.0" y="176.0" font-size="11" text-anchor="start" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">GND</text>
+<circle cx="620" cy="172" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="606.0" y="176.0" font-size="11" text-anchor="end" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">008</text>
+<circle cx="470" cy="194" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="484.0" y="198.0" font-size="11" text-anchor="start" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">RST</text>
+<circle cx="620" cy="194" r="7" fill="#c9a227" stroke="#222222" stroke-width="3"/>
+<text x="606.0" y="198.0" font-size="11" text-anchor="end" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">GND</text>
+<circle cx="470" cy="216" r="7" fill="#c9a227" stroke="#d62728" stroke-width="3"/>
+<text x="484.0" y="220.0" font-size="11" text-anchor="start" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">VCC</text>
+<circle cx="620" cy="216" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="606.0" y="220.0" font-size="11" text-anchor="end" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">GND</text>
+<circle cx="470" cy="238" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="484.0" y="242.0" font-size="11" text-anchor="start" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">031</text>
+<circle cx="620" cy="238" r="7" fill="#c9a227" stroke="#9467bd" stroke-width="3"/>
+<text x="606.0" y="242.0" font-size="11" text-anchor="end" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">017</text>
+<circle cx="470" cy="260" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="484.0" y="264.0" font-size="11" text-anchor="start" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">029</text>
+<circle cx="620" cy="260" r="7" fill="#c9a227" stroke="#1f77b4" stroke-width="3"/>
+<text x="606.0" y="264.0" font-size="11" text-anchor="end" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">020</text>
+<circle cx="470" cy="282" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="484.0" y="286.0" font-size="11" text-anchor="start" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">002</text>
+<circle cx="620" cy="282" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="606.0" y="286.0" font-size="11" text-anchor="end" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">022</text>
+<circle cx="470" cy="304" r="7" fill="#c9a227" stroke="#ff7f0e" stroke-width="3"/>
+<text x="484.0" y="308.0" font-size="11" text-anchor="start" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">115</text>
+<circle cx="620" cy="304" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="606.0" y="308.0" font-size="11" text-anchor="end" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">024</text>
+<circle cx="470" cy="326" r="7" fill="#c9a227" stroke="#e6b800" stroke-width="3"/>
+<text x="484.0" y="330.0" font-size="11" text-anchor="start" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">113</text>
+<circle cx="620" cy="326" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="606.0" y="330.0" font-size="11" text-anchor="end" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">100</text>
+<circle cx="470" cy="348" r="7" fill="#c9a227" stroke="#2ca02c" stroke-width="3"/>
+<text x="484.0" y="352.0" font-size="11" text-anchor="start" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">111</text>
+<circle cx="620" cy="348" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="606.0" y="352.0" font-size="11" text-anchor="end" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">011</text>
+<circle cx="470" cy="370" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="484.0" y="374.0" font-size="11" text-anchor="start" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">010</text>
+<circle cx="620" cy="370" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="606.0" y="374.0" font-size="11" text-anchor="end" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">104</text>
+<circle cx="470" cy="392" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="484.0" y="396.0" font-size="11" text-anchor="start" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">009</text>
+<circle cx="620" cy="392" r="7" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="606.0" y="396.0" font-size="11" text-anchor="end" font-weight="normal" fill="#aaa" font-family="Helvetica, Arial, sans-serif">106</text>
+<text x="545.0" y="416.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#ddd" font-family="Helvetica, Arial, sans-serif">RST sits between GND and VCC:</text>
+<text x="545.0" y="429.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#ddd" font-family="Helvetica, Arial, sans-serif">no solder bridges there</text>
+<rect x="800" y="250" width="130" height="170" rx="6" fill="#e8e8e8" stroke="#555"/>
+<text x="865.0" y="238.0" font-size="15" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">nice!view</text>
+<text x="865.0" y="400.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">pins by their</text>
+<text x="865.0" y="412.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">silkscreen names</text>
+<circle cx="800" cy="272" r="6" fill="#c9a227" stroke="#17becf" stroke-width="3"/>
+<text x="812.0" y="276.0" font-size="12" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">CS</text>
+<circle cx="800" cy="296" r="6" fill="#c9a227" stroke="#9467bd" stroke-width="3"/>
+<text x="812.0" y="300.0" font-size="12" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">MOSI</text>
+<circle cx="800" cy="320" r="6" fill="#c9a227" stroke="#1f77b4" stroke-width="3"/>
+<text x="812.0" y="324.0" font-size="12" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">SCK</text>
+<circle cx="800" cy="344" r="6" fill="#c9a227" stroke="#d62728" stroke-width="3"/>
+<text x="812.0" y="348.0" font-size="12" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">VCC</text>
+<circle cx="800" cy="368" r="6" fill="#c9a227" stroke="#222222" stroke-width="3"/>
+<text x="812.0" y="372.0" font-size="12" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">GND</text>
+<polyline points="95.5,193.4 330.0,193.4 330.0,216.0 470.0,216.0" fill="none" stroke="#d62728" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<text x="250.0" y="188.4" font-size="10" text-anchor="middle" font-weight="bold" fill="#d62728" font-family="Helvetica, Arial, sans-serif">J_LEFT1 pin 2  +3.3V</text>
+<polyline points="95.5,205.1 345.0,205.1 345.0,172.0 470.0,172.0" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<text x="250.0" y="218.1" font-size="10" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">J_LEFT1 pin 3  GND</text>
+<polyline points="95.5,269.1 160.0,269.1 160.0,257.1 360.0,257.1 360.0,326.0 470.0,326.0" fill="none" stroke="#e6b800" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<text x="250.0" y="252.1" font-size="10" text-anchor="middle" font-weight="bold" fill="#e6b800" font-family="Helvetica, Arial, sans-serif">J_LEFT2 pin 1  CLK</text>
+<polyline points="95.5,280.8 172.0,280.8 172.0,292.8 375.0,292.8 375.0,304.0 470.0,304.0" fill="none" stroke="#ff7f0e" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<text x="250.0" y="287.8" font-size="10" text-anchor="middle" font-weight="bold" fill="#ff7f0e" font-family="Helvetica, Arial, sans-serif">J_LEFT2 pin 2  /PL</text>
+<polyline points="95.5,292.5 184.0,292.5 184.0,328.5 390.0,328.5 390.0,348.0 470.0,348.0" fill="none" stroke="#2ca02c" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<text x="250.0" y="323.5" font-size="10" text-anchor="middle" font-weight="bold" fill="#2ca02c" font-family="Helvetica, Arial, sans-serif">J_LEFT2 pin 3  DATA</text>
+<polyline points="620.0,150.0 700.0,150.0 700.0,272.0 800.0,272.0" fill="none" stroke="#17becf" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<polyline points="620.0,238.0 715.0,238.0 715.0,296.0 800.0,296.0" fill="none" stroke="#9467bd" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<polyline points="620.0,260.0 730.0,260.0 730.0,320.0 800.0,320.0" fill="none" stroke="#1f77b4" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<polyline points="620.0,194.0 745.0,194.0 745.0,368.0 800.0,368.0" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<polyline points="470.0,216.0 454.0,216.0 454.0,474.0 760.0,474.0 760.0,344.0 800.0,344.0" fill="none" stroke="#d62728" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<text x="620.0" y="490.0" font-size="10" text-anchor="middle" font-weight="bold" fill="#d62728" font-family="Helvetica, Arial, sans-serif">second wire on the VCC pin, to the nice!view</text>
+<rect x="461" y="110" width="18" height="12" rx="2" fill="#c9a227" stroke="#8c1c13" stroke-width="3"/>
+<text x="486.0" y="120.0" font-size="11" text-anchor="start" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">B+</text>
+<rect x="611" y="110" width="18" height="12" rx="2" fill="#c9a227" stroke="#555555" stroke-width="3"/>
+<text x="604.0" y="120.0" font-size="11" text-anchor="end" font-weight="bold" fill="#fff" font-family="Helvetica, Arial, sans-serif">B-</text>
+<rect x="620" y="740" width="170" height="70" rx="6" fill="#dfe8f5" stroke="#555"/>
+<text x="705.0" y="772.0" font-size="14" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">Battery</text>
+<text x="705.0" y="790.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">electrokit 41016063</text>
+<rect x="660" y="650" width="60" height="40" rx="3" fill="#f2f2f2" stroke="#555"/>
+<text x="654.0" y="674.0" font-size="10" text-anchor="end" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">JST PH jack</text>
+<circle cx="678" cy="670" r="5" fill="#c9a227" stroke="#8c1c13" stroke-width="3"/>
+<circle cx="702" cy="670" r="5" fill="#c9a227" stroke="#555555" stroke-width="3"/>
+<polyline points="678.0,740.0 678.0,675.0" fill="none" stroke="#8c1c13" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<polyline points="702.0,740.0 702.0,675.0" fill="none" stroke="#555555" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<text x="670.0" y="728.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#8c1c13" font-family="Helvetica, Arial, sans-serif">+</text>
+<text x="710.0" y="728.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#555555" font-family="Helvetica, Arial, sans-serif">-</text>
+<text x="798.0" y="756.0" font-size="10" text-anchor="start" font-weight="bold" fill="#8c1c13" font-family="Helvetica, Arial, sans-serif">measure the plug's</text>
+<text x="798.0" y="769.0" font-size="10" text-anchor="start" font-weight="bold" fill="#8c1c13" font-family="Helvetica, Arial, sans-serif">polarity before</text>
+<text x="798.0" y="782.0" font-size="10" text-anchor="start" font-weight="bold" fill="#8c1c13" font-family="Helvetica, Arial, sans-serif">connecting: no source</text>
+<text x="798.0" y="795.0" font-size="10" text-anchor="start" font-weight="bold" fill="#8c1c13" font-family="Helvetica, Arial, sans-serif">says which pin is +</text>
+<rect x="510" y="560" width="80" height="34" rx="3" fill="#f2f2f2" stroke="#555"/>
+<text x="550.0" y="536.0" font-size="10" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">Power switch (Alps SSSS811101)</text>
+<text x="550.0" y="550.0" font-size="10" text-anchor="middle" font-weight="bold" fill="#8c1c13" font-family="Helvetica, Arial, sans-serif">2 = common? check with a meter</text>
+<circle cx="526" cy="584" r="5" fill="#c9a227" stroke="#8c1c13" stroke-width="3"/>
+<text x="526.0" y="572.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">1</text>
+<circle cx="550" cy="584" r="5" fill="#c9a227" stroke="#8c1c13" stroke-width="3"/>
+<text x="550.0" y="572.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">2</text>
+<circle cx="574" cy="584" r="5" fill="#c9a227" stroke="#777" stroke-width="1"/>
+<text x="574.0" y="572.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">3</text>
+<polyline points="678.0,665.0 678.0,612.0 550.0,612.0 550.0,589.0" fill="none" stroke="#8c1c13" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<polyline points="526.0,589.0 526.0,626.0 418.0,626.0 418.0,116.0 470.0,116.0" fill="none" stroke="#8c1c13" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<polyline points="702.0,665.0 702.0,630.0 955.0,630.0 955.0,116.0 620.0,116.0" fill="none" stroke="#555555" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<rect x="270" y="600" width="60" height="34" rx="3" fill="#f2f2f2" stroke="#555"/>
+<text x="300.0" y="650.0" font-size="10" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">Reset button (EVQPUC02K)</text>
+<text x="300.0" y="663.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">one pad of 1/3, one of 2/4</text>
+<circle cx="288" cy="617" r="5" fill="#c9a227" stroke="#e377c2" stroke-width="3"/>
+<circle cx="312" cy="617" r="5" fill="#c9a227" stroke="#222222" stroke-width="3"/>
+<polyline points="288.0,612.0 288.0,560.0 408.0,560.0 408.0,194.0 470.0,194.0" fill="none" stroke="#e377c2" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<polyline points="312.0,612.0 312.0,575.0 398.0,575.0 398.0,177.0 463.0,177.0 470.0,172.0" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round" opacity="0.9"/>
+<text x="40.0" y="870.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">The key module plugs into the socket board's sockets (its header side meets the socket side). The last key module needs the terminator module,</text>
+<text x="40.0" y="886.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">or a jumper from its J_LEFT2 pin 3 (DATA_IN) to J_LEFT1 pin 2 (+3.3V): without the 0xFF sentinel the chain reads as a fault and no keys fire.</text>
+<text x="40.0" y="902.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Solder to the socket joints (J_LEFT), not the empty header pads: those reach the sockets through 0.25 mm tracks that a tugged wire breaks. Pad 1 is nearest the SW5 end.</text></svg>

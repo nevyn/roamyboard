@@ -1,3 +1,5 @@
+# ZMK is pinned to the revision that the roamyboard module was checked against.
+# Move it deliberately: board names, bindings and Kconfig change on ZMK's main.
 manifest:
   remotes:
     - name: zmkfirmware
@@ -5,7 +7,7 @@ manifest:
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: main
+      revision: 5b51501fead672c41b5cfb396f3dafe0894bf4e9
       import: app/west.yml
   self:
     path: config

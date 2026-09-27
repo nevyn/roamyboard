@@ -64,3 +64,13 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **painted support**: Slicer support that the user paints on by hand, only under the guide pins. `tools/overhang.py` reads the zone from `shell-print-painted-support.stl`. Not: print aid, fin (the modelled break-away fins of r4 and r5, which printed as strands).
 - **revision**: The `r<n>` engraved on each printed part, from `Revision` in `Parameters.swift`.
 - **embed pause**: A pause in a print at which parts are dropped into open pockets and then printed over, so they end up captive.
+
+## Firmware
+
+- **chain**: The 74HC165s of one half, read by the MCU module as one serial stream on DATA: one byte per key module, nearest key module first. Not: daisy chain, scan chain, shift register chain.
+- **sentinel**: The first byte of the chain with bit 7 set, fed by the terminator module as 0xFF. It ends the chain, and its index is the key module count. Not: terminator byte, end marker.
+- **key module count**: The number of key modules in front of the sentinel. The firmware accepts a new count only after several consecutive scans observe it. Not: column count, chain length.
+- **fault**: A read of the chain with no sentinel in it. Not: chain error, bad read.
+- **physical column**: A key module's position in the chain, counted from 0 at the key module nearest the MCU module. Not: chain index, module index, hardware column.
+- **keymap column**: The column of the 30-column keymap that a key module's keys are reported in. Not: logical column, layout column, matrix column.
+- **anchor**: The end of a half that keymap columns are counted from, set per shield: the MCU module (`mcu`) or the terminator module (`terminator`). Not: origin, alignment, justification.

@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: MIT
+
+DT_COMPAT_ROAMYBOARD_KSCAN_165_CHAIN := roamyboard,kscan-165-chain
+
+config ROAMYBOARD_KSCAN_165_CHAIN
+    bool
+    default $(dt_compat_enabled,$(DT_COMPAT_ROAMYBOARD_KSCAN_165_CHAIN))
+    depends on KSCAN
+    select GPIO
+    select SPI
+    select ZMK_DEBOUNCE
+
+config ROAMYBOARD_KSCAN_165_CHAIN_INIT_PRIORITY
+    int "Init priority of the roamyboard 74HC165 chain kscan driver"
+    default 90
+    depends on ROAMYBOARD_KSCAN_165_CHAIN
+    help
+      POST_KERNEL priority. It must come after the SPI bus and GPIO drivers.
