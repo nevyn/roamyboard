@@ -17,7 +17,7 @@ enum MCU {
     /// The view's back: `viewAir` over the board where they come closest, under the view's outer edge.
     static var viewBack: Double { Joint.level(Vector2D(viewX0 + P.viewWidth + 0.3, P.boardTopZ + P.viewAir)) }
     static var top: Double { max(Joint.top, viewBack + P.viewBackParts + P.viewPCB + P.viewGlass + P.viewLip) }
-    static var ceiling: Double { top - P.plateThickness }
+    static var ceiling: Double { top - P.mcuPlate }
 
     // Across the column: x where lines perpendicular to the top cross the board's back
     static var bayX0: Double { Frame.pocketX1 + 0.5 }
@@ -78,7 +78,7 @@ struct MCUShell: Geometry3D {
                     .translated(z: -0.6), x: MCU.bayX0 + 8, d: 30, level: MCU.ceiling)
             }
             .adding {
-                Ledges(ceilingZ: Joint.z(level: MCU.ceiling + 0.3, x: Frame.pocketX0))
+                Ledges(ceilingZ: Joint.z(level: MCU.ceiling + 0.3, x: Frame.pocketX0), headerSide: P.boardSideTabYs)
                 MCU.joint.added
                 MCUStops()
                 // holds the nice!nano down on the top of its USB-C port
@@ -118,8 +118,8 @@ struct MCUCavity: Geometry3D {
 }
 
 /// Stops that hang from the plate: guides at the nice!nano's sides that reach 0.6 mm down its board edge, a stop behind
-/// it, and stops at the battery's ends, leaving its lead free to leave any side. The socket board's edge stops the
-/// battery toward the board.
+/// it and a prop over it; stops at the battery's ends, leaving its lead free to leave any side (the socket board's edge
+/// stops the battery toward the board); walls at the view's short ends; legs beside the socket board's bay-side edge.
 struct MCUStops: Geometry3D {
     var body: any Geometry3D {
         let t = P.tabThickness, w = P.nanoWidth, l = P.nanoLength, nano = Joint.rim + P.nanoRise
@@ -130,6 +130,22 @@ struct MCUStops: Geometry3D {
             }
         }
         MCU.place(Box(x: w / 2, y: 1.0, z: hang(nano - 0.5)), x: MCU.nanoX + w / 4, d: MCU.nanoD - 1.1, level: nano - 0.5)
+        // prop over the nano's middle, so it lies level in the upturned shell until the floor's rib clamps it
+        let prop = nano + P.nanoHeight + 0.1
+        MCU.place(Box(x: w / 2, y: l / 2, z: hang(prop)), x: MCU.nanoX + w / 4, d: MCU.nanoD + l / 4, level: prop)
+        // the view's short ends: a wall at its flex end, corner posts at its header end so its wires can leave
+        let v = P.viewWidth, e = 1.2, span = v + 0.3 + 2 * e, wall = hang(MCU.viewBack)
+        MCUParts.viewPlaced(Union {
+            Box(x: span, y: e, z: wall).translated(x: -0.15 - e, y: -0.35 - e)
+            for x in [-0.15 - e, v + 0.15 - 2] {
+                Box(x: 2 + e, y: e, z: wall).translated(x: x, y: P.viewLength + 0.15)
+            }
+        })
+        // legs beside the socket board's bay-side edge, under the board-side tabs: they stop it sliding into the bay
+        for (y0, y1) in P.boardSideTabYs {
+            let z0 = -0.5, z1 = Joint.z(level: MCU.ceiling + 0.3, x: Frame.pocketX1)
+            Box(x: 0.9, y: y1 - y0, z: z1 - z0).translated(x: Frame.pocketX1, y: y0, z: z0)
+        }
         let battery = Joint.rim + 2.0, b = P.batterySlack
         for d in [MCU.batteryD - b - t, MCU.batteryD + P.batteryLength + b] {
             for x in [MCU.bayX0 + 4, MCU.bayX0 + P.batteryWidth - 14] {   // clear of the outer screw bosses
@@ -290,6 +306,20 @@ enum MCUFixtures {
             P.screwXs.map { x in Cylinder(diameter: 2.0, height: length).translated(z: -0.5).transformed(KeyModuleFloor.frame(x: x, y: end.y(P.screwY))) as any Geometry3D }
                 + [Cylinder(diameter: 2.0, height: length).translated(z: -0.5)
                     .transformed(Joint.levelFrame(x: MCU.outerScrewX, y: end.y(P.outerScrewInset.y), level: Joint.bottom))]
+        }
+    }
+    /// Room for wires across the socket board's bay-side edge, between the board-side tabs: over the board past the
+    /// view's header end, and at each connector row from under the board (where the pads are) round its edge and over
+    /// the battery into the bay.
+    static var wirePaths: any Geometry3D {
+        let x0 = Frame.pocketX1 - 4, edge = Frame.pocketX1 + 0.9, x1 = MCU.bayX0 + 3, over = P.boardTopZ + 0.4
+        return Union {
+            Box(x: x1 - x0, y: 2, z: 1.2).translated(x: x0, y: MCU.y(MCU.viewD + P.viewLength + 3) - 1, z: over)
+            for r in P.rowYs {
+                Box(x: edge - x0, y: 2, z: 1.2).translated(x: x0, y: Frame.by(r) - 1, z: -1.9)
+                Box(x: edge - Frame.pocketX1 - 0.1, y: 2, z: over + 1.2 + 1.9).translated(x: Frame.pocketX1 + 0.1, y: Frame.by(r) - 1, z: -1.9)
+                Box(x: x1 - Frame.pocketX1 + 1, y: 2, z: 1.2).translated(x: Frame.pocketX1 - 1, y: Frame.by(r) - 1, z: over)
+            }
         }
     }
     static var plug: any Geometry3D {

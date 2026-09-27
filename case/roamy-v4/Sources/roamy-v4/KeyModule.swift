@@ -67,11 +67,15 @@ struct ScrewHoles: Geometry3D {
 struct Ledges: Geometry3D {
     /// z the ledges reach up to, into the plate.
     var ceilingZ = P.ceilingZ
+    /// y ranges (module frame) of the header-side ledge; the whole length when nil.
+    var headerSide: [(Double, Double)]? = nil
     var body: any Geometry3D {
         let z0 = P.boardTopZ, h = ceilingZ - P.boardTopZ + 0.01
         Box(x: P.pocketWidth, y: P.ledgeLength, z: h).translated(x: Frame.pocketX0, y: Frame.pocketY0, z: z0)
         Box(x: P.pocketWidth, y: P.ledgeLength, z: h).translated(x: Frame.pocketX0, y: Frame.pocketY1 - P.ledgeLength, z: z0)
-        Box(x: P.ledgeWidth, y: P.pocketLength, z: h).translated(x: Frame.pocketX1 - P.ledgeWidth, y: Frame.pocketY0, z: z0)
+        for (y0, y1) in headerSide ?? [(Frame.pocketY0, Frame.pocketY1)] {
+            Box(x: P.ledgeWidth, y: y1 - y0, z: h).translated(x: Frame.pocketX1 - P.ledgeWidth, y: y0, z: z0)
+        }
         for y in P.socketSideTabYs {
             Box(x: P.ledgeWidth, y: 4.0, z: h).aligned(at: .centerY).translated(x: Frame.pocketX0, y: Frame.by(y), z: z0)
         }

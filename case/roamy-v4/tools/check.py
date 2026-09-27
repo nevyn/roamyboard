@@ -168,6 +168,15 @@ for part, move, what in held:
     expect(overlap(part, nano, move) > 1e-3, f"MCU module: the nano is held {what}")
 worst = max(overlap(P["mcu-shell"], P["mcu-parts"], -up * d) for d in np.arange(0, 12, 0.25))
 expect(worst < 1e-3, f"MCU module: every part drops into the upturned shell (largest overlap {worst:.4f} mm³)")
+expect(overlap(P["mcu-shell"], nano, up * 0.15) > 5, "MCU module: the prop holds the nano level, not only its port")
+view = man("mcu-view")
+for move, what in [((0, 0.5, 0), "+y"), ((0, -0.5, 0), "-y")]:
+    expect(overlap(P["mcu-shell"], view, move) > 1, f"MCU module: the view is held at its {what} end")
+for move, what in [((0.3, 0, 0), "into the bay"), ((-0.3, 0, 0), "into the socket wall")]:
+    expect(overlap(P["mcu-shell"], P["socket-board"], move) > 1e-3, f"MCU module: the socket board is held {what}")
+paths = man("mcu-wire-paths")
+worst = max(overlap(P[n], paths) for n in ("mcu-shell", "mcu-floor", "socket-board", "mcu-parts"))
+expect(worst < 1e-3, f"MCU module: wires can cross the board's bay-side edge ({worst:.4f} mm³ in the way)")
 tongue = man("mcu-tongue")
 expect(overlap(tongue, nano, -up * 0.15) > 1e-3 and overlap(tongue, P["mcu-floor"]) > 0.9 * tongue.volume(),
        "MCU module: the floor's tongue holds the port from below")

@@ -9,7 +9,7 @@ enum Revision {
     static let floor = 5        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores; r5: 2.4 screw clearance
     static let jig = 4          // r1: first Cadova jig; r2: larger passive pockets; r3: larger text; r4: un-mirrored
     static let terminator = 1
-    static let mcuShell = 1
+    static let mcuShell = 2     // r2: prop over the nano, view end walls, board-side tabs with wire gaps
     static let mcuFloor = 1
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
@@ -151,9 +151,13 @@ enum P {
     static let jackTails = 3.4
     static let jackSeat = 2.0
     static let freeWallPocket = (switch: 0.8, reset: 0.6)  // how far each body sits into the free wall
+    static let mcuPlate = 1.4                 // a whole number of layers: the plate is parallel to the top the shell prints on
     static let bayEndWall = 1.6               // end walls beside the socket strip's
     static let outerScrewInset = (x: 2.6, y: 4.1)          // from the free wall's inner face and the end face
     static let bossDiameter = 5.6
+    /// Board-side tabs (module y): each a ledge over the socket board's edge and a leg beside it. Wires from the view
+    /// and the board's pads cross the edge between them, clear of the connector rows.
+    static let boardSideTabYs: [(Double, Double)] = [(12, 16), (42, 46), (55, 59), (98, 102)]
 
     // Derived
     static var pocketWidth: Double { boardWidth + 2 * boardClearance }
