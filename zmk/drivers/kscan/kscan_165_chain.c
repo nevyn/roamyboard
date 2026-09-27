@@ -25,6 +25,8 @@
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define FAULT_LOG_INTERVAL_MS 5000
+/** Leading chain bytes that the debug log dumps whenever they change. */
+#define DEBUG_DUMP_LEN 4
 
 BUILD_ASSERT(CHAIN_ANCHOR_MCU == 0 && CHAIN_ANCHOR_TERMINATOR == 1,
              "chain_anchor must follow the order of the anchor enum in the binding");
@@ -55,6 +57,7 @@ struct kscan_chain_data {
     bool *reported;
     struct zmk_debounce_state *debounce;
     int64_t next_fault_log;
+    uint8_t last_dump[DEBUG_DUMP_LEN];
     unsigned int faults_since_log;
 };
 
@@ -131,6 +134,12 @@ static bool kscan_chain_process(const struct device *dev) {
     if (err) {
         kscan_chain_log_read_error(dev, err);
         return false;
+    }
+
+    const size_t dump_len = MIN(config->read_len, DEBUG_DUMP_LEN);
+    if (CONFIG_ZMK_LOG_LEVEL >= LOG_LEVEL_DBG && memcmp(data->last_dump, data->buf, dump_len)) {
+        memcpy(data->last_dump, data->buf, dump_len);
+        LOG_HEXDUMP_DBG(data->buf, dump_len, "chain bytes changed, nearest key module first");
     }
 
     const enum chain_scan_result result =
