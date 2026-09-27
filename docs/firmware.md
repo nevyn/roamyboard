@@ -109,6 +109,16 @@ The firmware chooses the pins; the MCU board does not exist yet. Until it does, 
 
 +5V (J_LEFT1 pin 1) and the bottom connector (LED, SDA, SCL) stay unconnected for now.
 
+The nice!view, as ZMK's `nice_view_adapter` maps it on the nice!nano:
+
+| nice!view | nice!nano pin | nRF52840 |
+| --- | --- | --- |
+| VCC | VCC | switched by P0.13 |
+| GND | GND | |
+| SCK | D3 | P0.20, SPIM0 SCK |
+| MOSI | D2 | P0.17, SPIM0 MOSI |
+| CS | D1 | P0.06, active high |
+
 Why these pins:
 
 - SPIM1 is the nice!nano's `pro_micro_spi` instance, with SCK on D15 and MISO on D14 in the board's own pin control. Its MOSI (D16, P0.10) is left unconnected.
