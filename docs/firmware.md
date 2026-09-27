@@ -109,6 +109,8 @@ The firmware chooses the pins; the MCU board does not exist yet. Until it does, 
 
 +5V (J_LEFT1 pin 1) and the bottom connector (LED, SDA, SCL) stay unconnected for now.
 
+![Bench wiring: nice!nano underside, socket board back, nice!view](images/bench-wiring.svg)
+
 The nice!view, as ZMK's `nice_view_adapter` maps it on the nice!nano:
 
 | nice!view | nice!nano pin | nRF52840 |
