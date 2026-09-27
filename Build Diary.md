@@ -309,3 +309,22 @@ Two key modules in r3 cases, headers soldered in jig r4: the socket mouths sit f
 
 Shell r5 came off with every switch opening filled by a mat of loose strands, and the guide pins still ragged. The membrane meant to carry the seat was tilted with it, 2.9° to the bed, so it sliced into bands with nothing above them; the fins under the guide pins were one extrusion wide. Shell r6 drops both: a 0.4 mm chamfer on each opening's top edge shortens the seat's overhang from 0.8 to 0.57 mm, and the guide pins get painted slicer support. `tools/overhang.py` now slices the print poses and would have failed both r3 and r5.
 
+
+### Firmware on ZMK
+*2026-09-26*
+
+Firmware is ZMK plus our own module in `zmk/`, so Bluetooth, profiles, split halves, the display and ZMK Studio come for free and the new code is only the part no keyboard has: a driver for the 165 chain. It reads the chain over SPI every scan and counts key modules up to the terminator's 0xFF sentinel, so key modules can be added and removed while the keyboard runs, not just at boot. The keymap is one 30-column layout; each half fills it from an anchor end, and columns beyond the connected key modules never fire. Three builds, because ZMK fixes the split role at compile time: unibody, left (central) and right (peripheral). Design and pin table in [[firmware]]; punted work (a SwiftUI configurator over BLE, a topology service, a pull-up on DATA_IN in the next key module rev) is on the Roamyboard backlog in Patch. On the way, the shift-register test's notes turned out to have the read order backwards: the module nearest the reader comes out first.
+
+### First boot
+*2026-09-27*
+
+![firmware first boot irl](Images/firmware%20first%20boot%20irl.webp)
+
+nice!view wired to the nice!nano in the MCU shell, and the first build booted straight to ZMK's status screen through the window: USB, profile 1, layer "Base". The nano still carried settings from the Lily58 firmware (behavior IDs that no longer exist), so it got ZMK's `settings_reset` once before anything else. The bootloader wants its two RST taps about half a second apart; tapping as fast as possible just reboots.
+
+### First typing
+*2026-09-27, evening*
+
+![bench wiring](docs/images/bench-wiring.svg)
+
+Socket board wired, two key modules and a jumper standing in for the terminator. The log counted two key modules at rest and zero whenever a key was held; a debug dump of the raw chain bytes showed every byte going to 0xFF on a key press, which only happens if the 165s lose their supply. They had none: the wires soldered to the socket board's empty J_RIGHT1 pads no longer reached the sockets, as if the 0.25 mm tracks had broken at the pads, and the chain had been running on what leaked in through CLK and /PL. Bridged across on the board, and the first characters came out, each where the placeholder keymap puts it. The wiring diagram now taps the socket joints instead. Still open: one key module shows no GND continuity between its socket and header, yet works in either position, which a 165 can also do on leaked ground.
