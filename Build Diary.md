@@ -322,9 +322,19 @@ Firmware is ZMK plus our own module in `zmk/`, so Bluetooth, profiles, split hal
 
 nice!view wired to the nice!nano in the MCU shell, and the first build booted straight to ZMK's status screen through the window: USB, profile 1, layer "Base". The nano still carried settings from the Lily58 firmware (behavior IDs that no longer exist), so it got ZMK's `settings_reset` once before anything else. The bootloader wants its two RST taps about half a second apart; tapping as fast as possible just reboots.
 
+### MCU module r1
+*2026-09-27*
+
+First print of the MCU module. It goes together, with four gaps that the mesh checks had no test for: in the upturned shell the nice!nano rested only on the post over its port and the rest of it fell onto the plate; the nice!view's pocket held it only by the plate's thickness at its ends; the continuous ledge along the socket board's bay-side edge left no way for wires to cross into the bay; and nothing stopped the socket board sliding sideways into the bay, since the MCU module has no wall there. Shell r2 adds a prop over the nano, walls at the view's short ends, and board-side tabs with a leg beside the board and gaps for wires; check.py now tests each. Details in [[Case design]].
+
 ### First typing
 *2026-09-27, evening*
 
 ![bench wiring](docs/images/bench-wiring.svg)
 
 Socket board wired, two key modules and a jumper standing in for the terminator. The log counted two key modules at rest and zero whenever a key was held; a debug dump of the raw chain bytes showed every byte going to 0xFF on a key press, which only happens if the 165s lose their supply. They had none: the wires soldered to the socket board's empty J_RIGHT1 pads no longer reached the sockets, as if the 0.25 mm tracks had broken at the pads, and the chain had been running on what leaked in through CLK and /PL. Bridged across on the board, and the first characters came out, each where the placeholder keymap puts it. The wiring diagram now taps the socket joints instead. Still open: one key module shows no GND continuity between its socket and header, yet works in either position, which a 165 can also do on leaked ground.
+
+### MCU module wired
+*2026-09-27, evening*
+
+The MCU module is wired (all but the battery and the power switch) and reads the chain. The power switch and the reset button only had slots in the free wall, with nothing behind them to push against; hot glue held them. Shell r3 gives each a chamber hanging from the plate, with a back wall to take the press and side walls beyond the terminals, and widens the wall pockets for the terminals.

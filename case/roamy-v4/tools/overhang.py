@@ -94,6 +94,6 @@ def check(part):
     return not failures
 
 
-parts = sys.argv[1:] or ["shell-print", "floor-print"]
+parts = sys.argv[1:] or ["shell-print", "floor-print", "terminator-print", "mcu-shell-print", "mcu-floor-print"]
 results = [check(p) for p in parts]
 sys.exit(0 if all(results) else 1)

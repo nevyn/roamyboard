@@ -65,11 +65,17 @@ struct ScrewHoles: Geometry3D {
 /// side, and tabs between the switch housings on the socket side, where the housings sit 0.05 mm from the
 /// board edge.
 struct Ledges: Geometry3D {
+    /// z the ledges reach up to, into the plate.
+    var ceilingZ = P.ceilingZ
+    /// y ranges (module frame) of the header-side ledge; the whole length when nil.
+    var headerSide: [(Double, Double)]? = nil
     var body: any Geometry3D {
-        let z0 = P.boardTopZ, h = P.ceilingZ - P.boardTopZ + 0.01
+        let z0 = P.boardTopZ, h = ceilingZ - P.boardTopZ + 0.01
         Box(x: P.pocketWidth, y: P.ledgeLength, z: h).translated(x: Frame.pocketX0, y: Frame.pocketY0, z: z0)
         Box(x: P.pocketWidth, y: P.ledgeLength, z: h).translated(x: Frame.pocketX0, y: Frame.pocketY1 - P.ledgeLength, z: z0)
-        Box(x: P.ledgeWidth, y: P.pocketLength, z: h).translated(x: Frame.pocketX1 - P.ledgeWidth, y: Frame.pocketY0, z: z0)
+        for (y0, y1) in headerSide ?? [(Frame.pocketY0, Frame.pocketY1)] {
+            Box(x: P.ledgeWidth, y: y1 - y0, z: h).translated(x: Frame.pocketX1 - P.ledgeWidth, y: y0, z: z0)
+        }
         for y in P.socketSideTabYs {
             Box(x: P.ledgeWidth, y: 4.0, z: h).aligned(at: .centerY).translated(x: Frame.pocketX0, y: Frame.by(y), z: z0)
         }
@@ -117,32 +123,37 @@ struct KeyModuleFloor: Geometry3D {
                 engraving("floor \(Revision.label(Revision.floor))", size: 6.0)
                     .translated(z: -0.6)
                     .transformed(Transform3D([[t.x, 0, u.x, o.x], [0, 1, 0, P.outerLength / 2], [t.y, 0, u.y, o.y], [0, 0, 0, 1]]))
-                // counterbores bridged in two layers (a slot, then a square), so the floor prints bottom-down without
-                // the head's ceiling drooping into the bore
                 for end in ColumnEnd.allCases {
-                    for x in P.screwXs {
-                        let d = P.screwHeadDepth, l = P.layer, s = P.screwClearance
-                        Cylinder(diameter: P.screwHeadDiameter, height: d + 0.5).translated(z: -0.5)
-                            .adding {
-                                Box(x: s, y: P.screwHeadDiameter, z: l).aligned(at: .centerXY).translated(z: d)
-                                Box(x: s, y: s, z: 2 * l).aligned(at: .centerXY).translated(z: d)
-                                Cylinder(diameter: s, height: P.floorThickness + 2).translated(z: d + 2 * l)
-                            }
-                            .transformed(Self.frame(x: x, y: end.y(P.screwY)))
-                    }
+                    for x in P.screwXs { Counterbore().transformed(Self.frame(x: x, y: end.y(P.screwY))) }
                 }
+            }
+    }
+}
+
+/// Screw clearance and head counterbore through a floor, from its bottom face at z = 0 along z. The head's ceiling
+/// is bridged in two layers (a slot, then a square), so the floor prints bottom-down without it drooping into the bore.
+struct Counterbore: Geometry3D {
+    var body: any Geometry3D {
+        let d = P.screwHeadDepth, l = P.layer, s = P.screwClearance
+        Cylinder(diameter: P.screwHeadDiameter, height: d + 0.5).translated(z: -0.5)
+            .adding {
+                Box(x: s, y: P.screwHeadDiameter, z: l).aligned(at: .centerXY).translated(z: d)
+                Box(x: s, y: s, z: 2 * l).aligned(at: .centerXY).translated(z: d)
+                Cylinder(diameter: s, height: P.floorThickness + 2).translated(z: d + 2 * l)
             }
     }
 }
 
 /// Print placements: the shell with its top on the bed, the floor with its bottom on the bed.
 enum PrintPose {
-    static var shell: Transform3D {
+    static var shell: Transform3D { topDown(top: Joint.top) }
+    /// A part with its top at level `top` on the bed.
+    static func topDown(top: Double) -> Transform3D {
         let u = Joint.up, t = Joint.along, o = Joint.centre
         // x' = (p - o)·t, y' = -y, z' = top - (p - o)·up
         return Transform3D([[t.x, 0, t.y, -(o.x * t.x + o.y * t.y)],
                             [0, -1, 0, P.outerLength],
-                            [-u.x, 0, -u.y, Joint.top + (o.x * u.x + o.y * u.y)],
+                            [-u.x, 0, -u.y, top + (o.x * u.x + o.y * u.y)],
                             [0, 0, 0, 1]])
     }
     static var floor: Transform3D {

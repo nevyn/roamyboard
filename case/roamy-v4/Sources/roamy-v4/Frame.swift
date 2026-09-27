@@ -43,6 +43,9 @@ enum Joint {
         return Transform3D([[c, 0, s, t.x], [0, 1, 0, 0], [-s, 0, c, t.y], [0, 0, 0, 1]])
     }
 
+    /// `tilt` in 3D: a header built untilted with x from the pivot, into the module frame.
+    static var headerTilt: Transform3D { Transform3D([[c, 0, s, pivot.x], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]]) }
+
     /// Fixed point of `neighbour`: the arc's centre.
     static var centre: Vector2D {
         // (I - R)(p - F) = R m, R the tilt rotation, m the mouth offset along x
@@ -66,6 +69,18 @@ enum Joint {
     static func corner(_ face: Vector2D, _ level: Double) -> Vector2D { centre + face * (level / (face ⋅ up)) }
     /// z of a level at x.
     static func z(level: Double, x: Double) -> Double { centre.y + (level - (x - centre.x) * up.x) / up.y }
+
+    /// Frame lying on a level: x along it, y the module's y, z along `up`. Its origin is where the line through
+    /// (x, 0) along `up` meets the level, so faces perpendicular to the top at x stay at local x = 0.
+    static func levelFrame(x: Double, y: Double = 0, level: Double) -> Transform3D {
+        let q = Vector2D(x, 0), o = q + up * (level - self.level(q)), t = along, n = up
+        return Transform3D([[t.x, 0, n.x, o.x], [0, 1, 0, y], [t.y, 0, n.y, o.y], [0, 0, 0, 1]])
+    }
+    /// A point on the line through (x, 0) along `up`, at a level.
+    static func onPerpendicular(x: Double, level: Double) -> Vector2D {
+        let q = Vector2D(x, 0)
+        return q + up * (level - self.level(q))
+    }
 
     /// Top: through the plate top at the header-side edge of the switch pockets, so pockets are 0 deep there.
     static var top: Double { level(Vector2D(Frame.bx(P.keyX) + P.switchFlange / 2, P.plateTopZ)) }

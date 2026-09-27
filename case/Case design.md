@@ -223,3 +223,36 @@ Solder the front passives first, then lay the board front down in the pocket (SW
 - Every cut is open toward the component side, so the soldered board lifts straight out.
 
 Checked on the meshes: no overlap with the populated board mock-up; lifting it along its normal touches nothing; moving it 0.05 mm against either stop or into the jig overlaps, so the stops and floors are in contact. Prints base down with no overhangs.
+
+## Terminator module
+
+`TerminatorModule` in `case/roamy-v4` (models `terminator` with its neighbour, `terminator-print`). The header side of a key module's outline, printed solid in one piece top-down, about 12 mm wide at the board plane; the joint's header side (`HeaderSideJoint`), and a lug at each column end of the free face.
+
+Electrically it only ties the neighbour's DATA_IN to +3.3V, so that the neighbour's 74HC165 shifts in ones after its own byte and the MCU reads the end-of-chain sentinel ([[Electronics]]). Two headers sit where a key module's would: row 1 (+3.3V on its middle pin, board y 58.1) and row 2 (DATA on pin 3, board y 79.64). A wire joins those two pins' feet.
+
+Assembly, by embed pause:
+1. Solder the wire between the two feet: row 1 middle pin, row 2 pin 3 (the pin toward row 3). Insulated wire up to 1.3 mm.
+2. Print; the slicer pauses at the height that `swift run` prints (7.40 mm today, on a layer boundary).
+3. Drop both headers into their pockets, bodies down, pins out through the header face; lay the wire in its groove.
+4. Resume. 1.5 mm of print closes over the pockets. The wire's groove stays open on the underside, since covering it would take a 26 mm bridge.
+
+Checked on the meshes: the header side meets the JointSide contract; headers and wire fit their pockets and lie below the pause; the header pins sit in the neighbour's sockets like a key module's; no overlap with the neighbour, and slide-on touches only at the latch. The neighbour's socket mouths reach 0.17 mm past the seam, so the header face has reliefs there, as the key module's header wall has slots.
+
+## MCU module
+
+`MCUShell`, `MCUFloor` in `case/roamy-v4` (models `mcu-module` with the last key module, `mcu-module-print`). The last key module's neighbour: the joint's socket side (`SocketSideJoint`), no header side, so no pins stand exposed. Shell and screwed-on floor like the key module, 52.4 mm wide at the board plane.
+
+- **Assembly**, into the upturned shell: the nice!view, then the socket board, then the battery, the nano, the switch and the button; the jack on its floor seat; close with the floor.
+- **Board**: the socket board (a spare key module board with only its three sockets, soldered in the solder jig) sits exactly where a key module's board does, so the sockets meet the neighbour's headers. End ledges, the socket-side ledge tabs and floor pillars hold it as in the key module; on its bay side, where a key module has a wall, four board-side tabs (a ledge over its edge and a leg 0.2 mm beside it) stop it sliding into the bay, and wires from its pads and from the view cross the edge between them. The MCU board, later, keeps that socket edge.
+- **nice!view** over the socket board, header edge toward the nano, 0.2 mm above the board, under a window 0.4 mm past its active area with a 0.6 mm lip over the glass. It drops into its pocket from below before the board goes in; a wall hangs from the plate at its flex end and corner posts at its header end, so it stays put and its wires can leave toward the nano. The MCU module's plate is 1.4 mm, a whole number of layers, since it lies parallel to the top the shell prints on. To fit the view, its top lies 1.53 mm above the key modules' (10.48 mm thick, against 8.94); a local bezel would stand proud of the top, which the shell prints on.
+- **Bay**: the battery (electrokit 41016063, 48 × 30 × 5, 0.5 mm slack each side and above) at the SW1 end between floor stops; the nice!nano at the SW5 end (`P.usbEnd`), port through the end wall with a recess for the plug's overmould. Everything that locates the parts sideways hangs from the plate, so they go into the upturned shell before the floor closes it: guides at the nano's sides that reach 0.6 mm down its board edge, a stop 0.1 mm behind it, a post 0.1 mm over its USB-C shell, a prop 0.1 mm over its tallest part under its middle so it lies level, and stops at the battery's ends; the socket board's edge stops the battery toward the board. The port's slot in the end wall is open down to the rim so the nano drops in; a tongue on the floor closes it to 0.1 mm under the port, short of the overmould's recess, and a 2 mm rib on the floor under the nano's middle (room for wires underneath) presses it against the post. Between them the battery jack (JST S2B-PH-K-S) on a seat, mating face toward the battery, its tails through the floor.
+- **Free face**, between the lugs: the power switch (Alps SSSS811101, slider 0.5 mm proud) and the reset button (Panasonic EVQPUC02K, actuator 0.2 mm recessed), each in a pocket in the free wall's inner face, open toward the floor, which holds them. Behind each, a chamber hangs from the plate: a wall 0.1 mm behind the body takes the press, walls beyond its terminals stop it along the column, and its open corners let the wires out (the switch's back wall stops 0.5 mm above the rim, clear of its signal terminals). Their pegs sit in reliefs in the floor.
+- **Screws**: the key module's four corner screws in the socket side's end walls, and two more in bosses at the free face's corners.
+- **Lugs**: as on the terminator, their bottoms turned down by the joint angle to follow the leg.
+
+Dimensions: nice!nano measured (18.15 × 33.40, 34.26 with the port; 2.75 tall, 3.30 at the port); nice!view, switch, button and jack from their vendors' drawings (nicekeyboards.com, typeractive.xyz datasheet links); battery from electrokit.com.
+
+Checked on the meshes: the socket side meets the JointSide contract; shell, floor, socket board and parts don't overlap; joined to a key module, nothing overlaps and the header pins sit in the sockets; slide-on touches only at the latch; the socket board drops into the shell; the nano is held in every direction; the switch and the button are held when pressed and along the column; every part drops into the upturned shell; the floor's tongue holds the port from below; six screws clear the floor and bite into the shell; a USB-C plug's overmould clears the end wall. Both parts print without drooping overhangs (`tools/overhang.py`).
+
+Untested: all of it on the printer.
+

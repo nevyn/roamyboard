@@ -5,6 +5,11 @@
 - The bare board rises out of the shell along its normal without contact.
 - Sliding a neighbour on along its board plane touches only where the latch tooth rides the guide pin.
 - Solder jig: no overlap with the board, straight lift-out, stops in contact.
+- Terminator module: its header side meets the contract, the embedded headers fit their pockets, lie below the
+  embed pause and sit in the neighbour's sockets; nothing collides with the neighbour, joined or during slide-on.
+- MCU module: its socket side meets the contract; shell, floor, socket board and parts don't overlap; it joins the
+  last key module like a key module does; the socket board drops in; screws bite; the nano is held every way; the parts drop into the upturned shell; a USB-C
+  plug fits.
 - JointSide contract: within the body, a joint side's cuts and parts stay in its reserved blocks, the shell has no
   features of its own there, and nothing but the joint's own parts sits in its keep-out.
 Needs trimesh, manifold3d, lxml (scripts/setup-cloud.sh) and kicad-cli. Exits non-zero on a failure.
@@ -38,7 +43,8 @@ def expect(ok, text):
     if not ok:
         failures.append(text)
 
-P = {n: man(n) for n in ["shell", "floor", "board", "bare-board", "right-shell", "right-floor", "right-board", "jig"]}
+P = {n: man(n) for n in ["shell", "floor", "board", "bare-board", "right-shell", "right-floor", "right-board", "jig",
+                             "terminator", "terminator-embedded", "terminator-embedded-print"]}
 
 # KiCad cross-check. glTF is right-handed: x = KiCad x, y toward the front, z = KiCad y. Turn it front-up and
 # place the board where the case holds it; nothing here goes through Frame.bx/by.
@@ -87,6 +93,9 @@ others = max(overlap(P[x], P[y], along * d) for d in np.arange(0.25, 9, 0.25)
 expect(others < 1e-3 and touch and max(touch) <= 3.0,
        f"slide-on: shells touch only within {max(touch, default=0):.2f} mm of home (tooth), nothing else touches")
 
+touch = [d for d in np.arange(0, 9, 0.25) if overlap(P["terminator"], P["right-shell"], along * d) > 1e-3]
+expect(touch and max(touch) <= 3.0, f"terminator slide-on: touches only within {max(touch, default=0):.2f} mm of home (tooth)")
+
 for move, what in [((0.15, 0, 0), "+x"), ((-0.15, 0, 0), "-x"), ((0, 0.15, 0), "+y"), ((0, -0.15, 0), "-y")]:
     expect(overlap(P["shell"], P["floor"], move) > 1e-3, f"floor: tabs locate it in the shell ({what} 0.15 mm collides)")
 # M2 screws: shank through the floor's clearance, biting into the shell's pilot hole
@@ -104,17 +113,78 @@ for move, what in [((-0.05, 0, 0), "socket mouth stops"), ((0.05, 0, 0), "header
 
 # JointSide contract. Inside reserved, the shell is the outline minus the joint's cuts plus its parts; outside the body,
 # the keep-out holds nothing but the joint's parts.
-outline = man("shell-outline")
-for side in ("header", "socket"):
-    j = {k: man(f"{side}-joint-{k}") for k in ("reserved", "removed", "added", "keep-out")}
-    region = outline ^ j["reserved"]
-    expected = (region - j["removed"]) + (j["added"] ^ j["reserved"])
-    got = P["shell"] ^ j["reserved"]
-    stray = (got - expected).volume() + (expected - got).volume()
-    expect(stray < 1e-3, f"{side} joint side: shell matches the joint inside reserved ({stray:.4f} mm³ differ)")
-    spill = (((j["removed"] + j["added"]) ^ outline) - j["reserved"]).volume()
-    expect(spill < 1e-3, f"{side} joint side: its cuts and parts stay in reserved within the body ({spill:.4f} mm³ outside)")
-    intrusion = ((P["shell"] - j["added"]) ^ j["keep-out"]).volume()
-    expect(intrusion < 1e-3, f"{side} joint side: keep-out clear of the shell ({intrusion:.4f} mm³)")
+def contract(host, outline, sides):
+    for side in sides:
+        j = {k: man(f"{side}-joint-{k}") for k in ("reserved", "removed", "added", "keep-out")}
+        region = outline ^ j["reserved"]
+        expected = (region - j["removed"]) + (j["added"] ^ j["reserved"])
+        got = P[host] ^ j["reserved"]
+        stray = (got - expected).volume() + (expected - got).volume()
+        expect(stray < 1e-3, f"{host}, {side} joint side: matches the joint inside reserved ({stray:.4f} mm³ differ)")
+        spill = (((j["removed"] + j["added"]) ^ outline) - j["reserved"]).volume()
+        expect(spill < 1e-3, f"{host}, {side} joint side: its cuts and parts stay in reserved within the body ({spill:.4f} mm³ outside)")
+        intrusion = ((P[host] - j["added"]) ^ j["keep-out"]).volume()
+        expect(intrusion < 1e-3, f"{host}, {side} joint side: keep-out clear of the {host} ({intrusion:.4f} mm³)")
+
+contract("shell", man("shell-outline"), ("header", "socket"))
+
+# Terminator module: key module frame, neighbour at the joint pose (right-*)
+contract("terminator", man("terminator-outline"), ("header",))
+expect(overlap(P["terminator"], P["terminator-embedded"]) < 1e-3, "terminator: headers and wire fit their pockets")
+pause = float((CHECK / "terminator-pause.txt").read_text())
+top = P["terminator-embedded-print"].bounding_box()[5]
+expect(top <= pause, f"terminator: embedded parts below the pause ({top:.2f} ≤ {pause:.2f} mm)")
+worst = max(overlap(P["terminator"], P[n]) for n in ["right-shell", "right-board", "right-floor"])
+worst = max(worst, overlap(P["terminator-embedded"], P["right-shell"]))
+expect(worst < 1e-3, f"terminator: no overlap with its neighbour ({worst:.4f} mm³)")
+pins = overlap(P["terminator-embedded"], P["right-board"])
+expect(abs(pins - 6 * 0.64 ** 2 * 5.615) < 0.1, f"terminator: header pins in the neighbour's sockets: {pins:.2f} mm³ (6 × 0.64² × 5.6)")
+
+# MCU module: key module frame; right-* places it as the neighbour of the key module at the origin
+for n in ["mcu-shell", "mcu-floor", "mcu-parts", "socket-board", "right-mcu-shell", "right-mcu-floor", "right-socket-board", "mcu-usb-plug"]:
+    P[n] = man(n)
+contract("mcu-shell", man("mcu-outline"), ("socket",))
+pairs = [("mcu-shell", "mcu-floor"), ("mcu-shell", "socket-board"), ("mcu-floor", "socket-board"),
+         ("mcu-parts", "mcu-shell"), ("mcu-parts", "mcu-floor"), ("mcu-parts", "socket-board")]
+worst = max((overlap(P[a], P[b]), a, b) for a, b in pairs)
+expect(worst[0] < 1e-3, f"MCU module: largest overlap {worst[0]:.4f} mm³ ({worst[1]} × {worst[2]})")
+pairs = [(a, b) for a in ("shell", "floor", "board") for b in ("right-mcu-shell", "right-mcu-floor", "right-socket-board") if (a, b) != ("board", "right-socket-board")]
+worst = max((overlap(P[a], P[b]), a, b) for a, b in pairs)
+expect(worst[0] < 1e-3, f"MCU module joined to a key module: largest overlap {worst[0]:.4f} mm³ ({worst[1]} × {worst[2]})")
+pins = overlap(P["board"], P["right-socket-board"])
+expect(abs(pins - 9 * 0.64 ** 2 * 5.615) < 0.1, f"MCU module: header pins in its sockets: {pins:.2f} mm³ (9 × 0.64² × 5.6)")
+touch = [d for d in np.arange(0, 9, 0.25) if overlap(P["shell"], P["right-mcu-shell"], along * d) > 1e-3]
+expect(touch and max(touch) <= 3.0, f"MCU module slide-on: touches only within {max(touch, default=0):.2f} mm of home (tooth)")
+worst = max(overlap(P["mcu-shell"], P["socket-board"], (0, 0, -d)) for d in np.arange(0, 16, 0.25))
+expect(worst < 1e-3, f"MCU module: socket board drops into the shell (largest overlap {worst:.4f} mm³)")
+shanks = [man(f"mcu-shank-{i}") for i in range(6)]
+expect(max(overlap(P["mcu-floor"], s_) for s_ in shanks) < 1e-3, "MCU module: 6 M2 shanks clear the floor")
+expect(min(overlap(P["mcu-shell"], s_) for s_ in shanks) > 0.5, "MCU module: every shank bites into the shell")
+nano, up = man("mcu-nano"), np.array([math.sin(math.radians(2.94)), 0, math.cos(math.radians(2.94))])
+held = [(P["mcu-shell"], up * 0.15, "up (port post)"), (P["mcu-floor"], -up * 0.05, "down (rib)"),
+        (P["mcu-shell"], (0.2, 0, 0), "+x (guides)"), (P["mcu-shell"], (-0.2, 0, 0), "-x (guides)"),
+        (P["mcu-shell"], (0, -0.15, 0), "back (stop)"), (P["mcu-shell"], (0, 0.15, 0), "forward (end wall)")]
+for part, move, what in held:
+    expect(overlap(part, nano, move) > 1e-3, f"MCU module: the nano is held {what}")
+worst = max(overlap(P["mcu-shell"], P["mcu-parts"], -up * d) for d in np.arange(0, 12, 0.25))
+expect(worst < 1e-3, f"MCU module: every part drops into the upturned shell (largest overlap {worst:.4f} mm³)")
+expect(overlap(P["mcu-shell"], nano, up * 0.15) > 5, "MCU module: the prop holds the nano level, not only its port")
+view = man("mcu-view")
+for move, what in [((0, 0.5, 0), "+y"), ((0, -0.5, 0), "-y")]:
+    expect(overlap(P["mcu-shell"], view, move) > 1, f"MCU module: the view is held at its {what} end")
+for move, what in [((0.3, 0, 0), "into the bay"), ((-0.3, 0, 0), "into the socket wall")]:
+    expect(overlap(P["mcu-shell"], P["socket-board"], move) > 1e-3, f"MCU module: the socket board is held {what}")
+inward = -np.array([math.cos(math.radians(2.94)), 0, -math.sin(math.radians(2.94))])
+for part in ("switch", "reset"):
+    m = man(f"mcu-{part}")
+    for move, what in [(inward * 0.2, "when pressed"), ((0, 0.4, 0), "along +y"), ((0, -0.4, 0), "along -y")]:
+        expect(overlap(P["mcu-shell"], m, move) > 1e-3, f"MCU module: the {part} is held {what}")
+paths = man("mcu-wire-paths")
+worst = max(overlap(P[n], paths) for n in ("mcu-shell", "mcu-floor", "socket-board", "mcu-parts"))
+expect(worst < 1e-3, f"MCU module: wires can cross the board's bay-side edge ({worst:.4f} mm³ in the way)")
+tongue = man("mcu-tongue")
+expect(overlap(tongue, nano, -up * 0.15) > 1e-3 and overlap(tongue, P["mcu-floor"]) > 0.9 * tongue.volume(),
+       "MCU module: the floor's tongue holds the port from below")
+expect(overlap(P["mcu-shell"] + P["mcu-floor"], P["mcu-usb-plug"]) < 1e-3, "MCU module: a USB-C plug's overmould clears the end wall")
 
 sys.exit(1 if failures else 0)
