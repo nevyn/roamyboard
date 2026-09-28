@@ -1,0 +1,50 @@
+# Publishes the assembly guide (docs/assembly) to GitHub Pages. Runs only when the guide or the repo
+# images it shows change. The site keeps the repo's paths, since the guide links ../images and ../../Images;
+# the site root redirects to docs/assembly/.
+name: Assembly guide
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/assembly/**"
+      - "docs/images/**"
+      - "Images/firmware first boot irl.webp"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}docs/assembly/
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: true
+      - name: Assemble the site
+        run: |
+          mkdir -p _site/docs _site/Images
+          cp -R docs/assembly docs/images _site/docs/
+          cp "Images/firmware first boot irl.webp" _site/Images/
+          # Fails the job if a model is still an LFS pointer rather than a GLB.
+          for f in _site/docs/assembly/models/*.glb; do
+            [ "$(head -c 4 "$f")" = "glTF" ] || { echo "$f is not a GLB (LFS pointer?)"; exit 1; }
+          done
+          printf '<!doctype html><meta charset="utf-8"><title>Roamyboard</title><meta http-equiv="refresh" content="0; url=docs/assembly/"><a href="docs/assembly/">Roamyboard assembly guide</a>\n' > _site/index.html
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v5

@@ -7,7 +7,6 @@
 <meta name="description" content="Step-by-step guide to printing, soldering, assembling and flashing a Roamyboard, the modular keyboard you wear on your leg.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='6' width='7' height='20' rx='2' fill='%236b3fa0'/%3E%3Crect x='12.5' y='5' width='7' height='20' rx='2' fill='%236b3fa0' transform='rotate(8 16 15)'/%3E%3Crect x='22' y='7' width='7' height='20' rx='2' fill='%23e8871e' transform='rotate(16 25 17)'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="guide.css">
-<script>document.documentElement.dataset.theme = localStorage.getItem("roamy-guide:theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");</script>
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -27,7 +26,6 @@
     <span>Roamyboard<small>Printing and assembly guide</small></span>
   </a>
   <div class="sidebar-tools">
-    <button class="btn" data-action="theme" title="Light or dark">◐ Theme</button>
     <button class="btn" data-action="reset-progress" title="Clear every check mark">Reset progress</button>
   </div>
   <div class="overall"><div class="bar"><i></i></div><div class="label"><span>Progress</span><span data-overall>0 %</span></div></div>
@@ -74,7 +72,7 @@
         </ul>
         <p>The terminator module has a header side only, and the MCU module a socket side only, so no header pins stand exposed at either end. Their other long side is the <b>free face</b>, which carries the <b>lugs</b> for the harness.</p>
         <p>The two ends of a module are the <b>SW1 end</b> and the <b>SW5 end</b>, named by the switch nearest each. SW1 is the bottom key.</p>
-        <div class="note"><p>This guide uses the terms in <a href="../glossary.md">docs/glossary.md</a>. Hover a part in any 3D view to see its name.</p></div>
+        <div class="note"><p>This guide uses the terms in <a href="https://github.com/nevyn/roamyboard/blob/main/docs/glossary.md">docs/glossary.md</a>. Hover a part in any 3D view to see its name.</p></div>
       </div>
       <div class="step-media"><figure><img class="diagram" src="images/half-order.svg" alt="Top view of a half: terminator module, key modules and MCU module, with header and socket sides marked"></figure></div>
     </div>
@@ -97,7 +95,7 @@
         <p>Each key module has one 74HC165 shift register. The registers of a half form the <b>chain</b>: every scan, the MCU module loads all of them at once and clocks their bytes out on DATA, nearest key module first.</p>
         <p>The terminator module ties the far end of DATA to +3.3V, so after the last key module the chain reads <code>0xFF</code>, the <b>sentinel</b>. A real key module's byte always has bit 7 clear, so the first byte with bit 7 set ends the chain, and its index is the key module count.</p>
         <p>That is why modules can be added and removed while the keyboard runs, and why a half without its terminator module types nothing.</p>
-        <p class="summary">More in <a href="../firmware.md">docs/firmware.md</a> and <a href="../../electronics/Electronics.md">electronics/Electronics.md</a>.</p>
+        <p class="summary">More in <a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md">docs/firmware.md</a> and <a href="https://github.com/nevyn/roamyboard/blob/main/electronics/Electronics.md">electronics/Electronics.md</a>.</p>
       </div>
       <div class="step-media"><figure><img class="diagram" src="images/chain.svg" alt="The shift register chain of a half, and the bytes the MCU module reads"></figure></div>
     </div>
@@ -151,7 +149,7 @@
           <li>Thin hookup wire for the MCU module; insulated wire up to 1.3 mm across for the terminator module</li>
         </ul></div>
         <div class="card"><h4>Assembly</h4><ul class="check">
-          <li>Gel cyanoacrylate (gel CA) for staking the connectors</li>
+          <li>Two-component epoxy for gluing the connectors to the board; superglue if you have nothing else</li>
           <li>A small Phillips driver for M2 screws</li>
           <li>A USB-C cable for flashing and charging</li>
           <li>A strap for the harness: the lug slots take up to 24 × 4 mm</li>
@@ -165,7 +163,7 @@
 <section class="chapter" id="print" data-title="Print the parts">
   <div class="chapter-head"><div class="chapter-no">3</div><div>
     <h2>Print the parts</h2>
-    <p>The print files come from the Cadova model in <code>case/roamy-v4</code>. Each part carries its revision engraved (<code>r6</code> and so on); check it against the table before you print a batch.</p>
+    <p>The print files come from the Cadova model in <code>case/roamy-v4</code>. Each part carries its revision engraved (<code>r6</code> and so on).</p>
   </div></div>
 
   <article class="step" id="generate" data-title="Generate and check the print files">
@@ -176,7 +174,6 @@
         <li>Run <code>python3 tools/check.py</code>. It compares the board against KiCad's own 3D export (a mirrored model fails it) and checks the fits, the slide-on and the floors. Run it before printing anything.</li>
         <li>Run <code>python3 tools/overhang.py</code>. It slices the print poses at 0.2 mm and fails on anything that droops outside the painted-support zone.</li>
       </ol>
-      <div class="warn"><p>Shell and floor r1 and r2 and jig r1 to r3 are mirror images of the board. Use only the revisions below or later.</p></div>
     </div>
     <div class="step-text" style="border-left:1px solid var(--line)">
       <h4 style="margin-top:0">Current revisions</h4>
@@ -187,7 +184,6 @@
         <tr><td>MCU floor</td><td><code>mcu-module-print.3mf</code></td><td class="n" data-rev="mcuFloor"></td></tr>
         <tr><td>Terminator module</td><td><code>terminator-print.3mf</code></td><td class="n" data-rev="terminator"></td></tr>
         <tr><td>Solder jig</td><td><code>solder-jig-print.3mf</code></td><td class="n" data-rev="jig"></td></tr>
-        <tr><td>Choc cutout coupon</td><td><code>choc-cutout-coupon.3mf</code></td><td class="n" data-rev="coupon"></td></tr>
       </tbody></table></div>
       <p class="summary">Read from <code>Parameters.swift</code> when the guide's models were generated.</p>
     </div></div>
@@ -205,19 +201,6 @@
     </div></div>
   </article>
 
-  <article class="step" id="coupon" data-title="Print the Choc cutout coupon">
-    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Calibrate</span><h3>Print the Choc cutout coupon</h3><a class="anchor" href="#coupon">#</a></div>
-    <div class="step-body"><div class="step-text">
-      <p>A plate-thick strip with switch openings from 13.5 to 14.2 mm. It tells you which opening your printer makes that a Choc clicks into and holds.</p>
-      <ol class="do">
-        <li>Print <code>choc-cutout-coupon.3mf</code>.</li>
-        <li>Press a switch into each opening. The right one clicks in and holds without force.</li>
-        <li>The case uses <b>13.7 mm</b> (<code>switchCutout</code> in <code>Parameters.swift</code>), from the coupon of 2026-09-25. If yours prefers another size, change it and run <code>swift run</code> again.</li>
-      </ol>
-      <div class="tip"><p>Reprint the coupon after a printer or filament change.</p></div>
-    </div>
-    <div class="step-media"><div class="viewer" data-scene="coupon"></div></div></div>
-  </article>
 
   <article class="step" id="jig-print" data-title="Print the solder jig">
     <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Print</span><h3>Print the solder jig</h3><a class="anchor" href="#jig-print">#</a></div>
@@ -225,7 +208,7 @@
       <p>The jig holds a key module board front down and puts every connector where the case expects it: sockets against a stop at the mouth, headers tilted 8° in a cradle. One jig does every board.</p>
       <ol class="do">
         <li>Print <code>solder-jig-print.3mf</code>, base down. It has no overhangs.</li>
-        <li>Check the engraving on top: <code>8° jig r4</code> or later.</li>
+        <li>The engraving on top reads <code>8° jig</code> and its revision.</li>
       </ol>
     </div>
     <div class="step-media"><div class="viewer" data-scene="jigPrint"></div></div></div>
@@ -268,13 +251,14 @@
 
   <article class="step" id="front" data-title="Front: resistors and capacitor">
     <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Front</span><h3>Front: resistors and capacitor</h3><a class="anchor" href="#front">#</a></div>
-    <div class="step-body single"><div class="step-text">
+    <div class="step-body"><div class="step-text">
       <ul class="check">
         <li><b>R1 to R5</b>: 10 kΩ, 0805. The pull-downs of the five keys.</li>
         <li><b>C1</b>: 100 nF, 0805. Decoupling for U1.</li>
       </ul>
       <p>Do the front first: the jig holds the board front down, in pockets with room for these parts and their fillets.</p>
-    </div></div>
+    </div>
+    <div class="step-media"><figure class="photo"><img src="photos/keycap-on-bare-pcb.jpg" alt="A bare purple key module board with one switch and keycap in the SW5 position" loading="lazy"><figcaption>A bare v5 board's front, with a switch and keycap dropped into SW5 before anything was soldered (2026-09-23).</figcaption></figure></div></div>
   </article>
 
   <article class="step" id="back" data-title="Back: U1, hotswap sockets and connectors, in the jig">
@@ -290,7 +274,7 @@
       <p>Use the numbered buttons under the view to go through it.</p>
       <div class="tip"><p>Every cut in the jig is open toward the component side, so the soldered board lifts straight out.</p></div>
     </div>
-    <div class="step-media"><div class="viewer" data-scene="jig"></div></div></div>
+    <div class="step-media"><div class="viewer" data-scene="jig"></div><figure class="photo"><img src="photos/header-and-socket-mated-side.jpg" alt="A header and a socket plugged together, lying on a table" loading="lazy"><figcaption>A header and a socket, mated: both bodies rest on their feet, so a pair lies flat on the table (2026-09-25).</figcaption></figure></div></div>
   </article>
 
   <article class="step" id="headers" data-title="Headers at 8°">
@@ -302,22 +286,23 @@
         <li>Push it outward against the stop that touches the body's outer edge, and tack one pad.</li>
         <li>Solder all three feet. The foot touches its pad at the inboard end and has 0.32 mm under its other end, so each joint is a wedge-shaped fillet.</li>
       </ol>
-      <div class="warn"><p>The wedge fillet must not carry the connector's load. In the case, the floor's rear stop takes the slide-on push and its clamp pad keeps the body from tipping; staking, next, takes the pull when modules come apart.</p></div>
+      <div class="warn"><p>The wedge fillet must not carry the connector's load. In the case, the floor's rear stop takes the slide-on push and its clamp pad keeps the body from tipping; the glue, next, takes the pull when modules come apart.</p></div>
     </div>
-    <div class="step-media"><figure><img class="diagram" src="images/header-tilt.svg" alt="Cross-section of a header soldered at 8 degrees in the jig"></figure></div></div>
+    <div class="step-media"><figure><img class="diagram" src="images/header-tilt.svg" alt="Cross-section of a header soldered at 8 degrees in the jig"></figure><figure class="photo"><img src="photos/key-module-end-view.jpg" alt="End view of a key module with the header pins and a guide pin sticking out" loading="lazy"><figcaption>End view of a key module with headers soldered in the jig: the header pins run parallel to the guide pin (2026-09-26, an earlier case revision).</figcaption></figure></div></div>
   </article>
 
-  <article class="step" id="stake" data-title="Stake the connectors">
-    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Back</span><h3>Stake the connectors</h3><a class="anchor" href="#stake">#</a></div>
+  <article class="step" id="stake" data-title="Glue the connectors to the board">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Back</span><h3>Glue the connectors to the board</h3><a class="anchor" href="#stake">#</a></div>
     <div class="step-body"><div class="step-text">
-      <p>Pulling two modules apart pulls each connector body away from the floor that holds it, and there is no room for a stop on that side: at the seam, the header body and the neighbour's socket mouth are 0.39 mm apart. Glue carries that load instead of the solder joints.</p>
+      <p>Glue the headers and sockets to the board, so that pulling modules apart pulls on the board and the case rather than on the weak solder joints. Nothing else can take that pull: at the seam, the header body and the neighbour's socket mouth are only 0.39 mm apart, which leaves no room for a stop. The glossary calls this <b>staking</b>.</p>
       <ol class="do">
-        <li>Run a bead of gel CA along both long sides of each connector body, between the body and the board. Six bodies per board.</li>
+        <li>Mix a small amount of <b>two-component epoxy</b>. Superglue works as a fallback if you have nothing else.</li>
+        <li>Run a bead along both long sides of each connector body, between the body and the board. Six bodies per board.</li>
         <li>Keep the glue off the tails and their fillets, and within about 0.5 mm of the body: the floor's clamp pads and rear stops need the rest.</li>
-        <li>Let it cure before the board goes into its shell.</li>
+        <li>Let it cure fully before the board goes into its shell.</li>
       </ol>
     </div>
-    <div class="step-media"><figure><img class="diagram" src="images/staking.svg" alt="Where the gel CA goes along each connector body"></figure>
+    <div class="step-media"><figure><img class="diagram" src="images/staking.svg" alt="Where the glue goes along each connector body"></figure>
       <div class="photo-slot"><b>Photo wanted</b>A staked board: glue beads along a socket and a header.</div></div></div>
   </article>
 
@@ -332,7 +317,7 @@
         <tr><td>GPIO0</td><td>J_RIGHT2 pin 2</td><td>/PL</td></tr>
         <tr><td>GPIO26</td><td>J_RIGHT2 pin 3</td><td>DATA (QH)</td></tr>
       </tbody></table></div>
-      <p>Tie J_LEFT2 pin 3 (DATA in) to GND for the test, so the bits shifted in behind the module read 0. Details in the sketch's <a href="../../firmware/shiftregister-test/README.md">README</a>. Without an M5Stick, test the boards in the finished half instead (<a href="#first-test">chapter 9</a>).</p>
+      <p>Tie J_LEFT2 pin 3 (DATA in) to GND for the test, so the bits shifted in behind the module read 0. Details in the sketch's <a href="https://github.com/nevyn/roamyboard/blob/main/firmware/shiftregister-test/README.md">README</a>. Without an M5Stick, test the boards in the finished half instead (<a href="#first-test">chapter 9</a>).</p>
     </div></div>
   </article>
 </section>
@@ -360,13 +345,14 @@
 
   <article class="step" id="switches" data-title="Switches and keycaps">
     <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Assemble</span><h3>Switches and keycaps</h3><a class="anchor" href="#switches">#</a></div>
-    <div class="step-body single"><div class="step-text">
+    <div class="step-body"><div class="step-text">
       <ol class="do">
         <li>Turn the module right side up. Press a Choc v1 switch into each switch pocket until its side clips catch under the plate; its legs go through the board into the hotswap sockets.</li>
         <li>Put the keycaps on.</li>
       </ol>
       <p>The switches are hot-swappable: pull one out with a switch puller to change it. The sockets hold the switch; the plate's 0.25 mm seat and the clips keep it square. How well the seat holds under hard typing is still to be tested.</p>
-    </div></div>
+    </div>
+    <div class="step-media"><figure class="photo"><img src="photos/key-module-side-connectors.jpg" alt="A finished key module held in a hand, with connector openings along its side" loading="lazy"><figcaption>A finished key module (2026-09-26, an earlier case revision).</figcaption></figure></div></div>
   </article>
 </section>
 
@@ -374,7 +360,7 @@
 <section class="chapter" id="terminator" data-title="Build the terminator module">
   <div class="chapter-head"><div class="chapter-no">6</div><div>
     <h2>Build the terminator module</h2>
-    <p>A solid print about 12 mm wide with two headers inside it, embedded during a pause in the print. Electrically it only ties its neighbour's DATA to +3.3V, which makes the chain end in the sentinel.</p>
+    <p>A solid print about 12 mm wide with two headers glued inside it, embedded during a pause in the print. Electrically it only ties its neighbour's DATA to +3.3V, which makes the chain end in the sentinel.</p>
   </div></div>
 
   <article class="step" id="term-wire" data-title="Solder the wire">
@@ -397,6 +383,7 @@
         <li>Open <code>terminator-print.3mf</code>. Paint support under its two guide pins, as on the key module shell.</li>
         <li>Add a pause at <b><span data-pause></span> mm</b>, the height that <code>swift run</code> prints. It lies on a layer boundary.</li>
         <li>At the pause, drop both headers into their pockets, bodies down, pins out through the header face, and lay the wire in its groove.</li>
+        <li>Glue each header body into its pocket, for the same reason as on the boards: pulling modules apart must pull on the print, not on the wire's solder joints. Use glue that sets before you resume, so the nozzle doesn't drag through it.</li>
         <li>Resume. 1.5 mm of print closes over the pockets. The wire's groove stays open on the underside, since covering it would take a 26 mm bridge.</li>
       </ol>
       <p>Drag <b>Print height</b> under the view to watch the print reach the pause.</p>
@@ -428,7 +415,7 @@
       <ol class="do">
         <li>Take a bare key module board. Leave the front, U1, the hotswap sockets and the headers empty.</li>
         <li>Solder the three sockets (J_LEFT1 to J_LEFT3) in the solder jig, exactly as on a key module.</li>
-        <li>Stake them with gel CA.</li>
+        <li>Glue them to the board, as on a key module.</li>
       </ol>
       <p>The socket board sits in the MCU module exactly where a key module's board sits in its shell, so its sockets meet the last key module's headers.</p>
     </div></div>
@@ -527,7 +514,7 @@
       <p>Drag <b>Slide-on</b> under the view.</p>
       <div class="note"><p>Because the header is tilted, each module sits 1.1 mm lower at the seam than its neighbour. That is intended: it puts every module on the same arc.</p></div>
     </div>
-    <div class="step-media"><div class="viewer" data-scene="join"></div></div></div>
+    <div class="step-media"><div class="viewer" data-scene="join"></div><figure class="photo"><img src="photos/two-columns-in-hand.jpg" alt="Two joined key modules with purple keycaps held in a hand" loading="lazy"><figcaption>The first two key modules joined: they mated, clicked and read as a chain (2026-09-26, an earlier case revision).</figcaption></figure></div></div>
   </article>
 
   <article class="step" id="release" data-title="Release">
@@ -558,13 +545,13 @@
 <section class="chapter" id="firmware" data-title="Flash and test">
   <div class="chapter-head"><div class="chapter-no">9</div><div>
     <h2>Flash and test</h2>
-    <p>The Roamyboard runs <a href="https://zmk.dev">ZMK</a> with its own driver for the key modules' chain. Details in <a href="../firmware.md">docs/firmware.md</a>.</p>
+    <p>The Roamyboard runs <a href="https://zmk.dev">ZMK</a> with its own driver for the key modules' chain. Details in <a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md">docs/firmware.md</a>.</p>
   </div></div>
 
   <article class="step" id="get-firmware" data-title="Get the firmware">
     <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Firmware</span><h3>Get the firmware</h3><a class="anchor" href="#get-firmware">#</a></div>
     <div class="step-body single"><div class="step-text">
-      <p>GitHub Actions builds three UF2 files on every push that touches <code>zmk/</code>: download them from the latest run's artifacts in <a href="https://github.com/nevyn/roamyboard/actions/workflows/build.yml">the Build workflow</a>, or build locally with Docker (<a href="../firmware.md#building">instructions</a>).</p>
+      <p>GitHub Actions builds three UF2 files on every push that touches <code>zmk/</code>: download them from the latest run's artifacts in <a href="https://github.com/nevyn/roamyboard/actions/workflows/build.yml">the Build workflow</a>, or build locally with Docker (<a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md#building">instructions</a>).</p>
       <div class="table-wrap"><table><thead><tr><th>File</th><th>For</th><th>ZMK Studio</th></tr></thead><tbody>
         <tr data-layout-row="unibody"><td><code>roamyboard</code></td><td>A unibody keyboard: one half</td><td>yes</td></tr>
         <tr data-layout-row="split"><td><code>roamyboard_left</code></td><td>The left half of a split, which the computer connects to</td><td>yes</td></tr>
@@ -613,12 +600,10 @@
       <div class="table-wrap"><table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead><tbody>
         <tr><td>No keys at all; the log reports a fault</td><td>No sentinel: the terminator module is missing, DATA or /PL is broken, or there are more key modules than <code>max-key-modules</code> (32)</td><td>Put the terminator module on; check DATA and /PL continuity through each joint</td></tr>
         <tr><td>The count reads right at rest and drops to zero while a key is held; every byte goes to <code>0xFF</code></td><td>The 74HC165s have no supply and run on what leaks in through CLK and /PL</td><td>Check +3.3V and GND from the nice!nano to the socket board's socket joints, not to the J_RIGHT pads</td></tr>
-        <tr><td>Keys fire in the wrong columns after adding a module</td><td>Expected with the <code>terminator</code> anchor on the right half of a split: every keymap column moves</td><td>See <a href="../firmware.md#columns-and-anchors">columns and anchors</a></td></tr>
+        <tr><td>Keys fire in the wrong columns after adding a module</td><td>Expected with the <code>terminator</code> anchor on the right half of a split: every keymap column moves</td><td>See <a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md#columns-and-anchors">columns and anchors</a></td></tr>
         <tr><td>Bootloader will not start</td><td>The reset taps are too fast</td><td>Tap twice about half a second apart</td></tr>
         <tr><td>Strange behaviour right after flashing</td><td>Settings left by earlier firmware</td><td>Flash <code>settings_reset</code>, then the Roamyboard firmware</td></tr>
-        <tr><td>Parts are mirror images of the board</td><td>Shell or floor r1/r2, or jig r1 to r3</td><td>Print current revisions (<a href="#generate">chapter 3</a>)</td></tr>
         <tr><td>Floor will not sit flat</td><td>Solder or glue under the connector bodies; the tightest spot is 0.3 mm under the tilted headers</td><td>Trim the fillet or bead</td></tr>
-        <tr><td>Switch openings full of loose strands</td><td>Shell r4 or r5 (the print membrane)</td><td>Print shell r6 or later</td></tr>
       </tbody></table></div>
       <h4>Not tested yet</h4>
       <ul>
@@ -632,7 +617,7 @@
 </section>
 
 <footer>
-  Generated from the Roamyboard repo: models by <code>case/roamy-v4/tools/guide_models.py</code>, facts from <a href="../../case/Case%20design.md">Case design</a>, <a href="../../electronics/Electronics.md">Electronics</a>, <a href="../firmware.md">Firmware</a> and the <a href="../../Build%20Diary.md">Build Diary</a>. Keyboard: <kbd>j</kbd>/<kbd>k</kbd> next and previous step, <kbd>x</kbd> marks the current step done.
+  Generated from the Roamyboard repo: models by <code>case/roamy-v4/tools/guide_models.py</code>, facts from <a href="https://github.com/nevyn/roamyboard/blob/main/case/Case%20design.md">Case design</a>, <a href="https://github.com/nevyn/roamyboard/blob/main/electronics/Electronics.md">Electronics</a>, <a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md">Firmware</a> and the <a href="https://github.com/nevyn/roamyboard/blob/main/Build%20Diary.md">Build Diary</a>. Keyboard: <kbd>j</kbd>/<kbd>k</kbd> next and previous step, <kbd>x</kbd> marks the current step done.
 </footer>
 </main>
 </div>

@@ -1,5 +1,5 @@
 // Page behaviour for the assembly guide: contents and progress, the build planner and parts list, pinout
-// highlighting, lightbox, theme and keyboard navigation. Progress stays in localStorage; the plan is in the URL.
+// highlighting, lightbox and keyboard navigation. Progress stays in localStorage; the plan is in the URL.
 (() => {
   "use strict";
   const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -24,7 +24,7 @@
   const LCSC = id => `<a href="https://www.lcsc.com/product-detail/${id}.html">LCSC ${id}</a>`;
   const BOM = [
     ["Key module board"],
-    ["Key module PCB, fab revision v5", "<code>electronics/KeyModule/fab/KeyModule-v5-gerbers.zip</code>", { key: 1, mcu: 1 }, "One per MCU module becomes its socket board."],
+    ["Key module PCB, fab revision v5", `<a href="https://github.com/nevyn/roamyboard/tree/main/electronics/KeyModule/fab">Gerbers and BOM</a>`, { key: 1, mcu: 1 }, "One per MCU module becomes its socket board."],
     ["74HC165D, SOIC-16 (U1)", LCSC("C5613"), { key: 1 }],
     ["100 nF, 0805 (C1)", LCSC("C49678"), { key: 1 }],
     ["10 kΩ, 0805 (R1 to R5)", LCSC("C17414"), { key: 5 }],
@@ -44,13 +44,12 @@
     ["M2 × 5 mm self-tapping screw", "", { key: 4, mcu: 6 }],
     ["Hookup wire, thin", "for the MCU module", { text: "a few colours" }],
     ["Insulated wire, up to 1.3 mm across", "for the terminator module", { text: "25 mm per terminator" }],
-    ["Gel CA (cyanoacrylate)", "for staking", { text: "one tube" }],
+    ["Two-component epoxy", "superglue as a fallback", { text: "one pack" }, "glues the connectors to the board"],
     ["Printed"],
     ["Key module shell and floor", "<code>key-module-print.3mf</code>", { key: 1 }, "", "#key-print"],
     ["MCU module shell and floor", "<code>mcu-module-print.3mf</code>", { mcu: 1 }, "", "#mcu-print"],
     ["Terminator module", "<code>terminator-print.3mf</code>", { term: 1 }, "", "#term-print"],
     ["Solder jig", "<code>solder-jig-print.3mf</code>", { build: 1 }, "", "#jig-print"],
-    ["Choc cutout coupon", "<code>choc-cutout-coupon.3mf</code>", { build: 1 }, "", "#coupon"],
   ];
 
   function renderPlan() {
@@ -203,11 +202,6 @@
   }
 
   function setupChrome() {
-    $("[data-action=theme]").onclick = () => {
-      const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-      document.documentElement.dataset.theme = t;
-      localStorage.setItem(KEY + "theme", t);
-    };
     $("[data-action=reset-progress]").onclick = () => {
       if (!confirm("Clear every check mark and ticked part?")) return;
       ["done", "checks", "bom"].forEach(k => localStorage.removeItem(KEY + k));

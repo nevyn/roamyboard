@@ -22,7 +22,7 @@ EXTRAS = {
                          "Headers": ("terminator-embedded-print", "ffa500")},
 }
 MODELS = ["key-module", "key-module-print", "mcu-module", "mcu-module-print", "terminator", "terminator-print",
-          "solder-jig", "solder-jig-print", "choc-cutout-coupon"]
+          "solder-jig", "solder-jig-print"]
 MCU_PARTS = ["nano", "view", "switch", "reset"]   # check STLs mcu-<name>; the rest of "Parts" is the battery and jack
 
 
@@ -87,6 +87,23 @@ def split_mcu_parts(mesh):
     return out
 
 
+TAILS, SOCKETS, HEADERS = "ffff00", "808080", "ffa500"   # BoardMockup's colours
+
+
+def split_tails(tails, sockets, headers):
+    """Splits the connector tails by the nearer connector body, so the socket and header steps show only their own."""
+    bodies = {"socket": sockets.split(only_watertight=False)}
+    if headers is not None:
+        bodies["header"] = headers.split(only_watertight=False)
+    centres = {side: np.array([b.bounds.mean(axis=0) for b in bs]) for side, bs in bodies.items()}
+    out = {}
+    for t in tails.split(only_watertight=False):
+        c = t.bounds.mean(axis=0)
+        side = min(centres, key=lambda s: np.linalg.norm(centres[s] - c, axis=1).min())
+        out.setdefault(side, []).append(t)
+    return {side: trimesh.util.concatenate(ts) for side, ts in out.items()}
+
+
 def convert(model):
     scene = trimesh.Scene()
     def add(name, mesh, colour):
@@ -95,12 +112,17 @@ def convert(model):
         scene.add_geometry(mesh, node_name=f"{name}#{colour}", geom_name=f"{name}#{colour}")
     for name, v, f, colours in objects(BUILD / f"{model}.3mf"):
         colours = np.array([c or "c8b48c" for c in colours])
+        subs = {}
         for colour in dict.fromkeys(colours):
-            sub = trimesh.Trimesh(v, f[colours == colour])
-            sub.remove_unreferenced_vertices()
+            subs[colour] = trimesh.Trimesh(v, f[colours == colour])
+            subs[colour].remove_unreferenced_vertices()
+        for colour, sub in subs.items():
             if name == "Parts" and model == "mcu-module":
                 for part, mesh in split_mcu_parts(sub).items():
                     add(part, mesh, colour)
+            elif colour == TAILS and SOCKETS in subs:
+                for side, mesh in split_tails(sub, subs[SOCKETS], subs.get(HEADERS)).items():
+                    add(f"{name}/{side} tails", mesh, colour)
             else:
                 add(name, sub, colour)
     for name, (stl, colour) in EXTRAS.get(model, {}).items():

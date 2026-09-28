@@ -21,24 +21,26 @@
   --sidebar: 290px;
   color-scheme: light;
 }
-:root[data-theme="dark"] {
-  --paper: #141218;
-  --card: #1d1a23;
-  --ink: #ece8f2;
-  --muted: #a39db0;
-  --line: #322d3b;
-  --accent: #b58ce8;
-  --accent-soft: #2c2338;
-  --orange: #f2a04a;
-  --orange-soft: #33271a;
-  --ok: #5cc28b;
-  --ok-soft: #1c2d24;
-  --warn: #f08058;
-  --warn-soft: #36211b;
-  --code: #26222e;
-  --viewer-bg: radial-gradient(ellipse at 50% 35%, #2a2631 0%, #17151b 100%);
-  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 24px rgba(0, 0, 0, .25);
-  color-scheme: dark;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #141218;
+    --card: #1d1a23;
+    --ink: #ece8f2;
+    --muted: #a39db0;
+    --line: #322d3b;
+    --accent: #b58ce8;
+    --accent-soft: #2c2338;
+    --orange: #f2a04a;
+    --orange-soft: #33271a;
+    --ok: #5cc28b;
+    --ok-soft: #1c2d24;
+    --warn: #f08058;
+    --warn-soft: #36211b;
+    --code: #26222e;
+    --viewer-bg: radial-gradient(ellipse at 50% 35%, #2a2631 0%, #17151b 100%);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 24px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
 }
 
 * { box-sizing: border-box; }
@@ -205,6 +207,7 @@ td.n, th.n { text-align: right; font-family: var(--mono); white-space: nowrap; }
 .summary { font-size: .85rem; color: var(--muted); }
 .bom tr.group td { background: var(--code); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
 .bom td.have { width: 34px; }
+.bom td:nth-child(2) { min-width: 200px; }
 .bom tr.got td:not(.have) { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--ok); }
 
 /* pinout */
@@ -258,6 +261,8 @@ td.n, th.n { text-align: right; font-family: var(--mono); white-space: nowrap; }
 }
 .photo-slot b { display: block; color: var(--orange); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
 .photo { margin: 0; }
+.step-media > figure.photo { flex: none; background: var(--card); }
+.step-media > * + figure.photo { border-top: 1px solid var(--line); }
 .photo img { display: block; width: 100%; height: auto; cursor: zoom-in; }
 
 .kbd-help { position: fixed; bottom: 16px; right: 16px; z-index: 40; font-size: .75rem; color: var(--muted); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; box-shadow: var(--shadow); }

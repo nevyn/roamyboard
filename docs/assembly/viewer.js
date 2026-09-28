@@ -26,19 +26,21 @@
     shell:    ["Shell", PLA], floor: ["Floor", FLOOR],
     pcb:      ["Board", "#6a43a0"], ics: ["74HC165 and hotswap sockets", "#2a2730"],
     switches: ["Choc switches", "#f4f1ea", 0.72], legs: ["Switch legs", "#f4f1ea"],
-    sockets:  ["Sockets", "#77727f"], headers: ["Headers", "#e8871e"], tails: ["Connector tails", "#c9a227"],
+    sockets:  ["Sockets", "#77727f"], headers: ["Headers", "#e8871e"], tails: ["Socket tails", "#c9a227"],
+    headerTails: ["Header tails", "#c9a227"],
     ghost:    ["Neighbour", GHOST, 0.38], ghostBoard: ["Neighbour's board", "#8f7bb0", 0.38],
     support:  ["Painted support", "#ff3b30", 0.8], jig: ["Solder jig", "#b7cfa4"],
     terminator: ["Terminator module", PLA], termHeaders: ["Embedded headers", "#e8871e"],
     mcuShell: ["MCU shell", PLA], mcuFloor: ["MCU floor", FLOOR], socketBoard: ["Socket board", "#6a43a0"],
     view: ["nice!view", "#17161c"], nano: ["nice!nano", "#2f2d5c"], battery: ["Battery", "#b9bec5"],
     switch: ["Power switch", "#55545c"], reset: ["Reset button", "#55545c"], jack: ["Battery jack", "#efece2"],
-    coupon: ["Coupon", PLA], print: ["Print", PLA],
+    print: ["Print", PLA],
   };
 
   // mesh name -> group id, first match wins; `ghostRest` sends key module parts to the ghost groups
   function classify(name, opts = {}) {
-    const [part, hex] = name.split("#");
+    const [whole, hex] = name.split("#"), [part, sub] = whole.split("/");
+    if (sub === "header tails") return part.startsWith("Key module") ? "ghost" : "headerTails";
     const board = { "000000": "ics", "008000": "pcb", "808080": "sockets", "ffa500": "headers", "ffff00": "tails",
                     "ffffff": "legs", "ffffff80": "switches" };
     switch (part) {
@@ -52,8 +54,7 @@
       case "Jig": case "solder-jig-print": return "jig";
       case "Terminator": case "terminator-print": return "terminator";
       case "Headers": return "termHeaders";
-      case "choc-cutout-coupon": return "coupon";
-      default:
+            default:
         if (part.startsWith("MCU ")) return part.slice(4);
         return "print";
     }
@@ -72,7 +73,6 @@
       ],
       legend: ["shell", "floor", "switches", "mcuShell", "terminator"],
     },
-    coupon: { badge: "PRINT POSE", model: "choc-cutout-coupon", view: [0.6, -1, 1.3], bed: true },
     jigPrint: { badge: "PRINT POSE", model: "solder-jig-print", view: [0.7, -1, 1.2], bed: true },
     keyPrint: {
       badge: "PRINT POSE", model: "key-module-print", view: [0.8, -1.1, 1.1], bed: true,
@@ -87,22 +87,22 @@
     },
     jig: {
       badge: "SOLDER JIG", model: "solder-jig", view: [0.9, -0.8, 1.3],
-      explode: { pcb: [0, 0, 14], ics: [0, 0, 14], sockets: [0, 0, 14], headers: [0, 0, 14], tails: [0, 0, 14] },
+      explode: { pcb: [0, 0, 14], ics: [0, 0, 14], sockets: [0, 0, 14], headers: [0, 0, 14], tails: [0, 0, 14], headerTails: [0, 0, 14] },
       sequence: [
         { caption: "The empty jig. The engraved SW5 and SW1 mark the board's ends; the header side faces the labels.", add: ["jig"] },
         { caption: "Board front down in the pocket, back up. Solder U1 and the five hotswap sockets.", add: ["pcb", "ics"] },
         { caption: "Sockets: each nests on the board against its stop at the mouth, 2.0 mm past the board edge.", add: ["sockets", "tails"] },
-        { caption: "Headers: in the 8° cradle, pushed outward against the stop.", add: ["headers"] },
+        { caption: "Headers: in the 8° cradle, pushed outward against the stop.", add: ["headers", "headerTails"] },
       ],
       legend: ["jig", "pcb", "ics", "sockets", "headers"],
     },
     keyModule: {
       badge: "KEY MODULE", model: "key-module", view: [0.9, -0.9, -0.9],
-      explode: { pcb: [0, 0, -16], ics: [0, 0, -16], sockets: [0, 0, -16], headers: [0, 0, -16], tails: [0, 0, -16],
+      explode: { pcb: [0, 0, -16], ics: [0, 0, -16], sockets: [0, 0, -16], headers: [0, 0, -16], tails: [0, 0, -16], headerTails: [0, 0, -16],
                  floor: [0, 0, -34], switches: [0, 0, 16], legs: [0, 0, 16] },
       sequence: [
         { caption: "The shell, seen from below: it is open at the bottom.", add: ["shell"] },
-        { caption: "The board drops in along its normal, back (connectors) toward you.", add: ["pcb", "ics", "sockets", "headers", "tails"] },
+        { caption: "The board drops in along its normal, back (connectors) toward you.", add: ["pcb", "ics", "sockets", "headers", "tails", "headerTails"] },
         { caption: "The floor goes on and takes four M2 corner screws. Its pillars press the board against the ledges.", add: ["floor"] },
         { caption: "Turn it over: the switches click into the plate and their legs into the hotswap sockets.", add: ["switches", "legs"], view: [0.9, -0.9, 1.1] },
       ],
@@ -132,7 +132,7 @@
         { caption: "The floor, with the battery jack on its seat, closes it all. Six M2 screws.", add: ["jack", "mcuFloor"] },
       ],
       legend: ["mcuShell", "mcuFloor", "socketBoard", "view", "nano", "battery", "switch", "reset", "jack", "ghost"],
-      hidden: ["ghost", "ghostBoard", "legs", "switches", "pcb", "ics", "headers", "shell", "floor"],
+      hidden: ["ghost", "ghostBoard", "legs", "switches", "pcb", "ics", "headers", "headerTails", "shell", "floor"],
     },
   };
 
@@ -294,7 +294,7 @@
         this.controls = new OrbitControls(this.camera, renderer.domElement);
         this.controls.enableDamping = true;
         this.controls.addEventListener("change", () => this.invalidate());
-        this.controls.addEventListener("start", () => { this.controls.autoRotate = false; });
+        this.controls.addEventListener("start", () => { this.controls.autoRotate = false; this.userMoved = true; });
         this.root = new THREE.Group();
         this.root.rotation.x = -Math.PI / 2;   // module frame is z-up
         this.scene.add(this.root);
@@ -480,29 +480,42 @@
     }
 
     frame(animated) {
-      const THREE = this.T;
       if (!this.live) return;
+      if (animated) this.userMoved = false;
       if (!animated && this.saved) {
         this.camera.position.copy(this.saved.pos); this.controls.target.copy(this.saved.target);
-        this.saved = null; this.resize(); return;
+        this.saved = null; this.resize(false); return;
       }
       this.tweenView(this.spec.view || ISO, animated);
     }
 
     tweenView(view, animated = true) {
       const THREE = this.T;
+      this.currentView = view;
+      this.resize(false);
       this.scene.updateMatrixWorld(true);
       const box = new THREE.Box3();
       this.meshes.forEach(m => { if (m.userData.wanted !== false) box.expandByObject(m); });
       if (box.isEmpty()) box.setFromObject(this.content);
-      const sphere = box.getBoundingSphere(new THREE.Sphere());
+      const sphere = box.getBoundingSphere(new THREE.Sphere()), target = sphere.center.clone();
       const [vx, vy, vz] = this.spec.flip ? [-view[0], view[1], -view[2]] : view;   // flip: turned about the column
       const d = new THREE.Vector3(vx, vz, -vy).normalize();   // module frame -> world
-      const dist = sphere.radius / Math.sin(THREE.MathUtils.degToRad(this.camera.fov / 2)) * 0.92;
-      const to = sphere.center.clone().add(d.multiplyScalar(dist)), target = sphere.center.clone();
-      this.resize();
+      const from = this.camera.position.clone(), fromT = this.controls.target.clone();
+      // perspective makes the corners nearest the camera overflow a sphere fit: refine on the projected box corners
+      const corners = [];
+      for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z]) corners.push(new THREE.Vector3(x, y, z));
+      let dist = sphere.radius / Math.sin(THREE.MathUtils.degToRad(this.camera.fov) / 2);
+      for (let i = 0; i < 6; i++) {
+        this.camera.position.copy(target).addScaledVector(d, dist);
+        this.camera.lookAt(target);
+        this.camera.updateMatrixWorld();
+        const m = Math.max(...corners.map(c => { const p = c.clone().project(this.camera); return Math.max(Math.abs(p.x), Math.abs(p.y)); }));
+        dist *= 0.5 + 0.5 * m / 0.88;
+      }
+      const to = this.camera.position.clone();
+      this.camera.position.copy(from);
       if (!animated) { this.camera.position.copy(to); this.controls.target.copy(target); this.controls.update(); this.invalidate(); return; }
-      const from = this.camera.position.clone(), fromT = this.controls.target.clone(), t0 = performance.now();
+      const t0 = performance.now();
       this.tween = now => {
         const k = ease(Math.min(1, (now - t0) / 700));
         this.camera.position.lerpVectors(from, to, k);
@@ -512,13 +525,15 @@
       this.invalidate();
     }
 
-    resize() {
+    // refit: frame the model again for the new size, until the reader has moved the camera
+    resize(refit = true) {
       if (!this.live) return;
       const w = this.stage.clientWidth, h = this.stage.clientHeight;
       if (!w || !h) return;
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
+      if (refit && !this.userMoved && this.meshes && !this.tween) this.tweenView(this.currentView || this.spec.view || ISO, false);
       this.invalidate();
     }
 

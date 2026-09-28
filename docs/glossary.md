@@ -46,7 +46,7 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **tail**: The part of a header pin or socket contact behind the body: it leaves the body's **rear face** (opposite the mouth or the exposed pins) at the pin axis and jogs to the board. Its **foot** is the straight end that lies on the pad. Not: leg, lead.
 - **clamp pad**: The part of the floor that rests on a connector body's face away from the board, with zero interference, so the body can't tip toward the floor. The header's follows its 8° tilt. Not: hold-down, clamp.
 - **rear stop**: The rib on the floor against a connector body's rear face, below the tails; slide-on pushes the body against it instead of against its solder joints. Not: backstop, end stop.
-- **staking**: Glue (gel CA) between a connector body's long sides and the board, which carries separation. Not: potting, underfill.
+- **staking**: Glue (two-component epoxy; superglue as a fallback) between a connector body's long sides and the board, which carries separation. Not: potting, underfill.
 
 ## Joint
 
