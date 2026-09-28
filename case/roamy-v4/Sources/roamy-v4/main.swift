@@ -74,6 +74,12 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
         for joint in KeyModuleShell.joints { joint.added.transformed(PrintPose.shell) }
     }
     await Model("floor-print", options: .format3D(.stl)) { KeyModuleFloor().transformed(PrintPose.floor) }
+    // what the floor's clamp pads and rear stops touch and keep clear of
+    await Model("connector-bodies", options: .format3D(.stl)) {
+        for r in P.rowYs { SocketBody(rowY: r); TiltedHeader(rowY: r) }
+    }
+    await Model("connector-keep-out", options: .format3D(.stl)) { ConnectorTails() }
+    await Model("connector-staking", options: .format3D(.stl)) { StakingRoom() }
     await Model("terminator", options: .format3D(.stl)) { TerminatorModule() }
     await Model("terminator-outline", options: .format3D(.stl)) { TerminatorModule.outline }
     await Model("terminator-embedded", options: .format3D(.stl)) { TerminatorEmbedded() }

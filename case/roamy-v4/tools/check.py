@@ -10,6 +10,10 @@
 - MCU module: its socket side meets the contract; shell, floor, socket board and parts don't overlap; it joins the
   last key module like a key module does; the socket board drops in; screws bite; the nano is held every way; the parts drop into the upturned shell; a USB-C
   plug fits.
+- Clamp pads and rear stops, per connector body of the key module and MCU floors: they touch the body without
+  overlap, the pad bears when the floor moves toward the board and the stop when the body moves into the module
+  along the pin axis; they keep clear of the tails, the solder fillets and the staking glue; the floor's move onto
+  the shell clears every body until its last 0.05 mm.
 - JointSide contract: within the body, a joint side's cuts and parts stay in its reserved blocks, the shell has no
   features of its own there, and nothing but the joint's own parts sits in its keep-out.
 Needs trimesh, manifold3d, lxml (scripts/setup-cloud.sh) and kicad-cli. Exits non-zero on a failure.
@@ -186,5 +190,42 @@ tongue = man("mcu-tongue")
 expect(overlap(tongue, nano, -up * 0.15) > 1e-3 and overlap(tongue, P["mcu-floor"]) > 0.9 * tongue.volume(),
        "MCU module: the floor's tongue holds the port from below")
 expect(overlap(P["mcu-shell"] + P["mcu-floor"], P["mcu-usb-plug"]) < 1e-3, "MCU module: a USB-C plug's overmould clears the end wall")
+
+# Clamp pads and rear stops. The floor goes on along the board normal (+z): its locating tabs and the shell's opening
+# are parallel to z. The top's normal, 2.94° off, is checked too. Each body is checked on its own, in a box around its
+# row and side. overlap() moves its second argument, so a floor d mm short of home is the board moved d mm away.
+for n in ["connector-bodies", "connector-keep-out", "connector-staking"]:
+    P[n] = man(n)
+rows = [float(v) for v in re.search(r"static let rowYs = \[([^\]]+)\]", PARAMS).group(1).split(",")]
+up = np.array([math.sin(math.radians(2.94)), 0, math.cos(math.radians(2.94))])
+into = {"socket": np.array([1.0, 0, 0]), "header": np.array([-math.cos(a), 0, math.sin(a)])}   # away from the seam
+approach = [((0, 0, 1), "the board normal"), (tuple(up), "the top's normal")]
+for module, floor, board, sides in [("key module", "floor", "board", ("socket", "header")),
+                                    ("MCU module", "mcu-floor", "socket-board", ("socket",))]:
+    for side in sides:
+        for i, r in enumerate(rows):
+            y = END_WALL + CLEARANCE + BOARD_Y0 + BOARD_LENGTH - r
+            x0, x1 = (-2, 12.4) if side == "socket" else (12.4, 24)
+            box = m3d.Manifold.cube([x1 - x0, 12, 12]).translate([x0, y - 6, -9])
+            f, body = P[floor] ^ box, P["connector-bodies"] ^ box
+            name = f"{module}, {side} side, row {i + 1} (board y {r})"
+            worst = overlap(f, body)
+            expect(worst < 1e-3, f"{name}: pad and stop clear the body ({worst:.4f} mm³)")
+            touch = overlap(f, body, (0, 0, -0.05))
+            expect(touch > 1e-3, f"{name}: pad touches the body (floor 0.05 mm toward the board overlaps {touch:.4f} mm³)")
+            touch = overlap(f, body, into[side] * 0.05)
+            expect(touch > 1e-3, f"{name}: rear stop touches the body (body 0.05 mm along the pin axis overlaps {touch:.4f} mm³)")
+            worst = overlap(f, P["connector-keep-out"] ^ box)
+            expect(worst < 1e-3, f"{name}: clear of the tails by 0.3 mm and the feet by 0.6 mm ({worst:.4f} mm³)")
+            worst = overlap(f, P["connector-staking"] ^ box)
+            expect(worst < 1e-3, f"{name}: 0.5 mm free beside the body's long sides for staking ({worst:.4f} mm³)")
+            for direction, what in approach:
+                worst = max((overlap(f, body, np.array(direction) * d), d) for d in np.arange(0.05, 6, 0.05))
+                expect(worst[0] < 1e-3, f"{name}: floor clears the body going on along {what} "
+                                        f"(largest overlap {worst[0]:.4f} mm³, {worst[1]:.2f} mm out)")
+    for direction, what in approach:
+        worst = max((overlap(P[floor], P[board], np.array(direction) * d), d) for d in np.arange(0.05, 8, 0.05))
+        expect(worst[0] < 1e-3, f"{module}: floor clears the board, its parts and tails going on along {what} "
+                                f"(largest overlap {worst[0]:.4f} mm³, {worst[1]:.2f} mm out)")
 
 sys.exit(1 if failures else 0)

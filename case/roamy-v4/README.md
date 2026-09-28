@@ -10,7 +10,7 @@ Open the 3MF files in Cadova Viewer (https://github.com/tomasf/CadovaViewer); it
 
 Joint hardware (guide pins, guide holes, latches) sits behind `JointSide` in `JointSide.swift`; a module hosts a header side, a socket side or both, and keeps its own features out of the joint side's reserved blocks and keep-out.
 
-Mesh checks: `python3 tools/check.py` after `swift run`. It compares the board against KiCad's own 3D export (a mirrored model fails it), and checks the joined modules, the board drop-in, the slide-on, the jig fit and the `JointSide` contract. Run it before printing anything.
+Mesh checks: `python3 tools/check.py` after `swift run`. It compares the board against KiCad's own 3D export (a mirrored model fails it), and checks the joined modules, the board drop-in, the slide-on, the jig fit, the floors' clamp pads and rear stops, and the `JointSide` contract. Run it before printing anything.
 
 Printability: `python3 tools/overhang.py` slices the print-pose STLs at 0.2 mm and lists what the layer below doesn't carry. Bridges pass, and so do overhangs up to about 1.5 extrusion widths; anything that droops farther fails unless it is in the painted-support zone. Needs `trimesh` and `shapely`.
 
