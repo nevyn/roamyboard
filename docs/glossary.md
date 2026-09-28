@@ -6,6 +6,7 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 
 ## Modules
 
+- **half**: One row of modules, from a terminator module through the key modules to an MCU module. A unibody keyboard is one half, a split keyboard two. Not: side, hand.
 - **module**: One printed unit of the keyboard that couples to its neighbours side by side. Kinds: key module, MCU module, terminator module. Not: block, piece.
 - **key module**: A module carrying one column of five keys: shell, floor and board. `KeyModule*` in `case/roamy-v4`. Not: column module, column (for the part).
 - **MCU module**: The module at the header-side end of a half, carrying the nice!nano, battery and display. It has a socket side only, so no header pins stand exposed. Not: brain module, controller module.

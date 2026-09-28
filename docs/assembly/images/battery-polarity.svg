@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 930" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="ah6b6577" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0.8 L10,5 L0,9.2 z" fill="#6b6577"/></marker></defs>
+<rect x="0" y="0" width="960" height="930" rx="18" fill="#fbf9f5"/>
+<text x="36" y="50" font-size="22" font-weight="700" fill="#1d1a24">Check polarity before connecting the battery</text>
+<text x="36" y="76" font-size="15" fill="#6b6577">Two checks with a multimeter, both before anything is soldered or plugged in.</text>
+<circle cx="50" cy="118" r="15" fill="#6b3fa0" stroke="none" stroke-width="1"/>
+<text x="50" y="123.5" font-size="16" text-anchor="middle" font-weight="700" fill="#ffffff">1</text>
+<text x="76" y="124" font-size="17" font-weight="700" fill="#1d1a24">Measure the battery plug in DC volts.</text>
+<rect x="56" y="170" width="170" height="100" rx="8" fill="#cfd3da" stroke="#8f949e" stroke-width="1.4"/>
+<text x="141" y="226" font-size="15" text-anchor="middle" font-weight="600" fill="#1d1a24">battery</text>
+<path d="M 226,210 C 306,210 280,210 340,210" fill="none" stroke="#d64541" stroke-width="4.5"/>
+<path d="M 226,230 C 306,230 280,230 340,230" fill="none" stroke="#2a2730" stroke-width="4.5"/>
+<rect x="340" y="196" width="52" height="48" rx="4" fill="#f4f1ea" stroke="#8f8a7f" stroke-width="1.4"/>
+<rect x="384" y="205" width="8" height="10" fill="#c9a227" stroke="#8a6d10" stroke-width="1"/>
+<rect x="384" y="225" width="8" height="10" fill="#c9a227" stroke="#8a6d10" stroke-width="1"/>
+<text x="366" y="182" font-size="14" text-anchor="middle" fill="#6b6577">battery plug</text>
+<line x1="230" y1="325.1" x2="283" y2="220" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="283" cy="220" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="236" y="330" font-size="14" fill="#6b6577">lead colours:</text>
+<text x="236" y="348.9" font-size="14" fill="#6b6577">a convention only</text>
+<rect x="540" y="150" width="170" height="210" rx="14" fill="#3b3842" stroke="#26232b" stroke-width="1.5"/>
+<rect x="554" y="164" width="142" height="56" rx="5" fill="#c9d3bf" stroke="#26232b" stroke-width="1.2"/>
+<text x="566" y="206" font-size="30" font-weight="700" fill="#1d1a24">+</text>
+<text x="666" y="206" font-size="28" text-anchor="end" font-family="ui-monospace, 'SF Mono', Menlo, monospace" fill="#1d1a24" fill-opacity="0.18">8.88</text>
+<text x="690" y="206" font-size="16" text-anchor="end" font-weight="700" fill="#1d1a24">V</text>
+<circle cx="625" cy="277" r="30" fill="#55525c" stroke="#26232b" stroke-width="1.2"/>
+<line x1="625" y1="277" x2="609" y2="253" stroke="#ffffff" stroke-width="4"/>
+<text x="581" y="247" font-size="16" text-anchor="middle" font-weight="700" fill="#ffffff">V</text>
+<line x1="591" y1="237" x2="601" y2="237" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="591" y1="242" x2="601" y2="242" stroke="#ffffff" stroke-width="1.6" stroke-dasharray="2.5,1.8"/>
+<circle cx="659" cy="334" r="8" fill="#d64541" stroke="#26232b" stroke-width="1"/>
+<circle cx="591" cy="334" r="8" fill="#2a2730" stroke="#777" stroke-width="1"/>
+<path d="M 478,210 C 530,210 526,436 604,436 S 659.0,400 659.0,334" fill="none" stroke="#d64541" stroke-width="4" stroke-linecap="round"/>
+<line x1="438" y1="210" x2="478" y2="210" stroke="#d64541" stroke-width="11" stroke-linecap="round"/>
+<line x1="394" y1="210" x2="438" y2="210" stroke="#9aa0a8" stroke-width="2.6"/>
+<path d="M 478,230 C 505,240 500,404 556,404 S 591.0,380 591.0,334" fill="none" stroke="#2a2730" stroke-width="4" stroke-linecap="round"/>
+<line x1="438" y1="230" x2="478" y2="230" stroke="#2a2730" stroke-width="11" stroke-linecap="round"/>
+<line x1="394" y1="230" x2="438" y2="230" stroke="#9aa0a8" stroke-width="2.6"/>
+<line x1="732" y1="276.75" x2="591" y2="237" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="591" cy="237" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="738" y="282" font-size="15" font-weight="600" fill="#1d1a24">DC volts</text>
+<line x1="732" y1="184.75" x2="574" y2="194" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="574" cy="194" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="738" y="190" font-size="15" font-weight="600" fill="#1d1a24">positive: the red</text>
+<text x="738" y="210.25" font-size="15" font-weight="600" fill="#1d1a24">probe is on +</text>
+<rect x="830" y="330" width="44" height="68" rx="4" fill="#f4f1ea" stroke="#8f8a7f" stroke-width="1.4"/>
+<rect x="829" y="349" width="12" height="10" fill="#c9a227" stroke="#8a6d10" stroke-width="1"/>
+<text x="858" y="359" font-size="15" text-anchor="middle" font-weight="700" fill="#c9481a">?</text>
+<rect x="829" y="369" width="12" height="10" fill="#c9a227" stroke="#8a6d10" stroke-width="1"/>
+<text x="858" y="379" font-size="15" text-anchor="middle" font-weight="700" fill="#c9481a">?</text>
+<text x="810" y="352" font-size="14" text-anchor="end" fill="#6b6577">jack on the</text>
+<text x="810" y="370.9" font-size="14" text-anchor="end" fill="#6b6577">MCU module</text>
+<text x="810" y="392" font-size="14" text-anchor="end" font-family="ui-monospace, 'SF Mono', Menlo, monospace" fill="#6b6577">JST S2B-PH-K-S</text>
+<text x="852" y="426" font-size="14" text-anchor="middle" font-weight="700" fill="#c9481a">Plug in only</text>
+<text x="852" y="444.9" font-size="14" text-anchor="middle" font-weight="700" fill="#c9481a">after the check.</text>
+<rect x="36" y="474" width="520" height="96" rx="8" fill="#fbeee7" stroke="#c9481a" stroke-width="1.6"/>
+<text x="56" y="504" font-size="15" font-weight="700" fill="#c9481a">Neither the JST nor the battery's datasheet says which</text>
+<text x="56" y="524.25" font-size="15" font-weight="700" fill="#c9481a">pin carries +. Measure the plug; the lead colours are</text>
+<text x="56" y="544.5" font-size="15" font-weight="700" fill="#c9481a">only a convention.</text>
+<text x="584" y="504" font-size="15" fill="#1d1a24">Put the red probe on one contact and the</text>
+<text x="584" y="524.25" font-size="15" fill="#1d1a24">black on the other. If the reading is</text>
+<text x="584" y="544.5" font-size="15" fill="#1d1a24">negative, the black probe is on +.</text>
+<line x1="36" y1="618" x2="924" y2="618" stroke="#d8d1c4" stroke-width="1.2"/>
+<circle cx="50" cy="656" r="15" fill="#6b3fa0" stroke="none" stroke-width="1"/>
+<text x="50" y="661.5" font-size="16" text-anchor="middle" font-weight="700" fill="#ffffff">2</text>
+<text x="76" y="662" font-size="17" font-weight="700" fill="#1d1a24">Find the power switch's common terminal with a continuity tester.</text>
+<rect x="70" y="730" width="120" height="40" rx="3" fill="#c9ccd3" stroke="#7d828c" stroke-width="1.4"/>
+<rect x="104" y="716" width="26" height="16" rx="2" fill="#5e6270" stroke="#3d414b" stroke-width="1.2"/>
+<line x1="140" y1="724" x2="170" y2="724" stroke="#6b6577" stroke-width="1.6" marker-end="url(#ah6b6577)" marker-start="url(#ah6b6577)"/>
+<rect x="90" y="770" width="8" height="30" fill="#c9a227" stroke="#8a6d10" stroke-width="1"/>
+<text x="80" y="794" font-size="15" text-anchor="middle" font-weight="700" fill="#c9481a">?</text>
+<rect x="126" y="770" width="8" height="30" fill="#c9a227" stroke="#8a6d10" stroke-width="1"/>
+<text x="116" y="794" font-size="15" text-anchor="middle" font-weight="700" fill="#c9481a">?</text>
+<rect x="162" y="770" width="8" height="30" fill="#c9a227" stroke="#8a6d10" stroke-width="1"/>
+<text x="152" y="794" font-size="15" text-anchor="middle" font-weight="700" fill="#c9481a">?</text>
+<text x="130" y="704" font-size="14" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" fill="#6b6577">Alps SSSS811101</text>
+<rect x="250" y="690" width="140" height="170" rx="14" fill="#3b3842" stroke="#26232b" stroke-width="1.5"/>
+<rect x="264" y="704" width="112" height="56" rx="5" fill="#c9d3bf" stroke="#26232b" stroke-width="1.2"/>
+<path d="M 318.0,725.6 A 8,8 0 0 1 318.0,738.4" fill="none" stroke="#1d1a24" stroke-width="2"/>
+<path d="M 321.0,720.8 A 14,14 0 0 1 321.0,743.2" fill="none" stroke="#1d1a24" stroke-width="2"/>
+<path d="M 324.0,716.0 A 20,20 0 0 1 324.0,748.0" fill="none" stroke="#1d1a24" stroke-width="2"/>
+<polygon points="298,726 306,726 314,718 314,746 306,738 298,738" fill="#1d1a24" stroke="none" stroke-width="1" stroke-linejoin="round"/>
+<circle cx="320" cy="797" r="30" fill="#55525c" stroke="#26232b" stroke-width="1.2"/>
+<line x1="320" y1="797" x2="336" y2="773" stroke="#ffffff" stroke-width="4"/>
+<circle cx="354" cy="762" r="2.5" fill="#ffffff" stroke="none" stroke-width="1"/>
+<text x="368" y="767" font-size="14" text-anchor="middle" font-weight="700" fill="#ffffff">)))</text>
+<circle cx="348" cy="834" r="8" fill="#d64541" stroke="#26232b" stroke-width="1"/>
+<circle cx="292" cy="834" r="8" fill="#2a2730" stroke="#777" stroke-width="1"/>
+<path d="M 348.0,834 C 358.0,884 130.0,886.0 130.0,870.0" fill="none" stroke="#d64541" stroke-width="4" stroke-linecap="round"/>
+<line x1="130" y1="870" x2="130" y2="836" stroke="#d64541" stroke-width="11" stroke-linecap="round"/>
+<line x1="130" y1="836" x2="130" y2="802" stroke="#9aa0a8" stroke-width="2.6"/>
+<path d="M 292.0,834 C 262.0,884 94.0,886.0 94.0,870.0" fill="none" stroke="#2a2730" stroke-width="4" stroke-linecap="round"/>
+<line x1="94" y1="870" x2="94" y2="836" stroke="#2a2730" stroke-width="11" stroke-linecap="round"/>
+<line x1="94" y1="836" x2="94" y2="802" stroke="#9aa0a8" stroke-width="2.6"/>
+<rect x="780" y="700" width="112" height="84" rx="6" fill="#5b3a8c" stroke="none" stroke-width="1"/>
+<text x="836" y="720" font-size="14" text-anchor="middle" fill="#ffffff">nice!nano</text>
+<circle cx="780" cy="738" r="5" fill="#c9a227" stroke="none" stroke-width="1"/>
+<text x="792" y="743" font-size="14" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, monospace" fill="#ffffff">B+</text>
+<circle cx="780" cy="768" r="5" fill="#c9a227" stroke="none" stroke-width="1"/>
+<text x="792" y="773" font-size="14" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, monospace" fill="#ffffff">B-</text>
+<text x="450" y="743" font-size="15" font-weight="700" fill="#d64541">battery +</text>
+<text x="450" y="773" font-size="15" font-weight="700" fill="#1d1a24">battery -</text>
+<line x1="530" y1="738" x2="620" y2="738" stroke="#d64541" stroke-width="2.5"/>
+<circle cx="620" cy="738" r="3.5" fill="#1d1a24" stroke="none" stroke-width="1"/>
+<line x1="620" y1="738" x2="654" y2="722" stroke="#1d1a24" stroke-width="2.5"/>
+<circle cx="660" cy="738" r="3.5" fill="#1d1a24" stroke="none" stroke-width="1"/>
+<line x1="660" y1="738" x2="775" y2="738" stroke="#d64541" stroke-width="2.5"/>
+<text x="640" y="712" font-size="14" text-anchor="middle" fill="#6b6577">switch</text>
+<line x1="530" y1="768" x2="775" y2="768" stroke="#1d1a24" stroke-width="2.5"/>
+<text x="450" y="818" font-size="15" fill="#1d1a24">The switch goes between battery + and the</text>
+<text x="450" y="838.25" font-size="15" fill="#1d1a24">nice!nano's B+ pad. Battery - goes to B-.</text>
+<text x="450" y="870" font-size="15" font-weight="600" fill="#1d1a24">The common terminal beeps to one other</text>
+<text x="450" y="890.25" font-size="15" font-weight="600" fill="#1d1a24">terminal in each slider position, a different</text>
+<text x="450" y="910.5" font-size="15" font-weight="600" fill="#1d1a24">one each time. Find it before soldering.</text>
+</svg>

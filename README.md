@@ -14,6 +14,8 @@ I will also need a wearable [[Computer]] and [[Head mounted display]] to go with
 
 This repo is also an Obsidian project, which is why it has wiki syntax here and there.
 
+To build one, follow the [assembly guide](docs/assembly/index.html) (serve the repo and open `/docs/assembly/`; see [docs](docs/index.md)).
+
 # How to work on this shit
 
 ## Case

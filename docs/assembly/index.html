@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build a Roamyboard: printing and assembly guide</title>
+<meta name="description" content="Step-by-step guide to printing, soldering, assembling and flashing a Roamyboard, the modular keyboard you wear on your leg.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='6' width='7' height='20' rx='2' fill='%236b3fa0'/%3E%3Crect x='12.5' y='5' width='7' height='20' rx='2' fill='%236b3fa0' transform='rotate(8 16 15)'/%3E%3Crect x='22' y='7' width='7' height='20' rx='2' fill='%23e8871e' transform='rotate(16 25 17)'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="guide.css">
+<script>document.documentElement.dataset.theme = localStorage.getItem("roamy-guide:theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");</script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script src="models/data.js"></script>
+<script src="viewer.js" defer></script>
+<script src="guide.js" defer></script>
+</head>
+<body>
+<button class="btn menu-toggle" aria-label="Contents">☰ Contents</button>
+<div class="layout">
+<nav class="sidebar" aria-label="Contents">
+  <a class="brand" href="#top">
+    <svg width="34" height="34" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="7" height="20" rx="2" fill="#6b3fa0"/><rect x="12.5" y="5" width="7" height="20" rx="2" fill="#6b3fa0" transform="rotate(8 16 15)"/><rect x="22" y="7" width="7" height="20" rx="2" fill="#e8871e" transform="rotate(16 25 17)"/></svg>
+    <span>Roamyboard<small>Printing and assembly guide</small></span>
+  </a>
+  <div class="sidebar-tools">
+    <button class="btn" data-action="theme" title="Light or dark">◐ Theme</button>
+    <button class="btn" data-action="reset-progress" title="Clear every check mark">Reset progress</button>
+  </div>
+  <div class="overall"><div class="bar"><i></i></div><div class="label"><span>Progress</span><span data-overall>0 %</span></div></div>
+  <ol class="toc"></ol>
+</nav>
+
+<main id="top">
+
+<header class="hero">
+  <div>
+    <h1>Build a <span>Roamyboard</span></h1>
+    <p class="lead">A keyboard you wear on your leg, made of printed modules that click together side by side. Each key module carries one column of five keys; add or remove them while it runs.</p>
+    <div class="facts">
+      <div class="fact"><b>8°</b><span>between neighbouring modules, so a half curves around the leg</span></div>
+      <div class="fact"><b>5</b><span>Choc keys per key module, hot-swappable</span></div>
+      <div class="fact"><b>any</b><span>number of key modules per half; the firmware counts them</span></div>
+    </div>
+    <p>
+      <a class="btn primary" href="#plan">Plan your build →</a>
+      <a class="btn" href="#overview">What's in a half</a>
+    </p>
+    <p class="summary">Drag to orbit, scroll to zoom, and drag the slider to add key modules. Every 3D view in this guide is generated from the same Cadova model that the parts print from.</p>
+  </div>
+  <div class="step" style="margin:0">
+    <div class="viewer" data-scene="half" style="min-height:430px"></div>
+  </div>
+</header>
+
+<!-- ============================================================ 1 -->
+<section class="chapter" id="overview" data-title="What you're building">
+  <div class="chapter-head"><div class="chapter-no">1</div><div>
+    <h2>What you're building</h2>
+    <p>A <b>half</b> is a row of modules: a <b>terminator module</b> at the left end, any number of <b>key modules</b>, and the <b>MCU module</b> at the right end with the nice!nano, battery and display. A unibody keyboard is one half; a split keyboard is two.</p>
+  </div></div>
+
+  <article class="step info" id="order" data-title="The modules of a half">
+    <div class="step-head"><span class="tag">Orientation</span><h3>The modules of a half</h3><a class="anchor" href="#order">#</a></div>
+    <div class="step-body wide-media">
+      <div class="step-text">
+        <p>Every module has two long sides, named by the connector on them:</p>
+        <ul>
+          <li>The <b>header side</b> carries three <b>headers</b> (male, pins out) and the two <b>guide pins</b>. Headers face right, toward the MCU module.</li>
+          <li>The <b>socket side</b> carries three <b>sockets</b> (female) and the two <b>guide holes</b> with their <b>flaps</b>.</li>
+        </ul>
+        <p>The terminator module has a header side only, and the MCU module a socket side only, so no header pins stand exposed at either end. Their other long side is the <b>free face</b>, which carries the <b>lugs</b> for the harness.</p>
+        <p>The two ends of a module are the <b>SW1 end</b> and the <b>SW5 end</b>, named by the switch nearest each. SW1 is the bottom key.</p>
+        <div class="note"><p>This guide uses the terms in <a href="../glossary.md">docs/glossary.md</a>. Hover a part in any 3D view to see its name.</p></div>
+      </div>
+      <div class="step-media"><figure><img class="diagram" src="images/half-order.svg" alt="Top view of a half: terminator module, key modules and MCU module, with header and socket sides marked"></figure></div>
+    </div>
+  </article>
+
+  <article class="step info" id="joint" data-title="Parts of the joint">
+    <div class="step-head"><span class="tag">Orientation</span><h3>Parts of the joint</h3><a class="anchor" href="#joint">#</a></div>
+    <div class="step-body single">
+      <div class="step-text">
+        <p>Neighbours couple at a <b>joint</b>: the header pins go into the neighbour's sockets, the guide pins into its guide holes, and a <b>tooth</b> on each flap clicks into a <b>notch</b> in the guide pin. The guide pins arrive first, so the header pins reach the sockets already aligned.</p>
+      </div>
+      <div class="step-media"><figure><img class="diagram" src="../images/joint-parts.svg" alt="Labelled drawing of the joint between two key modules"><figcaption>From the glossary. Click to enlarge.</figcaption></figure></div>
+    </div>
+  </article>
+
+  <article class="step info" id="chain" data-title="How a half reads its keys">
+    <div class="step-head"><span class="tag">Electronics</span><h3>How a half reads its keys</h3><a class="anchor" href="#chain">#</a></div>
+    <div class="step-body wide-media">
+      <div class="step-text">
+        <p>Each key module has one 74HC165 shift register. The registers of a half form the <b>chain</b>: every scan, the MCU module loads all of them at once and clocks their bytes out on DATA, nearest key module first.</p>
+        <p>The terminator module ties the far end of DATA to +3.3V, so after the last key module the chain reads <code>0xFF</code>, the <b>sentinel</b>. A real key module's byte always has bit 7 clear, so the first byte with bit 7 set ends the chain, and its index is the key module count.</p>
+        <p>That is why modules can be added and removed while the keyboard runs, and why a half without its terminator module types nothing.</p>
+        <p class="summary">More in <a href="../firmware.md">docs/firmware.md</a> and <a href="../../electronics/Electronics.md">electronics/Electronics.md</a>.</p>
+      </div>
+      <div class="step-media"><figure><img class="diagram" src="images/chain.svg" alt="The shift register chain of a half, and the bytes the MCU module reads"></figure></div>
+    </div>
+  </article>
+</section>
+
+<!-- ============================================================ 2 -->
+<section class="chapter" id="plan" data-title="Plan and gather parts">
+  <div class="chapter-head"><div class="chapter-no">2</div><div>
+    <h2>Plan and gather parts</h2>
+    <p>Pick a layout and a key module count; the parts list and the print list below follow. The choice lives in the page's address, so a link to it keeps your plan.</p>
+  </div></div>
+
+  <article class="step" id="planner" data-title="Your build">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Plan</span><h3>Your build</h3><a class="anchor" href="#planner">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <div class="planner">
+        <div class="controls">
+          <div class="field"><label>Layout</label>
+            <div class="seg" data-planner="layout"><button data-v="split" aria-pressed="true">Split</button><button data-v="unibody" aria-pressed="false">Unibody</button></div>
+          </div>
+          <div class="field"><label>Key modules per half</label>
+            <div class="stepper"><button data-d="-1" aria-label="Fewer">−</button><output data-planner="keys">6</output><button data-d="1" aria-label="More">+</button></div>
+          </div>
+          <div class="half-strip" aria-hidden="true"></div>
+          <p class="summary" data-summary></p>
+          <div class="note"><p>The placeholder keymap types with <b>6 key modules per half</b> on a split (a Lily58-like block) and <b>12</b> on a unibody. More key modules work; their keys map to <code>&amp;none</code> until the layout grows.</p></div>
+        </div>
+        <div>
+          <h4 style="margin-top:0">Parts list</h4>
+          <p class="summary">Tick what you have. Quantities follow the plan; order a few spares of the small parts.</p>
+          <div class="table-wrap"><table class="bom"><thead><tr><th></th><th>Part</th><th>Source</th><th class="n">Qty</th></tr></thead><tbody data-bom></tbody></table></div>
+        </div>
+      </div>
+    </div></div>
+  </article>
+
+  <article class="step" id="tools" data-title="Tools and consumables">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Plan</span><h3>Tools and consumables</h3><a class="anchor" href="#tools">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <div class="cards">
+        <div class="card"><h4>Printing</h4><ul class="check">
+          <li>A 3D printer, and a slicer that can <b>paint supports</b> and <b>pause at a height</b></li>
+          <li>Filament: PLA or PETG. Which one holds the latch flap better is not tested yet.</li>
+          <li>Flush cutters and a deburring blade for the support under the guide pins</li>
+        </ul></div>
+        <div class="card"><h4>Soldering</h4><ul class="check">
+          <li>Fine-tip soldering iron, thin solder and flux</li>
+          <li>Tweezers for the 0805 parts and the SOIC-16</li>
+          <li>Multimeter with continuity and DC volts</li>
+          <li>Thin hookup wire for the MCU module; insulated wire up to 1.3 mm across for the terminator module</li>
+        </ul></div>
+        <div class="card"><h4>Assembly</h4><ul class="check">
+          <li>Gel cyanoacrylate (gel CA) for staking the connectors</li>
+          <li>A small Phillips driver for M2 screws</li>
+          <li>A USB-C cable for flashing and charging</li>
+          <li>A strap for the harness: the lug slots take up to 24 × 4 mm</li>
+        </ul></div>
+      </div>
+    </div></div>
+  </article>
+</section>
+
+<!-- ============================================================ 3 -->
+<section class="chapter" id="print" data-title="Print the parts">
+  <div class="chapter-head"><div class="chapter-no">3</div><div>
+    <h2>Print the parts</h2>
+    <p>The print files come from the Cadova model in <code>case/roamy-v4</code>. Each part carries its revision engraved (<code>r6</code> and so on); check it against the table before you print a batch.</p>
+  </div></div>
+
+  <article class="step" id="generate" data-title="Generate and check the print files">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Files</span><h3>Generate and check the print files</h3><a class="anchor" href="#generate">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <ol class="do">
+        <li>In <code>case/roamy-v4</code>, run <code>swift run</code>. It writes <code>build/roamy-v4/*.3mf</code> and prints, among other things, the terminator module's pause height.</li>
+        <li>Run <code>python3 tools/check.py</code>. It compares the board against KiCad's own 3D export (a mirrored model fails it) and checks the fits, the slide-on and the floors. Run it before printing anything.</li>
+        <li>Run <code>python3 tools/overhang.py</code>. It slices the print poses at 0.2 mm and fails on anything that droops outside the painted-support zone.</li>
+      </ol>
+      <div class="warn"><p>Shell and floor r1 and r2 and jig r1 to r3 are mirror images of the board. Use only the revisions below or later.</p></div>
+    </div>
+    <div class="step-text" style="border-left:1px solid var(--line)">
+      <h4 style="margin-top:0">Current revisions</h4>
+      <div class="table-wrap"><table><thead><tr><th>Part</th><th>File</th><th class="n">Rev</th></tr></thead><tbody>
+        <tr><td>Key module shell</td><td><code>key-module-print.3mf</code></td><td class="n" data-rev="shell"></td></tr>
+        <tr><td>Key module floor</td><td><code>key-module-print.3mf</code></td><td class="n" data-rev="floor"></td></tr>
+        <tr><td>MCU shell</td><td><code>mcu-module-print.3mf</code></td><td class="n" data-rev="mcuShell"></td></tr>
+        <tr><td>MCU floor</td><td><code>mcu-module-print.3mf</code></td><td class="n" data-rev="mcuFloor"></td></tr>
+        <tr><td>Terminator module</td><td><code>terminator-print.3mf</code></td><td class="n" data-rev="terminator"></td></tr>
+        <tr><td>Solder jig</td><td><code>solder-jig-print.3mf</code></td><td class="n" data-rev="jig"></td></tr>
+        <tr><td>Choc cutout coupon</td><td><code>choc-cutout-coupon.3mf</code></td><td class="n" data-rev="coupon"></td></tr>
+      </tbody></table></div>
+      <p class="summary">Read from <code>Parameters.swift</code> when the guide's models were generated.</p>
+    </div></div>
+  </article>
+
+  <article class="step" id="print-settings" data-title="Printer settings">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Settings</span><h3>Printer settings</h3><a class="anchor" href="#print-settings">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <div class="cards">
+        <div class="card"><h4>Layers</h4><p><b>0.2 mm.</b> The overhang check slices at 0.2 mm, and the MCU module's 1.4 mm plate is a whole number of layers at that height.</p></div>
+        <div class="card"><h4>Supports</h4><p><b>None, except where painted.</b> Paint tree support, from the build plate only, under the two guide pins of each shell and of the terminator module. Top Z distance about 0.275 mm makes it come off cleanly.</p></div>
+        <div class="card"><h4>Print poses</h4><p>The 3MF files already lie the right way: <b>shells top-down</b> on the bed, <b>floors bottom-down</b>, the jig base down.</p></div>
+        <div class="card"><h4>Several objects per file</h4><p><code>key-module-print.3mf</code> and <code>mcu-module-print.3mf</code> hold the shell and its floor side by side. To reprint one of them, delete the other object in the slicer.</p></div>
+      </div>
+    </div></div>
+  </article>
+
+  <article class="step" id="coupon" data-title="Print the Choc cutout coupon">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Calibrate</span><h3>Print the Choc cutout coupon</h3><a class="anchor" href="#coupon">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>A plate-thick strip with switch openings from 13.5 to 14.2 mm. It tells you which opening your printer makes that a Choc clicks into and holds.</p>
+      <ol class="do">
+        <li>Print <code>choc-cutout-coupon.3mf</code>.</li>
+        <li>Press a switch into each opening. The right one clicks in and holds without force.</li>
+        <li>The case uses <b>13.7 mm</b> (<code>switchCutout</code> in <code>Parameters.swift</code>), from the coupon of 2026-09-25. If yours prefers another size, change it and run <code>swift run</code> again.</li>
+      </ol>
+      <div class="tip"><p>Reprint the coupon after a printer or filament change.</p></div>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="coupon"></div></div></div>
+  </article>
+
+  <article class="step" id="jig-print" data-title="Print the solder jig">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Print</span><h3>Print the solder jig</h3><a class="anchor" href="#jig-print">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>The jig holds a key module board front down and puts every connector where the case expects it: sockets against a stop at the mouth, headers tilted 8° in a cradle. One jig does every board.</p>
+      <ol class="do">
+        <li>Print <code>solder-jig-print.3mf</code>, base down. It has no overhangs.</li>
+        <li>Check the engraving on top: <code>8° jig r4</code> or later.</li>
+      </ol>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="jigPrint"></div></div></div>
+  </article>
+
+  <article class="step" id="key-print" data-title="Print the key module shells and floors">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Print ×<span data-count="key"></span></span><h3>Print the key module shells and floors</h3><a class="anchor" href="#key-print">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <ol class="do">
+        <li>Open <code>key-module-print.3mf</code>: the shell on its top, the floor beside it.</li>
+        <li>Paint support under the two guide pins only (red in the view). Their lowest ridge is an 11 mm cantilever over the bed.</li>
+        <li>Print <b data-count="key"></b> of each.</li>
+        <li>Remove the support from the guide pins and clean their ridges: they align the whole joint.</li>
+      </ol>
+      <div class="note"><p>In the print pose, each switch seat hangs 0.57 mm over the empty pocket. The 0.4 mm chamfer on the opening's edge keeps that short enough to print as a slowed overhang wall. Whether it prints clean on every printer is not tested yet; stray strands in the openings can be trimmed.</p></div>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="keyPrint"></div></div></div>
+  </article>
+
+  <article class="step" id="mcu-print" data-title="Print the MCU module">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Print ×<span data-count="mcu"></span></span><h3>Print the MCU module</h3><a class="anchor" href="#mcu-print">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <ol class="do">
+        <li>Open <code>mcu-module-print.3mf</code>: the shell on its top, the floor beside it.</li>
+        <li>No painted support: the MCU module has no guide pins. Its lugs print standing on the bed.</li>
+        <li>Print <b data-count="mcu"></b> of each.</li>
+      </ol>
+      <p>The terminator module prints with a pause for its embedded headers, so it has its <a href="#terminator">own chapter</a>.</p>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="mcuPrint"></div></div></div>
+  </article>
+</section>
+
+<!-- ============================================================ 4 -->
+<section class="chapter" id="solder" data-title="Solder the key module boards">
+  <div class="chapter-head"><div class="chapter-no">4</div><div>
+    <h2>Solder the key module boards</h2>
+    <p>Repeat for each key module board, and once more for the MCU module's socket board, which takes the sockets only (<a href="#socket-board">chapter 7</a>). The board's front carries the passives and the switches; its back carries U1, the hotswap sockets and the connectors.</p>
+  </div></div>
+
+  <article class="step" id="front" data-title="Front: resistors and capacitor">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Front</span><h3>Front: resistors and capacitor</h3><a class="anchor" href="#front">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <ul class="check">
+        <li><b>R1 to R5</b>: 10 kΩ, 0805. The pull-downs of the five keys.</li>
+        <li><b>C1</b>: 100 nF, 0805. Decoupling for U1.</li>
+      </ul>
+      <p>Do the front first: the jig holds the board front down, in pockets with room for these parts and their fillets.</p>
+    </div></div>
+  </article>
+
+  <article class="step" id="back" data-title="Back: U1, hotswap sockets and connectors, in the jig">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Back · jig</span><h3>Back: U1, hotswap sockets and connectors, in the jig</h3><a class="anchor" href="#back">#</a></div>
+    <div class="step-body wide-media"><div class="step-text">
+      <ol class="do">
+        <li>Lay the board front down in the jig's pocket: the SW5 and SW1 engravings mark the matching ends, and the header side faces the labels.</li>
+        <li>Solder <b>U1</b> (74HC165, SOIC-16). Mind pin 1.</li>
+        <li>Solder the five <b>Choc hotswap sockets</b>, one above each key.</li>
+        <li><b>Sockets</b> (J_LEFT1 to J_LEFT3, socket side): each body rests on the board in its nest. Push it against the stop at its mouth, which sits 2.0 mm past the board edge, and tack one pad. Check, then solder the rest.</li>
+        <li><b>Headers</b> (J_RIGHT1 to J_RIGHT3, header side): see the next step.</li>
+      </ol>
+      <p>Use the numbered buttons under the view to go through it.</p>
+      <div class="tip"><p>Every cut in the jig is open toward the component side, so the soldered board lifts straight out.</p></div>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="jig"></div></div></div>
+  </article>
+
+  <article class="step" id="headers" data-title="Headers at 8°">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Back · jig</span><h3>Headers at 8°</h3><a class="anchor" href="#headers">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>Neighbouring modules meet at 8°, so the header pins must leave along the neighbour's board plane. Instead of bending the pins, you solder the whole header tilted.</p>
+      <ol class="do">
+        <li>Lay the header in the jig's cradle, which is tilted 8° about the inboard end of the pads, with a pin in each slot.</li>
+        <li>Push it outward against the stop that touches the body's outer edge, and tack one pad.</li>
+        <li>Solder all three feet. The foot touches its pad at the inboard end and has 0.32 mm under its other end, so each joint is a wedge-shaped fillet.</li>
+      </ol>
+      <div class="warn"><p>The wedge fillet must not carry the connector's load. In the case, the floor's rear stop takes the slide-on push and its clamp pad keeps the body from tipping; staking, next, takes the pull when modules come apart.</p></div>
+    </div>
+    <div class="step-media"><figure><img class="diagram" src="images/header-tilt.svg" alt="Cross-section of a header soldered at 8 degrees in the jig"></figure></div></div>
+  </article>
+
+  <article class="step" id="stake" data-title="Stake the connectors">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Back</span><h3>Stake the connectors</h3><a class="anchor" href="#stake">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>Pulling two modules apart pulls each connector body away from the floor that holds it, and there is no room for a stop on that side: at the seam, the header body and the neighbour's socket mouth are 0.39 mm apart. Glue carries that load instead of the solder joints.</p>
+      <ol class="do">
+        <li>Run a bead of gel CA along both long sides of each connector body, between the body and the board. Six bodies per board.</li>
+        <li>Keep the glue off the tails and their fillets, and within about 0.5 mm of the body: the floor's clamp pads and rear stops need the rest.</li>
+        <li>Let it cure before the board goes into its shell.</li>
+      </ol>
+    </div>
+    <div class="step-media"><figure><img class="diagram" src="images/staking.svg" alt="Where the gel CA goes along each connector body"></figure>
+      <div class="photo-slot"><b>Photo wanted</b>A staked board: glue beads along a socket and a header.</div></div></div>
+  </article>
+
+  <article class="step" id="test-board" data-title="Optional: test the board on its own">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Test</span><h3>Optional: test the board on its own</h3><a class="anchor" href="#test-board">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <p><code>firmware/shiftregister-test</code> is an Arduino sketch for an M5StickC Plus that clocks the 74HC165 and shows every key on its screen. It needs the board's header pins and five wires:</p>
+      <div class="table-wrap"><table><thead><tr><th>M5StickC Plus</th><th>Key module</th><th>Signal</th></tr></thead><tbody>
+        <tr><td>3V3</td><td>J_RIGHT1 pin 2</td><td>+3.3V</td></tr>
+        <tr><td>GND</td><td>J_RIGHT1 pin 3</td><td>GND</td></tr>
+        <tr><td>GPIO25</td><td>J_RIGHT2 pin 1</td><td>CLK</td></tr>
+        <tr><td>GPIO0</td><td>J_RIGHT2 pin 2</td><td>/PL</td></tr>
+        <tr><td>GPIO26</td><td>J_RIGHT2 pin 3</td><td>DATA (QH)</td></tr>
+      </tbody></table></div>
+      <p>Tie J_LEFT2 pin 3 (DATA in) to GND for the test, so the bits shifted in behind the module read 0. Details in the sketch's <a href="../../firmware/shiftregister-test/README.md">README</a>. Without an M5Stick, test the boards in the finished half instead (<a href="#first-test">chapter 9</a>).</p>
+    </div></div>
+  </article>
+</section>
+
+<!-- ============================================================ 5 -->
+<section class="chapter" id="keymodule" data-title="Assemble the key modules">
+  <div class="chapter-head"><div class="chapter-no">5</div><div>
+    <h2>Assemble the key modules</h2>
+    <p>Board into the upturned shell, floor on, switches in. Repeat <span data-count="key"></span> times.</p>
+  </div></div>
+
+  <article class="step" id="board-in" data-title="Board into the shell">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Assemble</span><h3>Board into the shell, floor on</h3><a class="anchor" href="#board-in">#</a></div>
+    <div class="step-body wide-media"><div class="step-text">
+      <ol class="do">
+        <li>Turn the shell upside down. The revision is engraved on the SW1 end wall's inner face.</li>
+        <li>Drop the board in along its normal, back up, SW1 at the SW1 end. The connectors go into the wall slots, which are open toward the floor. The ledges under the plate stop the board from rising further.</li>
+        <li>Put the floor on. Its locating tabs find the shell's opening; the clamp pads land on the connector bodies and the rear stops behind them.</li>
+        <li>Fasten it with four <b>M2 × 5 mm</b> self-tapping screws in the end walls' corners. The floor is 0.5 mm thick under each screw head and the pilots are 5 mm deep.</li>
+      </ol>
+      <div class="warn"><p>If the floor will not sit flat, look for a solder fillet or a glue bead in the way before you tighten the screws. The tightest spot is under the tilted header bodies.</p></div>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="keyModule"></div></div></div>
+  </article>
+
+  <article class="step" id="switches" data-title="Switches and keycaps">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Assemble</span><h3>Switches and keycaps</h3><a class="anchor" href="#switches">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <ol class="do">
+        <li>Turn the module right side up. Press a Choc v1 switch into each switch pocket until its side clips catch under the plate; its legs go through the board into the hotswap sockets.</li>
+        <li>Put the keycaps on.</li>
+      </ol>
+      <p>The switches are hot-swappable: pull one out with a switch puller to change it. The sockets hold the switch; the plate's 0.25 mm seat and the clips keep it square. How well the seat holds under hard typing is still to be tested.</p>
+    </div></div>
+  </article>
+</section>
+
+<!-- ============================================================ 6 -->
+<section class="chapter" id="terminator" data-title="Build the terminator module">
+  <div class="chapter-head"><div class="chapter-no">6</div><div>
+    <h2>Build the terminator module</h2>
+    <p>A solid print about 12 mm wide with two headers inside it, embedded during a pause in the print. Electrically it only ties its neighbour's DATA to +3.3V, which makes the chain end in the sentinel.</p>
+  </div></div>
+
+  <article class="step" id="term-wire" data-title="Solder the wire">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder</span><h3>Solder the wire</h3><a class="anchor" href="#term-wire">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>Two headers sit where a key module's would: row 1 and row 2. Row 3 has none.</p>
+      <ol class="do">
+        <li>Lay the two headers out as they sit on a board, pin 1 of each toward the SW5 end.</li>
+        <li>Solder one insulated wire, at most 1.3 mm across, between the feet of <b>row 1 pin 2</b> (+3.3V) and <b>row 2 pin 3</b> (DATA, the pin toward row 3).</li>
+        <li>Check with a meter: those two pins connected, nothing else.</li>
+      </ol>
+    </div>
+    <div class="step-media"><figure><img class="diagram" src="images/terminator-wire.svg" alt="The terminator module's two headers and the wire between them"></figure></div></div>
+  </article>
+
+  <article class="step" id="term-print" data-title="Print with an embed pause">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Print ×<span data-count="term"></span></span><h3>Print with an embed pause</h3><a class="anchor" href="#term-print">#</a></div>
+    <div class="step-body wide-media"><div class="step-text">
+      <ol class="do">
+        <li>Open <code>terminator-print.3mf</code>. Paint support under its two guide pins, as on the key module shell.</li>
+        <li>Add a pause at <b><span data-pause></span> mm</b>, the height that <code>swift run</code> prints. It lies on a layer boundary.</li>
+        <li>At the pause, drop both headers into their pockets, bodies down, pins out through the header face, and lay the wire in its groove.</li>
+        <li>Resume. 1.5 mm of print closes over the pockets. The wire's groove stays open on the underside, since covering it would take a 26 mm bridge.</li>
+      </ol>
+      <p>Drag <b>Print height</b> under the view to watch the print reach the pause.</p>
+      <div class="photo-slot"><b>Photo wanted</b>The paused print with both headers in their pockets.</div>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="termPrint"></div></div></div>
+  </article>
+
+  <article class="step" id="term-check" data-title="Check the terminator module">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Check</span><h3>Check it against a key module</h3><a class="anchor" href="#term-check">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>The headers' pins should stand out of the header face exactly like a key module's, and slide into a key module's sockets. The header face has small reliefs where the neighbour's socket mouths reach 0.17 mm past the seam.</p>
+      <p>Toggle the neighbour in the view to see the pair.</p>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="terminator"></div></div></div>
+  </article>
+</section>
+
+<!-- ============================================================ 7 -->
+<section class="chapter" id="mcu" data-title="Build the MCU module">
+  <div class="chapter-head"><div class="chapter-no">7</div><div>
+    <h2>Build the MCU module</h2>
+    <p>The MCU module holds the nice!nano, the battery and the nice!view. Until the planned MCU board exists, its connectors are a <b>socket board</b>: a spare key module board with only its three sockets, wired to the nice!nano.</p>
+  </div></div>
+
+  <article class="step" id="socket-board" data-title="Make the socket board">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder · jig</span><h3>Make the socket board</h3><a class="anchor" href="#socket-board">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <ol class="do">
+        <li>Take a bare key module board. Leave the front, U1, the hotswap sockets and the headers empty.</li>
+        <li>Solder the three sockets (J_LEFT1 to J_LEFT3) in the solder jig, exactly as on a key module.</li>
+        <li>Stake them with gel CA.</li>
+      </ol>
+      <p>The socket board sits in the MCU module exactly where a key module's board sits in its shell, so its sockets meet the last key module's headers.</p>
+    </div></div>
+  </article>
+
+  <article class="step" id="wiring" data-title="Wire the nice!nano">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder</span><h3>Wire the nice!nano, the nice!view and the socket board</h3><a class="anchor" href="#wiring">#</a></div>
+    <div class="step-body single stack"><div class="step-text">
+      <p>Hover a signal to find it in every table.</p>
+      <div class="pinout">
+        <div class="conn"><h5>J_LEFT1 (top)</h5>
+          <div class="pin" data-signal="5v"><b>1</b>+5V<small>not connected</small></div>
+          <div class="pin used" data-signal="vcc"><b>2</b>+3.3V<small>→ VCC</small></div>
+          <div class="pin used" data-signal="gnd"><b>3</b>GND<small>→ GND</small></div></div>
+        <div class="conn"><h5>J_LEFT2 (middle)</h5>
+          <div class="pin used" data-signal="clk"><b>1</b>CLK<small>→ D15</small></div>
+          <div class="pin used" data-signal="pl"><b>2</b>/PL<small>→ D18</small></div>
+          <div class="pin used" data-signal="data"><b>3</b>DATA<small>→ D14</small></div></div>
+        <div class="conn"><h5>J_LEFT3 (bottom)</h5>
+          <div class="pin" data-signal="led"><b>1</b>LED<small>not connected</small></div>
+          <div class="pin" data-signal="sda"><b>2</b>SDA<small>not connected</small></div>
+          <div class="pin" data-signal="scl"><b>3</b>SCL<small>not connected</small></div></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Signal</th><th>nice!nano</th><th>nRF52840</th><th>Socket board</th></tr></thead><tbody>
+        <tr data-signal="vcc"><td>+3.3V</td><td>VCC</td><td>switched by P0.13</td><td>J_LEFT1 pin 2</td></tr>
+        <tr data-signal="gnd"><td>GND</td><td>GND</td><td></td><td>J_LEFT1 pin 3</td></tr>
+        <tr data-signal="clk"><td>CLK</td><td>D15</td><td>P1.13, SPIM1 SCK</td><td>J_LEFT2 pin 1</td></tr>
+        <tr data-signal="pl"><td>/PL</td><td>D18</td><td>P1.15</td><td>J_LEFT2 pin 2</td></tr>
+        <tr data-signal="data"><td>DATA</td><td>D14</td><td>P1.11, SPIM1 MISO</td><td>J_LEFT2 pin 3</td></tr>
+      </tbody></table></div>
+      <h4>nice!view</h4>
+      <div class="table-wrap"><table><thead><tr><th>nice!view</th><th>nice!nano</th><th>nRF52840</th></tr></thead><tbody>
+        <tr data-signal="vcc"><td>VCC</td><td>VCC</td><td>switched by P0.13</td></tr>
+        <tr data-signal="gnd"><td>GND</td><td>GND</td><td></td></tr>
+        <tr><td>SCK</td><td>D3</td><td>P0.20</td></tr>
+        <tr><td>MOSI</td><td>D2</td><td>P0.17</td></tr>
+        <tr><td>CS</td><td>D1</td><td>P0.06</td></tr>
+      </tbody></table></div>
+      <div class="warn"><p><b>Solder the wires to the sockets' own joints</b> (J_LEFT), not to the empty header pads (J_RIGHT) or U1's pads. Those reach the sockets through 0.25 mm tracks, and on the first socket board a wire tugging on a header pad broke the +3.3V and GND connections.</p></div>
+      <p>The reset button closes RST to GND. Mind the nano's RST pad: it sits between GND and VCC, so check for solder bridges there.</p>
+      <p>The wires from the socket board's pads and from the view cross the board's bay-side edge between the board-side tabs; route them there.</p>
+    </div>
+    <div class="step-media"><figure><img class="diagram" src="../images/bench-wiring.svg" alt="Wiring of the nice!nano, socket board, nice!view, battery, power switch and reset button"><figcaption>From docs/firmware.md. Click to enlarge.</figcaption></figure>
+      <div class="photo-slot"><b>Photo wanted</b>The wired MCU module, open, with the wire routing across the board edge.</div></div></div>
+  </article>
+
+  <article class="step" id="polarity" data-title="Power: battery, jack and switch">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder · check</span><h3>Power: battery, jack and switch</h3><a class="anchor" href="#polarity">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>Battery + runs through the JST PH jack and the power switch to the nice!nano's <b>B+</b> pad; battery − goes to <b>B−</b>.</p>
+      <ol class="do">
+        <li>Measure the battery's plug with a meter in DC volts to find which contact is +. Neither the JST nor the electrokit datasheet says which jack pin the + lands on.</li>
+        <li>Find the power switch's common terminal with a continuity tester; the Alps drawing was not checked for it.</li>
+        <li>Wire the jack and the switch accordingly, and check the polarity at B+ and B− once more before the battery goes in.</li>
+      </ol>
+      <div class="gap"><p>With the switch off, USB still powers the nice!nano, but the battery does not charge. That was read from the nice!nano schematic and is untested.</p></div>
+    </div>
+    <div class="step-media"><figure><img class="diagram" src="images/battery-polarity.svg" alt="Checking the battery plug's polarity and the switch's common terminal with a meter"></figure></div></div>
+  </article>
+
+  <article class="step" id="mcu-assembly" data-title="Assemble the MCU module">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Assemble</span><h3>Assemble the MCU module</h3><a class="anchor" href="#mcu-assembly">#</a></div>
+    <div class="step-body wide-media"><div class="step-text">
+      <p>Everything that locates the parts sideways hangs from the plate, so the parts go into the <b>upturned shell</b> in this order, and the floor closes it:</p>
+      <ol class="do">
+        <li><b>nice!view</b> into its pocket under the window, header edge toward the nano's end. The wall at its flex end and the posts at its header end keep it in place.</li>
+        <li><b>Socket board</b> over it. The board-side tabs stop it sliding into the bay.</li>
+        <li><b>Battery</b> at the SW1 end, between its stops.</li>
+        <li><b>nice!nano</b> at the SW5 end: USB-C port into the end wall's slot, onto the post over the port and under the prop.</li>
+        <li><b>Power switch</b> and <b>reset button</b> into their chambers on the free face, slider and actuator outward.</li>
+        <li><b>Battery jack</b> onto its seat on the floor, mating face toward the battery.</li>
+        <li><b>Floor</b> on. Its tongue closes the USB slot under the port. Six M2 × 5 mm screws: four at the corners, as on a key module, and two in the bosses at the free face.</li>
+      </ol>
+      <p>Step through it with the numbered buttons under the view.</p>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="mcu"></div></div></div>
+  </article>
+</section>
+
+<!-- ============================================================ 8 -->
+<section class="chapter" id="join" data-title="Join a half">
+  <div class="chapter-head"><div class="chapter-no">8</div><div>
+    <h2>Join a half</h2>
+    <p>Start at the terminator module and work toward the MCU module: each module slides onto the headers of the one to its left.</p>
+  </div></div>
+
+  <article class="step" id="slide-on" data-title="Slide-on">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Join</span><h3>Slide-on</h3><a class="anchor" href="#slide-on">#</a></div>
+    <div class="step-body wide-media"><div class="step-text">
+      <ol class="do">
+        <li>Hold the new module's socket face to its neighbour's header face, tilted down by 8°, so that it moves along its own board plane.</li>
+        <li>Push it straight on. The guide pins enter their holes first, 5.7 mm before the header pins reach the sockets, and line them up.</li>
+        <li>The last 5.6 mm is the header pins going into the sockets. Over the last 2.3 mm the teeth ride the guide pins, and at the end they click into the notches.</li>
+        <li>Repeat until the MCU module is on.</li>
+      </ol>
+      <p>Drag <b>Slide-on</b> under the view.</p>
+      <div class="note"><p>Because the header is tilted, each module sits 1.1 mm lower at the seam than its neighbour. That is intended: it puts every module on the same arc.</p></div>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="join"></div></div></div>
+  </article>
+
+  <article class="step" id="release" data-title="Release">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Join</span><h3>Release and separation</h3><a class="anchor" href="#release">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>There are two latches per seam, one at each column end.</p>
+      <ol class="do">
+        <li>With the current tooth (45° catch face) the pair pulls apart by hand: pull the module off along its board plane.</li>
+        <li>If a latch holds, lift its flap outward with a fingernail in the flap slot at its free edge, and pull.</li>
+      </ol>
+      <p>The firmware counts key modules on every scan, so you can add or remove one while the keyboard runs. Keys stay quiet until the count has been stable for a few scans.</p>
+      <div class="gap"><p>How stiff the flap is and how well the tooth holds in PLA versus PETG is not tested yet.</p></div>
+    </div>
+    <div class="step-media"><figure><img class="diagram" src="images/latch.svg" alt="Slide-on, latching and release at one column end"></figure></div></div>
+  </article>
+
+  <article class="step" id="harness" data-title="Harness">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Wear</span><h3>Harness</h3><a class="anchor" href="#harness">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <p>The terminator module and the MCU module each have a lug at both column ends of their free face. Thread a strap through the four slots (up to 24 mm wide and 4 mm thick) and wear the half on your thigh. The lugs' undersides turn down by the joint angle to follow the leg.</p>
+      <div class="gap"><p>The harness itself is not designed yet. From earlier prototypes: a good position is out toward the side of the thigh, leaning about 45°, at pocket height when standing and just above the knee when sitting, so it needs a way to move up and down the leg.</p></div>
+      <div class="photo-slot"><b>Photo wanted</b>A finished half worn on the leg.</div>
+    </div></div>
+  </article>
+</section>
+
+<!-- ============================================================ 9 -->
+<section class="chapter" id="firmware" data-title="Flash and test">
+  <div class="chapter-head"><div class="chapter-no">9</div><div>
+    <h2>Flash and test</h2>
+    <p>The Roamyboard runs <a href="https://zmk.dev">ZMK</a> with its own driver for the key modules' chain. Details in <a href="../firmware.md">docs/firmware.md</a>.</p>
+  </div></div>
+
+  <article class="step" id="get-firmware" data-title="Get the firmware">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Firmware</span><h3>Get the firmware</h3><a class="anchor" href="#get-firmware">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <p>GitHub Actions builds three UF2 files on every push that touches <code>zmk/</code>: download them from the latest run's artifacts in <a href="https://github.com/nevyn/roamyboard/actions/workflows/build.yml">the Build workflow</a>, or build locally with Docker (<a href="../firmware.md#building">instructions</a>).</p>
+      <div class="table-wrap"><table><thead><tr><th>File</th><th>For</th><th>ZMK Studio</th></tr></thead><tbody>
+        <tr data-layout-row="unibody"><td><code>roamyboard</code></td><td>A unibody keyboard: one half</td><td>yes</td></tr>
+        <tr data-layout-row="split"><td><code>roamyboard_left</code></td><td>The left half of a split, which the computer connects to</td><td>yes</td></tr>
+        <tr data-layout-row="split"><td><code>roamyboard_right</code></td><td>The right half of a split</td><td>no</td></tr>
+      </tbody></table></div>
+    </div></div>
+  </article>
+
+  <article class="step" id="flash" data-title="Flash">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Firmware</span><h3>Flash</h3><a class="anchor" href="#flash">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <ol class="do">
+        <li>Connect the MCU module over USB-C.</li>
+        <li>Tap the reset button twice, about half a second apart. Tapping as fast as you can only reboots it.</li>
+        <li>A drive named <code>NICENANO</code> appears. Copy the UF2 for this half onto it; the nice!nano flashes it and restarts.</li>
+      </ol>
+      <div class="warn"><p>If the nice!nano ran other firmware before, flash ZMK's <code>settings_reset</code> first, then the Roamyboard firmware. The first MCU module still carried Lily58 settings with behaviors that no longer existed. For a split, reset both halves if they do not find each other.</p></div>
+    </div>
+    <div class="step-media"><figure><img class="diagram" src="images/flash.svg" alt="Double-tap reset, the NICENANO drive, copy the UF2"></figure></div></div>
+  </article>
+
+  <article class="step" id="first-test" data-title="First test">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Test</span><h3>First test</h3><a class="anchor" href="#first-test">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <ul class="check">
+        <li>The nice!view shows ZMK's status screen: connection, profile and the layer, <i>Base</i>.</li>
+        <li>With the terminator module on, the keys type. The placeholder keymap is a Lily58-like QWERTY block on the key modules nearest the middle of the keyboard.</li>
+        <li>Pair over Bluetooth: hold either <code>&amp;mo 1</code> key for layer 1, with three Bluetooth profiles, Bluetooth clear, the bootloader and reset.</li>
+        <li>Pull a key module off and put it back while it runs: the keys come back at their new keymap columns.</li>
+      </ul>
+      <p>For logs, build with the <code>zmk-usb-logging</code> snippet and read the nice!nano's serial port: the driver reports the key module count and any fault with the raw bytes.</p>
+    </div>
+    <div class="step-media"><figure class="photo"><img src="../../Images/firmware%20first%20boot%20irl.webp" alt="The MCU module's nice!view showing ZMK's status screen on first boot"><figcaption>First boot, 2026-09-27: ZMK's status screen through the MCU module's window.</figcaption></figure></div></div>
+  </article>
+</section>
+
+<!-- ============================================================ 10 -->
+<section class="chapter" id="trouble" data-title="Troubleshooting">
+  <div class="chapter-head"><div class="chapter-no">10</div><div>
+    <h2>Troubleshooting</h2>
+    <p>What went wrong on the first builds, and what the firmware's symptoms mean.</p>
+  </div></div>
+  <article class="step info" id="symptoms" data-title="Symptoms">
+    <div class="step-head"><span class="tag">Reference</span><h3>Symptoms and causes</h3><a class="anchor" href="#symptoms">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <div class="table-wrap"><table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead><tbody>
+        <tr><td>No keys at all; the log reports a fault</td><td>No sentinel: the terminator module is missing, DATA or /PL is broken, or there are more key modules than <code>max-key-modules</code> (32)</td><td>Put the terminator module on; check DATA and /PL continuity through each joint</td></tr>
+        <tr><td>The count reads right at rest and drops to zero while a key is held; every byte goes to <code>0xFF</code></td><td>The 74HC165s have no supply and run on what leaks in through CLK and /PL</td><td>Check +3.3V and GND from the nice!nano to the socket board's socket joints, not to the J_RIGHT pads</td></tr>
+        <tr><td>Keys fire in the wrong columns after adding a module</td><td>Expected with the <code>terminator</code> anchor on the right half of a split: every keymap column moves</td><td>See <a href="../firmware.md#columns-and-anchors">columns and anchors</a></td></tr>
+        <tr><td>Bootloader will not start</td><td>The reset taps are too fast</td><td>Tap twice about half a second apart</td></tr>
+        <tr><td>Strange behaviour right after flashing</td><td>Settings left by earlier firmware</td><td>Flash <code>settings_reset</code>, then the Roamyboard firmware</td></tr>
+        <tr><td>Parts are mirror images of the board</td><td>Shell or floor r1/r2, or jig r1 to r3</td><td>Print current revisions (<a href="#generate">chapter 3</a>)</td></tr>
+        <tr><td>Floor will not sit flat</td><td>Solder or glue under the connector bodies; the tightest spot is 0.3 mm under the tilted headers</td><td>Trim the fillet or bead</td></tr>
+        <tr><td>Switch openings full of loose strands</td><td>Shell r4 or r5 (the print membrane)</td><td>Print shell r6 or later</td></tr>
+      </tbody></table></div>
+      <h4>Not tested yet</h4>
+      <ul>
+        <li>Whether the 0.57 mm seat overhang prints clean, and how well the 0.25 mm seat holds a switch.</li>
+        <li>Flap stiffness and tooth hold in PLA versus PETG; the 0.1 mm guide clearance on other printers.</li>
+        <li>The MCU module r3 as a whole on the printer; charging with the power switch off.</li>
+        <li>One key module showed no GND continuity between its socket and header yet worked in either position, which a 74HC165 can also do on leaked ground. If a module acts up only in some positions, check its GND.</li>
+      </ul>
+    </div></div>
+  </article>
+</section>
+
+<footer>
+  Generated from the Roamyboard repo: models by <code>case/roamy-v4/tools/guide_models.py</code>, facts from <a href="../../case/Case%20design.md">Case design</a>, <a href="../../electronics/Electronics.md">Electronics</a>, <a href="../firmware.md">Firmware</a> and the <a href="../../Build%20Diary.md">Build Diary</a>. Keyboard: <kbd>j</kbd>/<kbd>k</kbd> next and previous step, <kbd>x</kbd> marks the current step done.
+</footer>
+</main>
+</div>
+<div class="lightbox" role="dialog" aria-label="Enlarged image"><img alt=""></div>
+<div class="kbd-help"><kbd>j</kbd> <kbd>k</kbd> steps · <kbd>x</kbd> done</div>
+</body>
+</html>
