@@ -42,6 +42,10 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **socket**: The female 3-pin connector on the board's back, socket side. Its **mouth** lies in the socket face, 2.0 mm past the board edge. Not: receptacle, female.
 - **connector row**: One header-and-socket position along the column; three per module, at board y 58.1, 77.1 and 115.1 mm.
 - **pin axis**: The line the header pins and socket bores share, 1.25 mm below the board.
+- **tail**: The part of a header pin or socket contact behind the body: it leaves the body's **rear face** (opposite the mouth or the exposed pins) at the pin axis and jogs to the board. Its **foot** is the straight end that lies on the pad. Not: leg, lead.
+- **clamp pad**: The part of the floor that rests on a connector body's face away from the board, with zero interference, so the body can't tip toward the floor. The header's follows its 8° tilt. Not: hold-down, clamp.
+- **rear stop**: The rib on the floor against a connector body's rear face, below the tails; slide-on pushes the body against it instead of against its solder joints. Not: backstop, end stop.
+- **staking**: Glue (gel CA) between a connector body's long sides and the board, which carries separation. Not: potting, underfill.
 
 ## Joint
 

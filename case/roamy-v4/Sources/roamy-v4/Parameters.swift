@@ -6,11 +6,11 @@ import Cadova
 /// Revision engraved on each printed part. Bump a part's number whenever its geometry changes.
 enum Revision {
     static let shell = 6        // r2: larger revision text, on the end wall; r3: un-mirrored (r1, r2 are mirror images); r4: corner screws, print aids; r5: 1.8 screw pilots; r6: seat chamfer, no print aids
-    static let floor = 5        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores; r5: 2.4 screw clearance
+    static let floor = 6        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores; r5: 2.4 screw clearance; r6: clamp pads and rear stops on the connector bodies
     static let jig = 4          // r1: first Cadova jig; r2: larger passive pockets; r3: larger text; r4: un-mirrored
     static let terminator = 1
     static let mcuShell = 3     // r2: prop over the nano, view end walls, board-side tabs with wire gaps; r3: chambers for the switch and button
-    static let mcuFloor = 1
+    static let mcuFloor = 2     // r2: clamp pads and rear stops on the socket bodies
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
 }
@@ -43,12 +43,19 @@ enum P {
     static let headerBodyDepth = 2.5
     static let headerTailReach = 4.8          // body face to foot tip, along the board
     static let headerPadInboardEnd = 5.685    // foot tip from the board edge: pad row 4.1 in, pads 3.17 long
+    static let headerFoot = 2.3               // straight end of the tail that lies on the pad
+    static let socketTail = 3.2               // rear face to foot tip, along the board
+    static let socketFoot = 1.3               // straight end of the tail that lies on the pad
+    static let socketTailThickness = 0.4      // across the board; the tail is 0.64 along the row
     static let pinPitch = 2.54
     static let pinSquare = 0.64
     static let pinLength = 6.0
     static let bodyFloat = 0.0                // body to the board
     static let bodyHeight = 2.5
     static let pinAxisBelowBoard = 1.25
+    static let tailClearance = 0.3            // rear stops to the tails, which leave the rear face at the pin axis
+    static let rearStopThickness = 1.2        // along the pin axis
+    static let stakingRoom = 0.5              // kept free beside each body's long sides, for the glue that stakes it to the board
     static let jointAngle = 8.0°
     /// Where the neighbour's socket mouth lands on this module's header axis, past the board edge (untilted).
     /// 2.0 keeps the 4.0 mm board-to-board convention: 0.39 mm between header body and socket mouth,

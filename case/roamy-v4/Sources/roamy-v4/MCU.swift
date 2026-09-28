@@ -179,9 +179,10 @@ struct MCUChambers: Geometry3D {
     }
 }
 
-/// Floor of the MCU module, screwed on like the key module's: pillars under the board's end margins, locating tabs, a
-/// rib that presses the nice!nano against the shell's post on its port, a tongue that closes the port's slot, a seat for the battery jack, and reliefs for the
-/// switch's and button's pegs. Everything that locates the parts sideways hangs from the shell, so they go into the
+/// Floor of the MCU module, screwed on like the key module's: pillars under the board's end margins, locating tabs, the
+/// socket board's clamp pads and rear stops (`ClampPadsAndRearStops`), a rib that presses the nice!nano against the shell's
+/// post on its port, a tongue that closes the port's slot, a seat for the battery jack, and reliefs for the switch's and
+/// button's pegs. Everything that locates the parts sideways hangs from the shell, so they go into the
 /// upturned shell before the floor closes it.
 struct MCUFloor: Geometry3D {
     var body: any Geometry3D {
@@ -207,6 +208,7 @@ struct MCUFloor: Geometry3D {
                 }
                 MCU.place(Box(x: t, y: 24, z: h + 0.5), x: MCU.freeWallX - c - t, d: 80, level: rim - 0.5)
                 MCU.place(Box(x: 20, y: t, z: h + 0.5), x: MCU.stripX1 + 2, d: P.bayEndWall + c, level: rim - 0.5)
+                ClampPadsAndRearStops(headers: false)
                 // nice!nano: rib under its middle; the shell holds it at the sides, behind and above
                 MCU.place(Box(x: P.nanoWidth / 2, y: P.nanoLength / 2, z: P.nanoRise + 0.01),
                           x: MCU.nanoX + P.nanoWidth / 4, d: MCU.nanoD + P.nanoLength / 4, level: rim - 0.01)

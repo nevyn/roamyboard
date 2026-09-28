@@ -83,7 +83,8 @@ struct Ledges: Geometry3D {
 }
 
 /// Floor screwed on from below into the end walls' corners, following the keystone. Pillars under the board's
-/// bare end margins push it against the ledges; tabs along the walls locate it in the shell's opening.
+/// bare end margins push it against the ledges; tabs along the walls locate it in the shell's opening; clamp pads and
+/// rear stops (`ClampPadsAndRearStops`) hold the connector bodies.
 struct KeyModuleFloor: Geometry3D {
     static func rimAt(_ x: Double) -> Double { Joint.z(level: Joint.rim, x: x) }
 
@@ -116,6 +117,7 @@ struct KeyModuleFloor: Geometry3D {
                         Box(x: x1 - x0, y: t, z: h + 0.5).translated(x: x0, y: y, z: Self.rimAt((x0 + x1) / 2) - 0.5)
                     }
                 }
+                ClampPadsAndRearStops()
             }
             .subtracting {
                 // revision on the inside face, following the floor's tilt
@@ -127,6 +129,47 @@ struct KeyModuleFloor: Geometry3D {
                     for x in P.screwXs { Counterbore().transformed(Self.frame(x: x, y: end.y(P.screwY))) }
                 }
             }
+    }
+}
+
+/// Clamp pads and rear stops: one L-shaped block on the floor under each connector body, touching it with zero
+/// interference. The clamp pad rests on the body's face away from the board, so the body can't tip toward the floor;
+/// the header's follows its 8° tilt instead of pressing it flat. The rear stop bears on the rear face below the tails,
+/// so slide-on pushes the body into the floor instead of into its solder joints. Staking carries separation;
+/// `StakingRoom` is the room kept for its glue.
+///
+/// The floor goes on along the board normal, or up to 2.94° off it along its own normal. Each stop starts at the edge
+/// between the rear face and the top and leans away from the rear face enough to clear it either way: the socket's
+/// stands perpendicular to the floor; the header's rear face leans 8° with the tilt, so its stop stands along the board
+/// normal and touches only that edge. `headers: false` for the socket board.
+struct ClampPadsAndRearStops: Geometry3D {
+    var headers = true
+
+    /// z of the tilted header's untilted level `w` (below the board's back, as in `TiltedHeader`) at module x.
+    static func headerZ(x: Double, w: Double) -> Double {
+        let u = (x - Joint.pivot.x - Joint.s * w) / Joint.c
+        return Joint.tilt(Joint.pivot + Vector2D(u, w)).y
+    }
+
+    var body: any Geometry3D {
+        let t = P.rearStopThickness, top = -(P.bodyFloat + P.bodyHeight)
+        let low = { (x: Double) in KeyModuleFloor.rimAt(x) - 0.5 }
+        let rear = P.socketDepth
+        let socketStop = -(P.pinAxisBelowBoard + P.socketTailThickness / 2) - P.tailClearance
+        let lean = (socketStop - top) * Joint.up.x / Joint.up.y
+        let socket: [Vector2D] = [[-1, low(-1)], [-1, top], [rear, top], [rear + lean, socketStop], [rear + lean + t, socketStop], [rear + t, low(rear + t)]]
+        let near = Joint.tilt(Joint.pivot + Vector2D(P.headerTailReach, top))
+        let far = Joint.tilt(Joint.pivot + Vector2D(P.headerTailReach + P.headerBodyDepth, top))
+        // the tails' underside slopes down toward the body, so it comes closest to the stop at the body
+        let headerStop = Self.headerZ(x: near.x, w: -(P.pinAxisBelowBoard + P.pinSquare / 2)) - P.tailClearance
+        let header: [Vector2D] = [[near.x - t, low(near.x - t)], [near.x - t, headerStop], [near.x, headerStop], near, far, [far.x, low(far.x)]]
+        Union {
+            for r in P.rowYs {
+                alongColumn(socket, from: Frame.by(r) - P.socketWidth / 2, length: P.socketWidth)
+                if headers { alongColumn(header, from: Frame.by(r) - P.headerWidth / 2, length: P.headerWidth) }
+            }
+        }
+        .intersecting { alongColumn(keystone(from: Joint.bottom, to: Joint.top)) }
     }
 }
 
