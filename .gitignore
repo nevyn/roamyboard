@@ -4,3 +4,4 @@ build
 ~*
 .build/
 __pycache__/
+.claude/launch.json
