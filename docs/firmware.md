@@ -10,7 +10,7 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/dts/roamyboard.dtsi` | Devicetree shared by all shields: pins, the chain node, the 30 × 5 physical layout and matrix transform. |
 | `zmk/boards/shields/roamyboard/` | The unibody shield. |
 | `zmk/boards/shields/roamyboard_split/` | The `roamyboard_left` and `roamyboard_right` shields. |
-| `zmk/config/roamyboard.keymap`, `roamyboard_split.keymap` | Placeholder keymaps (below). |
+| `zmk/config/roamyboard.keymap`, `roamyboard_split.keymap` | Keymaps (below). |
 | `zmk/tests/` | Host tests for the pure logic: `zmk/tests/run.sh`. |
 
 ## Reading the chain
@@ -93,7 +93,7 @@ Releasing every held key queues one event per key at once, so each shield raises
 
 ## Keymap
 
-`zmk/config/roamyboard.keymap` (unibody) and `zmk/config/roamyboard_split.keymap` (both halves) are placeholders that let a socket board with a few key modules type, until the real layout is designed ([Layout](../zmk/Layout.md)). Layer 0 is a Lily58-like 6 + 6 QWERTY block (number row, QWERTY, home row, bottom row, thumb and modifier row); every other position is `&none`. On the unibody the block fills keymap columns 18 to 29, the 12 key modules nearest the MCU module; on the split it fills 9 to 20, the 6 key modules nearest the middle on each half. Either `&mo 1` key reaches layer 1: `&bt BT_SEL 0` (Mac), `1` (iPad), `2` (phone), `&bt BT_CLR`, `&studio_unlock`, `&bootloader` and `&sys_reset`.
+`zmk/config/roamyboard_split.keymap` (both halves) and `zmk/config/roamyboard.keymap` (unibody) implement the four layers in [Layout](../zmk/Layout.md), 7 key modules per half. On the split, the left half uses keymap columns 8 to 14 and the right half 15 to 21. The unibody puts the same layout on one chain, in keymap columns 16 to 22 and 23 to 29, so its key module nearest the MCU module is the right half's outer column. Every other position is `&none`. The System layer (hold L2, the left pinky's row 4 key) has Bluetooth profiles, output selection, soft off (`CONFIG_ZMK_PM_SOFT_OFF`, woken only by the reset button), `&bootloader` and `&sys_reset`.
 
 ## Pins
 
@@ -156,7 +156,7 @@ The host tests need only a C compiler: `zmk/tests/run.sh`.
 
 ## Flashing
 
-1. Connect the nice!nano over USB and double-tap its reset button (or use `&bootloader` on layer 1). It mounts as a USB drive named NICENANO.
+1. Connect the nice!nano over USB and double-tap its reset button (or press Boot on the System layer). It mounts as a USB drive named NICENANO.
 2. Copy the UF2 for that nice!nano onto the drive. The nice!nano flashes it and restarts.
 
 For a split, flash `roamyboard_left` onto the left half and `roamyboard_right` onto the right. If the halves do not find each other after switching from other firmware, flash ZMK's `settings_reset` firmware onto both, then the roamyboard firmware again.
