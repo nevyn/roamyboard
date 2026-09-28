@@ -338,3 +338,10 @@ Socket board wired, two key modules and a jumper standing in for the terminator.
 *2026-09-27, evening*
 
 The MCU module is wired (all but the battery and the power switch) and reads the chain. The power switch and the reset button only had slots in the free wall, with nothing behind them to push against; hot glue held them. Shell r3 gives each a chamber hanging from the plate, with a back wall to take the press and side walls beyond the terminals, and widens the wall pockets for the terminals.
+
+### First staking
+*2026-09-28, evening*
+
+![staking header irl](Images/staking%20header%20irl.webp)
+
+Plugging and unplugging key modules pulls on the connectors, and the only thing holding a connector to the board is its solder. The case now takes the slide-on push and the tipping (clamp pads and rear stops in the floor), so the pull is the glue's job. First staking, with Gorilla Epoxy while it was still semi-gooey: slide the header body up its pins, put glue on the board under the tails, then press the body back down into the glue so it bonds to the board as well. Curing; no pull test yet.
