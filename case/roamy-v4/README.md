@@ -17,3 +17,5 @@ Printability: `python3 tools/overhang.py` slices the print-pose STLs at 0.2 mm a
 Headless renders (cloud sessions, CI): `python3 tools/render.py [view ...]` writes PNGs of the check STLs to `build/roamy-v4/render/`; views are listed in the script. Needs `trimesh` (pip) and `f3d`, `xvfb` (apt); `scripts/setup-cloud.sh` installs them, Swift and KiCad in a fresh cloud session.
 
 Each printed part carries its revision (`Revision` in `Parameters.swift`: shell on the SW1 end wall's inner face, floor on its inside face, jig and coupon on top). Bump a part's number whenever its geometry changes.
+
+Assembly guide models: `python3 tools/guide_models.py` after `swift run` converts the 3MF files into the GLBs (Git LFS) and `data.js` in `docs/assembly/models`. Rerun it whenever the geometry or a revision changes. Needs `trimesh`.

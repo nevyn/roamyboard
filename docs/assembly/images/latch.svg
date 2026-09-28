@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 1050" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="ah6b3fa0" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0.8 L10,5 L0,9.2 z" fill="#6b3fa0"/></marker></defs>
+<rect x="0" y="0" width="960" height="1050" rx="18" fill="#fbf9f5"/>
+<text x="36" y="50" font-size="22" font-weight="700" fill="#1d1a24">Slide-on, click, release</text>
+<text x="36" y="76" font-size="15" fill="#6b6577">Plan section through the guide pin at the SW1 end, looking down on the top. A carries the pin; B is A's neighbour.</text>
+<circle cx="50" cy="128" r="15" fill="#6b3fa0" stroke="none" stroke-width="1"/>
+<text x="50" y="133.5" font-size="16" text-anchor="middle" font-weight="700" fill="#ffffff">1</text>
+<text x="76" y="134" font-size="16" font-weight="700" fill="#1d1a24">Slide-on: the taper pushes the tooth outward, and the flap bends out.</text>
+<polygon points="60,300 189,300 189,267 428.4,267 447,246 474,246 492.6,267 498,267 528,249 528,219 498,201 189,201 189,162 60,162" fill="#dccba4" stroke="#b8a57c" stroke-width="1.4" stroke-linejoin="round"/>
+<polygon points="240,198 588,198 588,270 582,270 582,300 660,300 660,162 240,162" fill="#ebe1c9" stroke="#b8a57c" stroke-width="1.4" stroke-linejoin="round"/>
+<polygon points="240,300 258,300 258,270 240,270" fill="#ebe1c9" stroke="#b8a57c" stroke-width="1.4" stroke-linejoin="round"/>
+<polygon points="258,300 270.75,300.04 283.5,300.15 296.25,300.33 309,300.59 321.75,300.9 334.5,301.28 347.25,301.71 360,302.2 372.75,302.74 385.5,303.33 398.25,303.97 411,304.65 423.75,305.36 436.5,306.11 449.25,306.9 462,307.71 474.75,308.55 487.5,309.41 500.25,310.29 513,311.19 525.75,312.1 538.5,313.02 551.25,313.94 564,314.87 564,284.87 549,283.78 527.1,261.19 509.1,259.91 489,279.51 469.75,278.22 450.5,276.98 431.25,275.8 412,274.7 392.75,273.69 373.5,272.78 354.25,271.98 335,271.29 315.75,270.74 296.5,270.34 277.25,270.09 258,270" fill="#ebe1c9" stroke="#9c8a5e" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="258" y1="300" x2="258" y2="270" stroke="#b8a57c" stroke-width="1.2" stroke-dasharray="3,3"/>
+<path d="M 56.0,162.0 L 75.0,167.0 L 90.0,157.0 L 105.0,167.0 L 120.0,157.0 L 135.0,167.0 L 150.0,157.0 L 165.0,167.0 L 180.0,157.0 L 195.0,167.0 L 210.0,157.0 L 225.0,167.0 L 240.0,157.0 L 255.0,167.0 L 270.0,157.0 L 285.0,167.0 L 300.0,157.0 L 315.0,167.0 L 330.0,157.0 L 345.0,167.0 L 360.0,157.0 L 375.0,167.0 L 390.0,157.0 L 405.0,167.0 L 420.0,157.0 L 435.0,167.0 L 450.0,157.0 L 465.0,167.0 L 480.0,157.0 L 495.0,167.0 L 510.0,157.0 L 525.0,167.0 L 540.0,157.0 L 555.0,167.0 L 570.0,157.0 L 585.0,167.0 L 600.0,157.0 L 615.0,167.0 L 630.0,157.0 L 645.0,167.0 L 660.0,157.0" fill="none" stroke="#fbf9f5" stroke-width="6"/>
+<text x="126" y="222" font-size="22" text-anchor="middle" font-weight="700" fill="#6b6577">A</text>
+<text x="627" y="207" font-size="22" text-anchor="middle" font-weight="700" fill="#6b6577">B</text>
+<line x1="240" y1="154" x2="240" y2="314" stroke="#6b3fa0" stroke-width="1.4" stroke-dasharray="6,4"/>
+<line x1="84" y1="279" x2="162" y2="279" stroke="#6b3fa0" stroke-width="3" marker-end="url(#ah6b3fa0)"/>
+<line x1="552" y1="305.5" x2="552" y2="331.5" stroke="#6b3fa0" stroke-width="2.4" marker-end="url(#ah6b3fa0)"/>
+<line x1="686" y1="186.75" x2="513" y2="259.2" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="513" cy="259.2" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="692" y="192" font-size="15" fill="#1d1a24">taper on the</text>
+<text x="692" y="212.25" font-size="15" fill="#1d1a24">lead-in face</text>
+<line x1="686" y1="273.75" x2="558" y2="329" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="558" cy="329" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="692" y="279" font-size="15" fill="#1d1a24">flap bends out</text>
+<text x="214.5" y="326" font-size="14" text-anchor="middle" fill="#6b6577">faces apart</text>
+<circle cx="50" cy="424" r="15" fill="#6b3fa0" stroke="none" stroke-width="1"/>
+<text x="50" y="429.5" font-size="16" text-anchor="middle" font-weight="700" fill="#ffffff">2</text>
+<text x="76" y="430" font-size="16" font-weight="700" fill="#1d1a24">Latched: the tooth drops into the notch; the faces meet at the seam.</text>
+<polygon points="60,596 240,596 240,563 479.4,563 498,542 525,542 543.6,563 549,563 579,545 579,515 549,497 240,497 240,458 60,458" fill="#dccba4" stroke="#b8a57c" stroke-width="1.4" stroke-linejoin="round"/>
+<polygon points="240,494 588,494 588,566 582,566 582,596 660,596 660,458 240,458" fill="#ebe1c9" stroke="#b8a57c" stroke-width="1.4" stroke-linejoin="round"/>
+<polygon points="240,596 258,596 258,566 240,566" fill="#ebe1c9" stroke="#b8a57c" stroke-width="1.4" stroke-linejoin="round"/>
+<polygon points="258,596 270.75,596 283.5,596 296.25,596 309,596 321.75,596 334.5,596 347.25,596 360,596 372.75,596 385.5,596 398.25,596 411,596 423.75,596 436.5,596 449.25,596 462,596 474.75,596 487.5,596 500.25,596 513,596 525.75,596 538.5,596 551.25,596 564,596 564,566 549,566 527.1,545 509.1,545 489,566 469.75,566 450.5,566 431.25,566 412,566 392.75,566 373.5,566 354.25,566 335,566 315.75,566 296.5,566 277.25,566 258,566" fill="#ebe1c9" stroke="#9c8a5e" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="258" y1="596" x2="258" y2="566" stroke="#b8a57c" stroke-width="1.2" stroke-dasharray="3,3"/>
+<path d="M 56.0,458.0 L 75.0,463.0 L 90.0,453.0 L 105.0,463.0 L 120.0,453.0 L 135.0,463.0 L 150.0,453.0 L 165.0,463.0 L 180.0,453.0 L 195.0,463.0 L 210.0,453.0 L 225.0,463.0 L 240.0,453.0 L 255.0,463.0 L 270.0,453.0 L 285.0,463.0 L 300.0,453.0 L 315.0,463.0 L 330.0,453.0 L 345.0,463.0 L 360.0,453.0 L 375.0,463.0 L 390.0,453.0 L 405.0,463.0 L 420.0,453.0 L 435.0,463.0 L 450.0,453.0 L 465.0,463.0 L 480.0,453.0 L 495.0,463.0 L 510.0,453.0 L 525.0,463.0 L 540.0,453.0 L 555.0,463.0 L 570.0,453.0 L 585.0,463.0 L 600.0,453.0 L 615.0,463.0 L 630.0,453.0 L 645.0,463.0 L 660.0,453.0" fill="none" stroke="#fbf9f5" stroke-width="6"/>
+<text x="126" y="518" font-size="22" text-anchor="middle" font-weight="700" fill="#6b6577">A</text>
+<text x="627" y="503" font-size="22" text-anchor="middle" font-weight="700" fill="#6b6577">B</text>
+<line x1="240" y1="450" x2="240" y2="610" stroke="#6b3fa0" stroke-width="1.4" stroke-dasharray="6,4"/>
+<line x1="686" y1="464.75" x2="583.5" y2="506" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="583.5" cy="506" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="692" y="470" font-size="15" fill="#1d1a24">guide hole</text>
+<line x1="686" y1="491.75" x2="570" y2="530" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="570" cy="530" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="692" y="497" font-size="15" fill="#1d1a24">taper</text>
+<line x1="686" y1="518.75" x2="546" y2="558.5" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="546" cy="558.5" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="692" y="524" font-size="15" fill="#1d1a24">barb</text>
+<line x1="686" y1="545.75" x2="537" y2="555.5" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="537" cy="555.5" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="692" y="551" font-size="15" fill="#1d1a24">catch face against</text>
+<text x="692" y="571.25" font-size="15" fill="#1d1a24">the barb</text>
+<line x1="686" y1="587.75" x2="517.5" y2="557" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="517.5" cy="557" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="692" y="593" font-size="15" fill="#1d1a24">tooth in the notch</text>
+<text x="360" y="536" font-size="15" text-anchor="middle" font-weight="600" fill="#1d1a24">guide pin</text>
+<line x1="276" y1="619" x2="258" y2="581" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="258" cy="581" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="276" y="636" font-size="15" text-anchor="middle" fill="#1d1a24">hinge</text>
+<line x1="408" y1="619" x2="408" y2="581" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="408" cy="581" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="408" y="636" font-size="15" text-anchor="middle" fill="#1d1a24">flap</text>
+<line x1="522" y1="619" x2="564" y2="587" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="564" cy="587" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="522" y="636" font-size="15" text-anchor="middle" fill="#1d1a24">free edge</text>
+<line x1="627" y1="619" x2="573" y2="587" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="573" cy="587" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="627" y="636" font-size="15" text-anchor="middle" fill="#1d1a24">flap slot</text>
+<line x1="141" y1="619" x2="240" y2="604" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="240" cy="604" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="141" y="636" font-size="15" text-anchor="middle" fill="#1d1a24">seam</text>
+<circle cx="50" cy="722" r="15" fill="#6b3fa0" stroke="none" stroke-width="1"/>
+<text x="50" y="727.5" font-size="16" text-anchor="middle" font-weight="700" fill="#ffffff">3</text>
+<text x="76" y="728" font-size="16" font-weight="700" fill="#1d1a24">Release: pry the flap out at the flap slot, then pull B off.</text>
+<polygon points="60,894 240,894 240,861 479.4,861 498,840 525,840 543.6,861 549,861 579,843 579,813 549,795 240,795 240,756 60,756" fill="#dccba4" stroke="#b8a57c" stroke-width="1.4" stroke-linejoin="round"/>
+<polygon points="240,792 588,792 588,864 582,864 582,894 660,894 660,756 240,756" fill="#ebe1c9" stroke="#b8a57c" stroke-width="1.4" stroke-linejoin="round"/>
+<polygon points="240,894 258,894 258,864 240,864" fill="#ebe1c9" stroke="#b8a57c" stroke-width="1.4" stroke-linejoin="round"/>
+<polygon points="258,894 270.75,894.08 283.5,894.32 296.25,894.7 309,895.23 321.75,895.9 334.5,896.69 347.25,897.61 360,898.64 372.75,899.78 385.5,901.02 398.25,902.36 411,903.78 423.75,905.29 436.5,906.87 449.25,908.52 462,910.23 474.75,912 487.5,913.81 500.25,915.66 513,917.55 525.75,919.47 538.5,921.4 551.25,923.35 564,925.31 564,895.31 549,893.01 527.1,868.67 509.1,865.97 489,884.03 469.75,881.3 450.5,878.69 431.25,876.21 412,873.9 392.75,871.77 373.5,869.85 354.25,868.16 335,866.72 315.75,865.57 296.5,864.71 277.25,864.18 258,864" fill="#ebe1c9" stroke="#9c8a5e" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="258" y1="894" x2="258" y2="864" stroke="#b8a57c" stroke-width="1.2" stroke-dasharray="3,3"/>
+<path d="M 56.0,756.0 L 75.0,761.0 L 90.0,751.0 L 105.0,761.0 L 120.0,751.0 L 135.0,761.0 L 150.0,751.0 L 165.0,761.0 L 180.0,751.0 L 195.0,761.0 L 210.0,751.0 L 225.0,761.0 L 240.0,751.0 L 255.0,761.0 L 270.0,751.0 L 285.0,761.0 L 300.0,751.0 L 315.0,761.0 L 330.0,751.0 L 345.0,761.0 L 360.0,751.0 L 375.0,761.0 L 390.0,751.0 L 405.0,761.0 L 420.0,751.0 L 435.0,761.0 L 450.0,751.0 L 465.0,761.0 L 480.0,751.0 L 495.0,761.0 L 510.0,751.0 L 525.0,761.0 L 540.0,751.0 L 555.0,761.0 L 570.0,751.0 L 585.0,761.0 L 600.0,751.0 L 615.0,761.0 L 630.0,751.0 L 645.0,761.0 L 660.0,751.0" fill="none" stroke="#fbf9f5" stroke-width="6"/>
+<text x="126" y="816" font-size="22" text-anchor="middle" font-weight="700" fill="#6b6577">A</text>
+<text x="627" y="801" font-size="22" text-anchor="middle" font-weight="700" fill="#6b6577">B</text>
+<line x1="240" y1="748" x2="240" y2="908" stroke="#6b3fa0" stroke-width="1.4" stroke-dasharray="6,4"/>
+<ellipse cx="582.0" cy="937.5" rx="34.5" ry="21.0" fill="#f1d3bf" stroke="#b98b6e" stroke-width="1.4"/>
+<path d="M 562.5,921.0 L 567.0,877.5 Q 574.5,871.5 580.5,877.5 L 583.5,921.0 Z" fill="#fbeee4" stroke="#b98b6e" stroke-width="1.2"/>
+<line x1="531" y1="906" x2="531" y2="934" stroke="#6b3fa0" stroke-width="2.4" marker-end="url(#ah6b3fa0)"/>
+<line x1="597" y1="852" x2="654" y2="852" stroke="#6b3fa0" stroke-width="3" marker-end="url(#ah6b3fa0)"/>
+<line x1="686" y1="882.75" x2="573" y2="906" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="573" cy="906" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="692" y="888" font-size="15" fill="#1d1a24">fingernail in the</text>
+<text x="692" y="908.25" font-size="15" fill="#1d1a24">flap slot</text>
+<text x="692" y="834" font-size="15" fill="#1d1a24">then pull B off along</text>
+<text x="692" y="854.25" font-size="15" fill="#1d1a24">its board plane</text>
+<text x="36" y="1000" font-size="15" fill="#1d1a24">The guide pin enters its hole 5.7 mm before the header pins reach the sockets, so the pins arrive aligned.</text>
+<text x="36" y="1020.25" font-size="15" fill="#1d1a24">Two latches per seam, one at each column end.</text>
+</svg>

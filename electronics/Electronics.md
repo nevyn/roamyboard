@@ -40,7 +40,7 @@ i2c pull-ups live in the MCU module, as does the neopixel series resistor.
 
 Each key module holds a 74HC165 shift register, to be able to transmit all of its up to seven keys in a serial stream on DATA (row 2 pin 3), controlled by CLK and /PL (row 2 pins 1 and 2). Each module also has neopixel RGB LEDs, one under each key, and key switch sockets so the user can use any switch they want.
 
-Modules connect via three pin headers (male, hanxia PZ2.54; Harwin M20-889 fits) on the right side and matching sockets on the left side. The connectors are laid flat on the PCB and jut out past the board edge so modules click straight into each other. In the case, a rear stop on the floor behind each connector body takes the slide-on push, and a clamp pad on the body's face away from the board keeps it from tipping. Separation pulls the body away from both, so gel CA between each body's long sides and the board (staking) carries it; without that, the solder joints would. See case/Case design.md.
+Modules connect via three pin headers (male, hanxia PZ2.54; Harwin M20-889 fits) on the right side and matching sockets on the left side. The connectors are laid flat on the PCB and jut out past the board edge so modules click straight into each other. In the case, a rear stop on the floor behind each connector body takes the slide-on push, and a clamp pad on the body's face away from the board keeps it from tipping. Separation pulls the body away from both, so two-component epoxy between each body's long sides and the board (staking) carries it; without that, the solder joints would. See case/Case design.md.
 
 Each module has decoupling capacitors for both the 165 and NeoPixel data lines.
 ### Terminator module

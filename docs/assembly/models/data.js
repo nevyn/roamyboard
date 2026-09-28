@@ -1,0 +1,1 @@
+window.ROAMY_DATA = {"neighbour": [0.990268, -0.0, -0.139173, 0.0, 0.0, 1.0, 0.0, 0.0, 0.139173, -0.0, 0.990268, 0.0, 20.77521, 0.0, -1.069545, 1.0], "terminatorPause": 7.4, "revisions": {"shell": 6, "floor": 6, "jig": 4, "terminator": 1, "mcuShell": 3, "mcuFloor": 2, "coupon": 3}};

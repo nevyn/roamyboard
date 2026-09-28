@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 960" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="ah6b6577" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0.8 L10,5 L0,9.2 z" fill="#6b6577"/></marker><marker id="ah6b3fa0" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" markerUnits="strokeWidth" orient="auto-start-reverse"><path d="M0,0.8 L10,5 L0,9.2 z" fill="#6b3fa0"/></marker></defs>
+<rect x="0" y="0" width="960" height="960" rx="18" fill="#fbf9f5"/>
+<text x="36" y="50" font-size="22" font-weight="700" fill="#1d1a24">Staking: glue carries separation</text>
+<text x="36" y="76" font-size="15" fill="#6b6577">Top view of the board's back at one connector row. Glue along both long sides of each connector body.</text>
+<polygon points="196,157.32 227.29,166.68 258.59,157.32 289.88,166.68 321.17,157.32 352.46,166.68 383.76,157.32 415.05,166.68 446.34,157.32 477.64,166.68 508.93,157.32 540.22,166.68 571.51,157.32 602.81,166.68 634.1,157.32 634.1,469.32 602.81,478.68 571.51,469.32 540.22,478.68 508.93,469.32 477.64,478.68 446.34,469.32 415.05,478.68 383.76,469.32 352.46,478.68 321.17,469.32 289.88,478.68 258.59,469.32 227.29,478.68 196,469.32" fill="#5b3a8c" stroke="#3f2766" stroke-width="1.2" stroke-linejoin="round"/>
+<rect x="398.8" y="236.36" width="70.2" height="31.2" fill="#c9a227" stroke="#9a7a12" stroke-width="0.8"/>
+<rect x="486.29" y="236.36" width="82.42" height="31.2" fill="#c9a227" stroke="#9a7a12" stroke-width="0.8"/>
+<rect x="398.8" y="302.4" width="70.2" height="31.2" fill="#c9a227" stroke="#9a7a12" stroke-width="0.8"/>
+<rect x="486.29" y="302.4" width="82.42" height="31.2" fill="#c9a227" stroke="#9a7a12" stroke-width="0.8"/>
+<rect x="398.8" y="368.44" width="70.2" height="31.2" fill="#c9a227" stroke="#9a7a12" stroke-width="0.8"/>
+<rect x="486.29" y="368.44" width="82.42" height="31.2" fill="#c9a227" stroke="#9a7a12" stroke-width="0.8"/>
+<rect x="366.3" y="225.7" width="109.2" height="184.6" rx="6" fill="#c9481a" stroke="#c9481a" stroke-width="1.6" fill-opacity="0.10" stroke-dasharray="6,4"/>
+<rect x="480.7" y="225.7" width="128.7" height="184.6" rx="6" fill="#c9481a" stroke="#c9481a" stroke-width="1.6" fill-opacity="0.10" stroke-dasharray="6,4"/>
+<rect x="196" y="204.64" width="169" height="15.6" rx="7" fill="#37b3c4" stroke="#1f8391" stroke-width="1" fill-opacity="0.75"/>
+<rect x="196" y="415.76" width="169" height="15.6" rx="7" fill="#37b3c4" stroke="#1f8391" stroke-width="1" fill-opacity="0.75"/>
+<rect x="610.7" y="204.64" width="23.4" height="15.6" rx="7" fill="#37b3c4" stroke="#1f8391" stroke-width="1" fill-opacity="0.75"/>
+<rect x="610.7" y="415.76" width="23.4" height="15.6" rx="7" fill="#37b3c4" stroke="#1f8391" stroke-width="1" fill-opacity="0.75"/>
+<rect x="365" y="243.64" width="39" height="16.64" fill="#a8a3b0" stroke="#4a4652" stroke-width="0.8"/>
+<rect x="404" y="243.64" width="59.8" height="16.64" fill="#d4d0da" stroke="#4a4652" stroke-width="0.8"/>
+<rect x="365" y="309.68" width="39" height="16.64" fill="#a8a3b0" stroke="#4a4652" stroke-width="0.8"/>
+<rect x="404" y="309.68" width="59.8" height="16.64" fill="#d4d0da" stroke="#4a4652" stroke-width="0.8"/>
+<rect x="365" y="375.72" width="39" height="16.64" fill="#a8a3b0" stroke="#4a4652" stroke-width="0.8"/>
+<rect x="404" y="375.72" width="59.8" height="16.64" fill="#d4d0da" stroke="#4a4652" stroke-width="0.8"/>
+<rect x="144" y="218.94" width="221" height="198.12" rx="2" fill="#6d6875" stroke="#3d3944" stroke-width="1.4"/>
+<rect x="147" y="240.26" width="23.4" height="23.4" fill="#3d3944" stroke="none" stroke-width="1"/>
+<rect x="147" y="306.3" width="23.4" height="23.4" fill="#3d3944" stroke="none" stroke-width="1"/>
+<rect x="147" y="372.34" width="23.4" height="23.4" fill="#3d3944" stroke="none" stroke-width="1"/>
+<rect x="675.7" y="243.64" width="156" height="16.64" fill="#e8871e" stroke="#b8640f" stroke-width="0.8"/>
+<rect x="545.7" y="243.64" width="65" height="16.64" fill="#e8871e" stroke="#b8640f" stroke-width="0.8"/>
+<rect x="486.29" y="243.64" width="59.41" height="16.64" fill="#f4c27f" stroke="#b8640f" stroke-width="0.8"/>
+<rect x="675.7" y="309.68" width="156" height="16.64" fill="#e8871e" stroke="#b8640f" stroke-width="0.8"/>
+<rect x="545.7" y="309.68" width="65" height="16.64" fill="#e8871e" stroke="#b8640f" stroke-width="0.8"/>
+<rect x="486.29" y="309.68" width="59.41" height="16.64" fill="#f4c27f" stroke="#b8640f" stroke-width="0.8"/>
+<rect x="675.7" y="375.72" width="156" height="16.64" fill="#e8871e" stroke="#b8640f" stroke-width="0.8"/>
+<rect x="545.7" y="375.72" width="65" height="16.64" fill="#e8871e" stroke="#b8640f" stroke-width="0.8"/>
+<rect x="486.29" y="375.72" width="59.41" height="16.64" fill="#f4c27f" stroke="#b8640f" stroke-width="0.8"/>
+<rect x="610.7" y="218.94" width="65" height="198.12" rx="2" fill="#f2a65a" stroke="#b8640f" stroke-width="1.4"/>
+<line x1="196" y1="136" x2="196" y2="488" stroke="#6b6577" stroke-width="1.2" stroke-dasharray="4,4"/>
+<line x1="634.1" y1="136" x2="634.1" y2="488" stroke="#6b6577" stroke-width="1.2" stroke-dasharray="4,4"/>
+<text x="196" y="128" font-size="15" text-anchor="middle" font-weight="700" fill="#1d1a24">socket side</text>
+<text x="634.1" y="128" font-size="15" text-anchor="middle" font-weight="700" fill="#1d1a24">header side</text>
+<line x1="144" y1="421.06" x2="144" y2="512" stroke="#d8d1c4" stroke-width="1.2"/>
+<line x1="170" y1="504" x2="145" y2="504" stroke="#6b6577" stroke-width="1.4" marker-end="url(#ah6b6577)"/>
+<line x1="170" y1="504" x2="195" y2="504" stroke="#6b6577" stroke-width="1.4" marker-end="url(#ah6b6577)"/>
+<text x="170" y="528" font-size="15" text-anchor="middle" fill="#1d1a24">mouth, 2.0 mm</text>
+<text x="170" y="548.25" font-size="15" text-anchor="middle" fill="#1d1a24">past the edge</text>
+<text x="254.5" y="308.9" font-size="15" text-anchor="middle" font-weight="700" fill="#ffffff">socket body</text>
+<text x="254.5" y="345.3" font-size="15" text-anchor="middle" fill="#ffffff">8.5 × 2.5 mm</text>
+<line x1="274" y1="517" x2="274" y2="424.86" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="274" cy="424.86" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="274" y="534" font-size="15" text-anchor="middle" font-weight="700" fill="#1f8391">glue</text>
+<line x1="419.6" y1="517" x2="427.4" y2="384.04" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="427.4" cy="384.04" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="419.6" y="534" font-size="15" text-anchor="middle" fill="#1d1a24">tails and feet</text>
+<line x1="544.4" y1="517" x2="515.8" y2="393.14" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="515.8" cy="393.14" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="544.4" y="534" font-size="15" text-anchor="middle" fill="#1d1a24">foot on its pad</text>
+<line x1="648.4" y1="517" x2="622.4" y2="423.56" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="622.4" cy="423.56" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="648.4" y="534" font-size="15" text-anchor="middle" font-weight="700" fill="#1f8391">glue</text>
+<line x1="781" y1="133.25" x2="752.4" y2="251.96" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="752.4" cy="251.96" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="781" y="128" font-size="15" text-anchor="middle" fill="#1d1a24">header pins (6 mm)</text>
+<line x1="777.6" y1="490.75" x2="664" y2="393.66" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="664" cy="393.66" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="783.6" y="496" font-size="15" fill="#1d1a24">header body</text>
+<text x="783.6" y="516.25" font-size="15" fill="#1d1a24">(2.5 × 2.5 mm)</text>
+<text x="420.9" y="128" font-size="15" text-anchor="middle" font-weight="700" fill="#c9481a">Keep glue off the tails and feet.</text>
+<line x1="420.9" y1="136" x2="420.9" y2="225.7" stroke="#c9481a" stroke-width="1.1"/>
+<line x1="420.9" y1="201" x2="544.4" y2="201" stroke="#c9481a" stroke-width="1.1"/>
+<line x1="544.4" y1="201" x2="544.4" y2="225.7" stroke="#c9481a" stroke-width="1.1"/>
+<text x="36" y="624" font-size="16" font-weight="700" fill="#1d1a24">Section along the pins through a socket: the board's back faces the floor.</text>
+<rect x="30" y="644" width="296" height="296" rx="10" fill="#ffffff" stroke="#d8d1c4" stroke-width="1.2"/>
+<rect x="128" y="696" width="187.2" height="28.8" fill="#5b3a8c" stroke="#3f2766" stroke-width="1"/>
+<rect x="272" y="724.8" width="41.4" height="2.16" fill="#c9a227" stroke="none" stroke-width="1"/>
+<polygon points="48.8,786 315.2,786 315.2,807.6 48.8,807.6" fill="#dccba4" stroke="#b8a57c" stroke-width="1.2" stroke-linejoin="round"/>
+<polygon points="138.8,786 138.8,769.8 245,769.8 245,756.3 266.6,756.3 266.6,786" fill="#dccba4" stroke="#b8a57c" stroke-width="1.2" stroke-linejoin="round"/>
+<rect x="128" y="723.9" width="117" height="9.9" rx="4" fill="#37b3c4" stroke="#1f8391" stroke-width="1" fill-opacity="0.45"/>
+<polyline points="245,747.3 261.2,747.3 272,730.2 313.4,730.2" fill="none" stroke="#8f8a98" stroke-width="11.52" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M 266.6,726.96 Q 272.0,735.96 277.4,735.96 L 308.0,735.96 Q 317.0,735.96 320.6,726.96 Z" fill="#b9bcc4" stroke="#8a8e98" stroke-width="0.8"/>
+<rect x="92" y="724.8" width="153" height="45" rx="1.5" fill="#6d6875" stroke="#3d3944" stroke-width="1.3"/>
+<rect x="92" y="740.1" width="90" height="14.4" fill="#3d3944" stroke="none" stroke-width="1"/>
+<line x1="43.4" y1="747.3" x2="88.4" y2="747.3" stroke="#6b3fa0" stroke-width="3" marker-end="url(#ah6b3fa0)"/>
+<line x1="245" y1="757.2" x2="245" y2="769.8" stroke="#2f8f5b" stroke-width="4.5"/>
+<text x="164" y="715.4" font-size="14" text-anchor="middle" fill="#ffffff">board</text>
+<text x="84.8" y="801.8" font-size="14" text-anchor="middle" fill="#1d1a24">floor</text>
+<line x1="255.8" y1="820" x2="255.8" y2="771.6" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="255.8" cy="771.6" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="255.8" y="836" font-size="14" text-anchor="middle" fill="#1d1a24">rear stop</text>
+<text x="44" y="670" font-size="16" font-weight="700" fill="#6b3fa0">(a)</text>
+<text x="44" y="872" font-size="15" fill="#1d1a24">Slide-on pushes the body</text>
+<text x="44" y="892.25" font-size="15" fill="#1d1a24">against the rear stop.</text>
+<rect x="336" y="644" width="296" height="296" rx="10" fill="#ffffff" stroke="#d8d1c4" stroke-width="1.2"/>
+<rect x="434" y="696" width="187.2" height="28.8" fill="#5b3a8c" stroke="#3f2766" stroke-width="1"/>
+<rect x="578" y="724.8" width="41.4" height="2.16" fill="#c9a227" stroke="none" stroke-width="1"/>
+<polygon points="354.8,786 621.2,786 621.2,807.6 354.8,807.6" fill="#dccba4" stroke="#b8a57c" stroke-width="1.2" stroke-linejoin="round"/>
+<polygon points="444.8,786 444.8,769.8 551,769.8 551,756.3 572.6,756.3 572.6,786" fill="#dccba4" stroke="#b8a57c" stroke-width="1.2" stroke-linejoin="round"/>
+<rect x="434" y="723.9" width="117" height="9.9" rx="4" fill="#37b3c4" stroke="#1f8391" stroke-width="1" fill-opacity="0.45"/>
+<polyline points="551,747.3 567.2,747.3 578,730.2 619.4,730.2" fill="none" stroke="#8f8a98" stroke-width="11.52" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M 572.6,726.96 Q 578.0,735.96 583.4,735.96 L 614.0,735.96 Q 623.0,735.96 626.6,726.96 Z" fill="#b9bcc4" stroke="#8a8e98" stroke-width="0.8"/>
+<rect x="398" y="724.8" width="153" height="45" rx="1.5" fill="#6d6875" stroke="#3d3944" stroke-width="1.3"/>
+<rect x="398" y="740.1" width="90" height="14.4" fill="#3d3944" stroke="none" stroke-width="1"/>
+<path d="M 416.0,705.0 A 52,52 0 0 0 369.2,764.4" fill="none" stroke="#6b3fa0" stroke-width="2.6" marker-end="url(#ah6b3fa0)"/>
+<line x1="444.8" y1="769.8" x2="551" y2="769.8" stroke="#2f8f5b" stroke-width="4.5"/>
+<line x1="497" y1="820" x2="497" y2="778.8" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="497" cy="778.8" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="497" y="836" font-size="14" text-anchor="middle" fill="#1d1a24">clamp pad</text>
+<text x="350" y="670" font-size="16" font-weight="700" fill="#6b3fa0">(b)</text>
+<text x="350" y="872" font-size="15" fill="#1d1a24">The clamp pad keeps the</text>
+<text x="350" y="892.25" font-size="15" fill="#1d1a24">body from tipping.</text>
+<rect x="642" y="644" width="296" height="296" rx="10" fill="#ffffff" stroke="#d8d1c4" stroke-width="1.2"/>
+<rect x="740" y="696" width="187.2" height="28.8" fill="#5b3a8c" stroke="#3f2766" stroke-width="1"/>
+<rect x="884" y="724.8" width="41.4" height="2.16" fill="#c9a227" stroke="none" stroke-width="1"/>
+<polygon points="660.8,786 927.2,786 927.2,807.6 660.8,807.6" fill="#dccba4" stroke="#b8a57c" stroke-width="1.2" stroke-linejoin="round"/>
+<polygon points="750.8,786 750.8,769.8 857,769.8 857,756.3 878.6,756.3 878.6,786" fill="#dccba4" stroke="#b8a57c" stroke-width="1.2" stroke-linejoin="round"/>
+<rect x="740" y="723.9" width="117" height="9.9" rx="4" fill="#37b3c4" stroke="#1f8391" stroke-width="1" fill-opacity="0.95"/>
+<polyline points="857,747.3 873.2,747.3 884,730.2 925.4,730.2" fill="none" stroke="#8f8a98" stroke-width="11.52" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M 878.6,726.96 Q 884.0,735.96 889.4,735.96 L 920.0,735.96 Q 929.0,735.96 932.6,726.96 Z" fill="#b9bcc4" stroke="#8a8e98" stroke-width="0.8"/>
+<rect x="704" y="724.8" width="153" height="45" rx="1.5" fill="#6d6875" stroke="#3d3944" stroke-width="1.3"/>
+<rect x="704" y="740.1" width="90" height="14.4" fill="#3d3944" stroke="none" stroke-width="1"/>
+<line x1="700.4" y1="747.3" x2="653.6" y2="747.3" stroke="#6b3fa0" stroke-width="3" marker-end="url(#ah6b3fa0)"/>
+<line x1="785" y1="820" x2="785" y2="728.76" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="785" cy="728.76" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="785" y="836" font-size="14" text-anchor="middle" font-weight="700" fill="#1f8391">staking</text>
+<line x1="905.6" y1="820" x2="905.6" y2="735.96" stroke="#6b6577" stroke-width="1.1"/>
+<circle cx="905.6" cy="735.96" r="2.6" fill="#6b6577" stroke="none" stroke-width="1"/>
+<text x="905.6" y="836" font-size="14" text-anchor="middle" font-weight="700" fill="#2f8f5b">no load</text>
+<text x="656" y="670" font-size="16" font-weight="700" fill="#6b3fa0">(c)</text>
+<text x="656" y="872" font-size="15" fill="#1d1a24">Separation pulls the body away</text>
+<text x="656" y="892.25" font-size="15" fill="#1d1a24">from both. The staking carries that</text>
+<text x="656" y="912.5" font-size="15" fill="#1d1a24">load instead of the solder joints.</text>
+</svg>
