@@ -11,7 +11,8 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/boards/shields/roamyboard/` | The unibody shield. |
 | `zmk/boards/shields/roamyboard_split/` | The `roamyboard_left` and `roamyboard_right` shields. |
 | `zmk/config/roamyboard.keymap`, `roamyboard_split.keymap` | Keymaps (below). |
-| `zmk/include/roamyboard/` | Public headers: the key module count getter, the `roamyboard_chain_state_changed` event, the status screen's bootloader view. |
+| `zmk/include/roamyboard/` | Public headers: the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view. |
+| `zmk/src/ble/host_names.c` | Reads each Bluetooth host's name and keeps it per profile (below). |
 | `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. |
 | `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen`, the bootloader key; its binding is in `zmk/dts/bindings/behaviors/`. |
 | `zmk/tests/` | Host tests for the pure logic: `zmk/tests/run.sh`. |
@@ -111,7 +112,7 @@ The roamyboard mounts the nice!view with its contacts toward the MCU module, whi
 | --- | --- | --- |
 | Top row | Battery, and the output: USB, Bluetooth connected, disconnected, or not paired | Battery, and whether the central is connected |
 | Box below it | The key module count and the cat | The key module count and the cat |
-| Middle | The Bluetooth profiles, as on the stock widget | Empty |
+| Middle | The five Bluetooth profiles in a row, and the active profile's host name | Empty |
 | Bottom | The name of the highest active layer | Empty |
 
 The box shows this half's own accepted key module count: "7 cols", "1 col", "0 cols". It shows "no term" while the accepted state is a fault, which usually means that the terminator module is missing, and "..." before the driver has accepted any count. The kscan driver raises `roamyboard_chain_state_changed` whenever it accepts a new count or a fault, and `roamyboard_chain_key_module_count()` returns the current state (`zmk/include/roamyboard/`). The split central shows only its own half's count.
@@ -121,6 +122,16 @@ The cat walks when a key is pressed: every key press moves it 2 px to the right 
 The cat is an LVGL image on top of the top canvas, so a step redraws only the few rows that it covers instead of the whole canvas. Its frames are stored already rotated. Key presses are counted on the thread that raises them, and the display work queue draws at most one frame per 40 ms, so a burst of key presses moves the cat several steps in one redraw.
 
 `zmk/tools/cat_frames.py` holds the cat's pixel art and generates `cat_frames.c` and `cat_frames.h` from it. `zmk/tools/screen_mock/run.sh` compiles `screen.c` and LVGL from the west workspace on the host and renders the screen in several states to `/tmp/roamy-screen/`, so a layout change can be checked without hardware: `states.png` shows the panel's own image (line 1 at the top) and `states-on-leg.png` what a person sees on the mounted nice!view.
+
+### Host names
+
+The middle part shows a row of five profile markers. The active profile is a filled disc with its number; of the others, a filled dot is connected, a ring is paired but not connected, and a small dot is open (not paired). Whether the active profile is connected shows in the top row's output icon. Below the markers is the active profile's host name, even while the output is USB: in Montserrat 14 on up to three lines, in Montserrat 12 if it needs more, and cut with ".." if it still does not fit.
+
+The name is the host's GAP Device Name (characteristic 0x2A00). After a host's link is encrypted (Zephyr's `security_changed` callback), and after every `zmk_ble_active_profile_changed` (which also follows a new pairing, whose profile address ZMK sets only after encryption), the firmware checks every paired profile and reads the name of each connected, encrypted host that it has not read during that connection yet. It reads by UUID over the whole handle range, without discovery, and reads the value again by handle as a long read if the first response may have cut it short. So a reconnection reads the name again, and switching profiles only shows the other profile's stored result. This needs Zephyr's GATT client, which the unibody and the split central enable (`CONFIG_ROAMYBOARD_HOST_NAMES`); the split peripheral has no hosts.
+
+The screen shows each outcome of the read as it is, so that what each kind of host reports can be seen without a logging build: the name with trailing NULs and whitespace trimmed, "(empty)" for a zero-length name, "..." while the read is pending, "read err" and a negative errno if the read could not be sent, "att err" and the ATT error code if the host or the stack answered with one, "open" for an open profile, and "no name" for a paired profile whose name is not known.
+
+Each profile's last name is stored in the settings key `roamyboard/host/<n>`, with `<n>` the profile index 0 to 4. The value is the name as UTF-8 bytes, 1 to 64 bytes, without a terminating NUL. The firmware loads the keys at boot, so a profile shows its last name while its host is away, and ignores a key with an index or length out of range, with a warning. It writes the key after each read that returns a non-empty name, cut at a character boundary to 64 bytes, and deletes it when the profile's pairing is cleared. An empty name is shown but not stored. `zmk/include/roamyboard/host_name.h` states the same contract for a tool that writes names.
 
 ### Bootloader view
 

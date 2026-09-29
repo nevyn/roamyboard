@@ -35,6 +35,7 @@ test("labels from the layout's legend", () => {
   assert.deepStrictEqual(d("&mo 1"), ["L1", "Hold: Keypad"]);
   assert.deepStrictEqual(d("&to 3"), ["To3", "Switch to Gaming"]);
   assert.deepStrictEqual(d("&bt BT_SEL 0"), ["BT1", "Bluetooth profile 1"]);
+  assert.deepStrictEqual(d("&bt BT_SEL 4"), ["BT5", "Bluetooth profile 5"]);
   assert.deepStrictEqual(d("&ret_boot 0 RET"), ["↩/Boot", "Tap: Return. Hold 1.5 s: Bootloader"]);
   assert.deepStrictEqual(d("&none"), ["", "Nothing"]);
   assert.deepStrictEqual(d("&kp NOT_A_KEY"), ["&kp NOT_A_KEY", "&kp NOT_A_KEY"]);

@@ -8,6 +8,10 @@ if(CONFIG_ROAMYBOARD_KSCAN_165_CHAIN)
   target_sources(app PRIVATE src/events/chain_state_changed.c)
 endif()
 
+if(CONFIG_ROAMYBOARD_HOST_NAMES)
+  target_sources(app PRIVATE src/ble/host_names.c)
+endif()
+
 if(CONFIG_ROAMYBOARD_STATUS_SCREEN)
   target_sources(app PRIVATE
     src/display/bolt.c

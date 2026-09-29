@@ -109,9 +109,11 @@ static struct status_state base_state(int key_module_count) {
         .active_profile_index = 0,
         .active_profile_connected = true,
         .active_profile_bonded = true,
-        .profiles_connected = {true},
-        .profiles_bonded = {true, true},
+        // Profiles 1 and 4 connected, 2 paired, 3 and 5 open.
+        .profiles_connected = {true, false, false, true, false},
+        .profiles_bonded = {true, true, false, true, false},
         .layer_label = "QWERTY",
+        .active_host = {.state = ROAMYBOARD_HOST_NAME_KNOWN, .name = "Alecto"},
 #else
         .connected = true,
 #endif
@@ -145,18 +147,41 @@ int main(int argc, char **argv) {
     state.selected_endpoint.transport = ZMK_TRANSPORT_USB;
     state.charging = true;
     state.layer_label = "Keypad";
+    state.active_profile_index = 3;
+    snprintf(state.active_host.name, sizeof(state.active_host.name), "Nevyn's MacBook Pro");
     render(dir, "central-1col-sit", &state, CAT_SIT, 20);
 
     state = base_state(0);
+    state.active_profile_index = 1;
     state.active_profile_connected = false;
-    state.profiles_connected[0] = false;
+    state.active_host = (struct roamyboard_host_name){.state = ROAMYBOARD_HOST_NAME_PENDING};
     render(dir, "central-0cols-sleep", &state, CAT_SLEEP_1, 30);
 
     state = base_state(ROAMYBOARD_CHAIN_FAULT);
+    state.active_host = (struct roamyboard_host_name){.state = ROAMYBOARD_HOST_NAME_ATT_ERROR,
+                                                      .error = 0x0e};
     render(dir, "central-noterm-blink", &state, CAT_BLINK, 0);
 
     state = base_state(ROAMYBOARD_CHAIN_UNKNOWN);
+    state.active_host = (struct roamyboard_host_name){.state = ROAMYBOARD_HOST_NAME_READ_ERROR,
+                                                      .error = -12};
     render(dir, "central-unknown-walk", &state, CAT_WALK_0, CAT_TRACK_LENGTH - 1);
+
+    state = base_state(7);
+    state.active_profile_index = 2;
+    state.active_profile_bonded = false;
+    state.active_profile_connected = false;
+    state.active_host = (struct roamyboard_host_name){.state = ROAMYBOARD_HOST_NAME_NONE};
+    render(dir, "central-open-profile", &state, CAT_SIT, 8);
+
+    state = base_state(7);
+    state.active_host.name[0] = '\0';
+    render(dir, "central-empty-name", &state, CAT_WALK_2, 16);
+
+    state = base_state(7);
+    snprintf(state.active_host.name, sizeof(state.active_host.name),
+             "Living Room iPad Pro (12.9-inch) (6th generation)");
+    render(dir, "central-long-name", &state, CAT_WALK_3, 24);
 
     screen_draw_bootloader(&screen);
     fake_ms += 1000;
