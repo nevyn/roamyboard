@@ -100,6 +100,108 @@ void screen_draw_top(struct screen *screen, const struct status_state *state) {
     rotate_canvas(canvas);
 }
 
+#if STATUS_SCREEN_CENTRAL
+
+// The profile markers along the top of the middle canvas, and the host name below them.
+#define MARKER_Y 7
+#define ACTIVE_MARKER_R 7
+#define MARKER_R 3
+#define NAME_Y 17
+#define NAME_LINES 3
+
+static const int marker_x[NICEVIEW_PROFILE_COUNT] = {7, 20, 34, 47, 60};
+
+static void draw_profile_markers(lv_obj_t *canvas, const struct status_state *state) {
+    lv_draw_arc_dsc_t ring_dsc;
+    init_arc_dsc(&ring_dsc, LVGL_FOREGROUND, 1);
+    lv_draw_arc_dsc_t disc_dsc;
+    init_arc_dsc(&disc_dsc, LVGL_FOREGROUND, MARKER_R);
+    lv_draw_arc_dsc_t active_dsc;
+    init_arc_dsc(&active_dsc, LVGL_FOREGROUND, ACTIVE_MARKER_R);
+    lv_draw_label_dsc_t number_dsc;
+    init_label_dsc(&number_dsc, LVGL_BACKGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
+
+    for (int i = 0; i < NICEVIEW_PROFILE_COUNT; i++) {
+        const int x = marker_x[i];
+        if (i == state->active_profile_index) {
+            canvas_draw_arc(canvas, x, MARKER_Y, ACTIVE_MARKER_R, 0, 359, &active_dsc);
+            char number[2];
+            snprintf(number, sizeof(number), "%d", i + 1);
+            canvas_draw_text(canvas, x - 4, MARKER_Y - 3, 8, &number_dsc, number);
+        } else if (state->profiles_connected[i]) {
+            canvas_draw_arc(canvas, x, MARKER_Y, MARKER_R, 0, 359, &disc_dsc);
+        } else if (state->profiles_bonded[i]) {
+            canvas_draw_arc(canvas, x, MARKER_Y, MARKER_R, 0, 359, &ring_dsc);
+        } else {
+            canvas_draw_arc(canvas, x, MARKER_Y, 1, 0, 359, &ring_dsc);
+        }
+    }
+}
+
+static void host_text(const struct status_state *state, char *text, size_t size) {
+    const struct roamyboard_host_name *host = &state->active_host;
+    switch (host->state) {
+    case ROAMYBOARD_HOST_NAME_NONE:
+        snprintf(text, size, "%s", state->active_profile_bonded ? "no name" : "open");
+        break;
+    case ROAMYBOARD_HOST_NAME_PENDING:
+        snprintf(text, size, "...");
+        break;
+    case ROAMYBOARD_HOST_NAME_KNOWN:
+        snprintf(text, size, "%s", host->name[0] ? host->name : "(empty)");
+        break;
+    case ROAMYBOARD_HOST_NAME_READ_ERROR:
+        // Line breaks keep LVGL from wrapping at the minus sign.
+        snprintf(text, size, "read err\n%d", host->error);
+        break;
+    case ROAMYBOARD_HOST_NAME_ATT_ERROR:
+        snprintf(text, size, "att err\n0x%02x", (unsigned int)host->error);
+        break;
+    }
+}
+
+static bool text_fits(const char *text, const lv_font_t *font) {
+    lv_point_t size;
+    lv_text_get_size(&size, text, font, 0, 0, CANVAS_SIZE, LV_TEXT_FLAG_NONE);
+    return size.y <= NAME_LINES * lv_font_get_line_height(font);
+}
+
+/**
+ * Returns the largest font that fits text in NAME_LINES lines, and shortens text to end in
+ * ".." if even the smallest does not.
+ */
+static const lv_font_t *fit_text(char *text, size_t size) {
+    static const lv_font_t *const fonts[] = {&lv_font_montserrat_14, &lv_font_montserrat_12};
+    const size_t font_count = sizeof(fonts) / sizeof(fonts[0]);
+    for (size_t i = 0; i < font_count; i++) {
+        if (text_fits(text, fonts[i])) {
+            return fonts[i];
+        }
+    }
+
+    const lv_font_t *font = fonts[font_count - 1];
+    size_t len = strlen(text);
+    while (len > 0) {
+        // Drop the last character, with any UTF-8 continuation bytes, and the spaces before it.
+        do {
+            len--;
+        } while (len > 0 && ((uint8_t)text[len] & 0xC0) == 0x80);
+        while (len > 0 && text[len - 1] == ' ') {
+            len--;
+        }
+        if (len + 3 > size) {
+            continue;
+        }
+        memcpy(text + len, "..", 3);
+        if (text_fits(text, font)) {
+            break;
+        }
+    }
+    return font;
+}
+
+#endif // STATUS_SCREEN_CENTRAL
+
 void screen_draw_middle(struct screen *screen, const struct status_state *state) {
     lv_obj_t *canvas = screen->canvas[SCREEN_MIDDLE];
 
@@ -107,45 +209,14 @@ void screen_draw_middle(struct screen *screen, const struct status_state *state)
     lv_canvas_fill_bg(canvas, LVGL_BACKGROUND, LV_OPA_COVER);
 
 #if STATUS_SCREEN_CENTRAL
-    lv_draw_arc_dsc_t arc_dsc;
-    init_arc_dsc(&arc_dsc, LVGL_FOREGROUND, 2);
-    lv_draw_arc_dsc_t arc_dsc_filled;
-    init_arc_dsc(&arc_dsc_filled, LVGL_FOREGROUND, 9);
-    lv_draw_label_dsc_t label_dsc;
-    init_label_dsc(&label_dsc, LVGL_FOREGROUND, &lv_font_montserrat_18, LV_TEXT_ALIGN_CENTER);
-    lv_draw_label_dsc_t label_dsc_black;
-    init_label_dsc(&label_dsc_black, LVGL_BACKGROUND, &lv_font_montserrat_18, LV_TEXT_ALIGN_CENTER);
+    draw_profile_markers(canvas, state);
 
-    // Draw circles
-    int circle_offsets[NICEVIEW_PROFILE_COUNT][2] = {
-        {13, 13}, {55, 13}, {34, 34}, {13, 55}, {55, 55},
-    };
-
-    for (int i = 0; i < NICEVIEW_PROFILE_COUNT; i++) {
-        bool selected = i == state->active_profile_index;
-
-        if (state->profiles_connected[i]) {
-            canvas_draw_arc(canvas, circle_offsets[i][0], circle_offsets[i][1], 13, 0, 360,
-                            &arc_dsc);
-        } else if (state->profiles_bonded[i]) {
-            const int segments = 8;
-            const int gap = 20;
-            for (int j = 0; j < segments; ++j)
-                canvas_draw_arc(canvas, circle_offsets[i][0], circle_offsets[i][1], 13,
-                                360. / segments * j + gap / 2.0,
-                                360. / segments * (j + 1) - gap / 2.0, &arc_dsc);
-        }
-
-        if (selected) {
-            canvas_draw_arc(canvas, circle_offsets[i][0], circle_offsets[i][1], 9, 0, 359,
-                            &arc_dsc_filled);
-        }
-
-        char label[2];
-        snprintf(label, sizeof(label), "%d", i + 1);
-        canvas_draw_text(canvas, circle_offsets[i][0] - 8, circle_offsets[i][1] - 10, 16,
-                         (selected ? &label_dsc_black : &label_dsc), label);
-    }
+    char text[ROAMYBOARD_HOST_NAME_MAX + 3];
+    host_text(state, text, sizeof(text));
+    lv_draw_label_dsc_t name_dsc;
+    init_label_dsc(&name_dsc, LVGL_FOREGROUND, fit_text(text, sizeof(text)),
+                   LV_TEXT_ALIGN_CENTER);
+    canvas_draw_text(canvas, 0, NAME_Y, CANVAS_SIZE - 1, &name_dsc, text);
 #else
     (void)state;
 #endif

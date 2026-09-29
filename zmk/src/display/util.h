@@ -14,6 +14,8 @@
 #include <zephyr/sys/util_macro.h>
 #include <zmk/endpoints_types.h>
 
+#include <roamyboard/host_name.h>
+
 #define NICEVIEW_PROFILE_COUNT 5
 
 #define CANVAS_SIZE 68
@@ -41,6 +43,8 @@ struct status_state {
     bool profiles_bonded[NICEVIEW_PROFILE_COUNT];
     uint8_t layer_index;
     const char *layer_label;
+    /** Host name of the active profile. */
+    struct roamyboard_host_name active_host;
 #else
     bool connected;
 #endif

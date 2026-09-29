@@ -40,6 +40,10 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/events/endpoint_changed.h>
 #include <zmk/events/layer_state_changed.h>
 #include <zmk/keymap.h>
+#if IS_ENABLED(CONFIG_ROAMYBOARD_HOST_NAMES)
+#include <roamyboard/events/host_name_changed.h>
+#include <roamyboard/host_name.h>
+#endif
 #else
 #include <zmk/events/split_peripheral_status_changed.h>
 #include <zmk/split/bluetooth/peripheral.h>
@@ -167,6 +171,29 @@ ZMK_SUBSCRIPTION(widget_output_status, zmk_usb_conn_state_changed);
 #if defined(CONFIG_ZMK_BLE)
 ZMK_SUBSCRIPTION(widget_output_status, zmk_ble_active_profile_changed);
 #endif
+
+#if IS_ENABLED(CONFIG_ROAMYBOARD_HOST_NAMES)
+
+static void set_host_name_status(struct roamyboard_host_name host) {
+    state.active_host = host;
+
+    if (!bootloader_shown) {
+        screen_draw_middle(&screen, &state);
+    }
+}
+
+static struct roamyboard_host_name host_name_status_get_state(const zmk_event_t *eh) {
+    struct roamyboard_host_name host;
+    roamyboard_host_name_get(zmk_ble_active_profile_index(), &host);
+    return host;
+}
+
+ZMK_DISPLAY_WIDGET_LISTENER(widget_host_name_status, struct roamyboard_host_name,
+                            set_host_name_status, host_name_status_get_state)
+ZMK_SUBSCRIPTION(widget_host_name_status, roamyboard_host_name_changed);
+ZMK_SUBSCRIPTION(widget_host_name_status, zmk_ble_active_profile_changed);
+
+#endif // IS_ENABLED(CONFIG_ROAMYBOARD_HOST_NAMES)
 
 static void set_layer_status(struct layer_status_state layer) {
     state.layer_index = layer.index;
@@ -328,6 +355,9 @@ lv_obj_t *zmk_display_status_screen(void) {
     widget_chain_status_init();
 #if STATUS_SCREEN_CENTRAL
     widget_output_status_init();
+#if IS_ENABLED(CONFIG_ROAMYBOARD_HOST_NAMES)
+    widget_host_name_status_init();
+#endif
     widget_layer_status_init();
 #else
     widget_peripheral_status_init();
