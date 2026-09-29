@@ -11,7 +11,11 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/boards/shields/roamyboard/` | The unibody shield. |
 | `zmk/boards/shields/roamyboard_split/` | The `roamyboard_left` and `roamyboard_right` shields. |
 | `zmk/config/roamyboard.keymap`, `roamyboard_split.keymap` | Keymaps (below). |
+| `zmk/include/roamyboard/` | Public headers: the key module count getter, the `roamyboard_chain_state_changed` event, the status screen's bootloader view. |
+| `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. |
+| `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen`, the bootloader key; its binding is in `zmk/dts/bindings/behaviors/`. |
 | `zmk/tests/` | Host tests for the pure logic: `zmk/tests/run.sh`. |
+| `zmk/tools/` | `cat_frames.py` generates the cat's bitmaps; `screen_mock/run.sh` renders the status screen on the host. |
 
 ## Reading the chain
 
@@ -93,7 +97,32 @@ Releasing every held key queues one event per key at once, so each shield raises
 
 ## Keymap
 
-`zmk/config/roamyboard_split.keymap` (both halves) and `zmk/config/roamyboard.keymap` (unibody) implement the four layers in [Layout](../zmk/Layout.md), 7 key modules per half. On the split, the left half uses keymap columns 8 to 14 and the right half 15 to 21. The unibody puts the same layout on one chain, in keymap columns 16 to 22 and 23 to 29, so its key module nearest the MCU module is the right half's outer column. Every other position is `&none`. The System layer (hold L2, the left pinky's row 4 key) has Bluetooth profiles, output selection, soft off (`CONFIG_ZMK_PM_SOFT_OFF`, woken only by the reset button), `&bootloader` and `&sys_reset`.
+`zmk/config/roamyboard_split.keymap` (both halves) and `zmk/config/roamyboard.keymap` (unibody) implement the four layers in [Layout](../zmk/Layout.md), 7 key modules per half. On the split, the left half uses keymap columns 8 to 14 and the right half 15 to 21. The unibody puts the same layout on one chain, in keymap columns 16 to 22 and 23 to 29, so its key module nearest the MCU module is the right half's outer column. Every other position is `&none`. The System layer (hold L2, the left pinky's row 4 key) has Bluetooth profiles, output selection, soft off (`CONFIG_ZMK_PM_SOFT_OFF`, woken only by the reset button), `&boot_screen` and `&sys_reset`.
+
+`&boot_screen` shows the bootloader view on the status screen and then reboots into the UF2 bootloader, like ZMK's `&bootloader`. It runs on the half whose key triggered it. On the Keypad layer, the right half's outer column, row 5 (Return on QWERTY) is `&ret_boot`, a hold-tap that the keymaps define: a tap sends Return, and holding it for 1.5 s (`tapping-term-ms`, flavor `tap-preferred`, so other keys cannot make it a hold) triggers `&boot_screen`. That column is the key module nearest the MCU module, so a unibody with a single key module reaches the bootloader by holding L1 (row 4) and then row 5.
+
+## Status screen
+
+The nice!view shows roamyboard's own status screen (`zmk/src/display`), which replaces the nice!view shield's status widget: `zmk/config/roamyboard.conf` sets `CONFIG_NICE_VIEW_WIDGET_STATUS=n`, and the build stops with an error if both are on. The screen keeps the stock widget's look and is read with the nice!view upright: 68 px wide, 160 px tall, drawn as three 68 × 68 canvases that the firmware rotates.
+
+| Part | Unibody and split central | Split peripheral |
+| --- | --- | --- |
+| Top row | Battery, and the output: USB, Bluetooth connected, disconnected, or not paired | Battery, and whether the central is connected |
+| Box below it | The key module count and the cat | The key module count and the cat |
+| Middle | The Bluetooth profiles, as on the stock widget | Empty |
+| Bottom | The name of the highest active layer | Empty |
+
+The box shows this half's own accepted key module count: "7 cols", "1 col", "0 cols". It shows "no term" while the accepted state is a fault, which usually means that the terminator module is missing, and "..." before the driver has accepted any count. The kscan driver raises `roamyboard_chain_state_changed` whenever it accepts a new count or a fault, and `roamyboard_chain_key_module_count()` returns the current state (`zmk/include/roamyboard/`). The split central shows only its own half's count.
+
+The cat walks when a key is pressed: every key press moves it 2 px to the right along the box's floor and advances its walk cycle, and it wraps from the right end to the left. On the split central, key presses on both halves count; the peripheral counts only its own. When no key has been pressed for 2 s the cat sits down, and it blinks every 4 s while sitting. After 30 s it curls up and sleeps, with a z that comes and goes every second.
+
+The cat is an LVGL image on top of the top canvas, so a step redraws only the few rows that it covers instead of the whole canvas. Its frames are stored already rotated. Key presses are counted on the thread that raises them, and the display work queue draws at most one frame per 40 ms, so a burst of key presses moves the cat several steps in one redraw.
+
+`zmk/tools/cat_frames.py` holds the cat's pixel art and generates `cat_frames.c` and `cat_frames.h` from it. `zmk/tools/screen_mock/run.sh` compiles `screen.c` and LVGL from the west workspace on the host and renders the screen in several states to `/tmp/roamy-screen/screen.png` and `states.png`, so a layout change can be checked without hardware.
+
+### Bootloader view
+
+`&boot_screen` asks the status screen for the bootloader view: "BOOT LOADER", a download icon and "drop a UF2 on NICENANO". The display work queue draws it on all three canvases, stops every other update, and calls `lv_refr_now()`. The nice!view's 1-bit flush callback writes to the display before it returns, so the view is on the display when `lv_refr_now()` returns, and the behavior reboots into the bootloader from there. If the view has not been written within 1 s, or the display is not initialized, the behavior logs a warning and reboots without it.
 
 ## Pins
 
@@ -156,7 +185,7 @@ The host tests need only a C compiler: `zmk/tests/run.sh`.
 
 ## Flashing
 
-1. Connect the nice!nano over USB and double-tap its reset button (or press Boot on the System layer). It mounts as a USB drive named NICENANO.
+1. Connect the nice!nano over USB and double-tap its reset button, or press Boot on the System layer, or hold L1 and hold the right half's outer row 5 key for 1.5 s. It mounts as a USB drive named NICENANO. The two keys first put the bootloader view on the status screen; whether it stays there while the bootloader runs depends on whether the nice!nano keeps VCC on in the bootloader, which has not been tested.
 2. Copy the UF2 for that nice!nano onto the drive. The nice!nano flashes it and restarts.
 
 For a split, flash `roamyboard_left` onto the left half and `roamyboard_right` onto the right. If the halves do not find each other after switching from other firmware, flash ZMK's `settings_reset` firmware onto both, then the roamyboard firmware again.

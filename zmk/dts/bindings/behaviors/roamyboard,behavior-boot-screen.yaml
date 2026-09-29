@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Shows the bootloader view on the roamyboard status screen, waits until the display
+  has received it (at most 1 s), and then reboots into the UF2 bootloader like ZMK's
+  &bootloader. Without the status screen it reboots at once. It takes no parameters
+  and runs on the half whose key triggered it. zmk/dts/behaviors/boot_screen.dtsi
+  defines &boot_screen.
+
+compatible: "roamyboard,behavior-boot-screen"
+
+include: zero_param.yaml

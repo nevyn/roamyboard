@@ -1,3 +1,24 @@
 # SPDX-License-Identifier: MIT
 
 rsource "drivers/kscan/Kconfig"
+
+config ROAMYBOARD_STATUS_SCREEN
+    bool "roamyboard status screen on the nice!view"
+    default y
+    depends on ZMK_DISPLAY && ZMK_DISPLAY_STATUS_SCREEN_CUSTOM && SHIELD_NICE_VIEW
+    depends on ROAMYBOARD_KSCAN_165_CHAIN
+    select LV_USE_CANVAS
+    select LV_USE_IMAGE
+    select LV_FONT_MONTSERRAT_14
+    select LV_FONT_MONTSERRAT_16
+    select LV_FONT_MONTSERRAT_18
+    select LV_FONT_UNSCII_8
+    help
+      Replaces the nice!view's status widget, which must be off
+      (CONFIG_NICE_VIEW_WIDGET_STATUS=n). docs/firmware.md describes the screen.
+
+DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN := roamyboard,behavior-boot-screen
+
+config ROAMYBOARD_BEHAVIOR_BOOT_SCREEN
+    bool
+    default $(dt_compat_enabled,$(DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN))
