@@ -17,6 +17,15 @@ config ROAMYBOARD_STATUS_SCREEN
       Replaces the nice!view's status widget, which must be off
       (CONFIG_NICE_VIEW_WIDGET_STATUS=n). docs/firmware.md describes the screen.
 
+config ROAMYBOARD_STATUS_SCREEN_ROTATE_180
+    bool "Turn the status screen upside down"
+    default y
+    depends on ROAMYBOARD_STATUS_SCREEN
+    help
+      Rotates every image by 180 degrees on its way to the nice!view. The
+      roamyboard mounts the nice!view with its contacts toward the MCU module,
+      which shows the unrotated image upside down.
+
 DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN := roamyboard,behavior-boot-screen
 
 config ROAMYBOARD_BEHAVIOR_BOOT_SCREEN

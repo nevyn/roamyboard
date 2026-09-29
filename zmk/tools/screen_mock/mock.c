@@ -1,7 +1,10 @@
 /*
  * Renders the status screen on the host with the firmware's own drawing code
- * (zmk/src/display/screen.c) and LVGL. Writes one PGM per scene, upright as the nice!view
- * is read: 68 x 160 px, 0 for ink and 255 for background. run.sh builds and runs it.
+ * (zmk/src/display/screen.c) and LVGL. Writes two PGMs per scene, 0 for ink and 255 for
+ * background: NAME-panel.pgm is the panel's own image, 160 x 68 px with line 1 at the top;
+ * NAME-leg.pgm is what a person sees on the mounted nice!view, 68 x 160 px. Define
+ * CONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180 to flush like the firmware with that option.
+ * run.sh builds and runs it.
  *
  * Usage: mock OUTPUT_DIR
  *
@@ -29,30 +32,56 @@ static uint32_t fake_ms;
 
 static uint32_t tick(void) { return fake_ms; }
 
+/** Stores the flushed area in frame, as the panel receives it. */
 static void flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map) {
+    lv_area_t panel_area = *area;
+#ifdef CONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180
+    if (screen_rotate_180(&panel_area, px_map, WIDTH, HEIGHT)) {
+        fprintf(stderr, "cannot rotate area (%d,%d)-(%d,%d)\n", (int)area->x1, (int)area->y1,
+                (int)area->x2, (int)area->y2);
+        exit(1);
+    }
+#endif
     const uint8_t *bits = px_map + PALETTE_SIZE;
-    for (int y = area->y1; y <= area->y2; y++) {
-        for (int x = area->x1; x <= area->x2; x++) {
-            frame[y][x] = (bits[y * STRIDE + x / 8] >> (7 - x % 8)) & 1;
+    const int w = lv_area_get_width(&panel_area);
+    for (int y = 0; y < lv_area_get_height(&panel_area); y++) {
+        for (int x = 0; x < w; x++) {
+            frame[panel_area.y1 + y][panel_area.x1 + x] =
+                (bits[y * (w / 8) + x / 8] >> (7 - x % 8)) & 1;
         }
     }
     lv_display_flush_ready(display);
 }
 
-/** Writes the frame upright: the display's right edge is the top, its top edge the left. */
-static void write_scene(const char *dir, const char *name) {
+static FILE *open_pgm(const char *dir, const char *name, const char *kind, int w, int h) {
     char path[512];
-    snprintf(path, sizeof(path), "%s/%s.pgm", dir, name);
+    snprintf(path, sizeof(path), "%s/%s-%s.pgm", dir, name, kind);
     FILE *f = fopen(path, "wb");
     if (!f) {
         perror(path);
         exit(1);
     }
-    fprintf(f, "P5\n%d %d\n255\n", HEIGHT, WIDTH);
+    fprintf(f, "P5\n%d %d\n255\n", w, h);
+    return f;
+}
+
+// Index 1 of the I1 display is white, as in the nice!view's LVGL setup.
+static int gray(uint8_t pixel) { return pixel ? 255 : 0; }
+
+static void write_scene(const char *dir, const char *name) {
+    FILE *f = open_pgm(dir, name, "panel", WIDTH, HEIGHT);
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            fputc(gray(frame[y][x]), f);
+        }
+    }
+    fclose(f);
+
+    // On the leg, panel line 1 is on the reader's right and pixel 0 of each line at the top.
+    f = open_pgm(dir, name, "leg", HEIGHT, WIDTH);
     for (int py = 0; py < WIDTH; py++) {
         for (int px = 0; px < HEIGHT; px++) {
-            // Index 1 of the I1 display is white, as in the nice!view's LVGL setup.
-            fputc(frame[px][WIDTH - 1 - py] ? 255 : 0, f);
+            fputc(gray(frame[HEIGHT - 1 - px][py]), f);
         }
     }
     fclose(f);

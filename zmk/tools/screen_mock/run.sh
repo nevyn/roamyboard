@@ -1,8 +1,12 @@
 #!/bin/sh
 # Renders the status screen on the host with LVGL from a ZMK west workspace.
 # Usage: zmk/tools/screen_mock/run.sh [WEST_WORKSPACE [OUTPUT_DIR]]
-# Writes OUTPUT_DIR/screen.png (the central in use), states.png (every scene, left
-# to right in the order that mock.c renders them) and one PGM per scene.
+# Writes to OUTPUT_DIR, every scene in the order that mock.c renders them:
+#   states.png          the panel's own image, line 1 at the top, one scene per row
+#   states-on-leg.png   what a person sees on the mounted nice!view, side by side
+#   screen.png          the central in use, as a person sees it
+#   screen-panel.png    the same, as the panel's own image
+# and two PGMs per scene. ROTATE_180=0 renders without CONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180.
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 zmk_dir=$(cd "$here/../.." && pwd)
@@ -29,7 +33,8 @@ fi
 display="$zmk_dir/src/display"
 for role in central peripheral; do
     defines=""
-    [ "$role" = peripheral ] && defines="-DCONFIG_ZMK_SPLIT=1"
+    [ "${ROTATE_180:-1}" = 1 ] && defines="-DCONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180=1"
+    [ "$role" = peripheral ] && defines="$defines -DCONFIG_ZMK_SPLIT=1"
     ${CC:-cc} -std=c11 -Wall -Wextra -Werror -Wno-missing-field-initializers $defines \
         -DLV_CONF_INCLUDE_SIMPLE -I"$here" -I"$lvgl" -I"$display" -I"$zmk_dir/include" \
         -I"$zephyr" -I"$zmk_app" \

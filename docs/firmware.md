@@ -105,6 +105,8 @@ Releasing every held key queues one event per key at once, so each shield raises
 
 The nice!view shows roamyboard's own status screen (`zmk/src/display`), which replaces the nice!view shield's status widget: `zmk/config/roamyboard.conf` sets `CONFIG_NICE_VIEW_WIDGET_STATUS=n`, and the build stops with an error if both are on. The screen keeps the stock widget's look and is read with the nice!view upright: 68 px wide, 160 px tall, drawn as three 68 × 68 canvases that the firmware rotates.
 
+The roamyboard mounts the nice!view with its contacts toward the MCU module, which shows the stock orientation upside down, so the firmware turns every image 180° on its way to the panel (`CONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180`, on by default): a wrapper around LVGL's flush callback reverses each flushed area and moves it to the opposite side of the panel.
+
 | Part | Unibody and split central | Split peripheral |
 | --- | --- | --- |
 | Top row | Battery, and the output: USB, Bluetooth connected, disconnected, or not paired | Battery, and whether the central is connected |
@@ -118,7 +120,7 @@ The cat walks when a key is pressed: every key press moves it 2 px to the right 
 
 The cat is an LVGL image on top of the top canvas, so a step redraws only the few rows that it covers instead of the whole canvas. Its frames are stored already rotated. Key presses are counted on the thread that raises them, and the display work queue draws at most one frame per 40 ms, so a burst of key presses moves the cat several steps in one redraw.
 
-`zmk/tools/cat_frames.py` holds the cat's pixel art and generates `cat_frames.c` and `cat_frames.h` from it. `zmk/tools/screen_mock/run.sh` compiles `screen.c` and LVGL from the west workspace on the host and renders the screen in several states to `/tmp/roamy-screen/screen.png` and `states.png`, so a layout change can be checked without hardware.
+`zmk/tools/cat_frames.py` holds the cat's pixel art and generates `cat_frames.c` and `cat_frames.h` from it. `zmk/tools/screen_mock/run.sh` compiles `screen.c` and LVGL from the west workspace on the host and renders the screen in several states to `/tmp/roamy-screen/`, so a layout change can be checked without hardware: `states.png` shows the panel's own image (line 1 at the top) and `states-on-leg.png` what a person sees on the mounted nice!view.
 
 ### Bootloader view
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Composes the PGM scenes that mock.c writes into screen.png and states.png."""
+"""Composes the PGM scenes that mock.c writes into the PNGs that run.sh lists."""
 
 import os
 import sys
@@ -30,30 +30,38 @@ def read_pgm(path):
     return width, height, parts[4][: width * height]
 
 
-def compose(images, scale, gap, path):
-    """Places images side by side on a grey background, each pixel scale x scale."""
-    height = max(h for _, h, _ in images)
-    width = sum(w for w, _, _ in images) + gap * (len(images) + 1)
-    out_w, out_h = width * scale, (height + 2 * gap) * scale
+def compose(images, scale, gap, path, vertical=False):
+    """Places images side by side (or one per row) on a grey background, each pixel scale x scale."""
+    if vertical:
+        width = max(w for w, _, _ in images) + 2 * gap
+        height = sum(h for _, h, _ in images) + gap * (len(images) + 1)
+    else:
+        width = sum(w for w, _, _ in images) + gap * (len(images) + 1)
+        height = max(h for _, h, _ in images) + 2 * gap
+    out_w, out_h = width * scale, height * scale
     pixels = bytearray([0x80]) * (out_w * out_h)
-    ox = gap
+    offset = gap
     for w, h, data in images:
+        ox, oy = (gap, offset) if vertical else (offset, gap)
         for y in range(h):
             for x in range(w):
                 value = data[y * w + x]
                 for sy in range(scale):
-                    start = ((gap + y) * scale + sy) * out_w + (ox + x) * scale
+                    start = ((oy + y) * scale + sy) * out_w + (ox + x) * scale
                     pixels[start:start + scale] = bytes([value]) * scale
-        ox += w + gap
+        offset += (h if vertical else w) + gap
     write_png(path, pixels, out_w, out_h)
 
 
 def main():
     out = sys.argv[1]
-    images = [read_pgm(os.path.join(out, f"{name}.pgm")) for name in SCENES]
-    compose(images[:1], 4, 4, os.path.join(out, "screen.png"))
-    compose(images, 3, 4, os.path.join(out, "states.png"))
-    print(f"wrote {out}/screen.png and {out}/states.png")
+    panel = [read_pgm(os.path.join(out, f"{name}-panel.pgm")) for name in SCENES]
+    leg = [read_pgm(os.path.join(out, f"{name}-leg.pgm")) for name in SCENES]
+    compose(leg[:1], 4, 4, os.path.join(out, "screen.png"))
+    compose(panel[:1], 4, 4, os.path.join(out, "screen-panel.png"))
+    compose(panel, 3, 4, os.path.join(out, "states.png"), vertical=True)
+    compose(leg, 3, 4, os.path.join(out, "states-on-leg.png"))
+    print(f"wrote screen.png, screen-panel.png, states.png, states-on-leg.png to {out}")
 
 
 if __name__ == "__main__":

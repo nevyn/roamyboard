@@ -28,6 +28,11 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include "cat.h"
 #include "screen.h"
 
+#if IS_ENABLED(CONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180)
+// For lv_display_t's flush_cb, which LVGL has no getter for.
+#include <display/lv_display_private.h>
+#endif
+
 #if STATUS_SCREEN_CENTRAL
 #include <zmk/ble.h>
 #include <zmk/endpoints.h>
@@ -281,7 +286,36 @@ int roamyboard_status_screen_show_bootloader(void (*done)(void)) {
     return 0;
 }
 
+#if IS_ENABLED(CONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180)
+
+static lv_display_flush_cb_t panel_flush;
+
+static void rotated_flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map) {
+    lv_area_t panel_area = *area;
+    const int err =
+        screen_rotate_180(&panel_area, px_map, lv_display_get_horizontal_resolution(display),
+                          lv_display_get_vertical_resolution(display));
+    if (err) {
+        LOG_ERR("Cannot rotate the flushed area (%d,%d)-(%d,%d): %d; showing it unrotated",
+                (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2, err);
+    }
+    panel_flush(display, &panel_area, px_map);
+}
+
+/** Wraps the panel's flush callback, so that every view reaches the panel upside down. */
+static void rotate_display(void) {
+    lv_display_t *display = lv_display_get_default();
+    panel_flush = display->flush_cb;
+    lv_display_set_flush_cb(display, rotated_flush);
+}
+
+#endif // IS_ENABLED(CONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180)
+
 lv_obj_t *zmk_display_status_screen(void) {
+#if IS_ENABLED(CONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180)
+    rotate_display();
+#endif
+
     lv_obj_t *root = lv_obj_create(NULL);
     screen_init(&screen, root);
 
