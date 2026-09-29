@@ -14,7 +14,7 @@
   const plan = (() => {
     const q = new URLSearchParams(location.search);
     const layout = q.get("layout") === "unibody" ? "unibody" : "split";
-    const keys = Math.min(30, Math.max(1, parseInt(q.get("keys"), 10) || (layout === "unibody" ? 12 : 6)));
+    const keys = Math.min(30, Math.max(1, parseInt(q.get("keys"), 10) || (layout === "unibody" ? 14 : 7)));
     return { layout, keys };
   })();
   const halves = () => plan.layout === "split" ? 2 : 1;
@@ -86,7 +86,7 @@
     $$("[data-planner=layout] button").forEach(b => b.onclick = () => {
       const was = plan.layout;
       plan.layout = b.dataset.v;
-      if (was !== plan.layout && plan.keys === (was === "split" ? 6 : 12)) plan.keys = plan.layout === "split" ? 6 : 12;
+      if (was !== plan.layout && plan.keys === (was === "split" ? 7 : 14)) plan.keys = plan.layout === "split" ? 7 : 14;
       renderPlan();
     });
     $$(".stepper button").forEach(b => b.onclick = () => { plan.keys = Math.min(30, Math.max(1, plan.keys + +b.dataset.d)); renderPlan(); });
