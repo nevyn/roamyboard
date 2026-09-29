@@ -54,3 +54,16 @@ void screen_show_cat(struct screen *screen, enum cat_frame frame, int position);
 
 /** Replaces everything on the screen with the bootloader view. */
 void screen_draw_bootloader(struct screen *screen);
+
+/**
+ * Turns one flushed area of a 1-bit display upside down, for a flush callback to pass on to
+ * the panel's own.
+ *
+ * @param area In: the area that LVGL flushes. Out: where the rotated pixels go on the panel.
+ * @param px_map The pixels as LVGL passes them to the flush callback for LV_COLOR_FORMAT_I1:
+ *               an 8-byte palette, then rows of bits, MSB first. Rotated in place.
+ * @param hor_res Width of the display in pixels.
+ * @param ver_res Height of the display in pixels.
+ * @return 0, or -EINVAL if the area's rows do not fill whole bytes; then nothing is changed.
+ */
+int screen_rotate_180(lv_area_t *area, uint8_t *px_map, int32_t hor_res, int32_t ver_res);

@@ -5,6 +5,7 @@
  *
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -233,6 +234,39 @@ void screen_draw_bootloader(struct screen *screen) {
     lv_obj_t *bottom = screen->canvas[SCREEN_BOTTOM];
     lv_canvas_fill_bg(bottom, LVGL_BACKGROUND, LV_OPA_COVER);
     rotate_canvas(bottom);
+}
+
+static uint8_t reverse_bits(uint8_t b) {
+    b = (uint8_t)((b & 0xF0) >> 4 | (b & 0x0F) << 4);
+    b = (uint8_t)((b & 0xCC) >> 2 | (b & 0x33) << 2);
+    return (uint8_t)((b & 0xAA) >> 1 | (b & 0x55) << 1);
+}
+
+int screen_rotate_180(lv_area_t *area, uint8_t *px_map, int32_t hor_res, int32_t ver_res) {
+    const int32_t width = lv_area_get_width(area);
+    const uint32_t stride = lv_draw_buf_width_to_stride(width, LV_COLOR_FORMAT_I1);
+    if (width % 8 != 0 || stride * 8 != (uint32_t)width) {
+        return -EINVAL;
+    }
+
+    // Without padding bits, the area is one bit string, and turning it upside down reverses it.
+    uint8_t *bits = px_map + LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I1) * 4;
+    const size_t len = stride * lv_area_get_height(area);
+    for (size_t i = 0, j = len - 1; i < j; i++, j--) {
+        const uint8_t b = bits[i];
+        bits[i] = reverse_bits(bits[j]);
+        bits[j] = reverse_bits(b);
+    }
+    if (len % 2) {
+        bits[len / 2] = reverse_bits(bits[len / 2]);
+    }
+
+    const lv_area_t flushed = *area;
+    area->x1 = hor_res - 1 - flushed.x2;
+    area->x2 = hor_res - 1 - flushed.x1;
+    area->y1 = ver_res - 1 - flushed.y2;
+    area->y2 = ver_res - 1 - flushed.y1;
+    return 0;
 }
 
 void screen_init(struct screen *screen, lv_obj_t *parent) {
