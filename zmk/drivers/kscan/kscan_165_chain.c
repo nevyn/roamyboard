@@ -16,8 +16,11 @@
 #include <zephyr/drivers/spi.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/atomic.h>
 #include <zephyr/sys/util.h>
 
+#include <roamyboard/chain_state.h>
+#include <roamyboard/events/chain_state_changed.h>
 #include <zmk/debounce.h>
 
 #include "chain.h"
@@ -30,6 +33,17 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 BUILD_ASSERT(CHAIN_ANCHOR_MCU == 0 && CHAIN_ANCHOR_TERMINATOR == 1,
              "chain_anchor must follow the order of the anchor enum in the binding");
+BUILD_ASSERT(CHAIN_COUNT_FAULT == ROAMYBOARD_CHAIN_FAULT &&
+                 CHAIN_COUNT_UNKNOWN == ROAMYBOARD_CHAIN_UNKNOWN,
+             "chain.h and roamyboard/chain_state.h must agree on the special counts");
+BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) <= 1,
+             "roamyboard_chain_key_module_count() reports a single chain per MCU module");
+
+static atomic_t accepted_key_module_count = ATOMIC_INIT(CHAIN_COUNT_UNKNOWN);
+
+int roamyboard_chain_key_module_count(void) {
+    return (int)atomic_get(&accepted_key_module_count);
+}
 
 struct kscan_chain_config {
     struct spi_dt_spec bus;
@@ -158,6 +172,9 @@ static bool kscan_chain_process(const struct device *dev) {
         }
         chain_release_all(&data->chain, kscan_chain_emit, (void *)dev);
         memset(data->debounce, 0, config->keys * sizeof(data->debounce[0]));
+        atomic_set(&accepted_key_module_count, data->chain.accepted);
+        raise_roamyboard_chain_state_changed(
+            (struct roamyboard_chain_state_changed){.key_module_count = data->chain.accepted});
         return true;
 
     case CHAIN_SCAN_SETTLING:
