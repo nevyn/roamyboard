@@ -1,0 +1,101 @@
+/* The layout page; colours, type and buttons come from ../assembly/guide.css. */
+:root {
+  --terminator: #d9c8a0;
+  --k: min(48px, calc((100vw - 190px) / 23.6)); /* key size: two halves of about 11.3 keys side by side */
+}
+@media (prefers-color-scheme: dark) { :root { --terminator: #6d6250; } }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px clamp(16px, 4vw, 40px);
+  border-bottom: 1px solid var(--line); background: var(--card);
+}
+.page { max-width: 1320px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px) 80px; }
+.page h1 { font-size: clamp(2rem, 4vw, 3rem); margin: 36px 0 .2em; letter-spacing: -.03em; }
+.page h1 span { background: linear-gradient(90deg, var(--accent), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.page .lead { font-size: 1.1rem; color: var(--muted); max-width: 75ch; margin: 0 0 1em; }
+
+.layout-card .step-head { padding: 12px 18px; }
+.layer-title { font-size: 1.25rem; margin: 0; flex: 1; }
+.layout-body { padding: 16px 20px 20px; }
+.layers { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.layers .btn { font-size: .92rem; padding: 7px 13px; }
+.layers .btn .n { font: 700 .78rem var(--mono); color: var(--muted); }
+.layers .btn[aria-pressed="true"] .n { color: var(--accent); }
+.layers .btn.previewing { outline: 2px dashed var(--accent); outline-offset: 2px; }
+
+/* the board: two halves of terminator module, key modules, MCU module */
+.board { display: flex; justify-content: center; gap: calc(var(--k) * .9); padding: 10px 0 16px; }
+.half { display: flex; align-items: stretch; gap: calc(var(--k) * .08); }
+.terminator, .key-module, .mcu { border-radius: calc(var(--k) * .18); border: 1px solid var(--line); }
+.terminator { width: calc(var(--k) * .45); background: var(--terminator); }
+.key-module {
+  display: flex; flex-direction: column; gap: calc(var(--k) * .1); padding: calc(var(--k) * .1);
+  background: var(--code); transition: opacity .2s, filter .2s;
+}
+.key-module.detached { opacity: .28; filter: grayscale(1); }
+.mcu { width: calc(var(--k) * 1.7); background: var(--orange-soft); border-color: color-mix(in srgb, var(--orange) 45%, var(--line)); display: flex; justify-content: center; padding-top: calc(var(--k) * .4); }
+.screen {
+  width: calc(var(--k) * 1.05); height: calc(var(--k) * 2.1); border-radius: 4px; background: #1d1a24; color: #e8e4ee;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-family: var(--mono);
+  box-shadow: inset 0 0 0 3px #3a3544;
+}
+.screen b { font-size: calc(var(--k) * .6); line-height: 1; }
+.screen small { font-size: max(7px, calc(var(--k) * .19)); color: #a39db0; white-space: nowrap; }
+
+.key {
+  appearance: none; width: var(--k); height: var(--k); padding: 0 2px; border-radius: calc(var(--k) * .16);
+  border: 1px solid var(--line); border-bottom-width: 3px; background: var(--card); color: var(--ink);
+  font: 600 max(11px, calc(var(--k) * .36)) / 1.05 var(--sans); cursor: default; display: grid; place-items: center;
+  overflow: hidden; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  touch-action: manipulation; transition: background .15s, border-color .15s;
+}
+.key.long { font-size: max(9px, calc(var(--k) * .25)); }
+.key.longer { font-size: max(8px, calc(var(--k) * .2)); font-weight: 500; overflow-wrap: anywhere; }
+.key:hover { border-color: var(--accent); }
+.key:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.key.thumb { background: var(--orange-soft); border-color: color-mix(in srgb, var(--orange) 50%, var(--line)); }
+.key.kind-layer { background: var(--accent); border-color: var(--accent); color: var(--paper); cursor: pointer; }
+.key.kind-trans { background: transparent; color: var(--muted); border-style: dashed; border-bottom-width: 1px; }
+.key.thumb.kind-trans { background: color-mix(in srgb, var(--orange-soft) 55%, transparent); }
+.key.kind-none { background: transparent; border-style: dashed; border-bottom-width: 1px; border-color: color-mix(in srgb, var(--line) 70%, transparent); }
+.key.kind-unknown { font-family: var(--mono); font-weight: 500; border-color: var(--warn); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; list-style: none; padding: 0; margin: 4px 0 6px; font-size: .85rem; color: var(--muted); }
+.legend li { display: flex; align-items: center; gap: 7px; }
+.sw { display: inline-block; width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--line); }
+.sw.layer { background: var(--accent); border-color: var(--accent); }
+.sw.thumb { background: var(--orange-soft); border-color: color-mix(in srgb, var(--orange) 50%, var(--line)); }
+.sw.trans { border-style: dashed; }
+.sw.off { background: var(--code); border-color: var(--muted); opacity: .4; }
+
+.controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 28px; margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; }
+.controls .summary { grid-column: 1 / -1; margin: 2px 0 0; }
+.range { display: flex; align-items: center; gap: 10px; }
+.range input { flex: 1; accent-color: var(--accent); }
+.range output { font: 700 1rem var(--mono); min-width: 1.5em; text-align: right; }
+
+.tip {
+  position: fixed; z-index: 50; max-width: min(340px, calc(100vw - 16px)); padding: 8px 11px; border-radius: 9px;
+  background: var(--ink); color: var(--paper); font-size: .86rem; line-height: 1.4; pointer-events: none; box-shadow: var(--shadow);
+}
+.tip b { display: block; }
+.tip p { margin: .3em 0 0; }
+.tip small { display: block; margin-top: .35em; font-family: var(--mono); font-size: .74rem; opacity: .75; }
+
+.notes { max-width: 80ch; }
+.notes h2 { font-size: 1.5rem; margin: 40px 0 .4em; }
+.notes li { margin: .35em 0; }
+
+@media (max-width: 1080px) {
+  :root { --k: min(48px, calc((92vw - 80px) / 11.2)); }
+  .board { flex-direction: column; align-items: center; gap: 18px; }
+}
+@media (max-width: 560px) {
+  :root { --k: calc((100vw - 76px) / 10.1); }
+  .layout-body { padding: 12px 10px 16px; }
+  .terminator { width: calc(var(--k) * .3); }
+  .key-module { padding: calc(var(--k) * .06); gap: calc(var(--k) * .08); }
+  .mcu { width: calc(var(--k) * 1.3); }
+  .screen { width: calc(var(--k) * 1.1); }
+  .controls { grid-template-columns: minmax(0, 1fr); }
+}

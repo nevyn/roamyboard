@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roamyboard: the default layout</title>
+<meta name="description" content="The Roamyboard's default keymap, layer by layer, read straight from the firmware's keymap file.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='6' width='7' height='20' rx='2' fill='%236b3fa0'/%3E%3Crect x='12.5' y='5' width='7' height='20' rx='2' fill='%236b3fa0' transform='rotate(8 16 15)'/%3E%3Crect x='22' y='7' width='7' height='20' rx='2' fill='%23e8871e' transform='rotate(16 25 17)'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assembly/guide.css">
+<link rel="stylesheet" href="layout.css">
+<script src="keymap.js" defer></script>
+<script src="layout.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../assembly/">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="7" height="20" rx="2" fill="#6b3fa0"/><rect x="12.5" y="5" width="7" height="20" rx="2" fill="#6b3fa0" transform="rotate(8 16 15)"/><rect x="22" y="7" width="7" height="20" rx="2" fill="#e8871e" transform="rotate(16 25 17)"/></svg>
+    <span>Roamyboard<small>Default layout</small></span>
+  </a>
+  <a class="btn" href="../assembly/">← Assembly guide</a>
+</header>
+
+<main class="page">
+  <h1>The default <span>layout</span></h1>
+  <p class="lead">The layout that the Roamyboard firmware ships with: four layers on a split keyboard with seven key modules per half. This page reads the firmware's keymap file each time it loads, so it always shows what the firmware on GitHub types.</p>
+
+  <section class="step layout-card" aria-labelledby="layer-title">
+    <div class="step-head">
+      <h2 id="layer-title" class="layer-title" data-layer-title aria-live="polite">Loading the keymap…</h2>
+    </div>
+    <div class="layout-body">
+      <div class="layers" role="group" aria-label="Layer"></div>
+
+      <div class="warn" data-error hidden><p></p></div>
+      <div class="board" role="group" aria-label="Keyboard: arrow keys move between keys"></div>
+
+      <ul class="legend" aria-label="Legend">
+        <li><i class="sw layer"></i>Layer key</li>
+        <li><i class="sw thumb"></i>Thumb key</li>
+        <li><i class="sw trans"></i>︶ Transparent: the layer below decides</li>
+        <li><i class="sw off"></i>Key module not attached</li>
+      </ul>
+      <p class="summary">Hover a key, focus it with the keyboard, or tap it for its full name. Hover or long-press a layer key to preview its layer; click it to switch.</p>
+
+      <div class="controls">
+        <div class="field"><label for="count-left">Key modules on the left half</label>
+          <div class="range"><input type="range" id="count-left" min="1" max="7" value="7" data-count="left"><output for="count-left" data-count-out="left">7</output></div>
+        </div>
+        <div class="field"><label for="count-right">Key modules on the right half</label>
+          <div class="range"><input type="range" id="count-right" min="1" max="7" value="7" data-count="right"><output for="count-right" data-count-out="right">7</output></div>
+        </div>
+        <p class="summary">The left half's anchor is its MCU module and the right half's is its terminator module, so with fewer key modules each half keeps the keymap columns nearest the middle of the keyboard, and the keys of the faded key modules never fire.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="notes" aria-labelledby="notes-title">
+    <h2 id="notes-title">How the layout works</h2>
+    <p>Each half is drawn as it lies on the leg: the terminator module at the left end, then the key modules, then the MCU module with its status screen at the right end. Row 1 is the number row at the SW5 end; row 5 is at the SW1 end, which faces the hip.</p>
+    <ul>
+      <li><b>Thumb keys</b> are row 5 of the three inner key modules of each half: fn⌫ ␣ ⌫ on the left and ⌫ ␣ fn⌫ on the right, so both thumbs have space and backspace. fn⌫ is forward delete, and ⇧⌃ is Shift and Control in one key.</li>
+      <li><b>Layer keys</b> sit under the pinkies. The left pinky's outer column holds L1 (Keypad) and L2 (System), and the right pinky's outer column holds L1. A pinky that holds a layer key cannot press the other keys of its column, so the held key is transparent on its layer. To reach the right pinky's column on the Keypad layer, hold L1 with the left pinky.</li>
+      <li>The thumb keys are transparent on the upper layers, except for keypad 0 and the decimal point on the right thumbs.</li>
+      <li><b>Boot</b> on the System layer shows the bootloader view on the status screen and then enters the UF2 bootloader, on the half that it is pressed on, so each half has one. Rst restarts the firmware, and Pwr turns the keyboard off; only the reset button turns it back on.</li>
+      <li><b>↩/Boot</b> on the Keypad layer sends Return when tapped and enters the bootloader when held for 1.5 s. On a unibody it is on the key module nearest the MCU module, so a unibody with a single key module still reaches the bootloader.</li>
+      <li>Most of the System layer's right half is left empty for RGB lighting keys, which come when RGB lighting exists.</li>
+      <li>To3 switches to the Gaming layer, and To0 switches back to QWERTY.</li>
+    </ul>
+
+    <h2>Changing the layout</h2>
+    <p>The layout lives in <a href="https://github.com/nevyn/roamyboard/blob/main/zmk/config/roamyboard_split.keymap"><code>zmk/config/roamyboard_split.keymap</code></a> (and <code>roamyboard.keymap</code> for a unibody). Edit it and flash the new firmware, or change keys live with <a href="https://zmk.studio">ZMK Studio</a> over USB or Bluetooth on the left half. ZMK Studio stores its edits on the keyboard, and they override the file until you reset them, so this page shows the file, not your keyboard.</p>
+    <p class="summary">More in <a href="https://github.com/nevyn/roamyboard/blob/main/zmk/Layout.md">zmk/Layout.md</a> and <a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md#keymap">docs/firmware.md</a>. Terms follow <a href="https://github.com/nevyn/roamyboard/blob/main/docs/glossary.md">docs/glossary.md</a>.</p>
+  </section>
+
+  <footer>
+    <p><b>Roamyboard</b> is a project by Nevyn Bengtsson &lt;<a href="mailto:hello@nevyn.dev">hello@nevyn.dev</a>&gt;. Source on <a href="https://github.com/nevyn/roamyboard">GitHub</a>. Building one? Start with the <a href="../assembly/">assembly guide</a>.</p>
+  </footer>
+</main>
+<div class="tip" role="tooltip" aria-hidden="true" hidden></div>
+</body>
+</html>

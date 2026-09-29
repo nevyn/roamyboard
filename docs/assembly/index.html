@@ -27,6 +27,7 @@
   </a>
   <div class="sidebar-tools">
     <button class="btn" data-action="reset-progress" title="Clear every check mark">Reset progress</button>
+    <a class="btn" href="../layout/">Keyboard layout →</a>
   </div>
   <div class="overall"><div class="bar"><i></i></div><div class="label"><span>Progress</span><span data-overall>0 %</span></div></div>
   <ol class="toc"></ol>
@@ -119,11 +120,11 @@
             <div class="seg" data-planner="layout"><button data-v="split" aria-pressed="true">Split</button><button data-v="unibody" aria-pressed="false">Unibody</button></div>
           </div>
           <div class="field"><label>Key modules per half</label>
-            <div class="stepper"><button data-d="-1" aria-label="Fewer">−</button><output data-planner="keys">6</output><button data-d="1" aria-label="More">+</button></div>
+            <div class="stepper"><button data-d="-1" aria-label="Fewer">−</button><output data-planner="keys">7</output><button data-d="1" aria-label="More">+</button></div>
           </div>
           <div class="half-strip" aria-hidden="true"></div>
           <p class="summary" data-summary></p>
-          <div class="note"><p>The placeholder keymap types with <b>6 key modules per half</b> on a split (a Lily58-like block) and <b>12</b> on a unibody. More key modules work; their keys map to <code>&amp;none</code> until the layout grows.</p></div>
+          <div class="note"><p>The default keymap uses <b>7 key modules per half</b> on a split and <b>14</b> on a unibody; see <a href="../layout/">the keyboard layout</a>. More key modules work; their keys map to <code>&amp;none</code> until the layout grows.</p></div>
         </div>
         <div>
           <h4 style="margin-top:0">Parts list</h4>
@@ -546,7 +547,7 @@
 <section class="chapter" id="firmware" data-title="Flash and test">
   <div class="chapter-head"><div class="chapter-no">9</div><div>
     <h2>Flash and test</h2>
-    <p>The Roamyboard runs <a href="https://zmk.dev">ZMK</a> with its own driver for the key modules' chain. Details in <a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md">docs/firmware.md</a>.</p>
+    <p>The Roamyboard runs <a href="https://zmk.dev">ZMK</a> with its own driver for the key modules' chain. Details in <a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md">docs/firmware.md</a>; the keys and layers are on <a href="../layout/">the keyboard layout page</a>.</p>
   </div></div>
 
   <article class="step" id="get-firmware" data-title="Get the firmware">
@@ -578,9 +579,9 @@
     <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Test</span><h3>First test</h3><a class="anchor" href="#first-test">#</a></div>
     <div class="step-body"><div class="step-text">
       <ul class="check">
-        <li>The nice!view shows ZMK's status screen: connection, profile and the layer, <i>Base</i>.</li>
-        <li>With the terminator module on, the keys type. The placeholder keymap is a Lily58-like QWERTY block on the key modules nearest the middle of the keyboard.</li>
-        <li>Pair over Bluetooth: hold either <code>&amp;mo 1</code> key for layer 1, with three Bluetooth profiles, Bluetooth clear, the bootloader and reset.</li>
+        <li>The nice!view shows the status screen: battery, connection, the key module count, the Bluetooth profiles and the layer, <i>QWERTY</i>.</li>
+        <li>With the terminator module on, the keys type the <a href="../layout/">default layout</a>, on the key modules nearest the middle of the keyboard.</li>
+        <li>Pair over Bluetooth: hold L2 (the left pinky's row 4 key) for the System layer, with four Bluetooth profiles, Bluetooth clear, the bootloader and reset.</li>
         <li>Pull a key module off and put it back while it runs: the keys come back at their new keymap columns.</li>
       </ul>
       <p>For logs, build with the <code>zmk-usb-logging</code> snippet and read the nice!nano's serial port: the driver reports the key module count and any fault with the raw bytes.</p>
