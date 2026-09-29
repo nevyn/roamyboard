@@ -16,3 +16,9 @@ config ROAMYBOARD_STATUS_SCREEN
     help
       Replaces the nice!view's status widget, which must be off
       (CONFIG_NICE_VIEW_WIDGET_STATUS=n). docs/firmware.md describes the screen.
+
+DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN := roamyboard,behavior-boot-screen
+
+config ROAMYBOARD_BEHAVIOR_BOOT_SCREEN
+    bool
+    default $(dt_compat_enabled,$(DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN))

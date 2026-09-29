@@ -8,7 +8,8 @@ The tables show the left half, then the right half, as they lie on the legs. On 
 - **Layer keys**: the left pinky holds L1 (Keypad) and L2 (System) in its column 1, and the right pinky holds L1 in its column 1. A pinky that holds a layer key cannot press the other keys of its column, so the held key is transparent on its layer, and the left pinky's column carries nothing else on layers 1 and 2. To reach the right pinky's column on layer 1, hold L1 with the left pinky.
 - The thumb keys are transparent on layers 1 to 3, except for keypad 0 and the decimal point on the right thumbs.
 - ⇧⌃ is Shift + Control in one key. fn⌫ is forward delete.
-- System: BT1 to BT4 select Bluetooth profiles 0 to 3; BT× clears the selected profile's pairing; BLE and USB choose the output. Pwr turns the keyboard off (ZMK soft off); only the reset button turns it back on, because the polled chain cannot wake the nice!nano. Boot enters the UF2 bootloader and Rst restarts the firmware. The RGB keys on the right half do nothing until RGB lighting exists.
+- System: BT1 to BT4 select Bluetooth profiles 0 to 3; BT× clears the selected profile's pairing; BLE and USB choose the output. Pwr turns the keyboard off (ZMK soft off); only the reset button turns it back on, because the polled chain cannot wake the nice!nano. Boot shows the bootloader view on the nice!view and then enters the UF2 bootloader, on the half that it is pressed on; Rst restarts the firmware. The RGB keys on the right half do nothing until RGB lighting exists.
+- ↩/Boot on the Keypad layer is ↩ when tapped and Boot when held for 1.5 s. It is the outer column of the right half, the key module nearest the MCU module on a unibody, so a unibody with a single key module reaches the bootloader by holding L1 and then ↩/Boot.
 - To3 switches to the Gaming layer and To0 back to QWERTY.
 
 Legend: ︶ is transparent (the layer below decides), ⊘ does nothing, an empty cell is unassigned (also does nothing).
@@ -31,7 +32,7 @@ Legend: ︶ is transparent (the layer below decides), ⊘ does nothing, an empty
 | ︶ |   | Ins | PgU | Hm | ↑ | End |   | × | 7 | 8 | 9 | + | ( | ) |
 | ︶ |   | fn⌫ | PgD | ← | ↓ | → |   | . | 4 | 5 | 6 | − |   | ⇥ |
 | ︶ | ⇧ |   |   |   |   |   |   | , | 1 | 2 | 3 | ÷ | ︶ | ︶ |
-| ︶ | ⌃ | ⌥ | ⌘ | ︶ | ︶ | ︶ |   | ︶ | 0 | . | ︶ | ︶ | ︶ | ︶ |
+| ︶ | ⌃ | ⌥ | ⌘ | ︶ | ︶ | ︶ |   | ︶ | 0 | . | ︶ | ︶ | ︶ | ↩/Boot |
 
 ## 2 System
 

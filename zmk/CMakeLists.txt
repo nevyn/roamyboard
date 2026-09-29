@@ -18,3 +18,7 @@ if(CONFIG_ROAMYBOARD_STATUS_SCREEN)
     src/display/util.c
   )
 endif()
+
+if(CONFIG_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN)
+  target_sources(app PRIVATE src/behaviors/behavior_boot_screen.c)
+endif()
