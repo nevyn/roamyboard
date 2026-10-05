@@ -1,0 +1,17 @@
+/*
+ * &boot_screen: the bootloader key that shows the bootloader view on the status screen
+ * before it reboots into the UF2 bootloader.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/ {
+    behaviors {
+        // A split central invokes it on the peripheral by name, so the name is at most 8 characters.
+        boot_screen: bootscr {
+            compatible = "roamyboard,behavior-boot-screen";
+            #binding-cells = <0>;
+            display-name = "Bootloader";
+        };
+    };
+};

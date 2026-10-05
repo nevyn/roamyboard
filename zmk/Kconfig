@@ -1,3 +1,44 @@
 # SPDX-License-Identifier: MIT
 
 rsource "drivers/kscan/Kconfig"
+
+config ROAMYBOARD_STATUS_SCREEN
+    bool "roamyboard status screen on the nice!view"
+    default y
+    depends on ZMK_DISPLAY && ZMK_DISPLAY_STATUS_SCREEN_CUSTOM && SHIELD_NICE_VIEW
+    depends on ROAMYBOARD_KSCAN_165_CHAIN
+    select LV_USE_CANVAS
+    select LV_USE_IMAGE
+    select LV_FONT_MONTSERRAT_12
+    select LV_FONT_MONTSERRAT_14
+    select LV_FONT_MONTSERRAT_16
+    select LV_FONT_MONTSERRAT_18
+    select LV_FONT_UNSCII_8
+    help
+      Replaces the nice!view's status widget, which must be off
+      (CONFIG_NICE_VIEW_WIDGET_STATUS=n). docs/firmware.md describes the screen.
+
+config ROAMYBOARD_STATUS_SCREEN_ROTATE_180
+    bool "Turn the status screen upside down"
+    default y
+    depends on ROAMYBOARD_STATUS_SCREEN
+    help
+      Rotates every image by 180 degrees on its way to the nice!view. The
+      roamyboard mounts the nice!view with its contacts toward the MCU module,
+      which shows the unrotated image upside down.
+
+config ROAMYBOARD_HOST_NAMES
+    bool "Read the Bluetooth hosts' names for the status screen"
+    default y
+    depends on ZMK_BLE && SETTINGS && (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)
+    select BT_GATT_CLIENT
+    help
+      Reads each host's GAP Device Name once per encrypted connection and keeps
+      it per BLE profile in the settings key roamyboard/host/<n>
+      (zmk/include/roamyboard/host_name.h has the format).
+
+DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN := roamyboard,behavior-boot-screen
+
+config ROAMYBOARD_BEHAVIOR_BOOT_SCREEN
+    bool
+    default $(dt_compat_enabled,$(DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN))

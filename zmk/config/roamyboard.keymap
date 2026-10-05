@@ -1,43 +1,78 @@
 /*
- * Placeholder keymap for the unibody roamyboard, so that a socket board with a few key
- * modules types. It stays until the real layout is designed (zmk/Layout.md).
+ * Keymap for the unibody roamyboard: the split layout on one chain; zmk/Layout.md shows
+ * the layers and explains them.
  *
- * Positions are 5 rows of 30 keymap columns: row * 30 + column, one line per row.
- * The typing block
- * sits in columns 18 to 29, on the 12 key modules nearest the MCU module.
- * Keys of key modules that are not attached never fire.
+ * Positions are 5 rows of 30 keymap columns: row * 30 + column, one line per row, with a
+ * gap between the left block (keymap columns 16 to 22) and the right block (23 to 29).
+ * Keymap column 29 is the key module nearest the MCU module; keys of key modules that
+ * are not attached never fire.
  *
  * SPDX-License-Identifier: MIT
  */
 
 #include <behaviors.dtsi>
+#include <behaviors/boot_screen.dtsi>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/outputs.h>
 
 / {
+    behaviors {
+        // Tap for Return; hold past the tapping term for the bootloader.
+        ret_boot: ret_boot {
+            compatible = "zmk,behavior-hold-tap";
+            display-name = "Return or bootloader";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <1500>;
+            bindings = <&boot_screen>, <&kp>;
+        };
+    };
+
     keymap {
         compatible = "zmk,keymap";
 
-        base {
-            display-name = "Base";
+        qwerty {
+            display-name = "QWERTY";
             bindings = <
-            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp ESC    &kp N1    &kp N2    &kp N3  &kp N4     &kp N5    &kp N6    &kp N7   &kp N8     &kp N9    &kp N0    &kp GRAVE
-            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp TAB    &kp Q     &kp W     &kp E   &kp R      &kp T     &kp Y     &kp U    &kp I      &kp O     &kp P     &kp MINUS
-            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp LCTRL  &kp A     &kp S     &kp D   &kp F      &kp G     &kp H     &kp J    &kp K      &kp L     &kp SEMI  &kp SQT
-            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp LSHFT  &kp Z     &kp X     &kp C   &kp V      &kp B     &kp N     &kp M    &kp COMMA  &kp DOT   &kp FSLH  &kp RSHFT
-            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp EQUAL  &kp LALT  &kp LGUI  &mo 1   &kp SPACE  &kp LBKT  &kp RBKT  &kp RET  &mo 1      &kp BSPC  &kp RGUI  &kp BSLH
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp ESC        &kp GRAVE  &kp N1    &kp N2    &kp N3   &kp N4     &kp N5        &kp N6    &kp N7     &kp N8     &kp N9    &kp N0    &kp MINUS  &kp EQUAL
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp LS(LCTRL)  &kp TAB    &kp Q     &kp W     &kp E    &kp R      &kp T         &kp Y     &kp U      &kp I      &kp O     &kp P     &kp LBKT   &kp RBKT
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &mo 1          &kp LCTRL  &kp A     &kp S     &kp D    &kp F      &kp G         &kp H     &kp J      &kp K      &kp L     &kp SEMI  &kp SQT    &kp BSLH
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &mo 2          &kp LSHFT  &kp Z     &kp X     &kp C    &kp V      &kp B         &kp N     &kp M      &kp COMMA  &kp DOT   &kp FSLH  &kp RSHFT  &mo 1
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp RET        &kp LCTRL  &kp LALT  &kp LGUI  &kp DEL  &kp SPACE  &kp BSPC      &kp BSPC  &kp SPACE  &kp DEL    &kp RGUI  &kp RALT  &kp RCTRL  &kp RET
             >;
         };
 
-        // BT_SEL 0 = Mac, 1 = iPad, 2 = phone.
+        keypad {
+            display-name = "Keypad";
+            bindings = <
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none   &none      &kp F1    &kp F2     &kp F3    &kp F4    &kp F5         &kp F6           &kp F7     &kp F8      &kp F9     &kp F10        &kp F11   &kp F12
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &trans  &none      &kp INS   &kp PG_UP  &kp HOME  &kp UP    &kp END        &kp KP_MULTIPLY  &kp KP_N7  &kp KP_N8   &kp KP_N9  &kp KP_PLUS    &kp LPAR  &kp RPAR
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &trans  &none      &kp DEL   &kp PG_DN  &kp LEFT  &kp DOWN  &kp RIGHT      &kp KP_DOT       &kp KP_N4  &kp KP_N5   &kp KP_N6  &kp KP_MINUS   &none     &kp TAB
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &trans  &kp LSHFT  &none     &none      &none     &none     &none          &kp COMMA        &kp KP_N1  &kp KP_N2   &kp KP_N3  &kp KP_DIVIDE  &trans    &trans
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &trans  &kp LCTRL  &kp LALT  &kp LGUI   &trans    &trans    &trans         &trans           &kp KP_N0  &kp KP_DOT  &trans     &trans         &trans    &ret_boot 0 RET
+            >;
+        };
+
         system {
             display-name = "System";
             bindings = <
-            &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &trans  &bt BT_CLR  &trans  &trans  &trans  &studio_unlock  &bootloader  &sys_reset
-            &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans      &trans  &trans  &trans  &trans          &trans       &trans
-            &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans      &trans  &trans  &trans  &trans          &trans       &trans
-            &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans      &trans  &trans  &trans  &trans          &trans       &trans
-            &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans  &trans      &trans  &trans  &trans  &trans          &trans       &trans
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &soft_off  &bt BT_CLR    &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4      &none   &none  &none   &none         &none       &none  &none
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none      &boot_screen  &none         &none         &kp C_VOL_DN  &kp C_MUTE    &kp C_VOL_UP      &none   &none  &none   &none         &none       &none  &none
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none      &out OUT_BLE  &none         &none         &kp C_PREV    &kp C_PP      &kp C_NEXT        &none   &none  &none   &none         &none       &none  &none
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &trans     &out OUT_USB  &none         &none         &kp C_BRI_DN  &none         &kp C_BRI_UP      &none   &none  &none   &boot_screen  &sys_reset  &none  &none
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none      &to 3         &none         &none         &trans        &trans        &trans            &trans  &none  &trans  &none         &none       &none  &none
+            >;
+        };
+
+        gaming {
+            display-name = "Gaming";
+            bindings = <
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp ESC  &kp GRAVE  &kp N1    &kp N2    &kp N3  &kp N4  &kp N5      &kp N6  &kp N7  &kp N8     &kp N9   &kp N0    &kp MINUS  &kp EQUAL
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &trans   &kp TAB    &kp Q     &kp W     &kp E   &kp R   &kp T       &kp Y   &kp U   &kp I      &kp O    &kp P     &kp LBKT   &kp RBKT
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &trans   &kp CAPS   &kp A     &kp S     &kp D   &kp F   &kp G       &kp H   &kp J   &kp K      &kp L    &kp SEMI  &kp SQT    &kp BSLH
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &trans   &kp LSHFT  &kp Z     &kp X     &kp C   &kp V   &kp B       &kp N   &kp M   &kp COMMA  &kp DOT  &kp FSLH  &kp UP     &kp PSCRN
+            &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &to 0    &kp LCTRL  &kp LALT  &kp LGUI  &trans  &trans  &trans      &trans  &trans  &trans     &kp RET  &kp LEFT  &kp DOWN   &kp RIGHT
             >;
         };
     };

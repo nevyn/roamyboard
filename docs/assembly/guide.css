@@ -69,7 +69,8 @@ main { padding: 0 clamp(18px, 4vw, 56px) 120px; max-width: 1180px; width: 100%; 
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; text-decoration: none; color: var(--ink); }
 .brand svg { flex: none; }
 .brand small { display: block; font-weight: 500; font-size: .78rem; color: var(--muted); }
-.sidebar-tools { display: flex; gap: 8px; margin: 16px 0 18px; }
+.sidebar-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 18px; }
+.sidebar-tools .btn { white-space: nowrap; }
 .overall { margin: 0 0 18px; }
 .overall .bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
 .overall .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--orange)); transition: width .4s; }
