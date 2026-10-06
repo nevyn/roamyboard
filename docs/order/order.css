@@ -17,8 +17,15 @@
 .page h1 span { background: linear-gradient(90deg, var(--accent), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .page .lead { font-size: 1.1rem; color: var(--muted); max-width: 75ch; margin: 0 0 1.4em; }
 
-.builder { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 20px; align-items: start; }
-.preview { position: sticky; top: 16px; }
+/* Everything you change is in the left column; the right column only shows what you changed, and stays put
+   while you work down the steps. It holds the board alone, so it fits the viewport and sticking works. */
+.builder { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .95fr); gap: 20px; align-items: start; }
+.preview { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; }
+.running {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px;
+}
+.running b { font-size: 1.1rem; margin-left: 4px; }
 .board-card .step-head .tag { white-space: nowrap; letter-spacing: 0; text-transform: none; font-size: .78rem; }
 .choices .step-head .tag { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; }
 .step-text .field:first-child { margin-top: 0; }
@@ -104,13 +111,28 @@
 .notes h2 { font-size: 1.5rem; margin: 44px 0 .4em; }
 .notes li { margin: .4em 0; }
 
+/* Narrow: the board moves above the steps and sticks to the top of the screen, so painting a key never
+   means scrolling back up. One half's width sets the key size, and the halves stack under each other. */
 @media (max-width: 1080px) {
   .builder { grid-template-columns: minmax(0, 1fr); }
-  .preview { position: static; }
+  .preview {
+    order: -1; top: 0; max-height: 62vh; z-index: 20;
+    margin: 0 calc(0px - clamp(16px, 4vw, 48px)); padding: 0 clamp(16px, 4vw, 48px);
+    background: var(--paper); box-shadow: 0 10px 18px -12px rgba(0, 0, 0, .35);
+  }
+  .preview .step { margin-top: 0; border-radius: 0 0 var(--radius) var(--radius); }
+  .board { flex-direction: column; align-items: center; gap: 8px; padding: 2px 0 8px; }
+  .preview .step-text { padding: 8px 12px 10px; }
+  .preview .step-head { padding: 8px 12px; }
+  .preview .step-head h3 { font-size: 1.05rem; }
+  .running { margin-top: 6px; padding-top: 8px; }
+  .running b { font-size: 1rem; }
+  /* The key size is whichever is tighter: one half across (key modules and their gaps, the terminator and
+     the MCU module), or every half stacked down the card. */
+  :root { --k: min(38px, calc((100vw - 96px) / var(--half-units, 11.3)), calc(46vh / var(--board-units, 11.9))); }
 }
 @media (max-width: 560px) {
-  :root { --k: 26px; }
-  .board { gap: 14px; }
   .measure { grid-template-columns: minmax(0, 1fr); }
+  .running { font-size: .9rem; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

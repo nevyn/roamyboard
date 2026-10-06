@@ -405,6 +405,9 @@
     $("[data-out=brush]").textContent = `${state.brush}, ${state.profile}`;
 
     $("[data-board-tag]").textContent = `${state.cols * state.halves} modules, ${keyCount()} keys`;
+    // Key size on a narrow screen follows one half's width: key modules, their gaps, terminator and MCU.
+    document.documentElement.style.setProperty("--half-units", (state.cols * 1.28 + 2.31).toFixed(2));
+    document.documentElement.style.setProperty("--board-units", (state.halves * (state.rows * 1.1 + 0.2) + 0.5).toFixed(2));
     document.documentElement.style.setProperty("--case", caseHex());
     document.documentElement.style.setProperty("--accent-case", accentHex());
     $$("[data-board] .key").forEach(k => {
@@ -440,6 +443,9 @@
     html += row(`Shipping`, "quoted separately, once you say where to", null);
     html += row(`<b>Total</b>`, state.rows !== C.ROWS.built ? "before the design fee" : "", b.total, "total");
     $("[data-bill]").innerHTML = html;
+
+    $("[data-running-what]").textContent = state.build === "assembled" ? "Assembled " : "As a kit ";
+    $("[data-running-total]").textContent = money(b.total);
 
     $("[data-rates]").textContent =
       `Vendor prices as published on ${RATES_DATE}, converted at the European Central Bank's rates of that day ` +
