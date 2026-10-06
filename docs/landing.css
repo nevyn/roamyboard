@@ -1,0 +1,44 @@
+/* The landing page; colours, type, cards, buttons, the topbar and the 3D viewer come from assembly/guide.css. */
+.page { max-width: 1240px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px) 80px; }
+.page h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 64px 0 .5em; }
+.page .lead { font-size: 1.15rem; color: var(--muted); max-width: 60ch; }
+
+.hero { padding-top: 40px; }
+.hero h1 span { background: linear-gradient(90deg, var(--accent), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 14px; }
+a.btn { text-decoration: none; }
+.btn.big { font-size: 1rem; padding: 10px 18px; border-radius: 11px; }
+.hero-viewer { margin: 0; }
+.hero-viewer .viewer { min-height: 460px; }
+
+.band {
+  margin-top: 56px; padding: 26px clamp(18px, 3vw, 32px); border-radius: var(--radius);
+  background: linear-gradient(120deg, var(--accent-soft), var(--orange-soft));
+}
+.band h2 { margin-top: 0; }
+.band p { font-size: 1.08rem; max-width: 75ch; margin: 0; }
+
+.cards.how, .cards.ways { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.card h3 { font-size: 1.12rem; margin: 2px 0 .4em; }
+.card p { margin: 0 0 .6em; font-size: .95rem; }
+.way { display: flex; flex-direction: column; color: var(--ink); text-decoration: none; transition: border-color .2s, transform .2s; }
+.way p { flex: 1; color: var(--muted); }
+.way .btn { align-self: flex-start; }
+.way:hover { border-color: var(--accent); transform: translateY(-2px); }
+.way:hover .btn:not(.primary) { border-color: var(--accent); color: var(--accent); }
+
+.gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.gallery .photo { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.gallery img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.gallery figcaption { font-size: .82rem; color: var(--muted); padding: 8px 12px 12px; }
+
+@media (max-width: 1100px) {
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 860px) {
+  .cards.how, .cards.ways { grid-template-columns: minmax(0, 1fr); }
+  .hero-viewer .viewer { min-height: 360px; }
+}
+@media (max-width: 560px) {
+  .gallery { grid-template-columns: minmax(0, 1fr); }
+}

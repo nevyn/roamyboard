@@ -22,14 +22,17 @@
 <button class="btn menu-toggle" aria-label="Contents">☰ Contents</button>
 <div class="layout">
 <nav class="sidebar" aria-label="Contents">
-  <a class="brand" href="#top">
+  <a class="brand" href="../">
     <svg width="34" height="34" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="7" height="20" rx="2" fill="#6b3fa0"/><rect x="12.5" y="5" width="7" height="20" rx="2" fill="#6b3fa0" transform="rotate(8 16 15)"/><rect x="22" y="7" width="7" height="20" rx="2" fill="#e8871e" transform="rotate(16 25 17)"/></svg>
     <span>Roamyboard<small>Printing and assembly guide</small></span>
   </a>
+  <nav class="sidebar-links" aria-label="Pages">
+    <a class="btn" href="../assembly/" aria-current="page">Assembly guide</a>
+    <a class="btn" href="../layout/">Layout</a>
+    <a class="btn primary" href="../order/">Order one</a>
+  </nav>
   <div class="sidebar-tools">
     <button class="btn" data-action="reset-progress" title="Clear every check mark">Reset progress</button>
-    <a class="btn" href="../layout/">Keyboard layout →</a>
-    <a class="btn" href="../order/">Order one →</a>
   </div>
   <div class="overall"><div class="bar"><i></i></div><div class="label"><span>Progress</span><span data-overall>0 %</span></div></div>
   <ol class="toc"></ol>
@@ -588,7 +591,7 @@
       </ul>
       <p>For logs, build with the <code>zmk-usb-logging</code> snippet and read the nice!nano's serial port: the driver reports the key module count and any fault with the raw bytes.</p>
     </div>
-    <div class="step-media"><figure class="photo"><img src="../../Images/firmware%20first%20boot%20irl.webp" alt="The MCU module's nice!view showing ZMK's status screen on first boot"><figcaption>First boot, 2026-09-27: ZMK's status screen through the MCU module's window.</figcaption></figure></div></div>
+    <div class="step-media"><figure class="photo"><img src="photos/firmware-first-boot.webp" alt="The MCU module's nice!view showing ZMK's status screen on first boot" loading="lazy"><figcaption>First boot, 2026-09-27: ZMK's status screen through the MCU module's window.</figcaption></figure></div></div>
   </article>
 </section>
 

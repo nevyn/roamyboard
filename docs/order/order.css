@@ -1,4 +1,4 @@
-/* The order page; colours, type, cards and buttons come from ../assembly/guide.css. */
+/* The order page; colours, type, cards, buttons and the topbar come from ../assembly/guide.css. */
 :root {
   --terminator: #d9c8a0;
   --case: #482960;
@@ -7,11 +7,6 @@
 }
 @media (prefers-color-scheme: dark) { :root { --terminator: #6d6250; } }
 
-.topbar {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px clamp(16px, 4vw, 40px);
-  border-bottom: 1px solid var(--line); background: var(--card);
-}
-.topbar-links { display: flex; gap: 8px; }
 .page { max-width: 1320px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px) 80px; }
 .page h1 { font-size: clamp(2rem, 4vw, 3rem); margin: 36px 0 .2em; letter-spacing: -.03em; }
 .page h1 span { background: linear-gradient(90deg, var(--accent), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roamyboard: the modular keyboard you wear on your leg</title>
+<meta name="description" content="A keyboard you wear on your leg, made of printed modules that click together side by side. Order one, build your own, or read the layout.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='6' width='7' height='20' rx='2' fill='%236b3fa0'/%3E%3Crect x='12.5' y='5' width='7' height='20' rx='2' fill='%236b3fa0' transform='rotate(8 16 15)'/%3E%3Crect x='22' y='7' width='7' height='20' rx='2' fill='%23e8871e' transform='rotate(16 25 17)'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assembly/guide.css">
+<link rel="stylesheet" href="landing.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script src="assembly/models/data.js"></script>
+<script src="assembly/viewer.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="./">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="7" height="20" rx="2" fill="#6b3fa0"/><rect x="12.5" y="5" width="7" height="20" rx="2" fill="#6b3fa0" transform="rotate(8 16 15)"/><rect x="22" y="7" width="7" height="20" rx="2" fill="#e8871e" transform="rotate(16 25 17)"/></svg>
+    <span>Roamyboard<small>A keyboard you wear on your leg</small></span>
+  </a>
+  <nav class="topbar-links" aria-label="Pages">
+    <a class="btn" href="assembly/">Assembly guide</a>
+    <a class="btn" href="layout/">Layout</a>
+    <a class="btn primary" href="order/">Order one</a>
+  </nav>
+</header>
+
+<main class="page">
+  <section class="hero">
+    <div>
+      <h1>Type <span>on the move</span></h1>
+      <p class="lead">The Roamyboard is a keyboard you wear on your leg, so you can type while you walk as well as while you sit. It is made of printed modules that click together side by side, and it curves around your thigh.</p>
+      <div class="facts">
+        <div class="fact"><b>8°</b><span>between neighbouring modules, so a half curves around the leg</span></div>
+        <div class="fact"><b>5</b><span>Choc keys per key module, hot-swappable</span></div>
+        <div class="fact"><b>any</b><span>number of key modules per half; the firmware counts them</span></div>
+      </div>
+      <p class="actions">
+        <a class="btn primary big" href="order/">Order one →</a>
+        <a class="btn big" href="assembly/">Build your own</a>
+      </p>
+      <p class="summary">Drag to orbit and drag the slider to add key modules. The 3D view is generated from the same model that the parts print from.</p>
+    </div>
+    <div class="step hero-viewer">
+      <div class="viewer" data-scene="half" data-no-zoom></div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="why-title">
+    <h2 id="why-title">Why wear a keyboard?</h2>
+    <p>Nevyn thinks better when he is moving, so he wants to code while he walks. That needs an input method that works on the move: a keyboard that stays put on his leg instead of on a desk. The Roamyboard is the latest of several attempts since 2012.</p>
+  </section>
+
+  <section aria-labelledby="how-title">
+    <h2 id="how-title">How it fits together</h2>
+    <div class="cards how">
+      <article class="card">
+        <h3>A half is a row of modules</h3>
+        <p>A <b>terminator module</b> at one end, any number of <b>key modules</b>, and the <b>MCU module</b> at the other end with the nice!nano, battery and display. A split keyboard is two halves; a unibody keyboard is one.</p>
+      </article>
+      <article class="card">
+        <h3>Modules click together</h3>
+        <p>At each <b>joint</b>, a module's header pins slide into its neighbour's sockets and its guide pins into the neighbour's guide holes, and a <b>tooth</b> on each flap clicks into a <b>notch</b>. No tools, no cables between modules.</p>
+      </article>
+      <article class="card">
+        <h3>The firmware counts the keys</h3>
+        <p>Every key module adds a shift register to the <b>chain</b>, and the terminator module ends it. The MCU module reads the chain, so <a href="https://zmk.dev">ZMK</a> knows how many key modules are attached. Pull one off while it runs and the keys move to their new places.</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="built-title">
+    <h2 id="built-title">Built so far</h2>
+    <div class="gallery">
+      <figure class="card photo"><img src="assembly/photos/two-columns-in-hand.jpg" alt="Two joined key modules with purple keycaps held in a hand" loading="lazy"><figcaption>The first two key modules joined: they mated, clicked and read as a chain.</figcaption></figure>
+      <figure class="card photo"><img src="assembly/photos/key-module-side-connectors.jpg" alt="A finished key module held in a hand, with connector openings along its side" loading="lazy"><figcaption>A finished key module.</figcaption></figure>
+      <figure class="card photo"><img src="assembly/photos/mcu-module-wired-open.jpg" alt="An open MCU module: battery, power switch, reset button, nice!nano and the socket board" loading="lazy"><figcaption>A wired MCU module, open: battery, power switch, reset button and nice!nano.</figcaption></figure>
+      <figure class="card photo"><img src="assembly/photos/firmware-first-boot.webp" alt="The MCU module's nice!view showing ZMK's status screen on first boot" loading="lazy"><figcaption>First boot: ZMK's status screen through the MCU module's window.</figcaption></figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="go-title">
+    <h2 id="go-title">Get one</h2>
+    <div class="cards ways">
+      <a class="card way" href="order/">
+        <h3>Order one</h3>
+        <p>Pick the halves, key modules, curve, case colour, switches and keycaps, and see what each part costs. The order goes to Nevyn as an email, and he builds it by hand.</p>
+        <span class="btn primary">Configure yours →</span>
+      </a>
+      <a class="card way" href="assembly/">
+        <h3>Build your own</h3>
+        <p>The assembly guide covers printing, soldering, assembling, flashing and testing a half, step by step, with a parts list and 3D views of every module.</p>
+        <span class="btn">Read the guide →</span>
+      </a>
+      <a class="card way" href="layout/">
+        <h3>See the layout</h3>
+        <p>The default keymap, layer by layer, drawn as the two halves of modules that type it. It changes with the number of key modules per half.</p>
+        <span class="btn">Browse the layers →</span>
+      </a>
+    </div>
+    <div class="note"><p><b>This is a hobby project, not a shop.</b> Nevyn builds these one at a time, on evenings. Everything is open: the case model, the boards, the firmware and these pages are on <a href="https://github.com/nevyn/roamyboard">GitHub</a>.</p></div>
+  </section>
+
+  <footer>
+    <p><b>Roamyboard</b> is a project by Nevyn Bengtsson &lt;<a href="mailto:hello@nevyn.dev">hello@nevyn.dev</a>&gt;. Source on <a href="https://github.com/nevyn/roamyboard">GitHub</a>.</p>
+  </footer>
+</main>
+</body>
+</html>

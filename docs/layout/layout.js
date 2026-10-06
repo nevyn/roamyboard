@@ -3,7 +3,7 @@
 (() => {
   "use strict";
   const { COLUMNS, ROWS, parseKeymap, describeBinding } = window.RoamyKeymap;
-  const KEYMAP_URL = "../../zmk/config/roamyboard_split.keymap";
+  const KEYMAP_URL = "../keymaps/roamyboard_split.keymap";
   const HALF = COLUMNS / 2; // keymap columns 0 to 14 are the left half, 15 to 29 the right
   const LONG_PRESS_MS = 450;
   const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];

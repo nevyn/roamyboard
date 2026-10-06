@@ -1,20 +1,20 @@
-# Publishes the assembly guide (docs/assembly), the layout page (docs/layout) and the order page (docs/order)
-# to GitHub Pages. Runs only when the pages, the parts list they share, the repo images they show, or the
-# keymaps change. The site keeps the repo's paths, since the
-# guide links ../images and ../../Images and the layout page fetches ../../zmk/config/roamyboard_split.keymap;
-# the site root redirects to docs/assembly/.
+# Publishes docs/ as the site root: the landing page (docs/index.html), the assembly guide, the layout page and
+# the order page, at /, /assembly/, /layout/ and /order/. The pages fetch the keymaps from docs/keymaps, a
+# symlink to zmk/config; this job publishes copies of the keymaps there. The pages' relative paths stay inside
+# docs/, so the same files also work served from the repo root at /docs/. The old /docs/<page>/ URLs redirect.
 name: Pages
 
 on:
   push:
     branches: [main]
     paths:
+      - "docs/index.html"
+      - "docs/landing.css"
       - "docs/assembly/**"
       - "docs/layout/**"
       - "docs/order/**"
       - "docs/parts.js"
       - "docs/images/**"
-      - "Images/firmware first boot irl.webp"
       - "zmk/config/*.keymap"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -33,23 +33,27 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}docs/assembly/
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
         with:
           lfs: true
       - name: Assemble the site
         run: |
-          mkdir -p _site/docs _site/Images _site/zmk/config
-          cp -R docs/assembly docs/images docs/layout docs/order _site/docs/
-          cp docs/parts.js _site/docs/
-          cp zmk/config/*.keymap _site/zmk/config/
-          cp "Images/firmware first boot irl.webp" _site/Images/
+          mkdir -p _site/keymaps
+          cp -R docs/index.html docs/landing.css docs/parts.js docs/assembly docs/images docs/layout docs/order _site/
+          cp zmk/config/*.keymap _site/keymaps/
           # Fails the job if a model is still an LFS pointer rather than a GLB.
-          for f in _site/docs/assembly/models/*.glb; do
+          for f in _site/assembly/models/*.glb; do
             [ "$(head -c 4 "$f")" = "glTF" ] || { echo "$f is not a GLB (LFS pointer?)"; exit 1; }
           done
-          printf '<!doctype html><meta charset="utf-8"><title>Roamyboard</title><meta http-equiv="refresh" content="0; url=docs/assembly/"><a href="docs/assembly/">Roamyboard assembly guide</a>\n' > _site/index.html
+          # Redirects the old /docs/<page>/ URLs, keeping the query (the order page's configuration) and the anchor.
+          for page in "" assembly/ layout/ order/; do
+            mkdir -p "_site/docs/$page"
+            up=$([ -z "$page" ] && echo "../" || echo "../../")
+            printf '<!doctype html><meta charset="utf-8"><title>Roamyboard</title><link rel="canonical" href="%s%s"><script>location.replace("%s%s" + location.search + location.hash)</script><meta http-equiv="refresh" content="0; url=%s%s"><a href="%s%s">Roamyboard has moved</a>\n' \
+              "$up" "$page" "$up" "$page" "$up" "$page" "$up" "$page" > "_site/docs/${page}index.html"
+          done
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

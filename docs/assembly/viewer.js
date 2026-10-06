@@ -1,15 +1,18 @@
 // Interactive 3D figures for the assembly guide.
 //
-// A <div class="viewer" data-scene="<id>"> gets the scene SCENES[id]. Models are models/<name>.glb (Git LFS, written by
-// case/roamy-v4/tools/guide_models.py), one mesh per part and colour, named "<part>#<rrggbb[aa]>".
+// A <div class="viewer" data-scene="<id>"> gets the scene SCENES[id]; data-no-zoom leaves the scroll wheel to the
+// page. Models are models/<name>.glb beside this script (Git LFS, written by case/roamy-v4/tools/guide_models.py),
+// one mesh per part and colour, named "<part>#<rrggbb[aa]>".
 // Scene coordinates are the case's module frame in mm: x across the column from the socket face, y along it from
 // the SW1 end face, z up from the board's back. Viewers only hold a WebGL context while on screen.
 (() => {
   "use strict";
 
+  const MODELS = new URL("models/", document.currentScript.src);
+
   // Browsers refuse fetch() from file://, so the guide has to be served; the fallback says how.
   async function loadModel(name) {
-    const url = `models/${name}.glb`;
+    const url = new URL(`${name}.glb`, MODELS).href;
     if (location.protocol === "file:") throw new Error("Opened from disk: serve the repo to see the 3D views: python3 -m http.server in the repo root, then open /docs/assembly/");
     const res = await fetch(url);
     if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
@@ -293,6 +296,7 @@
         this.camera = new THREE.PerspectiveCamera(28, 1, 1, 5000);
         this.controls = new OrbitControls(this.camera, renderer.domElement);
         this.controls.enableDamping = true;
+        this.controls.enableZoom = !("noZoom" in this.el.dataset);
         this.controls.addEventListener("change", () => this.invalidate());
         this.controls.addEventListener("start", () => { this.controls.autoRotate = false; this.userMoved = true; });
         this.root = new THREE.Group();

@@ -100,6 +100,17 @@ main { padding: 0 clamp(18px, 4vw, 56px) 120px; max-width: 1180px; width: 100%; 
 .btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .menu-toggle { display: none; }
 
+/* the page header that every page shares; the guide shows the same links in its sidebar */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px clamp(16px, 4vw, 40px);
+  border-bottom: 1px solid var(--line); background: var(--card);
+}
+.topbar-links, .sidebar-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.sidebar-links { margin: 16px 0 0; gap: 5px; flex-wrap: nowrap; }
+.sidebar-links .btn { flex: 1 1 auto; justify-content: center; padding: 6px; font-size: .8rem; white-space: nowrap; }
+.topbar-links a.btn, .sidebar-links a.btn { text-decoration: none; }
+.topbar-links .btn[aria-current="page"], .sidebar-links .btn[aria-current="page"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
 /* hero */
 .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 28px; align-items: center; padding: 48px 0 24px; }
 .hero h1 { font-size: clamp(2.3rem, 4.5vw, 3.6rem); margin: 0 0 .25em; letter-spacing: -.03em; }
@@ -285,6 +296,9 @@ footer { margin-top: 80px; color: var(--muted); font-size: .85rem; border-top: 1
   .pinout { grid-template-columns: minmax(0, 1fr); }
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kbd-help { display: none; }
+}
+@media (max-width: 560px) {
+  .topbar { flex-direction: column; align-items: flex-start; }
 }
 @media print {
   .sidebar, .menu-toggle, .viewer .hud, .viewer .controls3d, .kbd-help, .done-toggle, .planner .controls { display: none !important; }
