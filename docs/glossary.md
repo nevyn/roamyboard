@@ -53,7 +53,7 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **joint**: Everything that couples a module to its neighbour: the keystone faces, the connectors, the guide pins and the latches.
 - **joint side**: The joint hardware on one side of a module, behind the `JointSide` protocol: `HeaderSideJoint` (guide pins) or `SocketSideJoint` (guide holes and latches). A module hosts a joint side without knowing how the latch works. The joint side's **reserved** blocks are the part of the host's body that it owns, in the end walls; its **keep-out** is space outside the body that the host leaves empty.
 - **seam**: The plane where a module's header face meets its neighbour's socket face.
-- **joint angle**: The 8° between neighbouring boards. **Joint centre**: the axis 149 mm below the board that the neighbour's pose rotates about.
+- **joint angle**: The 8° between neighbouring boards. **Joint centre**: the axis 149 mm below the board that the neighbour's pose rotates about. The order page calls it the **curve**, since a buyer picks the bend rather than builds to the angle; everywhere else it is the joint angle.
 - **slide-on**: The straight move that couples B onto A, along B's board plane (8° down in A's frame). Its last 5.6 mm is **insertion** of the header pins into the sockets. Not: snap on, push in.
 - **guide pin**: The gabled bar that protrudes from A's header face at each column end and enters B's guide hole before the header pins reach the sockets; it aligns the pair across the column and vertically. Its tip is the **taper**. Not: peg, dowel, prong, tongue (v3's T rail).
 - **guide hole**: The hole in B's socket-side end wall that takes the guide pin.

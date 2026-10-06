@@ -1,8 +1,9 @@
-# Publishes the assembly guide (docs/assembly) and the layout page (docs/layout) to GitHub Pages. Runs only
-# when the pages, the repo images they show, or the keymaps change. The site keeps the repo's paths, since the
+# Publishes the assembly guide (docs/assembly), the layout page (docs/layout) and the order page (docs/order)
+# to GitHub Pages. Runs only when the pages, the parts list they share, the repo images they show, or the
+# keymaps change. The site keeps the repo's paths, since the
 # guide links ../images and ../../Images and the layout page fetches ../../zmk/config/roamyboard_split.keymap;
 # the site root redirects to docs/assembly/.
-name: Assembly guide
+name: Pages
 
 on:
   push:
@@ -10,6 +11,8 @@ on:
     paths:
       - "docs/assembly/**"
       - "docs/layout/**"
+      - "docs/order/**"
+      - "docs/parts.js"
       - "docs/images/**"
       - "Images/firmware first boot irl.webp"
       - "zmk/config/*.keymap"
@@ -38,7 +41,8 @@ jobs:
       - name: Assemble the site
         run: |
           mkdir -p _site/docs _site/Images _site/zmk/config
-          cp -R docs/assembly docs/images docs/layout _site/docs/
+          cp -R docs/assembly docs/images docs/layout docs/order _site/docs/
+          cp docs/parts.js _site/docs/
           cp zmk/config/*.keymap _site/zmk/config/
           cp "Images/firmware first boot irl.webp" _site/Images/
           # Fails the job if a model is still an LFS pointer rather than a GLB.
