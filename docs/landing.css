@@ -1,9 +1,4 @@
-/* The landing page; colours, type, cards, buttons and the 3D viewer come from assembly/guide.css. */
-.topbar {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px clamp(16px, 4vw, 40px);
-  border-bottom: 1px solid var(--line); background: var(--card);
-}
-.topbar-links { display: flex; gap: 8px; }
+/* The landing page; colours, type, cards, buttons, the topbar and the 3D viewer come from assembly/guide.css. */
 .page { max-width: 1240px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px) 80px; }
 .page h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 64px 0 .5em; }
 .page .lead { font-size: 1.15rem; color: var(--muted); max-width: 60ch; }
@@ -45,7 +40,5 @@ a.btn { text-decoration: none; }
   .hero-viewer .viewer { min-height: 360px; }
 }
 @media (max-width: 560px) {
-  .topbar { flex-direction: column; align-items: flex-start; }
-  .topbar-links { flex-wrap: wrap; }
   .gallery { grid-template-columns: minmax(0, 1fr); }
 }
