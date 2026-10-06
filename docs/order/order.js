@@ -48,12 +48,14 @@
     if (layout in keymaps) return;
     keymaps[layout] = null;      // one attempt per layout, whatever happens
     const file = layout === "split" ? "roamyboard_split.keymap" : "roamyboard.keymap";
+    const url = new URL(`../keymaps/${file}`, location.href);
     try {
-      const res = await fetch(new URL(`../../zmk/config/${file}`, location.href), { cache: "no-cache" });
+      const res = await fetch(url, { cache: "no-cache" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       keymaps[layout] = window.RoamyKeymap.parseKeymap(await res.text());
-    } catch {
+    } catch (e) {
       keymaps[layout] = null;    // the page works without it; only the characters go missing
+      console.error(`order: no ${layout} keymap from ${url}: ${e.message}`);
     }
     render();
   }

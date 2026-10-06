@@ -14,7 +14,7 @@ I will also need a wearable [[Computer]] and [[Head mounted display]] to go with
 
 This repo is also an Obsidian project, which is why it has wiki syntax here and there.
 
-To build one, follow the [assembly guide](https://nevyn.github.io/roamyboard/docs/assembly/).
+To build one, follow the [assembly guide](https://nevyn.github.io/roamyboard/assembly/), or [order one](https://nevyn.github.io/roamyboard/order/). The project's page is https://nevyn.github.io/roamyboard/.
 
 # How to work on this shit
 
