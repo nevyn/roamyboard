@@ -4,6 +4,7 @@
   "use strict";
   const { PARTS, RATES, RATES_DATE, FILAMENT } = window.RoamyParts;
   const { WIDTH, THICK, arcRadius, radiusFromSagitta } = window.RoamyGeometry;
+  const { GROUPS, keymapColumn, boundModules, groupOf } = window.RoamyKeys;
   const C = window.RoamyCatalog;
   const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const el = (tag, cls, attrs = {}) => Object.assign(document.createElement(tag), cls ? { className: cls } : {}, attrs);
@@ -17,6 +18,7 @@
     halves: 2, cols: C.COLUMNS.default, rows: C.ROWS.built, curve: curveDefault,
     material: C.DEFAULTS.material, caseColour: C.DEFAULTS.caseColour, accent: null,
     switch: C.DEFAULTS.switch, brush: C.DEFAULTS.capColour, profile: "flat", build: "kit",
+    keycaps: "splitkb", chars: false,
     caps: {},   // "side:col:row" -> { colour, profile }; absent means the default colour, flat
   };
   const DEFAULTS = { ...state };
@@ -24,6 +26,8 @@
   const capKey = (side, col, row) => `${side}:${col}:${row}`;
   const capAt = (side, col, row) => state.caps[capKey(side, col, row)] || { colour: BASE_CAP, profile: "flat" };
   const keyCount = () => state.halves * state.cols * state.rows;
+  const layoutName = () => state.halves === 2 ? "split" : "unibody";
+  const maxCols = () => C.COLUMNS.max[layoutName()];
   const counts = () => ({ key: state.cols * state.halves, mcu: state.halves, term: state.halves, build: 1 });
   const palette = () => C.FILAMENTS[state.material];
   const hexOf = (list, name) => (list.find(e => e[0] === name) || [])[1] || "#888888";
@@ -32,6 +36,39 @@
   const capHex = name => hexOf(C.CAPS, name);
   // A key module's three inner columns carry the thumb keys on their last row, as the firmware's keymap does.
   const isThumb = (col, row) => row === state.rows - 1 && col >= state.cols - 3;
+
+  // ---- what each key types, read from the firmware's keymap
+
+  // The keymap file is the only copy of the layout, so this page fetches and parses it rather than holding
+  // one. Characters are a reference while ordering; the caps themselves are blank.
+  const keymaps = {};            // layout name -> parsed keymap, or null once a load has failed
+  const keymapOf = () => keymaps[layoutName()] || null;
+
+  async function loadKeymap(layout) {
+    if (layout in keymaps) return;
+    keymaps[layout] = null;      // one attempt per layout, whatever happens
+    const file = layout === "split" ? "roamyboard_split.keymap" : "roamyboard.keymap";
+    try {
+      const res = await fetch(new URL(`../../zmk/config/${file}`, location.href), { cache: "no-cache" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      keymaps[layout] = window.RoamyKeymap.parseKeymap(await res.text());
+    } catch {
+      keymaps[layout] = null;    // the page works without it; only the characters go missing
+    }
+    render();
+  }
+
+  /// What the key at a module position types on the base layer, or null where the keymap binds nothing.
+  function binding(side, col, row) {
+    const keymap = keymapOf();
+    if (!keymap || row >= window.RoamyKeymap.ROWS) return null;
+    const column = keymapColumn(layoutName(), side, state.cols, col);
+    const total = window.RoamyKeymap.COLUMNS;
+    if (column < 0 || column >= total) return null;
+    const b = keymap.layers[0].bindings[row * total + column];
+    const described = window.RoamyKeymap.describeBinding(b, keymap);
+    return described.kind === "none" ? null : described;
+  }
 
   // ---- the configuration in the query string
 
@@ -78,7 +115,7 @@
     const int = (k, lo, hi, d) => { const n = parseInt(q.get(k), 10); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : d; };
     const one = (k, list, d) => list.includes(q.get(k)) ? q.get(k) : d;
     state.halves = int("halves", 1, 2, 2);
-    state.cols = int("cols", C.COLUMNS.min, C.COLUMNS.max, C.COLUMNS.default);
+    state.cols = int("cols", C.COLUMNS.min, maxCols(), C.COLUMNS.default);
     state.rows = int("rows", C.ROWS.min, C.ROWS.max, C.ROWS.built);
     const curve = int("curve", 0, 90, curveDefault);
     state.curve = C.CURVES.some(c => c.angle === curve) ? curve : curveDefault;
@@ -88,6 +125,8 @@
     state.accent = names.includes(q.get("accent")) ? q.get("accent") : null;
     state.switch = one("switch", C.SWITCHES.map(s => s.name), state.switch);
     state.build = one("build", ["kit", "assembled"], "kit");
+    state.keycaps = one("keycaps", ["splitkb", "none"], "splitkb");
+    state.chars = q.get("chars") === "1";
     state.caps = (q.get("caps") && decodeCaps(q.get("caps"))) || {};
   }
   function writeUrl() {
@@ -102,6 +141,8 @@
     put("accent", state.accent, null);
     put("switch", state.switch, DEFAULTS.switch);
     put("build", state.build, "kit");
+    put("keycaps", state.keycaps, "splitkb");
+    if (state.chars) q.set("chars", "1");
     const caps = encodeCaps();
     if (Object.keys(state.caps).length) q.set("caps", caps);
     history.replaceState(null, "", q.toString() ? `?${q}` : location.pathname);
@@ -139,7 +180,7 @@
       detail: `${keyCount()} keys → ${swPacks} × pack of ${sw.pack}` + (swPacks * sw.pack > keyCount() ? ` (${swPacks * sw.pack - keyCount()} spare)` : ""),
     });
 
-    for (const { colour, profile, n } of capTally()) {
+    if (state.keycaps === "splitkb") for (const { colour, profile, n } of capTally()) {
       const pack = C.CAP_PACKS[profile];
       const packs = Math.ceil(n / pack.pack);
       lines.push({
@@ -218,12 +259,18 @@
       return b;
     }));
 
-    for (const [name, max] of [["cols", C.COLUMNS], ["rows", C.ROWS]]) {
+    for (const name of ["cols", "rows"]) {
       const input = $(`[data-input=${name}]`);
-      input.min = max.min; input.max = max.max;
       input.oninput = () => { state[name] = +input.value; commit(); };
     }
-    $$("[data-pick=halves] button").forEach(b => b.onclick = () => { state.halves = +b.dataset.v; commit(); });
+    $$("[data-pick=halves] button").forEach(b => b.onclick = () => {
+      state.halves = +b.dataset.v;
+      state.cols = Math.min(state.cols, maxCols());
+      loadKeymap(layoutName());
+      commit();
+    });
+    $$("[data-pick=keycaps] button").forEach(b => b.onclick = () => { state.keycaps = b.dataset.v; commit(); });
+    $("[data-pick=chars]").onchange = e => { state.chars = e.target.checked; commit(); };
     $$("[data-pick=build] button").forEach(b => b.onclick = () => { state.build = b.dataset.v; commit(); });
     $$("[data-pick=profile] button").forEach(b => b.onclick = () => { state.profile = b.dataset.v; commit(); });
     $("[data-pick=accent-on]").onchange = e => {
@@ -289,7 +336,8 @@
       for (let c = 0; c < state.cols; c++)
         for (let r = 0; r < state.rows; r++) {
           const hit = which === "all" || (which === "thumbs" && isThumb(c, r)) ||
-            (which === "outer" && (c === 0 || c === state.cols - 1));
+            (which === "outer" && (c === 0 || c === state.cols - 1)) ||
+            (which in GROUPS && groupOf(binding(s, c, r)) === which);
           if (hit) paintAt(s, c, r);
         }
     commit();
@@ -372,15 +420,26 @@
 
   function render() {
     const names = palette().map(e => e[0]), hexes = palette().map(e => e[1]);
+    const colsInput = $("[data-input=cols]"), rowsInput = $("[data-input=rows]");
+    colsInput.min = C.COLUMNS.min; colsInput.max = maxCols();
+    rowsInput.min = C.ROWS.min; rowsInput.max = C.ROWS.max;
     $("[data-out=cols]").textContent = state.cols;
     $("[data-out=rows]").textContent = state.rows;
-    $("[data-input=cols]").value = state.cols;
-    $("[data-input=rows]").value = state.rows;
+    colsInput.value = state.cols;
+    rowsInput.value = state.rows;
     $("[data-note=cols]").textContent =
       `${state.cols * state.halves} key modules, ${keyCount()} keys. Columns click together, so you can start narrow and add more later.`;
     $("[data-note=material]").textContent = state.material === "PETG HF"
       ? "Tougher and less brittle than PLA, and it minds a hot car less. Fewer colours."
       : "Prints beautifully and comes in every colour. Goes soft in a car on a summer day.";
+
+    const bound = boundModules(layoutName(), 0);
+    const colWarn = $("[data-warn=cols]");
+    colWarn.hidden = state.cols <= bound;
+    if (!colWarn.hidden) colWarn.querySelector("p").innerHTML =
+      `The firmware counts the key modules itself, so ${state.cols} of them work. The keymap that ships binds ` +
+      `<b>${bound} columns per half</b> though, so the outermost ${state.cols - bound} would type nothing until ` +
+      `you give them keys — in <a href="https://zmk.studio">ZMK Studio</a> over USB, or in the keymap file.`;
 
     const rowWarn = $("[data-warn=rows]");
     rowWarn.hidden = state.rows === C.ROWS.built;
@@ -404,21 +463,38 @@
     swatchList($("[data-pick=brush]"), C.CAPS.map(e => e[0]), C.CAPS.map(e => e[1]), state.brush, n => { state.brush = n; commit(); });
     $("[data-out=brush]").textContent = `${state.brush}, ${state.profile}`;
 
+    $("[data-pick=chars]").checked = state.chars;
+    $("[data-note=chars]").innerHTML = keymapOf()
+      ? `The caps you order are blank. This only draws the <a href="../layout/">default layout</a> on them, so you ` +
+        `can tell which key you are painting.`
+      : `The keymap did not load, so there are no characters to show. Serve the repo root and open /docs/order/ to read it.`;
+    $("[data-pick=chars]").disabled = !keymapOf();
+    $$("[data-pick=keycaps] button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === state.keycaps)));
+    $("[data-caps-ui]").hidden = state.keycaps === "none";
+    $("[data-note=keycaps]").textContent = state.keycaps === "none"
+      ? "No caps in the box. The switches take any Choc-spacing cap, so order your own."
+      : "MBK low-profile blanks, in packs. Pick a colour below and paint it onto the keys.";
+
     $("[data-board-tag]").textContent = `${state.cols * state.halves} modules, ${keyCount()} keys`;
     // Key size on a narrow screen follows one half's width: key modules, their gaps, terminator and MCU.
     document.documentElement.style.setProperty("--half-units", (state.cols * 1.28 + 2.31).toFixed(2));
     document.documentElement.style.setProperty("--board-units", (state.halves * (state.rows * 1.1 + 0.2) + 0.5).toFixed(2));
     document.documentElement.style.setProperty("--case", caseHex());
     document.documentElement.style.setProperty("--accent-case", accentHex());
+    const bare = state.keycaps === "none";
     $$("[data-board] .key").forEach(k => {
       const [s, c, r] = k.dataset.k.split(":").map(Number);
       const cap = capAt(s, c, r);
-      k.style.setProperty("--cap", capHex(cap.colour));
-      k.className = `key profile-${cap.profile}` + (isThumb(c, r) ? " thumb" : "");
-      k.title = `${cap.colour}, ${cap.profile}`;
+      const b = state.chars ? binding(s, c, r) : null;
+      k.style.setProperty("--cap", bare ? "transparent" : capHex(cap.colour));
+      k.className = `key profile-${bare ? "flat" : cap.profile}` + (isThumb(c, r) ? " thumb" : "") + (bare ? " bare" : "");
+      k.textContent = b ? b.label : "";
+      k.classList.toggle("lettered", !!(b && b.label));
+      if (b && b.label.length > 2) k.classList.add("long");
+      k.title = b ? (bare ? b.name : `${b.name} — ${cap.colour}, ${cap.profile}`) : (bare ? "" : `${cap.colour}, ${cap.profile}`);
     });
 
-    $("[data-cap-legend]").innerHTML = capTally().map(({ colour, profile, n }) =>
+    $("[data-cap-legend]").innerHTML = bare ? "" : capTally().map(({ colour, profile, n }) =>
       `<li><i class="sw" style="background:${capHex(colour)}"></i>${colour}${profile === "flat" ? "" : ` ${profile}`} × ${n}</li>`).join("");
 
     drawCurve();
@@ -466,7 +542,7 @@
       `  Curve       ${cv.name}, ${state.curve}°${Number.isFinite(R) ? `, around ${Math.round(R)} mm` : ""}`,
       `  Case        ${state.material}, ${state.caseColour}${state.accent ? `, ${state.accent} for the MCU and terminator modules` : ""}`,
       `  Switches    ${state.switch}`,
-      `  Keycaps     ${capTally().map(c => `${c.colour}${c.profile === "flat" ? "" : ` ${c.profile}`} × ${c.n}`).join(", ")}`,
+      `  Keycaps     ${state.keycaps === "none" ? "none, I will get my own" : capTally().map(c => `${c.colour}${c.profile === "flat" ? "" : ` ${c.profile}`} × ${c.n}`).join(", ")}`,
       `  Build       ${state.build === "assembled" ? `assembled by you (${b.hours} h)` : "kit, I will build it"}`,
       ``,
       `  Parts       ${money(b.partsTotal)}`,
@@ -491,6 +567,7 @@
   }
 
   readUrl();
+  loadKeymap(layoutName());
   buildPickers();
   buildBoard();
   built = { halves: state.halves, cols: state.cols, rows: state.rows };

@@ -104,7 +104,9 @@
   };
 
   const ROWS = { min: 3, max: 8, built: 5 };
-  const COLUMNS = { min: 2, max: 7, default: 7 };
+  // A half takes as many key modules as you like; these are the counts worth offering. The firmware reads
+  // the chain's length, so the only limit past the keymap's columns is the keymap itself.
+  const COLUMNS = { min: 1, max: { split: 10, unibody: 20 }, default: 7 };
 
   // Nevyn's own pace, soldering included. Hours per module; the terminator is mostly a print with two
   // headers and a wire.

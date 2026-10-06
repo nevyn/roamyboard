@@ -5,6 +5,26 @@ const assert = require("node:assert");
 const { PITCH, WIDTH, arcRadius, radiusFromSagitta } = require("./geometry.js");
 const C = require("./catalog.js");
 const { PARTS, RATES, FILAMENT } = require("../parts.js");
+const K = require("./keys.js");
+const keymapjs = require("../layout/keymap.js");
+const fs = require("node:fs");
+const path = require("node:path");
+
+const keymaps = {
+  split: keymapjs.parseKeymap(fs.readFileSync(path.join(__dirname, "../../zmk/config/roamyboard_split.keymap"), "utf8")),
+  unibody: keymapjs.parseKeymap(fs.readFileSync(path.join(__dirname, "../../zmk/config/roamyboard.keymap"), "utf8")),
+};
+// What the keymap actually binds, so the hand-written ranges in keys.js cannot drift from the firmware.
+function boundRange(keymap, half) {
+  const used = new Set();
+  for (const layer of keymap.layers)
+    layer.bindings.forEach((b, i) => { if (b.behavior !== "none") used.add(i % keymapjs.COLUMNS); });
+  const half0 = keymapjs.COLUMNS / 2;
+  const cols = [...used].filter(c => half === "right" ? c >= half0 : c < half0);
+  return cols.length ? [Math.min(...cols), Math.max(...cols)] : null;
+}
+const described = (keymap, column, row) =>
+  keymapjs.describeBinding(keymap.layers[0].bindings[row * keymapjs.COLUMNS + column], keymap);
 
 test("the arc matches the case model", () => {
   // case/Case design.md: one 8° rotation about a centre 149 mm below the board.
@@ -118,4 +138,70 @@ test("a build's quantities and bill come out sane", () => {
   const hours = halves * (C.ASSEMBLY.hours.key * cols + C.ASSEMBLY.hours.mcu + C.ASSEMBLY.hours.term);
   assert.strictEqual(hours, 8.5);
   assert.ok(FILAMENT.amount > 0 && RATES[FILAMENT.currency]);
+});
+
+test("the bound columns in keys.js are the columns the keymaps bind", () => {
+  assert.deepStrictEqual(K.BOUND.split.left, boundRange(keymaps.split, "left"));
+  assert.deepStrictEqual(K.BOUND.split.right, boundRange(keymaps.split, "right"));
+  const unibody = boundRange(keymaps.unibody, "right");
+  assert.deepStrictEqual(K.BOUND.unibody.left, unibody, "the unibody binds one run of columns");
+});
+
+test("a full half maps onto exactly the bound columns, and a short one keeps the inner ones", () => {
+  const full = n => [...Array(n).keys()];
+  const cols = (layout, side, n) => full(n).map(i => K.keymapColumn(layout, side, n, i));
+
+  const [l0, l1] = K.BOUND.split.left, [r0, r1] = K.BOUND.split.right;
+  assert.deepStrictEqual(cols("split", 0, 7), full(7).map(i => l0 + i), "left half, every module");
+  assert.deepStrictEqual(cols("split", 1, 7), full(7).map(i => r0 + i), "right half, every module");
+
+  // Both halves keep the columns nearest the middle of the keyboard, as docs/layout/ draws them.
+  assert.deepStrictEqual(cols("split", 0, 3), [l1 - 2, l1 - 1, l1], "left half anchors at its MCU module");
+  assert.deepStrictEqual(cols("split", 1, 3), [r0, r0 + 1, r0 + 2], "right half anchors at its terminator");
+  assert.strictEqual(K.keymapColumn("unibody", 0, 14, 13), K.BOUND.unibody.left[1]);
+
+  // More key modules than the keymap binds: the extra ones fall off the end, and the page draws them blank.
+  assert.ok(K.keymapColumn("split", 0, 10, 0) < l0, "a tenth module reaches past the bound columns");
+  assert.strictEqual(K.keymapColumn("split", 0, 10, 9), l1, "the module at the anchor does not move");
+});
+
+test("every column on offer is one a half can carry", () => {
+  for (const [layout, max] of Object.entries(C.COLUMNS.max)) {
+    assert.ok(max >= K.boundModules(layout, 0), `${layout}: ${max} columns offered, ${K.boundModules(layout, 0)} bound`);
+    assert.ok(C.COLUMNS.min >= 1 && C.COLUMNS.default <= max, layout);
+  }
+});
+
+test("the painter's groups pick out the keys they name", () => {
+  const keymap = keymaps.split;
+  const names = group => {
+    const out = [];
+    for (let c = K.BOUND.split.left[0]; c <= K.BOUND.split.right[1]; c++)
+      for (let r = 0; r < keymapjs.ROWS; r++) {
+        const d = described(keymap, c, r);
+        if (K.groupOf(d) === group) out.push(d.name);
+      }
+    return out;
+  };
+  const numbers = names("numerics");
+  assert.deepStrictEqual([...new Set(numbers)].sort(), ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]);
+  assert.strictEqual(numbers.length, 10, "the number row, once");
+
+  const modifiers = new Set(names("modifiers"));
+  for (const want of ["Left Shift", "Right Shift", "Left Control", "Left Alt (Option)",
+                      "Left GUI (Command, Windows)", "Shift + Control", "Hold: Keypad"])
+    assert.ok(modifiers.has(want), `modifiers should include ${want}`);
+  assert.ok(![...modifiers].some(n => /^[A-Z]$/.test(n)), "a letter is not a modifier");
+  assert.ok(![...modifiers].some(n => /bracket/.test(n)), "a bracket is not a modifier");
+
+  const white = new Set(names("whitespace"));
+  for (const want of ["Space", "Backspace", "Return", "Tab"]) assert.ok(white.has(want), `whitespace should include ${want}`);
+
+  // A key belongs to one group at most, so painting one group never silently repaints another.
+  for (let c = K.BOUND.split.left[0]; c <= K.BOUND.split.right[1]; c++)
+    for (let r = 0; r < keymapjs.ROWS; r++) {
+      const d = described(keymap, c, r);
+      const hits = Object.keys(K.GROUPS).filter(g => K.GROUPS[g].test(d));
+      assert.ok(hits.length <= 1, `${d.name} is in ${hits.join(" and ")}`);
+    }
 });

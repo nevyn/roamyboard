@@ -11,6 +11,8 @@
 <script src="../parts.js"></script>
 <script src="geometry.js"></script>
 <script src="catalog.js"></script>
+<script src="keys.js"></script>
+<script src="../layout/keymap.js"></script>
 <script src="order.js" defer></script>
 </head>
 <body>
@@ -46,6 +48,7 @@
             <label for="cols">Key modules per half <output data-out="cols"></output></label>
             <div class="range"><input type="range" id="cols" data-input="cols"></div>
             <p class="summary" data-note="cols"></p>
+            <div class="warn" data-warn="cols" hidden><p></p></div>
           </div>
           <div class="field">
             <label for="rows">Keys per column <output data-out="rows"></output></label>
@@ -108,6 +111,14 @@
         <div class="step-text">
           <p class="summary">Pick a colour, then paint keys with it. Homing caps have a ridge you can feel; convex caps are dished the other way and suit thumbs. Caps come in packs, so the list below shows what you would actually buy.</p>
           <div class="field">
+            <div class="seg" data-pick="keycaps">
+              <button data-v="splitkb">Keycaps from splitkb</button>
+              <button data-v="none">No keycaps, I have my own</button>
+            </div>
+            <p class="summary" data-note="keycaps"></p>
+          </div>
+          <div data-caps-ui>
+          <div class="field">
             <label>Painting with <b data-out="brush"></b></label>
             <div class="swatches" data-pick="brush"></div>
             <div class="seg" data-pick="profile">
@@ -119,11 +130,19 @@
               <button class="btn" data-preset="all">Paint every key</button>
               <button class="btn" data-preset="thumbs">Paint the thumb row</button>
               <button class="btn" data-preset="outer">Paint the outer columns</button>
+              <button class="btn" data-preset="modifiers">Paint the modifiers</button>
+              <button class="btn" data-preset="numerics">Paint the numbers</button>
+              <button class="btn" data-preset="whitespace">Paint whitespace</button>
               <button class="btn" data-preset="reset">Start over</button>
             </div>
             <p class="summary">Click a key on the keyboard to paint it. Arrow keys move between keys, space paints.</p>
           </div>
           <ul class="legend" data-cap-legend aria-label="Keycaps used"></ul>
+          </div>
+          <div class="field">
+            <label class="check-label"><input type="checkbox" data-pick="chars"> Show what each key types</label>
+            <p class="summary" data-note="chars"></p>
+          </div>
         </div>
       </section>
       <section class="step" aria-labelledby="price-title">
