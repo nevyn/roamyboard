@@ -1,0 +1,143 @@
+/* The order page; colours, type, cards and buttons come from ../assembly/guide.css. */
+:root {
+  --terminator: #d9c8a0;
+  --case: #482960;
+  --accent-case: #482960;
+  --k: 34px;            /* key size on the board drawing */
+}
+@media (prefers-color-scheme: dark) { :root { --terminator: #6d6250; } }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px clamp(16px, 4vw, 40px);
+  border-bottom: 1px solid var(--line); background: var(--card);
+}
+.topbar-links { display: flex; gap: 8px; }
+.page { max-width: 1320px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px) 80px; }
+.page h1 { font-size: clamp(2rem, 4vw, 3rem); margin: 36px 0 .2em; letter-spacing: -.03em; }
+.page h1 span { background: linear-gradient(90deg, var(--accent), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.page .lead { font-size: 1.1rem; color: var(--muted); max-width: 75ch; margin: 0 0 1.4em; }
+
+/* Everything you change is in the left column; the right column only shows what you changed, and stays put
+   while you work down the steps. It holds the board alone, so it fits the viewport and sticking works. */
+.builder { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .95fr); gap: 20px; align-items: start; }
+.preview { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; }
+.running {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px;
+}
+.running b { font-size: 1.1rem; margin-left: 4px; }
+.board-card .step-head .tag { white-space: nowrap; letter-spacing: 0; text-transform: none; font-size: .78rem; }
+.choices .step-head .tag { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.step-text .field:first-child { margin-top: 0; }
+.check-label { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--ink); margin-bottom: 6px; }
+.check-label input { accent-color: var(--accent); width: 16px; height: 16px; }
+.range { display: flex; align-items: center; gap: 10px; }
+.range input { flex: 1; accent-color: var(--accent); }
+.field label output { font: 700 1rem var(--mono); color: var(--accent); margin-left: 4px; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* swatches */
+.swatches { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 4px; }
+.swatch-btn {
+  appearance: none; width: 26px; height: 26px; border-radius: 7px; cursor: pointer; padding: 0;
+  background: var(--c); border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); transition: transform .12s;
+}
+.swatch-btn:hover { transform: scale(1.12); }
+.swatch-btn[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 2px; }
+.swatch-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* curve and switch option cards */
+.curve-pick, .switch-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 7px; margin: 6px 0; }
+.curve-opt, .switch-opt {
+  appearance: none; text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  border-radius: 11px; padding: 8px 10px; cursor: pointer; display: flex; flex-direction: column; gap: 2px;
+  font: inherit; transition: border-color .15s, background .15s;
+}
+.curve-opt:hover, .switch-opt:hover { border-color: var(--accent); }
+.curve-opt[aria-checked="true"], .switch-opt[aria-checked="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.curve-opt b, .switch-opt b { font-size: .92rem; }
+.curve-opt small, .switch-opt small { color: var(--muted); font-size: .76rem; line-height: 1.35; }
+.curve-opt .deg { font: 700 .78rem var(--mono); color: var(--accent); }
+.switch-opt .pill { align-self: flex-start; }
+
+.curve-view { margin: 12px 0 4px; }
+.curve-view svg { width: 100%; height: auto; display: block; background: var(--viewer-bg); border: 1px solid var(--line); border-radius: 12px; }
+.curve-view .leg { fill: color-mix(in srgb, var(--orange) 14%, transparent); stroke: color-mix(in srgb, var(--orange) 45%, transparent); stroke-dasharray: 4 4; }
+.curve-view .mod { stroke: color-mix(in srgb, var(--ink) 30%, transparent); stroke-width: .7; }
+.curve-view figcaption { font-size: .82rem; color: var(--muted); padding: 7px 2px 0; }
+
+.guide { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; }
+.guide summary { cursor: pointer; font-size: .88rem; color: var(--accent); }
+.guide p { font-size: .88rem; }
+.measure { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.measure input { width: 100%; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
+
+/* the board: two halves of terminator module, key modules, MCU module */
+.board { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(var(--k) * .7); padding: 6px 0 14px; }
+.half { display: flex; align-items: stretch; gap: calc(var(--k) * .08); }
+.terminator, .key-module, .mcu { border-radius: calc(var(--k) * .18); border: 1px solid var(--line); }
+.terminator { width: calc(var(--k) * .45); background: var(--accent-case); }
+.key-module { display: flex; flex-direction: column; gap: calc(var(--k) * .1); padding: calc(var(--k) * .1); background: var(--case); }
+.mcu { width: calc(var(--k) * 1.7); background: var(--accent-case); display: flex; justify-content: center; padding-top: calc(var(--k) * .4); }
+.screen {
+  width: calc(var(--k) * 1.05); height: calc(var(--k) * 2.1); border-radius: 4px; background: #1d1a24;
+  box-shadow: inset 0 0 0 3px #3a3544;
+}
+.key {
+  appearance: none; width: var(--k); height: var(--k); padding: 0; border-radius: calc(var(--k) * .16);
+  border: 1px solid color-mix(in srgb, #000 22%, transparent); border-bottom-width: 3px;
+  background: var(--cap); cursor: pointer; display: grid; place-items: center;
+  user-select: none; -webkit-user-select: none; transition: transform .12s;
+}
+.key.lettered { font: 600 calc(var(--k) * .36) / 1 var(--sans); color: color-mix(in srgb, #000 72%, var(--cap)); }
+.key.lettered.long { font-size: calc(var(--k) * .24); font-weight: 500; padding: 0 1px; overflow: hidden; }
+/* no keycaps ordered: the switch stem shows through instead of a cap */
+.key.bare { background: color-mix(in srgb, var(--case) 62%, #000); border-style: dashed; border-bottom-width: 1px; }
+.key.bare.lettered { color: color-mix(in srgb, #fff 72%, transparent); }
+.key:hover { transform: scale(1.08); z-index: 1; }
+.key:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; z-index: 1; }
+/* a homing cap has a ridge you can feel; a convex one is dished the other way */
+.key.profile-homing::after { content: ""; width: 48%; height: 2px; border-radius: 2px; background: rgba(0,0,0,.42); }
+.key.profile-convex { border-radius: calc(var(--k) * .42); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 5px 16px; list-style: none; padding: 0; margin: 2px 0 8px; font-size: .84rem; color: var(--muted); }
+.legend li { display: flex; align-items: center; gap: 7px; }
+.sw { display: inline-block; width: 14px; height: 14px; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); vertical-align: -2px; margin-right: 5px; }
+
+/* the bill */
+.bill td { font-size: .88rem; }
+.bill td:first-child { width: 100%; }
+.bill .summary { font-size: .76rem; }
+.bill tr.sum td { border-top: 1px solid var(--line); font-weight: 650; }
+.bill tr.total td { border-top: 2px solid var(--ink); border-bottom: 0; font-size: 1.05rem; font-weight: 800; }
+.order-btn { width: 100%; justify-content: center; padding: 11px; font-size: 1rem; margin-top: 12px; }
+
+.notes { max-width: 80ch; }
+.notes h2 { font-size: 1.5rem; margin: 44px 0 .4em; }
+.notes li { margin: .4em 0; }
+
+/* Narrow: the board moves above the steps and sticks to the top of the screen, so painting a key never
+   means scrolling back up. One half's width sets the key size, and the halves stack under each other. */
+@media (max-width: 1080px) {
+  .builder { grid-template-columns: minmax(0, 1fr); }
+  .preview {
+    order: -1; top: 0; max-height: 62vh; z-index: 20;
+    margin: 0 calc(0px - clamp(16px, 4vw, 48px)); padding: 0 clamp(16px, 4vw, 48px);
+    background: var(--paper); box-shadow: 0 10px 18px -12px rgba(0, 0, 0, .35);
+  }
+  .preview .step { margin-top: 0; border-radius: 0 0 var(--radius) var(--radius); }
+  .board { flex-direction: column; align-items: center; gap: 8px; padding: 2px 0 8px; }
+  .preview .step-text { padding: 8px 12px 10px; }
+  .preview .step-head { padding: 8px 12px; }
+  .preview .step-head h3 { font-size: 1.05rem; }
+  .running { margin-top: 6px; padding-top: 8px; }
+  .running b { font-size: 1rem; }
+  /* The key size is whichever is tighter: one half across (key modules and their gaps, the terminator and
+     the MCU module), or every half stacked down the card. */
+  :root { --k: min(38px, calc((100vw - 96px) / var(--half-units, 11.3)), calc(46vh / var(--board-units, 11.9))); }
+}
+@media (max-width: 560px) {
+  .measure { grid-template-columns: minmax(0, 1fr); }
+  .running { font-size: .9rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

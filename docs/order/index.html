@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roamyboard: order one</title>
+<meta name="description" content="Configure a Roamyboard — columns, curve, case colour, switches and keycaps — see what it costs, and send the order.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='6' width='7' height='20' rx='2' fill='%236b3fa0'/%3E%3Crect x='12.5' y='5' width='7' height='20' rx='2' fill='%236b3fa0' transform='rotate(8 16 15)'/%3E%3Crect x='22' y='7' width='7' height='20' rx='2' fill='%23e8871e' transform='rotate(16 25 17)'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assembly/guide.css">
+<link rel="stylesheet" href="order.css">
+<script src="../parts.js"></script>
+<script src="geometry.js"></script>
+<script src="catalog.js"></script>
+<script src="keys.js"></script>
+<script src="../layout/keymap.js"></script>
+<script src="order.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../assembly/">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="7" height="20" rx="2" fill="#6b3fa0"/><rect x="12.5" y="5" width="7" height="20" rx="2" fill="#6b3fa0" transform="rotate(8 16 15)"/><rect x="22" y="7" width="7" height="20" rx="2" fill="#e8871e" transform="rotate(16 25 17)"/></svg>
+    <span>Roamyboard<small>Order one</small></span>
+  </a>
+  <nav class="topbar-links">
+    <a class="btn" href="../layout/">Layout</a>
+    <a class="btn" href="../assembly/">Assembly guide</a>
+  </nav>
+</header>
+
+<main class="page">
+  <h1>Order a <span>Roamyboard</span></h1>
+  <p class="lead">A keyboard that sits on your legs, built out of printed columns you can add to. Nothing here is a shop: the button at the bottom opens an email to Nevyn with your configuration in it, and you two take it from there. Every price is what the parts actually cost from their vendor, listed line by line, so you can see what you are paying for.</p>
+
+  <div class="builder">
+    <div class="choices">
+
+      <section class="step" aria-labelledby="shape-title">
+        <div class="step-head"><span class="tag">1</span><h3 id="shape-title">Shape</h3></div>
+        <div class="step-text">
+          <div class="field">
+            <label>Halves</label>
+            <div class="seg" data-pick="halves">
+              <button data-v="2">Split, two halves</button>
+              <button data-v="1">Unibody, one half</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="cols">Key modules per half <output data-out="cols"></output></label>
+            <div class="range"><input type="range" id="cols" data-input="cols"></div>
+            <p class="summary" data-note="cols"></p>
+            <div class="warn" data-warn="cols" hidden><p></p></div>
+          </div>
+          <div class="field">
+            <label for="rows">Keys per column <output data-out="rows"></output></label>
+            <div class="range"><input type="range" id="rows" data-input="rows"></div>
+            <div class="warn" data-warn="rows" hidden><p></p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step" aria-labelledby="curve-title">
+        <div class="step-head"><span class="tag">2</span><h3 id="curve-title">Curve</h3></div>
+        <div class="step-text">
+          <p class="summary">Each column meets the next at an angle, so a half bends around your leg. The angle is the whole of it: the electronics are identical either way.</p>
+          <div class="curve-pick" role="radiogroup" aria-label="Curve" data-pick="curve"></div>
+          <figure class="curve-view">
+            <svg viewBox="0 0 420 200" data-curve-svg aria-hidden="true"></svg>
+            <figcaption data-curve-caption></figcaption>
+          </figure>
+          <details class="guide">
+            <summary>Measuring your leg</summary>
+            <p>Sit down. Lay something straight across the top of your thigh where the keyboard will rest, touching at both ends, and measure the span between those ends and the gap under the middle.</p>
+            <div class="measure">
+              <div class="field"><label for="span">Span across (mm)</label><input type="number" id="span" data-measure="span" min="40" max="400" step="5" placeholder="180"></div>
+              <div class="field"><label for="drop">Gap under the middle (mm)</label><input type="number" id="drop" data-measure="drop" min="1" max="120" step="1" placeholder="25"></div>
+            </div>
+            <p class="summary" data-measure-out>Fill both in and this will suggest a curve.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="step" aria-labelledby="case-title">
+        <div class="step-head"><span class="tag">3</span><h3 id="case-title">Case</h3></div>
+        <div class="step-text">
+          <div class="field">
+            <label>Filament</label>
+            <div class="seg" data-pick="material"></div>
+            <p class="summary" data-note="material"></p>
+          </div>
+          <div class="field">
+            <label>Case colour <b data-out="case"></b></label>
+            <div class="swatches" data-pick="case"></div>
+          </div>
+          <div class="field">
+            <label class="check-label"><input type="checkbox" data-pick="accent-on"> A second colour for the MCU and terminator modules</label>
+            <div class="swatches" data-pick="accent" hidden></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step" aria-labelledby="switch-title">
+        <div class="step-head"><span class="tag">4</span><h3 id="switch-title">Switches</h3></div>
+        <div class="step-text">
+          <p class="summary">Kailh Choc v1, the low-profile switch the key module's hotswap sockets take. Hotswap means you can change your mind later without a soldering iron.</p>
+          <div class="switch-pick" role="radiogroup" aria-label="Switch" data-pick="switch"></div>
+        </div>
+      </section>
+
+      <section class="step" aria-labelledby="caps-title">
+        <div class="step-head"><span class="tag">5</span><h3 id="caps-title">Keycaps</h3></div>
+        <div class="step-text">
+          <p class="summary">Pick a colour, then paint keys with it. Homing caps have a ridge you can feel; convex caps are dished the other way and suit thumbs. Caps come in packs, so the list below shows what you would actually buy.</p>
+          <div class="field">
+            <div class="seg" data-pick="keycaps">
+              <button data-v="splitkb">Keycaps from splitkb</button>
+              <button data-v="none">No keycaps, I have my own</button>
+            </div>
+            <p class="summary" data-note="keycaps"></p>
+          </div>
+          <div data-caps-ui>
+          <div class="field">
+            <label>Painting with <b data-out="brush"></b></label>
+            <div class="swatches" data-pick="brush"></div>
+            <div class="seg" data-pick="profile">
+              <button data-v="flat">Flat</button><button data-v="homing">Homing</button><button data-v="convex">Convex</button>
+            </div>
+          </div>
+          <div class="field">
+            <div class="presets">
+              <button class="btn" data-preset="all">Paint every key</button>
+              <button class="btn" data-preset="thumbs">Paint the thumb row</button>
+              <button class="btn" data-preset="outer">Paint the outer columns</button>
+              <button class="btn" data-preset="modifiers">Paint the modifiers</button>
+              <button class="btn" data-preset="numerics">Paint the numbers</button>
+              <button class="btn" data-preset="whitespace">Paint whitespace</button>
+              <button class="btn" data-preset="reset">Start over</button>
+            </div>
+            <p class="summary">Click a key on the keyboard to paint it. Arrow keys move between keys, space paints.</p>
+          </div>
+          <ul class="legend" data-cap-legend aria-label="Keycaps used"></ul>
+          </div>
+          <div class="field">
+            <label class="check-label"><input type="checkbox" data-pick="chars"> Show what each key types</label>
+            <p class="summary" data-note="chars"></p>
+          </div>
+        </div>
+      </section>
+      <section class="step" aria-labelledby="price-title">
+        <div class="step-head"><span class="tag">6</span><h3 id="price-title">What it costs</h3></div>
+        <div class="step-text">
+          <div class="field">
+            <div class="seg" data-pick="build">
+              <button data-v="kit">Kit, you build it</button>
+              <button data-v="assembled">Assembled by Nevyn</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table class="bill"><tbody data-bill></tbody></table></div>
+          <p class="summary" data-rates></p>
+          <a class="btn primary order-btn" data-order href="#">Send this order</a>
+          <p class="summary" data-permalink></p>
+        </div>
+      </section>
+    </div>
+
+    <div class="preview">
+      <section class="step board-card" aria-labelledby="board-title">
+        <div class="step-head"><h3 id="board-title">Your keyboard</h3><span class="tag" data-board-tag></span></div>
+        <div class="step-text">
+          <div class="board" data-board></div>
+          <div class="running">
+            <div><span data-running-what></span><b data-running-total></b></div>
+            <a class="btn" href="#price-title">See the bill</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <section class="notes" aria-labelledby="notes-title">
+    <h2 id="notes-title">The small print</h2>
+    <ul>
+      <li><b>This is a hobby project, not a shop.</b> Nevyn builds these one at a time, on evenings. Ask him how long it will take before you count on it.</li>
+      <li><b>Shipping is quoted separately</b>, once you say where it goes.</li>
+      <li><b>Parts prices are the vendors' own</b>, read from their pages on the date shown under the bill, plus a small markup for the odds and ends no line item catches. They drift; the bill is an estimate until Nevyn orders.</li>
+      <li><b>Five keys per column is what exists.</b> Any other row count needs a new PCB, a new case and a new keymap, so it carries a design fee, quoted on request.</li>
+      <li><b>Assembly time is Nevyn's own pace</b>, soldering included: a quarter hour per key module, two hours per MCU module, half an hour per terminator.</li>
+    </ul>
+    <p class="summary">Curious what you are ordering? The <a href="../assembly/">assembly guide</a> shows every step of the build, and the <a href="../layout/">layout page</a> shows what the keys do. Terms follow <a href="https://github.com/nevyn/roamyboard/blob/main/docs/glossary.md">the glossary</a>.</p>
+  </section>
+
+  <footer>
+    <p><b>Roamyboard</b> is a project by Nevyn Bengtsson &lt;<a href="mailto:hello@nevyn.dev">hello@nevyn.dev</a>&gt;. Source on <a href="https://github.com/nevyn/roamyboard">GitHub</a>.</p>
+  </footer>
+</main>
+<div class="tip" role="tooltip" aria-hidden="true" hidden></div>
+</body>
+</html>

@@ -20,37 +20,8 @@
   const halves = () => plan.layout === "split" ? 2 : 1;
   const counts = () => ({ key: plan.keys * halves(), mcu: halves(), term: halves() });
 
-  // per: quantity per key module (key), MCU module (mcu), terminator module (term), once per build (build), or text
-  const LCSC = id => `<a href="https://www.lcsc.com/product-detail/${id}.html">LCSC ${id}</a>`;
-  const BOM = [
-    ["Key module board"],
-    ["Key module PCB, fab revision v5", `<a href="https://github.com/nevyn/roamyboard/tree/main/electronics/KeyModule/fab">Gerbers and BOM</a>`, { key: 1, mcu: 1 }, "One per MCU module becomes its socket board."],
-    ["74HC165D, SOIC-16 (U1)", LCSC("C5613"), { key: 1 }],
-    ["100 nF, 0805 (C1)", LCSC("C49678"), { key: 1 }],
-    ["10 kΩ, 0805 (R1 to R5)", LCSC("C17414"), { key: 5 }],
-    ["Kailh Choc hotswap socket CPG135001S30", LCSC("C5333465"), { key: 5 }],
-    ["Socket, hanxia HX PM2.54-1x3P WT", LCSC("C46061767") + "; Harwin M20-7910342R fits", { key: 3, mcu: 3 }],
-    ["Header, hanxia HX PZ2.54-1x3P WT", LCSC("C46061676") + "; Harwin M20-8890345R fits", { key: 3, term: 2 }],
-    ["Kailh Choc v1 switch, any", "", { key: 5 }],
-    ["Choc keycap", "", { key: 5 }],
-    ["MCU module"],
-    ["nice!nano v2", "nicekeyboards.com", { mcu: 1 }],
-    ["nice!view", "nicekeyboards.com", { mcu: 1 }],
-    ["LiPo battery, 750 mAh, 48 × 30 × 5 mm", "electrokit 41016063", { mcu: 1 }],
-    ["Battery jack, JST S2B-PH-K-S", "", { mcu: 1 }],
-    ["Slide switch, Alps SSSS811101", "", { mcu: 1 }],
-    ["Reset button, Panasonic EVQPUC02K", "", { mcu: 1 }],
-    ["Hardware"],
-    ["M2 × 5 mm self-tapping screw", "", { key: 4, mcu: 6 }],
-    ["Hookup wire, thin", "for the MCU module", { text: "a few colours" }],
-    ["Insulated wire, up to 1.3 mm across", "for the terminator module", { text: "25 mm per terminator" }],
-    ["Two-component epoxy", "superglue as a fallback", { text: "one pack" }, "glues the connectors to the board"],
-    ["Printed"],
-    ["Key module shell and floor", "<code>key-module-print.3mf</code>", { key: 1 }, "", "#key-print"],
-    ["MCU module shell and floor", "<code>mcu-module-print.3mf</code>", { mcu: 1 }, "", "#mcu-print"],
-    ["Terminator module", "<code>terminator-print.3mf</code>", { term: 1 }, "", "#term-print"],
-    ["Solder jig", "<code>solder-jig-print.3mf</code>", { build: 1 }, "", "#jig-print"],
-  ];
+  const { PARTS } = window.RoamyParts;
+  const ROWS = { built: 5 };   // the key module the guide builds has five key positions
 
   function renderPlan() {
     const c = counts(), have = store.get("bom", {});
@@ -61,13 +32,14 @@
       `<i class="k" title="key module"></i>`.repeat(plan.keys) + `<i class="m" title="MCU module"></i></span>`).join("");
     $("[data-summary]").textContent = `${halves() === 2 ? "Two halves" : "One half"}: ${c.key} key modules (${c.key * 5} keys), ` +
       `${c.mcu} MCU module${c.mcu > 1 ? "s" : ""} and ${c.term} terminator module${c.term > 1 ? "s" : ""}.`;
-    $("[data-bom]").innerHTML = BOM.map(([name, source, per, note, link]) => {
-      if (!per) return `<tr class="group"><td colspan="4">${name}</td></tr>`;
-      const qty = per.text ?? (per.key || 0) * c.key + (per.mcu || 0) * c.mcu + (per.term || 0) * c.term + (per.build || 0);
+    $("[data-bom]").innerHTML = PARTS.map(({ name, source, per, note, link, group }) => {
+      if (group) return `<tr class="group"><td colspan="4">${group}</td></tr>`;
+      const qty = per.text ?? (per.key || 0) * c.key + (per.keyRow || 0) * c.key * ROWS.built +
+        (per.mcu || 0) * c.mcu + (per.term || 0) * c.term + (per.build || 0);
       const got = have[name];
       return `<tr class="${got ? "got" : ""}" data-item="${name}"><td class="have"><input type="checkbox" ${got ? "checked" : ""} aria-label="Have it"></td>
         <td>${link ? `<a href="${link}">${name}</a>` : name}${note ? `<br><span class="summary">${note}</span>` : ""}</td>
-        <td>${source}</td><td class="n">${qty}</td></tr>`;
+        <td>${source || ""}</td><td class="n">${qty}</td></tr>`;
     }).join("");
     $$("[data-bom] input").forEach(i => i.onchange = () => {
       const h = store.get("bom", {}), name = i.closest("tr").dataset.item;
