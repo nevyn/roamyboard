@@ -7,7 +7,7 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/drivers/kscan/chain.c`, `chain.h` | Pure logic: sentinel search, key module count stabilizing, column mapping, key event bookkeeping. No Zephyr dependencies. |
 | `zmk/drivers/kscan/kscan_165_chain.c` | Zephyr glue: SPI, /PL, polling, debouncing, the kscan callback. |
 | `zmk/dts/bindings/kscan/roamyboard,kscan-165-chain.yaml` | The driver's devicetree binding; every property is documented there. |
-| `zmk/dts/roamyboard.dtsi` | Devicetree shared by all shields: pins, the chain node, the 30 × 5 physical layout and matrix transform. |
+| `zmk/dts/roamyboard.dtsi` | Devicetree shared by all shields: pins, the chain node, the 24 × 5 physical layout and matrix transform. |
 | `zmk/boards/shields/roamyboard/` | The unibody shield. |
 | `zmk/boards/shields/roamyboard_split/` | The `roamyboard_left` and `roamyboard_right` shields. |
 | `zmk/config/roamyboard.keymap`, `roamyboard_split.keymap` | Keymaps (below). |
@@ -53,7 +53,7 @@ The driver scans every `poll-period-ms` (10 ms) while idle, and every `debounce-
 
 The **physical column** is a key module's position in the chain: 0 is the key module nearest the MCU module. The MCU module sits at the right end of a half and the terminator module at the left end, so physical columns count right to left.
 
-The **keymap column** is where a key module's keys land in the 30-column keymap. Each shield's chain node owns `columns` keymap columns and has an **anchor**, the end of the half that keymap columns are counted from:
+The **keymap column** is where a key module's keys land in the 24-column keymap. Each shield's chain node owns `columns` keymap columns and has an **anchor**, the end of the half that keymap columns are counted from:
 
 | Anchor | Keymap column of physical column p | With fewer key modules than columns |
 | --- | --- | --- |
@@ -66,15 +66,15 @@ A split roamyboard anchors both halves at the middle of the keyboard:
 
 ```
               left half, anchor mcu                            right half, anchor terminator
- terminator  [11] [12] [13] [14]  MCU module  |  terminator  [15] [16] [17] [18]  MCU module
+ terminator  [8]  [9]  [10] [11]  MCU module  |  terminator  [12] [13] [14] [15]  MCU module
              p=3  p=2  p=1  p=0               |              p=3  p=2  p=1  p=0
 ```
 
-Keymap columns are in brackets. With five key modules on each half, the left half fills keymap columns 10 to 14 and the right half 15 to 19, wherever in the half the fifth one goes.
+Keymap columns are in brackets. With five key modules on each half, the left half fills keymap columns 7 to 11 and the right half 12 to 16, wherever in the half the fifth one goes.
 
-The kscan reports keymap columns within its half; the matrix transform's `col-offset` of 15 on the right half places them in 15 to 29.
+The kscan reports keymap columns within its half; the matrix transform's `col-offset` of 12 on the right half places them in 12 to 23.
 
-Every build uses one physical layout, 30 × 5 keys (positions `row * 30 + column`), so ZMK Studio shows the full width and the keys of missing key modules never fire.
+Every build uses one physical layout, 24 × 5 keys (positions `row * 24 + column`), so ZMK Studio shows the full width and the keys of missing key modules never fire. The width keeps every position below 128: ZMK's Bluetooth split sends the peripheral's held keys as a 16-byte bitmap (`POS_STATE_LEN` in `app/src/split/bluetooth/service.c`), so the central never hears a position of 128 or more. A wider layout would put the right half's bottom row at 128 or above, where its keys never reach the central. A half therefore uses at most 12 key modules.
 
 ## Builds
 
@@ -82,9 +82,9 @@ Every build uses one physical layout, 30 × 5 keys (positions `row * 30 + column
 
 | Build | Shield | Role | Columns | Anchor | ZMK Studio |
 | --- | --- | --- | --- | --- | --- |
-| `roamyboard` | `roamyboard` | unibody | 0 to 29 | `mcu` | yes |
-| `roamyboard_left` | `roamyboard_left` | split central | 0 to 14 | `mcu` | yes |
-| `roamyboard_right` | `roamyboard_right` | split peripheral | 15 to 29 | `terminator` | no |
+| `roamyboard` | `roamyboard` | unibody | 0 to 23 | `mcu` | yes |
+| `roamyboard_left` | `roamyboard_left` | split central | 0 to 11 | `mcu` | yes |
+| `roamyboard_right` | `roamyboard_right` | split peripheral | 12 to 23 | `terminator` | no |
 
 The split role is fixed at compile time. ZMK Studio runs over BLE and over USB (the `studio-rpc-usb-uart` snippet), with locking off; the peripheral cannot host it.
 
@@ -98,7 +98,7 @@ Releasing every held key queues one event per key at once, so each shield raises
 
 ## Keymap
 
-`zmk/config/roamyboard_split.keymap` (both halves) and `zmk/config/roamyboard.keymap` (unibody) implement the four layers in [Layout](../zmk/Layout.md), 7 key modules per half. On the split, the left half uses keymap columns 8 to 14 and the right half 15 to 21. The unibody puts the same layout on one chain, in keymap columns 16 to 22 and 23 to 29, so its key module nearest the MCU module is the right half's outer column. Every other position is `&none`. The System layer (hold L2, the left pinky's row 4 key) has Bluetooth profiles, output selection, soft off (`CONFIG_ZMK_PM_SOFT_OFF`, woken only by the reset button), `&boot_screen` and `&sys_reset`.
+`zmk/config/roamyboard_split.keymap` (both halves) and `zmk/config/roamyboard.keymap` (unibody) implement the four layers in [Layout](../zmk/Layout.md), 7 key modules per half. On the split, the left half uses keymap columns 5 to 11 and the right half 12 to 18. The unibody puts the same layout on one chain, in keymap columns 10 to 16 and 17 to 23, so its key module nearest the MCU module is the right half's outer column. Every other position is `&none`. The System layer (hold L2, the left pinky's row 4 key) has Bluetooth profiles, output selection, soft off (`CONFIG_ZMK_PM_SOFT_OFF`, woken only by the reset button), `&boot_screen` and `&sys_reset`.
 
 `&boot_screen` shows the bootloader view on the status screen and then reboots into the UF2 bootloader, like ZMK's `&bootloader`. It runs on the half whose key triggered it. On the Keypad layer, the right half's outer column, row 5 (Return on QWERTY) is `&ret_boot`, a hold-tap that the keymaps define: a tap sends Return, and holding it for 1.5 s (`tapping-term-ms`, flavor `tap-preferred`, so other keys cannot make it a hold) triggers `&boot_screen`. That column is the key module nearest the MCU module, so a unibody with a single key module reaches the bootloader by holding L1 (row 4) and then row 5.
 

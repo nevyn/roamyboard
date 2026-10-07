@@ -7,10 +7,10 @@
 (() => {
   "use strict";
 
-  /// Keymap columns the shipped keymaps bind, per half, as [first, last] in the 30-column keymap.
+  /// Keymap columns the shipped keymaps bind, per half, as [first, last] in the 24-column keymap.
   const BOUND = {
-    split: { left: [8, 14], right: [15, 21] },
-    unibody: { left: [16, 29] },
+    split: { left: [5, 11], right: [12, 18] },
+    unibody: { left: [10, 23] },
   };
 
   /**

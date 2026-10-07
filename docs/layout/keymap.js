@@ -3,7 +3,7 @@
 (function (root) {
   "use strict";
 
-  const COLUMNS = 30, ROWS = 5;
+  const COLUMNS = 24, ROWS = 5;
 
   // ---- parsing
 

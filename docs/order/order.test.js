@@ -20,7 +20,7 @@ function boundRange(keymap, half) {
   for (const layer of keymap.layers)
     layer.bindings.forEach((b, i) => { if (b.behavior !== "none") used.add(i % keymapjs.COLUMNS); });
   const half0 = keymapjs.COLUMNS / 2;
-  const cols = [...used].filter(c => half === "right" ? c >= half0 : c < half0);
+  const cols = [...used].filter(c => half === "both" || (half === "right" ? c >= half0 : c < half0));
   return cols.length ? [Math.min(...cols), Math.max(...cols)] : null;
 }
 const described = (keymap, column, row) =>
@@ -143,7 +143,7 @@ test("a build's quantities and bill come out sane", () => {
 test("the bound columns in keys.js are the columns the keymaps bind", () => {
   assert.deepStrictEqual(K.BOUND.split.left, boundRange(keymaps.split, "left"));
   assert.deepStrictEqual(K.BOUND.split.right, boundRange(keymaps.split, "right"));
-  const unibody = boundRange(keymaps.unibody, "right");
+  const unibody = boundRange(keymaps.unibody, "both");
   assert.deepStrictEqual(K.BOUND.unibody.left, unibody, "the unibody binds one run of columns");
 });
 

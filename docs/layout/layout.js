@@ -4,7 +4,7 @@
   "use strict";
   const { COLUMNS, ROWS, parseKeymap, describeBinding } = window.RoamyKeymap;
   const KEYMAP_URL = "../keymaps/roamyboard_split.keymap";
-  const HALF = COLUMNS / 2; // keymap columns 0 to 14 are the left half, 15 to 29 the right
+  const HALF = COLUMNS / 2; // keymap columns 0 to 11 are the left half, 12 to 23 the right
   const LONG_PRESS_MS = 450;
   const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const el = (tag, cls, attrs = {}) => Object.assign(document.createElement(tag), cls ? { className: cls } : {}, attrs);
