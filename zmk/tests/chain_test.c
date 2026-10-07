@@ -171,13 +171,13 @@ static void test_n_modules_anchor_terminator(void) {
 }
 
 static void test_column_mapping(void) {
-    const struct chain_config mcu = {CHAIN_ANCHOR_MCU, 15, 5, 3};
+    const struct chain_config mcu = {CHAIN_ANCHOR_MCU, 15, 5, 3, 3};
     CHECK_EQ(chain_keymap_column(&mcu, 3, 0), 14);
     CHECK_EQ(chain_keymap_column(&mcu, 3, 2), 12);
     CHECK_EQ(chain_keymap_column(&mcu, 20, 14), 0);
     CHECK_EQ(chain_keymap_column(&mcu, 20, 15), -1);
 
-    const struct chain_config term = {CHAIN_ANCHOR_TERMINATOR, 15, 5, 3};
+    const struct chain_config term = {CHAIN_ANCHOR_TERMINATOR, 15, 5, 3, 3};
     CHECK_EQ(chain_keymap_column(&term, 3, 0), 2);
     CHECK_EQ(chain_keymap_column(&term, 3, 2), 0);
     CHECK_EQ(chain_keymap_column(&term, 20, 19), 0);
@@ -232,6 +232,39 @@ static void test_missing_sentinel(void) {
     CHECK_EQ(scan(&f, modules, 2), CHAIN_SCAN_SETTLING);
     CHECK_EQ(scan(&f, modules, 2), CHAIN_SCAN_REMAP);
     CHECK_EQ(scan(&f, modules, 2), CHAIN_SCAN_KEYS);
+}
+
+static void test_fault_recovery_needs_a_longer_run(void) {
+    struct fixture f;
+    setup(&f, CHAIN_ANCHOR_MCU, 30, 3);
+    f.chain.config.recovery_scans = 10;
+    const uint8_t modules[] = {SW(1), SW(2)};
+    settle(&f, modules, 2);
+
+    uint8_t broken[MAX_MODULES + 1];
+    memset(broken, 0x00, sizeof(broken));
+    for (int i = 0; i < 3; i++) {
+        chain_scan(&f.chain, broken, sizeof(broken), f.active);
+    }
+    CHECK_EQ(f.chain.accepted, CHAIN_COUNT_FAULT);
+
+    /* A floating DATA input that reads like a terminator for a while is not believed... */
+    for (int i = 0; i < 9; i++) {
+        CHECK_EQ(scan(&f, modules, 2), CHAIN_SCAN_SETTLING);
+    }
+    /* ...and one faulty scan starts the run over. */
+    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active), CHAIN_SCAN_FAULT);
+    for (int i = 0; i < 9; i++) {
+        CHECK_EQ(scan(&f, modules, 2), CHAIN_SCAN_SETTLING);
+    }
+    CHECK_EQ(scan(&f, modules, 2), CHAIN_SCAN_REMAP);
+    CHECK_EQ(f.chain.accepted, 2);
+
+    /* Away from a fault, a new count still needs only stable_scans. */
+    const uint8_t three[] = {SW(1), SW(2), SW(3)};
+    CHECK_EQ(scan(&f, three, 3), CHAIN_SCAN_SETTLING);
+    CHECK_EQ(scan(&f, three, 3), CHAIN_SCAN_SETTLING);
+    CHECK_EQ(scan(&f, three, 3), CHAIN_SCAN_REMAP);
 }
 
 static void test_flapping_during_insertion(void) {
@@ -311,7 +344,7 @@ static void test_count_change_releases_held_keys(void) {
 static void test_seven_rows(void) {
     struct fixture f;
     memset(&f, 0, sizeof(f));
-    const struct chain_config config = {CHAIN_ANCHOR_MCU, 2, 7, 1};
+    const struct chain_config config = {CHAIN_ANCHOR_MCU, 2, 7, 1, 1};
     chain_init(&f.chain, &config, f.reported);
     const uint8_t modules[] = {0x40 /* G, SW7 */, 0x20 /* F, SW6 */};
     uint8_t buf[MAX_MODULES + 1];
@@ -331,6 +364,7 @@ int main(void) {
     test_column_mapping();
     test_more_modules_than_columns();
     test_missing_sentinel();
+    test_fault_recovery_needs_a_longer_run();
     test_flapping_during_insertion();
     test_report_diff();
     test_count_change_releases_held_keys();

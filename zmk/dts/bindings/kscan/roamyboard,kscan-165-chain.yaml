@@ -74,6 +74,17 @@ properties:
       accepted one, the driver reports no key events. When a new count is
       accepted, the driver first releases every key that it reports pressed.
 
+  recovery-scans:
+    type: int
+    default: 100
+    description: |
+      Number of consecutive scans that must observe the same key module count
+      before the driver leaves an accepted fault (no sentinel). A chain without
+      its terminator module floats, and its open DATA input can read like a
+      terminator for a while, so the driver wants about 1 s of clean scans at the
+      idle pace before it believes the chain again. Values below stable-scans
+      count as stable-scans.
+
   debounce-press-ms:
     type: int
     default: 5
