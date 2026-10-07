@@ -161,8 +161,10 @@ struct MCUStops: Geometry3D {
 }
 
 /// Chambers for the power switch and the reset button, hanging from the plate down to the rim behind their wall pockets:
-/// a wall behind each body takes the press, and walls beyond its terminals stop it along the column. The corners stay
-/// open for the wires, and the switch's back wall clears its signal terminals.
+/// a wall behind each body takes the press, walls beyond its terminals stop it along the column, and a seat over the body
+/// keeps it from falling toward the plate in the upturned shell. The corners and the terminals' ends stay open for the
+/// wires, the button's end walls have slots that let its wires rise toward the nano, and the switch's back wall clears
+/// its signal terminals.
 struct MCUChambers: Geometry3D {
     var body: any Geometry3D {
         let t = P.chamberWall, h = MCU.ceiling - Joint.rim + 0.5, gap = 0.1
@@ -170,14 +172,24 @@ struct MCUChambers: Geometry3D {
         let switchSides = P.switchSpan / 2 + 0.2, resetSides = P.resetSpan / 2 + 0.3
         MCU.place(Union {
             Box(x: t, y: 3, z: h - 0.5).translated(x: -gap - t, y: b.y / 2 - 1.5, z: 0.5)
+            Box(x: b.u - P.freeWallPocket.switch + gap + 0.5, y: b.y, z: h - b.h - 0.1).translated(x: -gap, z: b.h + 0.1)
             for y in [b.y / 2 - switchSides - t, b.y / 2 + switchSides] {
                 Box(x: b.u - P.freeWallPocket.switch + gap + t + 0.5, y: t, z: h).translated(x: -gap - t, y: y)
             }
         }, x: MCU.switchX, d: MCU.switchD - b.y / 2, level: Joint.rim)
+        let inside = r.u - P.freeWallPocket.reset
         MCU.place(Union {
             Box(x: t, y: r.y - 0.6, z: h).translated(x: -gap - t, y: 0.3)
+            Box(x: inside + gap + 0.5, y: r.y, z: h - r.h - 0.1).translated(x: -gap, z: r.h + 0.1)
             for y in [r.y / 2 - resetSides - t, r.y / 2 + resetSides] {
-                Box(x: r.u - P.freeWallPocket.reset + gap + t + 0.5, y: t, z: h).translated(x: -gap - t, y: y)
+                Box(x: inside + gap + t + 0.5, y: t, z: h).translated(x: -gap - t, y: y)
+            }
+        }
+        .subtracting {
+            // a slot in each end wall, open toward the floor, for the wires from the terminals up to the nano
+            for y in [r.y / 2 - resetSides - t, r.y / 2 + resetSides] {
+                Box(x: P.resetWireSlot.width, y: t + 0.2, z: P.resetWireSlot.height + 0.5)
+                    .translated(x: (inside - P.resetWireSlot.width) / 2, y: y - 0.1, z: -0.5)
             }
         }, x: MCU.resetX, d: MCU.resetD - r.y / 2, level: Joint.rim)
     }
