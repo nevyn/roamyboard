@@ -9,7 +9,7 @@ enum Revision {
     static let floor = 7        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores; r5: 2.4 screw clearance; r6: clamp pads and rear stops on the connector bodies; r7: lead-in on the socket stops
     static let jig = 4          // r1: first Cadova jig; r2: larger passive pockets; r3: larger text; r4: un-mirrored
     static let terminator = 1
-    static let mcuShell = 4     // r2: prop over the nano, view end walls, board-side tabs with wire gaps; r3: chambers for the switch and button; r4: board-side legs down to the floor
+    static let mcuShell = 5     // r2: prop over the nano, view end walls, board-side tabs with wire gaps; r3: chambers for the switch and button; r4: board-side legs down to the floor; r5: seats over the switch and button, wire slots at the button
     static let mcuFloor = 3     // r2: clamp pads and rear stops on the socket bodies; r3: lead-in on the socket stops, tabs at the board-side legs
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
@@ -158,6 +158,7 @@ enum P {
     static let switchTails = 1.2              // signal terminals past the body's back
     static let resetSpan = 6.4                // terminal tip to tip, two at each end
     static let chamberWall = 1.2              // around the switch and the button, so they bear the press
+    static let resetWireSlot = (width: 1.6, height: 3.0)   // in the button chamber's end walls, from the rim; the nano sits 2.0 up
     static let jackBody = (u: 5.9, y: 7.6, h: 4.8)         // JST S2B-PH-K-S, mating face toward the battery
     static let jackPins = 6.25                // from the mating face
     static let jackTails = 3.4
