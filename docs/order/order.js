@@ -157,6 +157,7 @@
   const money = eur => `€${eur.toFixed(2)} / ${(eur * RATES.SEK).toFixed(0)} kr`;
   // Unit prices stay in euros alone: a line like "70 × €0.00 / 0 kr" reads as free when it is not.
   const unitPrice = eur => `€${eur.toFixed(eur < 0.1 ? 3 : 2)}`;
+  const sell = eur => eur * (1 + C.MARGIN);   // a vendor price as this page charges it
 
   function bill() {
     const c = counts(), lines = [];
@@ -170,14 +171,14 @@
       if (!qty) continue;
       if (row.grams) { grams += row.grams * qty; continue; }
       if (!row.price) continue;
-      const unit = toEur(row.price.amount, row.price.currency) / row.price.each;
+      const unit = sell(toEur(row.price.amount, row.price.currency) / row.price.each);
       lines.push({ what: row.name, detail: `${qty} × ${unitPrice(unit)}`, eur: unit * qty, vendor: row.price.vendor, url: row.price.url });
     }
 
     const sw = C.SWITCHES.find(s => s.name === state.switch);
     const swPacks = Math.ceil(keyCount() / sw.pack);
     lines.push({
-      what: `${sw.name} switches`, eur: swPacks * sw.price, vendor: "splitkb",
+      what: `${sw.name} switches`, eur: swPacks * sell(sw.price), vendor: "splitkb",
       url: `https://splitkb.com/products/${sw.handle}`,
       detail: `${keyCount()} keys → ${swPacks} × pack of ${sw.pack}` + (swPacks * sw.pack > keyCount() ? ` (${swPacks * sw.pack - keyCount()} spare)` : ""),
     });
@@ -186,21 +187,21 @@
       const pack = C.CAP_PACKS[profile];
       const packs = Math.ceil(n / pack.pack);
       lines.push({
-        what: `${colour} keycaps, ${pack.label}`, eur: packs * pack.price, vendor: "splitkb", swatch: capHex(colour),
+        what: `${colour} keycaps, ${pack.label}`, eur: packs * sell(pack.price), vendor: "splitkb", swatch: capHex(colour),
         url: `https://splitkb.com/products/${(C.CAPS.find(e => e[0] === colour) || [])[2]}`,
         detail: `${n} cap${n > 1 ? "s" : ""} → ${packs} × pack of ${pack.pack}` + (packs * pack.pack > n ? ` (${packs * pack.pack - n} spare)` : ""),
       });
     }
 
+    const kilo = sell(toEur(FILAMENT.amount, FILAMENT.currency));
     lines.push({
-      what: `Filament, ${state.material}`, eur: grams / 1000 * toEur(FILAMENT.amount, FILAMENT.currency),
-      detail: `${Math.round(grams)} g at ${unitPrice(toEur(FILAMENT.amount, FILAMENT.currency))} a kilo, measured off the print models`,
+      what: `Filament, ${state.material}`, eur: grams / 1000 * kilo,
+      detail: `${Math.round(grams)} g at ${unitPrice(kilo)} a kilo, measured off the print models`,
       vendor: FILAMENT.vendor, url: FILAMENT.url,
     });
 
     const parts = lines.reduce((a, l) => a + l.eur, 0);
-    const markup = parts * C.MARKUP;
-    const out = { lines, parts, markup, partsTotal: parts + markup, grams, hours: 0, assembly: 0 };
+    const out = { lines, partsTotal: parts, grams, hours: 0, assembly: 0 };
 
     if (state.build === "assembled") {
       const h = C.ASSEMBLY.hours;
@@ -512,7 +513,6 @@
     let html = b.lines.map(l => row(
       (l.swatch ? `<i class="sw" style="background:${l.swatch}"></i>` : "") +
       (l.url ? `<a href="${l.url}">${l.what}</a>` : l.what), l.detail, l.eur)).join("");
-    html += row(`Markup`, `${Math.round(C.MARKUP * 100)} % on parts, for the odds and ends no line catches`, b.markup);
     html += row(`<b>Parts</b>`, "", b.partsTotal, "sum");
     if (state.build === "assembled")
       html += row(`<b>Assembly by Nevyn</b>`, `${b.hours} hours at ${C.ASSEMBLY.rate} ${C.ASSEMBLY.currency}/h, soldering included`, b.assembly, "sum");
@@ -526,7 +526,7 @@
     $("[data-running-total]").textContent = money(b.total);
 
     $("[data-rates]").textContent =
-      `Vendor prices as published on ${RATES_DATE}, converted at the European Central Bank's rates of that day ` +
+      `Vendor prices as published on ${RATES_DATE}, plus my margin, converted at the European Central Bank's rates of that day ` +
       `(€1 = ${RATES.SEK} kr = $${RATES.USD}). Both drift; treat the bill as an estimate.`;
 
     const order = $("[data-order]");
