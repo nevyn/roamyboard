@@ -143,8 +143,9 @@ struct KeyModuleFloor: Geometry3D {
 /// stands perpendicular to the floor; the header's rear face leans 8° with the tilt, so its stop stands along the board
 /// normal and touches only that edge. `headers: false` for the socket board.
 ///
-/// The socket's stop has a 45° lead-in on its tip, wider than the board's float, so a board that floats toward the stop
-/// is cammed back as the floor closes instead of holding the floor off on the stop.
+/// Each stop has a 45° lead-in on its tip, wider than the board's float, so a board that floats toward a stop is cammed
+/// back as the floor closes instead of holding the floor off on it. With the socket's and the header's stops on opposite
+/// sides of the board, the floor centres it.
 struct ClampPadsAndRearStops: Geometry3D {
     var headers = true
 
@@ -167,7 +168,8 @@ struct ClampPadsAndRearStops: Geometry3D {
         let far = Joint.tilt(Joint.pivot + Vector2D(P.headerTailReach + P.headerBodyDepth, top))
         // the tails' underside slopes down toward the body, so it comes closest to the stop at the body
         let headerStop = Self.headerZ(x: near.x, w: -(P.pinAxisBelowBoard + P.pinSquare / 2)) - P.tailClearance
-        let header: [Vector2D] = [[near.x - t, low(near.x - t)], [near.x - t, headerStop], [near.x, headerStop], near, far, [far.x, low(far.x)]]
+        let header: [Vector2D] = [[near.x - t, low(near.x - t)], [near.x - t, headerStop], [near.x - c, headerStop], [near.x, headerStop - c], near, far,
+                                  [far.x, low(far.x)]]
         Union {
             for r in P.rowYs {
                 alongColumn(socket, from: Frame.by(r) - P.socketWidth / 2, length: P.socketWidth)

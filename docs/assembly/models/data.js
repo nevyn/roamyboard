@@ -1,1 +1,1 @@
-window.ROAMY_DATA = {"neighbour": [0.990268, -0.0, -0.139173, 0.0, 0.0, 1.0, 0.0, 0.0, 0.139173, -0.0, 0.990268, 0.0, 20.77521, 0.0, -1.069545, 1.0], "terminatorPause": 7.4, "revisions": {"shell": 6, "floor": 7, "jig": 4, "terminator": 1, "mcuShell": 5, "mcuFloor": 3, "coupon": 3}};
+window.ROAMY_DATA = {"neighbour": [0.990268, -0.0, -0.139173, 0.0, 0.0, 1.0, 0.0, 0.0, 0.139173, -0.0, 0.990268, 0.0, 20.77521, 0.0, -1.069545, 1.0], "terminatorPause": 7.4, "revisions": {"shell": 6, "floor": 8, "jig": 4, "terminator": 1, "mcuShell": 5, "mcuFloor": 3, "coupon": 3}};
