@@ -51,7 +51,10 @@ static enum chain_scan_result stabilize(struct chain *chain, int observed) {
         chain->streak = 1;
     }
 
-    if (chain->streak < chain->config.stable_scans) {
+    const int needed = chain->accepted == CHAIN_COUNT_FAULT && chain->config.recovery_scans > chain->config.stable_scans
+                           ? chain->config.recovery_scans
+                           : chain->config.stable_scans;
+    if (chain->streak < needed) {
         return CHAIN_SCAN_SETTLING;
     }
 

@@ -47,6 +47,12 @@ struct chain_config {
     int rows;
     /** Consecutive identical observations needed before a new count is accepted, >= 1. */
     int stable_scans;
+    /**
+     * Consecutive observations of one count needed to leave an accepted fault. An unterminated
+     * chain floats and can read like a terminated one for a few scans. Values below
+     * stable_scans count as stable_scans.
+     */
+    int recovery_scans;
 };
 
 /** Called once per key event, with keymap coordinates within this half. */
