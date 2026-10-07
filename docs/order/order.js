@@ -430,7 +430,7 @@
     colsInput.value = state.cols;
     rowsInput.value = state.rows;
     $("[data-note=cols]").textContent =
-      `${state.cols * state.halves} key modules, ${keyCount()} keys. Columns click together, so you can start narrow and add more later.`;
+      `${state.cols * state.halves} key modules, ${keyCount()} keys. Columns click together, so you can start narrow and add more when you get greedy.`;
     $("[data-note=material]").textContent = state.material === "PETG HF"
       ? "Tougher and less brittle than PLA, and it minds a hot car less. Fewer colours."
       : "Prints beautifully and comes in every colour. Goes soft in a car on a summer day.";
@@ -447,7 +447,7 @@
     rowWarn.hidden = state.rows === C.ROWS.built;
     if (!rowWarn.hidden) rowWarn.querySelector("p").innerHTML =
       `Only <b>${C.ROWS.built} keys per column</b> exists today. ${state.rows} would need a new PCB, a new case and a new keymap, ` +
-      `so it carries a design fee, quoted on request. Ask Nevyn before you count on it.`;
+      `so it carries a design fee, quoted on request. Ask me before you count on it.`;
 
     $$("[data-pick=halves] button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.v === state.halves)));
     $$("[data-pick=build] button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === state.build)));
