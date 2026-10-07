@@ -6,7 +6,7 @@
 .hero { padding-top: 40px; }
 .hero h1 { font-size: clamp(3rem, 7vw, 5.2rem); margin: 0; letter-spacing: -.04em; line-height: 1; }
 .hero .tagline { font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 750; letter-spacing: -.02em; margin: .25em 0 .6em; }
-.hero .tagline span { background: linear-gradient(90deg, var(--accent), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero h1 span { background: linear-gradient(90deg, var(--accent), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .features { list-style: none; padding: 0; margin: 22px 0; display: grid; gap: 10px; }
 .features li { display: flex; align-items: center; gap: 12px; font-size: 1.02rem; }
 .features svg {
