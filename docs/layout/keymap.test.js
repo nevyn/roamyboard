@@ -43,5 +43,5 @@ test("labels from the layout's legend", () => {
 
 test("parse errors name the problem", () => {
   assert.throws(() => parseKeymap("/ { };"), /zmk,keymap/);
-  assert.throws(() => parseKeymap('/ { keymap { compatible = "zmk,keymap"; base { bindings = <&kp A>; }; }; };'), /"base" has 1 bindings; expected 150/);
+  assert.throws(() => parseKeymap('/ { keymap { compatible = "zmk,keymap"; base { bindings = <&kp A>; }; }; };'), /"base" has 1 bindings; expected 120/);
 });

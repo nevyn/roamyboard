@@ -1,5 +1,5 @@
 /*
- * Right half of a split roamyboard, the peripheral: keymap columns 15 to 29,
+ * Right half of a split roamyboard, the peripheral: keymap columns 12 to 23,
  * filled from the terminator module at the half's left (inner) end.
  *
  * SPDX-License-Identifier: MIT
@@ -8,10 +8,10 @@
 #include <roamyboard.dtsi>
 
 &roamyboard_transform {
-    col-offset = <15>;
+    col-offset = <12>;
 };
 
 &roamyboard_chain {
-    columns = <15>;
+    columns = <12>;
     anchor = "terminator";
 };

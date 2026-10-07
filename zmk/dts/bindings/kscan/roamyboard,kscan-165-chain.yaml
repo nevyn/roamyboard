@@ -34,7 +34,7 @@ properties:
     type: int
     required: true
     description: |
-      Number of keymap columns that this half owns: 30 for a unibody, 15 for each
+      Number of keymap columns that this half owns: 24 for a unibody, 12 for each
       half of a split. Key modules that map outside these columns are ignored.
 
   anchor:

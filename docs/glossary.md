@@ -79,6 +79,6 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **key module count**: The number of key modules in front of the sentinel. The firmware accepts a new count only after several consecutive scans observe it. Not: column count, chain length.
 - **fault**: A read of the chain with no sentinel in it. Not: chain error, bad read.
 - **physical column**: A key module's position in the chain, counted from 0 at the key module nearest the MCU module. Not: chain index, module index, hardware column.
-- **keymap column**: The column of the 30-column keymap that a key module's keys are reported in. Not: logical column, layout column, matrix column.
+- **keymap column**: The column of the 24-column keymap that a key module's keys are reported in. Not: logical column, layout column, matrix column.
 - **thumb key**: One of the row 5 keys of a half's three inner key modules, which the thumb presses. Not: thumb cluster, thumb row.
 - **anchor**: The end of a half that keymap columns are counted from, set per shield: the MCU module (`mcu`) or the terminator module (`terminator`). Not: origin, alignment, justification.
