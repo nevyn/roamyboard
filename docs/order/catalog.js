@@ -111,9 +111,10 @@
   // Nevyn's own pace, soldering included. Hours per module; the terminator is mostly a print with two
   // headers and a wire.
   const ASSEMBLY = { rate: 1000, currency: "SEK", hours: { key: 0.25, mcu: 2, term: 0.5 } };
-  const MARKUP = 0.15;   // on parts, to cover the odds and ends that no line item catches
+  // Added to every part's vendor price on the bill, for the design work and for gathering the parts. 0.25 is 25 %.
+  const MARGIN = 0.25;
 
-  const api = { FILAMENTS, FILAMENT_SOURCE, SWITCHES, CAPS, CAP_PACKS, CAP_SOURCE, CURVES, DEFAULTS, ROWS, COLUMNS, ASSEMBLY, MARKUP };
+  const api = { FILAMENTS, FILAMENT_SOURCE, SWITCHES, CAPS, CAP_PACKS, CAP_SOURCE, CURVES, DEFAULTS, ROWS, COLUMNS, ASSEMBLY, MARGIN };
   if (typeof module === "object" && module.exports) module.exports = api;
   if (typeof window === "object") window.RoamyCatalog = api;
 })();
