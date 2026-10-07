@@ -6,11 +6,11 @@ import Cadova
 /// Revision engraved on each printed part. Bump a part's number whenever its geometry changes.
 enum Revision {
     static let shell = 6        // r2: larger revision text, on the end wall; r3: un-mirrored (r1, r2 are mirror images); r4: corner screws, print aids; r5: 1.8 screw pilots; r6: seat chamfer, no print aids
-    static let floor = 6        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores; r5: 2.4 screw clearance; r6: clamp pads and rear stops on the connector bodies
+    static let floor = 7        // r2: larger revision text; r3: un-mirrored; r4: corner screws, locating tabs, bridged counterbores; r5: 2.4 screw clearance; r6: clamp pads and rear stops on the connector bodies; r7: lead-in on the socket stops
     static let jig = 4          // r1: first Cadova jig; r2: larger passive pockets; r3: larger text; r4: un-mirrored
     static let terminator = 1
-    static let mcuShell = 3     // r2: prop over the nano, view end walls, board-side tabs with wire gaps; r3: chambers for the switch and button
-    static let mcuFloor = 2     // r2: clamp pads and rear stops on the socket bodies
+    static let mcuShell = 4     // r2: prop over the nano, view end walls, board-side tabs with wire gaps; r3: chambers for the switch and button; r4: board-side legs down to the floor
+    static let mcuFloor = 3     // r2: clamp pads and rear stops on the socket bodies; r3: lead-in on the socket stops, tabs at the board-side legs
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
 }
@@ -55,6 +55,7 @@ enum P {
     static let pinAxisBelowBoard = 1.25
     static let tailClearance = 0.3            // rear stops to the tails, which leave the rear face at the pin axis
     static let rearStopThickness = 1.2        // along the pin axis
+    static let rearStopLeadIn = 0.3           // 45° chamfer on the socket stop's tip; more than boardClearance
     static let stakingRoom = 0.5              // kept free beside each body's long sides, for the glue that stakes it to the board
     static let jointAngle = 8.0°
     /// Where the neighbour's socket mouth lands on this module's header axis, past the board edge (untilted).

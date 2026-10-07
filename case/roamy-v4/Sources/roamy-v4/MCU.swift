@@ -120,7 +120,8 @@ struct MCUCavity: Geometry3D {
 
 /// Stops that hang from the plate: guides at the nice!nano's sides that reach 0.6 mm down its board edge, a stop behind
 /// it and a prop over it; stops at the battery's ends, leaving its lead free to leave any side (the socket board's edge
-/// stops the battery toward the board); walls at the view's short ends; legs beside the socket board's bay-side edge.
+/// stops the battery toward the board); walls at the view's short ends; legs beside the socket board's bay-side edge,
+/// down to the floor.
 struct MCUStops: Geometry3D {
     var body: any Geometry3D {
         let t = P.tabThickness, w = P.nanoWidth, l = P.nanoLength, nano = Joint.rim + P.nanoRise
@@ -142,10 +143,13 @@ struct MCUStops: Geometry3D {
                 Box(x: 2 + e, y: e, z: wall).translated(x: x, y: P.viewLength + 0.15)
             }
         })
-        // legs beside the socket board's bay-side edge, under the board-side tabs: they stop it sliding into the bay
+        // legs beside the socket board's bay-side edge, under the board-side tabs, down to just over the floor: they stop
+        // it sliding into the bay, and the battery or a floor tab braces each tip
         for (y0, y1) in P.boardSideTabYs {
-            let z0 = -0.5, z1 = Joint.z(level: MCU.ceiling + 0.3, x: Frame.pocketX1)
-            Box(x: 0.9, y: y1 - y0, z: z1 - z0).translated(x: Frame.pocketX1, y: y0, z: z0)
+            let z0 = max(KeyModuleFloor.rimAt(Frame.pocketX1), KeyModuleFloor.rimAt(Frame.pocketX1 + 0.7)) + 0.2
+            let z1 = Joint.z(level: MCU.ceiling + 0.3, x: Frame.pocketX1)
+            Box(x: 0.9, y: y1 - y0, z: z1 + 0.5).translated(x: Frame.pocketX1, y: y0, z: -0.5)
+            Box(x: 0.7, y: y1 - y0, z: -0.5 - z0 + 0.01).translated(x: Frame.pocketX1, y: y0, z: z0)   // the battery's side leans in near the floor
         }
         let battery = Joint.rim + 2.0, b = P.batterySlack
         for d in [MCU.batteryD - b - t, MCU.batteryD + P.batteryLength + b] {
@@ -179,7 +183,8 @@ struct MCUChambers: Geometry3D {
     }
 }
 
-/// Floor of the MCU module, screwed on like the key module's: pillars under the board's end margins, locating tabs, the
+/// Floor of the MCU module, screwed on like the key module's: pillars under the board's end margins, locating tabs (also
+/// beside the board-side legs that the battery doesn't brace), the
 /// socket board's clamp pads and rear stops (`ClampPadsAndRearStops`), a rib that presses the nice!nano against the shell's
 /// post on its port, a tongue that closes the port's slot, a seat for the battery jack, and reliefs for the switch's and
 /// button's pegs. Everything that locates the parts sideways hangs from the shell, so they go into the
@@ -208,6 +213,14 @@ struct MCUFloor: Geometry3D {
                 }
                 MCU.place(Box(x: t, y: 24, z: h + 0.5), x: MCU.freeWallX - c - t, d: 80, level: rim - 0.5)
                 MCU.place(Box(x: 20, y: t, z: h + 0.5), x: MCU.stripX1 + 2, d: P.bayEndWall + c, level: rim - 0.5)
+                // beside the tips of the board-side legs that the battery doesn't brace
+                let battery = [MCU.y(MCU.batteryD - P.batterySlack), MCU.y(MCU.batteryD + P.batteryLength + P.batterySlack)].sorted()
+                for (y0, y1) in P.boardSideTabYs {
+                    let x = Frame.pocketX1 + 0.7 + c
+                    for (a, b) in [(y0, min(y1, battery[0])), (max(y0, battery[1]), y1)] where b - a >= 1 {
+                        Box(x: t, y: b - a, z: h + 0.5).translated(x: x, y: a, z: KeyModuleFloor.rimAt(x + t / 2) - 0.5)
+                    }
+                }
                 ClampPadsAndRearStops(headers: false)
                 // nice!nano: rib under its middle; the shell holds it at the sides, behind and above
                 MCU.place(Box(x: P.nanoWidth / 2, y: P.nanoLength / 2, z: P.nanoRise + 0.01),

@@ -142,6 +142,9 @@ struct KeyModuleFloor: Geometry3D {
 /// between the rear face and the top and leans away from the rear face enough to clear it either way: the socket's
 /// stands perpendicular to the floor; the header's rear face leans 8° with the tilt, so its stop stands along the board
 /// normal and touches only that edge. `headers: false` for the socket board.
+///
+/// The socket's stop has a 45° lead-in on its tip, wider than the board's float, so a board that floats toward the stop
+/// is cammed back as the floor closes instead of holding the floor off on the stop.
 struct ClampPadsAndRearStops: Geometry3D {
     var headers = true
 
@@ -157,7 +160,9 @@ struct ClampPadsAndRearStops: Geometry3D {
         let rear = P.socketDepth
         let socketStop = -(P.pinAxisBelowBoard + P.socketTailThickness / 2) - P.tailClearance
         let lean = (socketStop - top) * Joint.up.x / Joint.up.y
-        let socket: [Vector2D] = [[-1, low(-1)], [-1, top], [rear, top], [rear + lean, socketStop], [rear + lean + t, socketStop], [rear + t, low(rear + t)]]
+        let c = P.rearStopLeadIn, f = (socketStop - c - top) / (socketStop - top)
+        let socket: [Vector2D] = [[-1, low(-1)], [-1, top], [rear, top], [rear + lean * f, socketStop - c], [rear + lean + c, socketStop],
+                                  [rear + lean + t, socketStop], [rear + t, low(rear + t)]]
         let near = Joint.tilt(Joint.pivot + Vector2D(P.headerTailReach, top))
         let far = Joint.tilt(Joint.pivot + Vector2D(P.headerTailReach + P.headerBodyDepth, top))
         // the tails' underside slopes down toward the body, so it comes closest to the stop at the body
