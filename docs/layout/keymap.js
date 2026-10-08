@@ -210,6 +210,12 @@
   const BT = { BT_CLR: ["BT×", "Clear the selected Bluetooth profile's pairing"], BT_CLR_ALL: ["BT×*", "Clear every Bluetooth profile's pairing"],
     BT_NXT: ["BT→", "Next Bluetooth profile"], BT_PRV: ["BT←", "Previous Bluetooth profile"] };
   const OUT = { OUT_BLE: ["BLE", "Send keys over Bluetooth"], OUT_USB: ["USB", "Send keys over USB"], OUT_TOG: ["Out", "Toggle between USB and Bluetooth"] };
+  // Mouse keys: &mkp clicks, &mmv moves the pointer, &msc scrolls; [cap label, long name] per parameter.
+  const MOUSE = {
+    mkp: { LCLK: ["M1", "Left click"], RCLK: ["M2", "Right click"], MCLK: ["M3", "Middle click"], MB4: ["M4", "Mouse back"], MB5: ["M5", "Mouse forward"] },
+    mmv: { MOVE_UP: ["M↑", "Move the pointer up"], MOVE_DOWN: ["M↓", "Move the pointer down"], MOVE_LEFT: ["M←", "Move the pointer left"], MOVE_RIGHT: ["M→", "Move the pointer right"] },
+    msc: { SCRL_UP: ["W↑", "Scroll up"], SCRL_DOWN: ["W↓", "Scroll down"], SCRL_LEFT: ["W←", "Scroll left"], SCRL_RIGHT: ["W→", "Scroll right"] },
+  };
 
   // Behaviors without parameters: [cap label, long name, detail].
   const PLAIN = {
@@ -259,6 +265,7 @@
       if (BT[p[0]] && p.length === 1) return { label: BT[p[0]][0], name: BT[p[0]][1], kind: "system" };
     }
     if (behavior === "out" && OUT[p[0]] && p.length === 1) return { label: OUT[p[0]][0], name: OUT[p[0]][1], kind: "system" };
+    if (MOUSE[behavior]?.[p[0]] && p.length === 1) return { label: MOUSE[behavior][p[0]][0], name: MOUSE[behavior][p[0]][1], kind: "key" };
     if (PLAIN[behavior] && (p.length === 0 || behavior === "boot_screen")) {
       const [label, name, detail] = PLAIN[behavior];
       return { label, name, detail, kind: "system" };
