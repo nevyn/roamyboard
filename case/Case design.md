@@ -262,3 +262,12 @@ Untested: all of it on the printer.
 ## Harness
 
 The harness holds each half by identical lugs at both column ends. Keep every harness point-symmetric: the right half is the left half's hardware turned by 180 degrees (a rotated half, [[firmware]]), so a harness that differs between the column ends fits only one of the halves.
+
+First try, 2026-10-08: one strap per column end, threaded through the lugs of the MCU and terminator modules, around the leg and under the board. The under-board strand cancels the pull along the board, so the strap no longer pulls the modules apart along the chain. It still pulls the joints open, though. A lug's slot runs perpendicular to the top, so the strap climbs from under the board, wraps the lug's outer bar and drops back to the leg. Both strands leave the bar toward the leg, so the lug takes about twice the strap tension, at the top plane and a module's width from the joint, and that tips the end module about the joint. Whichever way it is routed, a strap through a slot at the top plane bends there. The chain of modules takes compression and the leg's push across the board; it can't take a bending moment.
+
+A strap only pushes on what it bends around, so the strap must bend only on the leg. The board should ride on the strap, not be part of its loop. To try with the current prints: run the strap under the whole board and tie each lug down to it with a zip tie or a short velcro strap, snug but not tight.
+
+Next iteration of the MCU and terminator modules:
+- [ ] Lugs at leg level: a slot at the free face's bottom edge whose axis runs along the strap, so the strap passes straight through and the lug only locates the board. A floor about 2 mm thick between strap and leg, edges rounded where the strap enters and leaves. Bridged roof in the print pose: check with `tools/overhang.py`.
+- [ ] A `strapWidth` parameter that the lug length follows: strap width + 2 mm clearance + 2 × `lugWall`. The current slot is 24 mm, just under a centimetre narrower than the strap on hand; measure the strap.
+- [ ] MCU free face: 40 mm lugs collide with the reset button at the SW5 end (`resetD` 73 mm, about 36 mm from that end). Move the button toward the switch, so both sit between the lugs, and keep room for a finger between the button and the lug.
