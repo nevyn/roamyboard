@@ -183,7 +183,7 @@ Why these pins:
 
 ## Building
 
-GitHub Actions (`.github/workflows/build.yml`) builds all three UF2s on every push that touches `zmk/`, and runs the host tests. ZMK's reusable `build-user-config` workflow cannot build this repo: it expects the config and `zephyr/module.yml` at the repo root, and it checks ZMK out into `./zmk`, which is this repo's module. The workflow does the same steps with the right paths. Download the UF2s from the run's artifacts.
+GitHub Actions (`.github/workflows/build.yml`) builds all three UF2s and their DFU zips on every push that touches `zmk/`, and runs the host tests. ZMK's reusable `build-user-config` workflow cannot build this repo: it expects the config and `zephyr/module.yml` at the repo root, and it checks ZMK out into `./zmk`, which is this repo's module. The workflow does the same steps with the right paths. Download the UF2s and DFU zips from the run's artifacts.
 
 Local build with Docker, from the repo root. The west workspace lives outside the repo and is reused between builds:
 
@@ -210,3 +210,23 @@ The host tests need only a C compiler: `zmk/tests/run.sh`.
 2. Copy the UF2 for that nice!nano onto the drive. The nice!nano flashes it and restarts.
 
 For a split, flash `roamyboard_left` onto the left half and `roamyboard_right` onto the right. If the halves do not find each other after switching from other firmware, flash ZMK's `settings_reset` firmware onto both, then the roamyboard firmware again.
+
+## Updating over Bluetooth
+
+The nice!nano's Adafruit nRF52 bootloader also has an OTA mode, which takes a DFU zip over Bluetooth from Nordic's nRF Device Firmware Update app (iOS and Android) or nRF Connect. None of this has been tried on the roamyboard yet: it is unverified whether the nice!nano's bootloader build includes OTA, and whether the update works.
+
+Every CI build uploads `<build>.zip` next to `<build>.uf2`. adafruit-nrfutil (0.5.3.post16) makes it from `zmk.hex`:
+
+```sh
+adafruit-nrfutil dfu genpkg --dev-type 0x0052 --sd-req 0xFFFE --application zmk.hex roamyboard.zip
+```
+
+The zip holds the application image (`zmk.bin`), its init packet (`zmk.dat`) and `manifest.json`. The bootloader rejects every init packet whose device type is not 0x0052. A SoftDevice requirement of 0xFFFE means any SoftDevice, which matches UF2 updates, since a UF2 file carries no SoftDevice requirement. The firmware is linked to start at 0x26000, after S140 6.1.1, either way. To make a zip locally, install adafruit-nrfutil into a virtual environment outside the repo, for example `python3 -m venv ~/Library/Caches/roamyboard-nrfutil-venv`, and run the command above on `zephyr/zmk.hex` in the build directory.
+
+To update a half:
+
+1. Press OTA on that half's System layer: under Boot on the left half, next to Boot on the right half. The status screen shows the OTA view, and the nice!nano restarts in the bootloader's OTA mode.
+2. In the nRF Device Firmware Update app, choose the DFU zip for that half, and set Packet Receipt Notification (PRN) to 8 or less; with more, the bootloader runs out of memory.
+3. Choose the nice!nano from the app's device list and start the update.
+
+The bootloader as Adafruit builds it by default updates in place: it erases the old firmware before it receives the new one. If a transfer fails, the nice!nano has no firmware and stays in the bootloader. Send the zip again, or double-tap the reset button and flash the UF2 over USB (Flashing, above). A bootloader built with dual-bank updates keeps the old firmware until the new one is complete, but then takes only applications up to 401,408 bytes, which the unibody and left builds with ZMK Studio exceed.

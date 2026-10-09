@@ -1,4 +1,5 @@
-# Builds the ZMK firmware in zmk/ and runs its host tests.
+# Builds the ZMK firmware in zmk/ (a UF2 and a Bluetooth DFU zip per build) and
+# runs its host tests.
 # ZMK's reusable build-user-config workflow cannot be used: it expects the config
 # and zephyr/module.yml at the repo root, and it checks ZMK out into ./zmk,
 # where this repo keeps its module. docs/firmware.md describes the builds.
@@ -89,10 +90,23 @@ jobs:
           grep -v -e "^#" -e "^$" "$BUILD_DIR/zephyr/.config" | sort || true
           cat "$BUILD_DIR/zephyr/zephyr.dts" || cat -s "$BUILD_DIR/zephyr/zephyr.dts.pre" || true
 
+      # The build image has Python but no pip; adafruit-nrfutil packs the DFU zip.
+      - name: Install adafruit-nrfutil
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends python3-venv
+          python3 -m venv /tmp/nrfutil
+          /tmp/nrfutil/bin/pip install --quiet adafruit-nrfutil==0.5.3.post16
+
       - name: Collect firmware
+        env:
+          NAME: ${{ matrix.artifact-name }}
         run: |
           mkdir -p "$BUILD_DIR/artifacts"
-          cp "$BUILD_DIR/zephyr/zmk.uf2" "$BUILD_DIR/artifacts/${{ matrix.artifact-name }}.uf2"
+          cp "$BUILD_DIR/zephyr/zmk.uf2" "$BUILD_DIR/artifacts/$NAME.uf2"
+          # Application DFU zip for the bootloader's Bluetooth mode; docs/firmware.md.
+          /tmp/nrfutil/bin/adafruit-nrfutil dfu genpkg --dev-type 0x0052 --sd-req 0xFFFE \
+            --application "$BUILD_DIR/zephyr/zmk.hex" "$BUILD_DIR/artifacts/$NAME.zip"
 
       - uses: actions/upload-artifact@v7
         with:

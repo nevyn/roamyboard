@@ -82,3 +82,5 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **keymap column**: The column of the 24-column keymap that a key module's keys are reported in. Not: logical column, layout column, matrix column.
 - **thumb key**: One of the row 5 keys of a half's three inner key modules, which the thumb presses. Not: thumb cluster, thumb row.
 - **anchor**: The end of a half that keymap columns are counted from, set per shield: the MCU module (`mcu`) or the terminator module (`terminator`). Not: origin, alignment, justification.
+- **OTA mode**: The mode of the nice!nano's Adafruit bootloader that takes a DFU zip over Bluetooth, entered with the OTA key (`&ota_boot`). Not: BLE DFU mode, wireless bootloader.
+- **DFU zip**: The firmware package for OTA mode: the application image, its init packet and a manifest, made by adafruit-nrfutil from `zmk.hex`. Not: OTA package, DFU package, OTA zip.
