@@ -109,6 +109,15 @@ length = END_WALL * 2 + BOARD_LENGTH + 2 * CLEARANCE
 shanks = [m3d.Manifold.cylinder(8, 1.0, 1.0, 32).translate([x, y, -8]) for x in screw_x for y in (screw_y, length - screw_y)]
 expect(max(overlap(P["floor"], s_) for s_ in shanks) < 1e-3, f"screws: {len(shanks)} M2 shanks clear the floor")
 expect(min(overlap(P["shell"], s_) for s_ in shanks) > 0.5, "screws: every shank bites into the shell")
+# Tunnel floor: the key module floor thickened under the strap tunnels, in place of the plain one
+T = {n: man(n) for n in ["tunnel-floor", "right-tunnel-floor", "tunnel-straps"]}
+worst = max([overlap(T["tunnel-floor"], P[n]) for n in ["shell", "board", "right-shell", "right-floor", "right-board"]] +
+            [overlap(T["right-tunnel-floor"], P[n]) for n in ["shell", "floor", "board", "terminator"]])
+expect(worst < 1e-3, f"tunnel floor: no overlap with its own or either neighbour's parts (largest {worst:.4f} mm³)")
+expect(max(overlap(T["tunnel-floor"], s_) for s_ in shanks) < 1e-3, f"tunnel floor: {len(shanks)} M2 shanks clear it")
+heads = [m3d.Manifold.cylinder(7.3, 1.6, 1.6, 32).translate([x, y, -12]) for x in screw_x for y in (screw_y, length - screw_y)]
+expect(max(overlap(T["tunnel-floor"], h, (0, 0, -0.05)) for h in heads) < 1e-3, "tunnel floor: a 3.2 mm screwdriver reaches every head (counterbores lean with the floor)")
+expect(overlap(T["tunnel-floor"], T["tunnel-straps"]) < 1e-3, "tunnel floor: a strap 0.5 mm smaller than the tunnel passes through")
 expect(overlap(P["jig"], P["bare-board"]) < 1e-3, "jig: no overlap with the board")
 worst = max(overlap(P["jig"], P["bare-board"], (0, 0, -d)) for d in np.arange(0, 12, 0.25))
 expect(worst < 1e-3, f"jig: board lifts straight out (largest overlap {worst:.4f} mm³)")

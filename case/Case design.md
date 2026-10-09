@@ -267,7 +267,13 @@ First try, 2026-10-08: one strap per column end, threaded through the lugs of th
 
 A strap only pushes on what it bends around, so the strap must bend only on the leg. The board should ride on the strap, not be part of its loop. To try with the current prints: run the strap under the whole board and tie each lug down to it with a zip tie or a short velcro strap, snug but not tight.
 
-Next iteration of the MCU and terminator modules:
-- [ ] Lugs at leg level: a slot at the free face's bottom edge whose axis runs along the strap, so the strap passes straight through and the lug only locates the board. A floor about 2 mm thick between strap and leg, edges rounded where the strap enters and leaves. Bridged roof in the print pose: check with `tools/overhang.py`.
-- [ ] A `strapWidth` parameter that the lug length follows: strap width + 2 mm clearance + 2 × `lugWall`. The current slot is 24 mm, just under a centimetre narrower than the strap on hand; measure the strap.
-- [ ] MCU free face: 40 mm lugs collide with the reset button at the SW5 end (`resetD` 73 mm, about 36 mm from that end). Move the button toward the switch, so both sit between the lugs, and keep room for a finger between the button and the lug.
+A loop under the board can't hang from a floor: floors print bottom-down, so the loop would be the first layer and the floor would start in the air above it. Two ways around that, to try against each other:
+- **Strap keeper** (`StrapKeeper`, model `strap-keeper-print`, four per plate): a flat tube, 39 × 6.6 × 10 mm, that prints standing on end with no overhangs. Epoxy its plate to the bottom of any floor (or the terminator), slot across the column, its outer face 6 mm in from the column end so that its slot lines up with the tunnel floor's. On a key module floor it fits between the corner screw heads (x 4.8 to 16); on the MCU floor, put it under the bay.
+- **Tunnel floor** (`KeyModuleFloor(tunnels: true)`, model `tunnel-floor-print`): the key module floor, 4.6 mm thicker below, with a tunnel at each column end (y 8 to 43 from each end, clear of the counterbores, which go down through the extra thickness). Same screws. The tunnel roof is a 35 mm bridge, past the 20 mm that `tools/overhang.py` passes, so the check flags it; if it droops in the print, paint support inside the tunnels.
+
+The slot is 35 × 3 mm, for webbing up to about 33 × 2.5 (`strapSlot`, `strapGap`; the strap on hand is unmeasured). Checked on the meshes: the tunnel floor doesn't overlap its own module's or either neighbour's parts, the screws clear it and a screwdriver reaches them, and a strap 0.5 mm smaller than the tunnel passes through.
+
+Next iteration:
+- [ ] Measure the strap and set `strapSlot` and `strapGap`.
+- [ ] Terminator: a keeper built into its bottom (it prints top-down, so the keeper's bridge is printed last), and no free-face lugs.
+- [ ] MCU shell: drop the free-face lugs.

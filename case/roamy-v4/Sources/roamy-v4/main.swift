@@ -20,6 +20,19 @@ await Project(packageRelative: "../../build/roamy-v4") {
         KeyModuleShell().transformed(PrintPose.shell).inPart(name: "Shell")
         KeyModuleFloor().transformed(PrintPose.floor).translated(x: 30).inPart(name: "Floor")
     }
+    await Model("key-module-tunnel-floor") {
+        KeyModuleShell().inPart(name: "Shell")
+        KeyModuleFloor(tunnels: true).inPart(name: "Floor", color: .blue)
+        BoardMockup().inPart(name: "Board")
+        StrapTunnel.slots(shrink: 0.25).inPart(name: "Straps", color: .red)
+    }
+    await Model("tunnel-floor-print") {
+        let f = KeyModuleFloor(tunnels: true)
+        f.transformed(PrintPose.bottomDown(f.bottom))
+    }
+    await Model("strap-keeper-print") {   // four: two for the MCU floor, two for the terminator's neighbour
+        for i in 0..<4 { StrapKeeper().translated(x: Double(i % 2) * (StrapKeeper.width + 5), y: Double(i / 2) * (StrapKeeper.height + 5)) }
+    }
     await Model("choc-cutout-coupon") { ChocCutoutCoupon() }
     await Model("solder-jig") {   // as used: turned over, board front down in the pocket
         SolderJig().transformed(SolderJig.printPose).inPart(name: "Jig")
@@ -74,6 +87,14 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
         for joint in KeyModuleShell.joints { joint.added.transformed(PrintPose.shell) }
     }
     await Model("floor-print", options: .format3D(.stl)) { KeyModuleFloor().transformed(PrintPose.floor) }
+    await Model("tunnel-floor", options: .format3D(.stl)) { KeyModuleFloor(tunnels: true) }
+    await Model("tunnel-straps", options: .format3D(.stl)) { StrapTunnel.slots(shrink: 0.25) }
+    await Model("right-tunnel-floor", options: .format3D(.stl)) { KeyModuleFloor(tunnels: true).transformed(Joint.neighbourTransform) }
+    await Model("tunnel-floor-print", options: .format3D(.stl)) {
+        let f = KeyModuleFloor(tunnels: true)
+        f.transformed(PrintPose.bottomDown(f.bottom))
+    }
+    await Model("strap-keeper-print", options: .format3D(.stl)) { StrapKeeper() }
     // what the floor's clamp pads and rear stops touch and keep clear of
     await Model("connector-bodies", options: .format3D(.stl)) {
         for r in P.rowYs { SocketBody(rowY: r); TiltedHeader(rowY: r) }

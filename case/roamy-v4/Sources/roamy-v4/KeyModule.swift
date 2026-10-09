@@ -86,6 +86,10 @@ struct Ledges: Geometry3D {
 /// bare end margins push it against the ledges; tabs along the walls locate it in the shell's opening; clamp pads and
 /// rear stops (`ClampPadsAndRearStops`) hold the connector bodies.
 struct KeyModuleFloor: Geometry3D {
+    /// Thickened below by `StrapTunnel.depth`, with a tunnel for the harness strap at each column end.
+    var tunnels = false
+    var bottom: Double { tunnels ? Joint.bottom - StrapTunnel.depth : Joint.bottom }
+
     static func rimAt(_ x: Double) -> Double { Joint.z(level: Joint.rim, x: x) }
 
     /// The floor's own frame: x along it, z out of its top face, origin on its bottom face at x.
@@ -97,7 +101,7 @@ struct KeyModuleFloor: Geometry3D {
 
     var body: any Geometry3D {
         let c = P.tabClearance, t = P.tabThickness, h = P.tabHeight
-        alongColumn(keystone(from: Joint.bottom, to: Joint.rim))
+        alongColumn(keystone(from: bottom, to: Joint.rim))
             .adding {
                 for x in P.pillarXs {
                     for y in P.pillarYs {
@@ -122,12 +126,19 @@ struct KeyModuleFloor: Geometry3D {
             .subtracting {
                 // revision on the inside face, following the floor's tilt
                 let o = Joint.corner(Joint.socketFace, Joint.rim) + Joint.along * 10, u = Joint.up, t = Joint.along
-                engraving("floor \(Revision.label(Revision.floor))", size: 6.0)
+                engraving(tunnels ? "tunnel \(Revision.label(Revision.tunnelFloor))" : "floor \(Revision.label(Revision.floor))", size: 6.0)
                     .translated(z: -0.6)
                     .transformed(Transform3D([[t.x, 0, u.x, o.x], [0, 1, 0, P.outerLength / 2], [t.y, 0, u.y, o.y], [0, 0, 0, 1]]))
                 for end in ColumnEnd.allCases {
-                    for x in P.screwXs { Counterbore().transformed(Self.frame(x: x, y: end.y(P.screwY))) }
+                    for x in P.screwXs {
+                        Counterbore().transformed(Self.frame(x: x, y: end.y(P.screwY)))
+                        if tunnels {
+                            Cylinder(diameter: P.screwHeadDiameter, height: StrapTunnel.depth + 1).translated(z: -StrapTunnel.depth - 0.5)
+                                .transformed(Self.frame(x: x, y: end.y(P.screwY)))
+                        }
+                    }
                 }
+                if tunnels { StrapTunnel.slots() }
             }
     }
 }
@@ -206,11 +217,13 @@ enum PrintPose {
                             [-u.x, 0, -u.y, top + (o.x * u.x + o.y * u.y)],
                             [0, 0, 0, 1]])
     }
-    static var floor: Transform3D {
+    static var floor: Transform3D { bottomDown(Joint.bottom) }
+    /// A part with its bottom at level `bottom` on the bed.
+    static func bottomDown(_ bottom: Double) -> Transform3D {
         let u = Joint.up, t = Joint.along, o = Joint.centre
         return Transform3D([[t.x, 0, t.y, -(o.x * t.x + o.y * t.y)],
                             [0, 1, 0, 0],
-                            [u.x, 0, u.y, -Joint.bottom - (o.x * u.x + o.y * u.y)],
+                            [u.x, 0, u.y, -bottom - (o.x * u.x + o.y * u.y)],
                             [0, 0, 0, 1]])
     }
 }

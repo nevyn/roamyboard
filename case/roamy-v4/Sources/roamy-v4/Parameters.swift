@@ -10,6 +10,8 @@ enum Revision {
     static let jig = 4          // r1: first Cadova jig; r2: larger passive pockets; r3: larger text; r4: un-mirrored
     static let terminator = 1
     static let mcuShell = 5     // r2: prop over the nano, view end walls, board-side tabs with wire gaps; r3: chambers for the switch and button; r4: board-side legs down to the floor; r5: seats over the switch and button, wire slots at the button
+    static let tunnelFloor = 1  // key module floor r8 with strap tunnels
+    static let keeper = 1
     static let mcuFloor = 3     // r2: clamp pads and rear stops on the socket bodies; r3: lead-in on the socket stops, tabs at the board-side legs
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
@@ -126,6 +128,15 @@ enum P {
     static let lugLength = 30.0               // along the column, flush with each column end
     static let lugWall = 3.0                  // around the strap slot
     static let lugRounding = 2.0              // outer vertical edges
+
+    // Harness strap: it runs under the board and through keepers or a floor's tunnels, which only locate the board
+    static let strapSlot = 35.0               // across the strap; the strap on hand (unmeasured) is about 33
+    static let strapGap = 3.0                 // through the slot; webbing up to about 2.5 thick (unmeasured)
+    static let strapBridge = 1.6              // under the strap, against the leg
+    static let keeperWall = 2.0               // a keeper's glue plate and side rails
+    static let keeperLength = 10.0            // along the strap; fits between a key module floor's screw heads
+    static let keeperLeadIn = 0.6             // 45 degrees on the slot's edges at both ends
+    static let tunnelInset = 8.0              // tunnel floor: slot from the column end, clear of the counterbores
 
     // MCU module. nice!nano v2 measured 2026-09-26; other parts from their vendors' drawings (Case design.md).
     static let usbEnd = ColumnEnd.sw5         // the nice!nano's end; the battery lies at the other
