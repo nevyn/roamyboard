@@ -213,7 +213,7 @@ For a split, flash `roamyboard_left` onto the left half and `roamyboard_right` o
 
 ## Updating over Bluetooth
 
-The nice!nano's Adafruit nRF52 bootloader also has an OTA mode, which takes a DFU zip over Bluetooth from Nordic's nRF Device Firmware Update app (iOS and Android) or nRF Connect. None of this has been tried on the roamyboard yet: it is unverified whether the nice!nano's bootloader build includes OTA, and whether the update works.
+The nice!nano's Adafruit nRF52 bootloader also has an OTA mode, which takes a DFU zip over Bluetooth from Nordic's nRF Device Firmware Update app (iOS and Android) or nRF Connect. Tried on the roamyboard: the OTA key brings up the bootloader's OTA mode, which advertises as AdaDFU, and the bootloader accepts our DFU zips. A complete update has not been confirmed yet.
 
 Every CI build uploads `<build>.zip` next to `<build>.uf2`. adafruit-nrfutil (0.5.3.post16) makes it from `zmk.hex`:
 
@@ -226,7 +226,7 @@ The zip holds the application image (`zmk.bin`), its init packet (`zmk.dat`) and
 To update a half:
 
 1. Press OTA on that half's System layer: under Boot on the left half, next to Boot on the right half. The status screen shows the OTA view, and the nice!nano restarts in the bootloader's OTA mode.
-2. In the nRF Device Firmware Update app, choose the DFU zip for that half, and set Packet Receipt Notification (PRN) to 8 or less; with more, the bootloader runs out of memory.
+2. In the nRF Device Firmware Update app, choose the DFU zip for that half, and turn Packet Receipt Notification (PRN) on and set it to 8 or less. With PRN off or above 8, the bootloader runs out of memory and the upload fails right after "DFU initialized". At PRN 4 an iPhone sends about 1.2 kB/s, so a 450 KB zip takes about six minutes; PRN 8 waits for half as many receipts.
 3. Choose the nice!nano from the app's device list and start the update.
 
-The bootloader as Adafruit builds it by default updates in place: it erases the old firmware before it receives the new one. If a transfer fails, the nice!nano has no firmware and stays in the bootloader. Send the zip again, or double-tap the reset button and flash the UF2 over USB (Flashing, above). A bootloader built with dual-bank updates keeps the old firmware until the new one is complete, but then takes only applications up to 401,408 bytes, which the unibody and left builds with ZMK Studio exceed.
+The nice!nano's bootloader updates in place, as Adafruit builds it by default: it erases the old firmware before it receives the new one, so a failed update leaves the half in the bootloader. If a transfer fails, the nice!nano has no firmware and stays in the bootloader. Send the zip again, or double-tap the reset button and flash the UF2 over USB (Flashing, above). A bootloader built with dual-bank updates keeps the old firmware until the new one is complete, but then takes only applications up to 401,408 bytes, which the unibody and left builds with ZMK Studio exceed.
