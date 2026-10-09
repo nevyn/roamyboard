@@ -8,6 +8,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 from cat_frames import write_png  # noqa: E402
 
 SCENES = [
+    "central-startup",
+    "central-startup-unknown",
     "central-7cols-walk",
     "central-1col-sit",
     "central-0cols-sleep",
@@ -18,6 +20,7 @@ SCENES = [
     "central-long-name",
     "central-bootloader",
     "central-ota",
+    "peripheral-startup",
     "peripheral-7cols-walk",
     "peripheral-noterm-sit",
     "peripheral-bootloader",

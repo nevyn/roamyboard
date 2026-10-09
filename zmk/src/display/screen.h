@@ -37,7 +37,10 @@ struct screen {
 /** Creates the screen's objects as children of parent, which should be 160 x 68 px. */
 void screen_init(struct screen *screen, lv_obj_t *parent);
 
-/** Top canvas: output or split link, battery, and the key module count box. */
+/**
+ * Top canvas: output or split link, battery, and the key module count box, which shows
+ * state->startup_build_id instead of the count when that is not NULL.
+ */
 void screen_draw_top(struct screen *screen, const struct status_state *state);
 
 /** Middle canvas: Bluetooth profiles on the central and unibody, empty on the peripheral. */
@@ -54,8 +57,12 @@ void screen_draw_bottom(struct screen *screen, const struct status_state *state)
  */
 void screen_show_cat(struct screen *screen, enum cat_frame frame, int position);
 
-/** Replaces everything on the screen with the view for a bootloader mode. */
-void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mode mode);
+/**
+ * Replaces everything on the screen with the view for a bootloader mode, with build_id in
+ * small text at the bottom.
+ */
+void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mode mode,
+                            const char *build_id);
 
 /**
  * Turns one flushed area of a 1-bit display upside down, for a flush callback to pass on to
