@@ -213,7 +213,7 @@ For a split, flash `roamyboard_left` onto the left half and `roamyboard_right` o
 
 ## Updating over Bluetooth
 
-The nice!nano's Adafruit nRF52 bootloader also has an OTA mode, which takes a DFU zip over Bluetooth: from a Mac with `roamy-ota`, or from a phone with Nordic's nRF Device Firmware Update app (iOS and Android) or nRF Connect. Tried on the roamyboard with the iOS app: the OTA key brings up the bootloader's OTA mode, which advertises as AdaDFU, and the bootloader accepts our DFU zips. A complete update has not been confirmed yet.
+The nice!nano's Adafruit nRF52 bootloader also has an OTA mode, which takes a DFU zip over Bluetooth: from a Mac with `roamy-ota`, or from a phone with Nordic's nRF Device Firmware Update app (iOS and Android) or nRF Connect. Both work on the roamyboard: the iOS app updated the left half, and `roamy-ota` updated both halves of the split in one run. After each update, the status screen showed the new build ID at startup.
 
 Every CI build uploads `<build>.zip` next to `<build>.uf2`. adafruit-nrfutil (0.5.3.post16) makes it from `zmk.hex`:
 
