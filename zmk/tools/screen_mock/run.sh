@@ -10,7 +10,7 @@
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 zmk_dir=$(cd "$here/../.." && pwd)
-ws=${1:-/tmp/roamyboard-west}
+ws=${1:-$HOME/Library/Caches/roamyboard-west}
 out=${2:-/tmp/roamy-screen}
 lvgl="$ws/modules/lib/gui/lvgl"
 zephyr="$ws/zephyr/include"

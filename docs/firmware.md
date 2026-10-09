@@ -185,10 +185,10 @@ Why these pins:
 
 GitHub Actions (`.github/workflows/build.yml`) builds all three UF2s and their DFU zips on every push that touches `zmk/`, and runs the host tests. ZMK's reusable `build-user-config` workflow cannot build this repo: it expects the config and `zephyr/module.yml` at the repo root, and it checks ZMK out into `./zmk`, which is this repo's module. The workflow does the same steps with the right paths. Download the UF2s and DFU zips from the run's artifacts.
 
-Local build with Docker, from the repo root. The west workspace lives outside the repo and is reused between builds:
+Local build with Docker, from the repo root. The west workspace lives outside the repo and is reused between builds; keep it out of /tmp, which macOS empties:
 
 ```sh
-ws=${WS:-$(mktemp -d /tmp/roamyboard-west.XXXXXX)}
+ws=${WS:-$HOME/Library/Caches/roamyboard-west}
 mkdir -p "$ws/config" && cp zmk/config/west.yml "$ws/config/"
 docker run --rm -v "$ws:/west" -v "$PWD:/repo:ro" -w /west zmkfirmware/zmk-build-arm:4.1 sh -c '
   [ -d .west ] || { west init -l config && west update --fetch-opt=--filter=tree:0; }
