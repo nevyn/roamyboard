@@ -21,6 +21,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/events/usb_conn_state_changed.h>
 #include <zmk/usb.h>
 
+#include <roamyboard/build_id.h>
 #include <roamyboard/chain_state.h>
 #include <roamyboard/events/chain_state_changed.h>
 #include <roamyboard/status_screen.h>
@@ -244,6 +245,9 @@ static atomic_t cat_last_frame_ms;
 static enum cat_frame cat_shown_frame = CAT_FRAME_COUNT;
 static int cat_shown_position = -1;
 
+/** The cat appears with the key module count, once the startup build ID is gone. */
+static atomic_t cat_started;
+
 static void cat_work_handler(struct k_work *work);
 static K_WORK_DELAYABLE_DEFINE(cat_work, cat_work_handler);
 
@@ -271,7 +275,7 @@ static void cat_work_handler(struct k_work *work) {
 
 static int cat_key_listener(const zmk_event_t *eh) {
     const struct zmk_position_state_changed *ev = as_zmk_position_state_changed(eh);
-    if (ev == NULL || !ev->state || !atomic_get(&ready)) {
+    if (ev == NULL || !ev->state || !atomic_get(&cat_started)) {
         return ZMK_EV_EVENT_BUBBLE;
     }
 
@@ -289,13 +293,29 @@ static int cat_key_listener(const zmk_event_t *eh) {
 ZMK_LISTENER(roamyboard_cat, cat_key_listener);
 ZMK_SUBSCRIPTION(roamyboard_cat, zmk_position_state_changed);
 
+/** How long the count box shows the build ID after the screen starts. */
+#define STARTUP_BUILD_ID_MS 3000
+
+static void startup_end_handler(struct k_work *work) {
+    if (bootloader_shown) {
+        return;
+    }
+    state.startup_build_id = NULL;
+    screen_draw_top(&screen, &state);
+    atomic_set(&cat_last_press_ms, (atomic_val_t)k_uptime_get_32());
+    atomic_set(&cat_started, true);
+    k_work_schedule_for_queue(zmk_display_work_q(), &cat_work, K_NO_WAIT);
+}
+
+static K_WORK_DELAYABLE_DEFINE(startup_end_work, startup_end_handler);
+
 static void (*bootloader_done)(void);
 static enum roamyboard_bootloader_mode bootloader_mode;
 
 static void bootloader_work_handler(struct k_work *work) {
     bootloader_shown = true;
     k_work_cancel_delayable(&cat_work);
-    screen_draw_bootloader(&screen, bootloader_mode);
+    screen_draw_bootloader(&screen, bootloader_mode, roamyboard_build_id());
     // The 1-bit flush callback writes to the display before it returns, so the whole view
     // is on the display once lv_refr_now() returns.
     lv_refr_now(NULL);
@@ -350,6 +370,7 @@ lv_obj_t *zmk_display_status_screen(void) {
     screen_init(&screen, root);
 
     state.key_module_count = ROAMYBOARD_CHAIN_UNKNOWN;
+    state.startup_build_id = roamyboard_build_id();
     screen_draw_top(&screen, &state);
     screen_draw_middle(&screen, &state);
     screen_draw_bottom(&screen, &state);
@@ -366,9 +387,9 @@ lv_obj_t *zmk_display_status_screen(void) {
     widget_peripheral_status_init();
 #endif
 
-    atomic_set(&cat_last_press_ms, (atomic_val_t)k_uptime_get_32());
     atomic_set(&ready, true);
-    k_work_schedule_for_queue(zmk_display_work_q(), &cat_work, K_NO_WAIT);
+    k_work_schedule_for_queue(zmk_display_work_q(), &startup_end_work,
+                              K_MSEC(STARTUP_BUILD_ID_MS));
 
     return root;
 }

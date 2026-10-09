@@ -100,9 +100,22 @@ static void render(const char *dir, const char *name, const struct status_state 
     write_scene(dir, name);
 }
 
+/** Renders the first seconds after start: the count box shows the build ID, with no cat. */
+static void render_startup(const char *dir, const char *name, struct status_state state,
+                           const char *build_id) {
+    state.startup_build_id = build_id;
+    screen_draw_top(&screen, &state);
+    screen_draw_middle(&screen, &state);
+    screen_draw_bottom(&screen, &state);
+    lv_obj_add_flag(screen.cat, LV_OBJ_FLAG_HIDDEN);
+    fake_ms += 1000;
+    lv_refr_now(NULL);
+    write_scene(dir, name);
+}
+
 static void render_bootloader(const char *dir, const char *name,
-                              enum roamyboard_bootloader_mode mode) {
-    screen_draw_bootloader(&screen, mode);
+                              enum roamyboard_bootloader_mode mode, const char *build_id) {
+    screen_draw_bootloader(&screen, mode, build_id);
     fake_ms += 1000;
     lv_refr_now(NULL);
     write_scene(dir, name);
@@ -148,6 +161,9 @@ int main(int argc, char **argv) {
     lv_screen_load(root);
 
 #if STATUS_SCREEN_CENTRAL
+    render_startup(dir, "central-startup", base_state(7), "3274ed3-dirty");
+    render_startup(dir, "central-startup-unknown", base_state(7), "unknown");
+
     struct status_state state = base_state(7);
     render(dir, "central-7cols-walk", &state, CAT_WALK_1, 12);
 
@@ -191,9 +207,11 @@ int main(int argc, char **argv) {
              "Living Room iPad Pro (12.9-inch) (6th generation)");
     render(dir, "central-long-name", &state, CAT_WALK_3, 24);
 
-    render_bootloader(dir, "central-bootloader", ROAMYBOARD_BOOTLOADER_UF2);
-    render_bootloader(dir, "central-ota", ROAMYBOARD_BOOTLOADER_OTA);
+    render_bootloader(dir, "central-bootloader", ROAMYBOARD_BOOTLOADER_UF2, "3274ed3-dirty");
+    render_bootloader(dir, "central-ota", ROAMYBOARD_BOOTLOADER_OTA, "3274ed3");
 #else
+    render_startup(dir, "peripheral-startup", base_state(7), "3274ed3");
+
     struct status_state state = base_state(7);
     render(dir, "peripheral-7cols-walk", &state, CAT_WALK_2, 6);
 
@@ -201,8 +219,8 @@ int main(int argc, char **argv) {
     state.connected = false;
     render(dir, "peripheral-noterm-sit", &state, CAT_SIT, 36);
 
-    render_bootloader(dir, "peripheral-bootloader", ROAMYBOARD_BOOTLOADER_UF2);
-    render_bootloader(dir, "peripheral-ota", ROAMYBOARD_BOOTLOADER_OTA);
+    render_bootloader(dir, "peripheral-bootloader", ROAMYBOARD_BOOTLOADER_UF2, "3274ed3");
+    render_bootloader(dir, "peripheral-ota", ROAMYBOARD_BOOTLOADER_OTA, "3274ed3-dirty");
 #endif
     return 0;
 }

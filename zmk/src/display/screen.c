@@ -24,6 +24,13 @@
 _Static_assert(CAT_X_MIN + CAT_TRACK_LENGTH - 1 + CAT_WIDTH <= CANVAS_SIZE - 3,
                "the cat must stay inside the box");
 
+/** Draws a build ID centered at y; a "-dirty" suffix wraps to a second line. */
+static void draw_build_id(lv_obj_t *canvas, int y, const lv_font_t *font, const char *build_id) {
+    lv_draw_label_dsc_t label_dsc;
+    init_label_dsc(&label_dsc, LVGL_FOREGROUND, font, LV_TEXT_ALIGN_CENTER);
+    canvas_draw_text(canvas, 1, y, CANVAS_SIZE - 3, &label_dsc, build_id);
+}
+
 static void draw_count(lv_obj_t *canvas, int key_module_count) {
     lv_draw_label_dsc_t label_dsc;
     init_label_dsc(&label_dsc, LVGL_FOREGROUND, &lv_font_montserrat_16, LV_TEXT_ALIGN_CENTER);
@@ -94,7 +101,11 @@ void screen_draw_top(struct screen *screen, const struct status_state *state) {
     // Draw the key module count box; the cat is a separate image on top of it.
     canvas_draw_rect(canvas, 0, BOX_Y, CANVAS_SIZE, BOX_H, &rect_white_dsc);
     canvas_draw_rect(canvas, 1, BOX_Y + 1, CANVAS_SIZE - 2, BOX_H - 2, &rect_black_dsc);
-    draw_count(canvas, state->key_module_count);
+    if (state->startup_build_id != NULL) {
+        draw_build_id(canvas, COUNT_Y, &lv_font_montserrat_12, state->startup_build_id);
+    } else {
+        draw_count(canvas, state->key_module_count);
+    }
 
     // Rotate canvas
     rotate_canvas(canvas);
@@ -277,7 +288,8 @@ static void draw_download_icon(lv_obj_t *canvas, int y) {
     canvas_draw_rect(canvas, cx - 16, tray_y + 7, 32, 3, &ink);
 }
 
-void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mode mode) {
+void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mode mode,
+                            const char *build_id) {
     lv_obj_add_flag(screen->cat, LV_OBJ_FLAG_HIDDEN);
 
     lv_draw_label_dsc_t title_dsc;
@@ -326,6 +338,8 @@ void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mo
 
     lv_obj_t *bottom = screen->canvas[SCREEN_BOTTOM];
     lv_canvas_fill_bg(bottom, LVGL_BACKGROUND, LV_OPA_COVER);
+    // Two lines of 8 px fit the 24 visible rows of the bottom canvas.
+    draw_build_id(bottom, 3, &lv_font_unscii_8, build_id);
     rotate_canvas(bottom);
 }
 

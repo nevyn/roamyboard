@@ -11,7 +11,8 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/boards/shields/roamyboard/` | The unibody shield. |
 | `zmk/boards/shields/roamyboard_split/` | The `roamyboard_left` and `roamyboard_right` shields. |
 | `zmk/config/roamyboard.keymap`, `roamyboard_split.keymap` | Keymaps (below). |
-| `zmk/include/roamyboard/` | Public headers: the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view. |
+| `zmk/include/roamyboard/` | Public headers: the build ID, the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view. |
+| `zmk/cmake/build_id.cmake`, `zmk/src/build_id.c` | The build ID (Building, below). |
 | `zmk/src/ble/host_names.c` | Reads each Bluetooth host's name and keeps it per profile (below). |
 | `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. |
 | `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen` and `&ota_boot`, the bootloader keys; their binding is in `zmk/dts/bindings/behaviors/`. |
@@ -115,7 +116,7 @@ The roamyboard mounts the nice!view with its contacts toward the MCU module, whi
 | Middle | The five Bluetooth profiles in a row, and the active profile's host name | Empty |
 | Bottom | The name of the highest active layer | Empty |
 
-The box shows this half's own accepted key module count: "7 cols", "1 col", "0 cols". It shows "no term" while the accepted state is a fault, which usually means that the terminator module is missing, and "..." before the driver has accepted any count. The kscan driver raises `roamyboard_chain_state_changed` whenever it accepts a new count or a fault, and `roamyboard_chain_key_module_count()` returns the current state (`zmk/include/roamyboard/`). The split central shows only its own half's count.
+For the first 3 s after the keyboard starts, the box shows the firmware's build ID (Building, below) instead, on every half, and the cat appears with the count. A dirty build ID wraps after the dash. Then the box shows this half's own accepted key module count: "7 cols", "1 col", "0 cols". It shows "no term" while the accepted state is a fault, which usually means that the terminator module is missing, and "..." before the driver has accepted any count. The kscan driver raises `roamyboard_chain_state_changed` whenever it accepts a new count or a fault, and `roamyboard_chain_key_module_count()` returns the current state (`zmk/include/roamyboard/`). The split central shows only its own half's count.
 
 The cat walks when a key is pressed: every key press moves it 2 px to the right along the box's floor and advances its walk cycle, and it wraps from the right end to the left. On the split central, key presses on both halves count; the peripheral counts only its own. When no key has been pressed for 2 s the cat sits down, and it blinks every 4 s while sitting. After 30 s it curls up and sleeps, with a z that comes and goes every second.
 
@@ -135,7 +136,7 @@ Each profile's last name is stored in the settings key `roamyboard/host/<n>`, wi
 
 ### Bootloader view
 
-`&boot_screen` asks the status screen for the bootloader view: "BOOT LOADER", a download icon and "drop a UF2 on NICENANO". `&ota_boot` asks for the OTA view: "OTA BOOT", a Bluetooth glyph and "send the DFU zip over Bluetooth". Both are the same driver, and the behavior node's `mode` property (`uf2` or `ota`) selects the view and the bootloader mode. The display work queue draws it on all three canvases, stops every other update, and calls `lv_refr_now()`. The nice!view's 1-bit flush callback writes to the display before it returns, so the view is on the display when `lv_refr_now()` returns, and the behavior reboots into the bootloader from there. If the view has not been written within 1 s, or the display is not initialized, the behavior logs a warning and reboots without it.
+`&boot_screen` asks the status screen for the bootloader view: "BOOT LOADER", a download icon and "drop a UF2 on NICENANO". `&ota_boot` asks for the OTA view: "OTA BOOT", a Bluetooth glyph and "send the DFU zip over Bluetooth". Both views show the build ID in small text at the bottom, so it stays on the display while the bootloader runs, as long as the display keeps its power there. Both are the same driver, and the behavior node's `mode` property (`uf2` or `ota`) selects the view and the bootloader mode. The display work queue draws it on all three canvases, stops every other update, and calls `lv_refr_now()`. The nice!view's 1-bit flush callback writes to the display before it returns, so the view is on the display when `lv_refr_now()` returns, and the behavior reboots into the bootloader from there. If the view has not been written within 1 s, or the display is not initialized, the behavior logs a warning and reboots without it.
 
 ### Choosing the bootloader mode
 
@@ -204,6 +205,19 @@ For the split halves use `-d build/roamyboard_left` with `SHIELD="roamyboard_lef
 
 The host tests need only a C compiler: `zmk/tests/run.sh`.
 
+### Build ID
+
+Every firmware carries a build ID: the git commit that it was built from, as 7 hex digits ("3274ed3"), with "-dirty" appended when tracked files under `zmk/` had uncommitted changes ("3274ed3-dirty"). Only `zmk/` (the module, the keymaps and the settings) goes into the firmware, and the build image has no git-lfs, so outside `zmk/` its git would see every Git LFS file as modified. Untracked files do not count. `zmk/cmake/build_id.cmake` runs `git rev-parse` and `git diff --quiet HEAD -- .` in the module's directory and writes the ID to a generated header, `roamyboard_build_id.h`. It runs at CMake configure time and again before every build, and rewrites the header only when the ID changed, so an incremental build cannot keep a stale ID. When git is missing or fails, the ID is "unknown", the build prints why ("roamyboard build ID: unknown (...)"), and the build goes on. `roamyboard_build_id()` (`zmk/include/roamyboard/build_id.h`) returns the ID, and the firmware logs "roamyboard <id>" once at boot.
+
+The builds run git as another user than the one that owns the checkout, so `build_id.cmake` passes `-c safe.directory=*`. CI gets the real commit: `actions/checkout` leaves a `.git` directory with the commit in the workspace that the build container mounts; a pull request builds, and identifies, GitHub's merge commit. In a git worktree, `.git` is a file that points into the main checkout's `.git` directory, which the container cannot see, so the ID would be "unknown". Mount the main repository's git directory, and point `build_id.cmake` at the worktree's part of it with `ROAMYBOARD_GIT_DIR` and `ROAMYBOARD_GIT_WORK_TREE` (`GIT_DIR` itself would break west):
+
+```sh
+common=$(git rev-parse --path-format=absolute --git-common-dir)
+gitdir=$(git rev-parse --path-format=absolute --git-dir)
+docker run --rm -v "$ws:/west" -v "$PWD:/repo:ro" -v "$common:/gitcommon:ro" \
+  -e ROAMYBOARD_GIT_DIR="/gitcommon/${gitdir#"$common"/}" -e ROAMYBOARD_GIT_WORK_TREE=/repo ...
+```
+
 ## Flashing
 
 1. Connect the nice!nano over USB and double-tap its reset button, or press Boot on the System layer, or hold L1 and hold the right half's outer row 5 key for 1.5 s. It mounts as a USB drive named NICENANO. The two keys first put the bootloader view on the status screen; whether it stays there while the bootloader runs depends on whether the nice!nano keeps VCC on in the bootloader, which has not been tested.
@@ -228,5 +242,6 @@ To update a half:
 1. Press OTA on that half's System layer: under Boot on the left half, next to Boot on the right half. The status screen shows the OTA view, and the nice!nano restarts in the bootloader's OTA mode.
 2. In the nRF Device Firmware Update app, choose the DFU zip for that half, and turn Packet Receipt Notification (PRN) on and set it to 8 or less. With PRN off or above 8, the bootloader runs out of memory and the upload fails right after "DFU initialized". At PRN 4 an iPhone sends about 1.2 kB/s, so a 450 KB zip takes about six minutes; PRN 8 waits for half as many receipts.
 3. Choose the nice!nano from the app's device list and start the update.
+4. When the half restarts, check the build ID that its status screen shows for the first 3 s: it is the commit of the new firmware.
 
 The nice!nano's bootloader updates in place, as Adafruit builds it by default: it erases the old firmware before it receives the new one, so a failed update leaves the half in the bootloader. If a transfer fails, the nice!nano has no firmware and stays in the bootloader. Send the zip again, or double-tap the reset button and flash the UF2 over USB (Flashing, above). A bootloader built with dual-bank updates keeps the old firmware until the new one is complete, but then takes only applications up to 401,408 bytes, which the unibody and left builds with ZMK Studio exceed.
