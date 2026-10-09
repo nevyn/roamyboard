@@ -17,7 +17,7 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. |
 | `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen` and `&ota_boot`, the bootloader keys; their binding is in `zmk/dts/bindings/behaviors/`. |
 | `zmk/tests/` | Host tests for the pure logic: `zmk/tests/run.sh`. |
-| `zmk/tools/` | `cat_frames.py` generates the cat's bitmaps; `screen_mock/run.sh` renders the status screen on the host. |
+| `zmk/tools/` | `cat_frames.py` generates the cat's bitmaps; `screen_mock/run.sh` renders the status screen on the host; `ota/` builds `roamy-ota`, which updates halves over Bluetooth (Updating over Bluetooth, below). |
 
 ## Reading the chain
 
@@ -227,7 +227,7 @@ For a split, flash `roamyboard_left` onto the left half and `roamyboard_right` o
 
 ## Updating over Bluetooth
 
-The nice!nano's Adafruit nRF52 bootloader also has an OTA mode, which takes a DFU zip over Bluetooth from Nordic's nRF Device Firmware Update app (iOS and Android) or nRF Connect. Tried on the roamyboard: the OTA key brings up the bootloader's OTA mode, which advertises as AdaDFU, and the bootloader accepts our DFU zips. A complete update has not been confirmed yet.
+The nice!nano's Adafruit nRF52 bootloader also has an OTA mode, which takes a DFU zip over Bluetooth: from a Mac with `roamy-ota`, or from a phone with Nordic's nRF Device Firmware Update app (iOS and Android) or nRF Connect. Both work on the roamyboard: the iOS app updated the left half, and `roamy-ota` updated both halves of the split in one run. After each update, the status screen showed the new build ID at startup.
 
 Every CI build uploads `<build>.zip` next to `<build>.uf2`. adafruit-nrfutil (0.5.3.post16) makes it from `zmk.hex`:
 
@@ -237,11 +237,50 @@ adafruit-nrfutil dfu genpkg --dev-type 0x0052 --sd-req 0xFFFE --application zmk.
 
 The zip holds the application image (`zmk.bin`), its init packet (`zmk.dat`) and `manifest.json`. The bootloader rejects every init packet whose device type is not 0x0052. A SoftDevice requirement of 0xFFFE means any SoftDevice, which matches UF2 updates, since a UF2 file carries no SoftDevice requirement. The firmware is linked to start at 0x26000, after S140 6.1.1, either way. To make a zip locally, install adafruit-nrfutil into a virtual environment outside the repo, for example `python3 -m venv ~/Library/Caches/roamyboard-nrfutil-venv`, and run the command above on `zephyr/zmk.hex` in the build directory.
 
-To update a half:
+Every update starts the same way: press OTA on that half's System layer, under Boot on the left half and next to Boot on the right half. The status screen shows the OTA view, and the nice!nano restarts in the bootloader's OTA mode.
 
-1. Press OTA on that half's System layer: under Boot on the left half, next to Boot on the right half. The status screen shows the OTA view, and the nice!nano restarts in the bootloader's OTA mode.
-2. In the nRF Device Firmware Update app, choose the DFU zip for that half, and turn Packet Receipt Notification (PRN) on and set it to 8 or less. With PRN off or above 8, the bootloader runs out of memory and the upload fails right after "DFU initialized". At PRN 4 an iPhone sends about 1.2 kB/s, so a 450 KB zip takes about six minutes; PRN 8 waits for half as many receipts.
+The bootloader keeps each image packet in one of its 16 receive buffers until it has written the packet to flash. The sender must therefore wait for a Packet Receipt Notification (PRN) after every few packets; Adafruit's README requires one every 8 packets or fewer. With PRN off, the upload failed right after "DFU initialized".
+
+### From a Mac
+
+`zmk/tools/ota` is a Swift package that builds `roamy-ota`, which speaks the bootloader's protocol: Nordic's legacy DFU from nRF5 SDK 11. Build it:
+
+```sh
+swift build -c release --package-path zmk/tools/ota
+```
+
+Download the DFU zips of a CI run. With several `-n`, `gh` puts each artifact in its own directory, and `roamy-ota` takes such a directory in place of the zip inside it:
+
+```sh
+gh run list --workflow Firmware --limit 5
+gh run download RUN_ID -n roamyboard_left -n roamyboard_right -D fw
+```
+
+`--dry-run` shows what `roamy-ota` would send, and checks each zip, without Bluetooth:
+
+```sh
+zmk/tools/ota/.build/release/roamy-ota --dry-run fw/roamyboard_left fw/roamyboard_right
+```
+
+Then run it from a terminal app. On the first run, macOS asks whether the terminal app may use Bluetooth. A process that macOS cannot attribute to an app that may ask, such as an agent's shell, is killed instead.
+
+```sh
+zmk/tools/ota/.build/release/roamy-ota fw/roamyboard_left fw/roamyboard_right
+```
+
+`roamy-ota` asks for one half at a time, for example "Press OTA on the half for roamyboard_right.zip." The first half that appears as AdaDFU gets the first zip, and the next new one gets the second, so press OTA in the order that `roamy-ota` asks. On a split keyboard the right half goes first: its OTA key works only while the left half, which runs the keymap, still runs its firmware. `roamy-ota` therefore moves a zip whose name contains "left" to the end and says so. A half that is already in OTA mode when `roamy-ota` starts, for example after a failed update, appears first; name its zip first. Both halves update at the same time, each with a progress line. `roamy-ota` exits with 0 once every half has validated and activated its new firmware; each half then restarts with it.
+
+`roamy-ota` sends 20-byte packets and asks for a receipt after every 8 by default (`--prn 1` to `--prn 8`). Each receipt costs a round trip, so 8 is the fastest allowed value. We estimate about 2.5 kB/s at PRN 8, so about three minutes for a 450 KB image; that has not been measured. `--packet-size` sends larger packets, which the bootloader accepts in whole 4-byte words up to the connection's MTU; that has not been tried on the roamyboard.
+
+If an update fails, `roamy-ota` names the half, the phase and the bootloader's response code. When the failure comes after the bootloader has erased the old firmware and the connection is still up, `roamy-ota` asks the bootloader to reset, and the half restarts in OTA mode: run `roamy-ota` again with that half's zip. When the connection dropped instead, the half keeps advertising as AdaDFU, but its bootloader still holds the interrupted transfer; the next run resets it and asks you to run once more. Flashing the UF2 over USB (Flashing, above) works in every case.
+
+### From a phone
+
+1. Press OTA on the half.
+2. In the nRF Device Firmware Update app, choose the DFU zip for that half, and turn Packet Receipt Notification on and set it to 8 or less. At PRN 4 an iPhone sends about 1.2 kB/s, so a 450 KB zip takes about six minutes; PRN 8 waits for half as many receipts.
 3. Choose the nice!nano from the app's device list and start the update.
 4. When the half restarts, check the build ID that its status screen shows for the first 3 s: it is the commit of the new firmware.
 
-The nice!nano's bootloader updates in place, as Adafruit builds it by default: it erases the old firmware before it receives the new one, so a failed update leaves the half in the bootloader. If a transfer fails, the nice!nano has no firmware and stays in the bootloader. Send the zip again, or double-tap the reset button and flash the UF2 over USB (Flashing, above). A bootloader built with dual-bank updates keeps the old firmware until the new one is complete, but then takes only applications up to 401,408 bytes, which the unibody and left builds with ZMK Studio exceed.
+### When an update fails
+
+The nice!nano's bootloader updates in place, as Adafruit builds it by default: it erases the old firmware before it receives the new one, so a failed update leaves the half in the bootloader with no firmware. Send the zip again, or double-tap the reset button and flash the UF2 over USB (Flashing, above). A bootloader built with dual-bank updates keeps the old firmware until the new one is complete, but then takes only applications up to 401,408 bytes, which the unibody and left builds with ZMK Studio exceed.
