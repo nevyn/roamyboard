@@ -290,24 +290,27 @@ ZMK_LISTENER(roamyboard_cat, cat_key_listener);
 ZMK_SUBSCRIPTION(roamyboard_cat, zmk_position_state_changed);
 
 static void (*bootloader_done)(void);
+static enum roamyboard_bootloader_mode bootloader_mode;
 
 static void bootloader_work_handler(struct k_work *work) {
     bootloader_shown = true;
     k_work_cancel_delayable(&cat_work);
-    screen_draw_bootloader(&screen);
+    screen_draw_bootloader(&screen, bootloader_mode);
     // The 1-bit flush callback writes to the display before it returns, so the whole view
     // is on the display once lv_refr_now() returns.
     lv_refr_now(NULL);
-    LOG_INF("Bootloader view is on the display");
+    LOG_INF("Bootloader view %d is on the display", bootloader_mode);
     bootloader_done();
 }
 
 static K_WORK_DEFINE(bootloader_work, bootloader_work_handler);
 
-int roamyboard_status_screen_show_bootloader(void (*done)(void)) {
+int roamyboard_status_screen_show_bootloader(enum roamyboard_bootloader_mode mode,
+                                             void (*done)(void)) {
     if (!atomic_get(&ready)) {
         return -ENODEV;
     }
+    bootloader_mode = mode;
     bootloader_done = done;
     k_work_submit_to_queue(zmk_display_work_q(), &bootloader_work);
     return 0;

@@ -1,12 +1,25 @@
 # SPDX-License-Identifier: MIT
 
 description: |
-  Shows the bootloader view on the roamyboard status screen, waits until the display
-  has received it (at most 1 s), and then reboots into the UF2 bootloader like ZMK's
-  &bootloader. Without the status screen it reboots at once. It takes no parameters
-  and runs on the half whose key triggered it. zmk/dts/behaviors/boot_screen.dtsi
-  defines &boot_screen.
+  Shows a bootloader view on the roamyboard status screen, waits until the display
+  has received it (at most 1 s), and then reboots into a mode of the nice!nano's
+  Adafruit nRF52 bootloader. Without the status screen it reboots at once. It takes
+  no parameters and runs on the half whose key triggered it.
+  zmk/dts/behaviors/boot_screen.dtsi defines &boot_screen and &ota_boot.
 
 compatible: "roamyboard,behavior-boot-screen"
 
 include: zero_param.yaml
+
+properties:
+  mode:
+    type: string
+    default: "uf2"
+    enum:
+      - "uf2"
+      - "ota"
+    description: |
+      The bootloader mode to reboot into. "uf2" (the default) is the USB drive that
+      takes a UF2 file, like ZMK's &bootloader. "ota" is Bluetooth DFU, which takes a
+      DFU zip from Nordic's nRF Device Firmware Update app. docs/firmware.md describes
+      both.

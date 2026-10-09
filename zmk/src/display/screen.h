@@ -10,6 +10,8 @@
 
 #include <lvgl.h>
 
+#include <roamyboard/status_screen.h>
+
 #include "cat_frames.h"
 #include "util.h"
 
@@ -52,8 +54,8 @@ void screen_draw_bottom(struct screen *screen, const struct status_state *state)
  */
 void screen_show_cat(struct screen *screen, enum cat_frame frame, int position);
 
-/** Replaces everything on the screen with the bootloader view. */
-void screen_draw_bootloader(struct screen *screen);
+/** Replaces everything on the screen with the view for a bootloader mode. */
+void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mode mode);
 
 /**
  * Turns one flushed area of a 1-bit display upside down, for a flush callback to pass on to
