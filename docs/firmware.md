@@ -11,7 +11,8 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/boards/shields/roamyboard/` | The unibody shield. |
 | `zmk/boards/shields/roamyboard_split/` | The `roamyboard_left` and `roamyboard_right` shields. |
 | `zmk/config/roamyboard.keymap`, `roamyboard_split.keymap` | Keymaps (below). |
-| `zmk/include/roamyboard/` | Public headers: the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view. |
+| `zmk/include/roamyboard/` | Public headers: the build ID, the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view. |
+| `zmk/cmake/build_id.cmake`, `zmk/src/build_id.c` | The build ID (Building, below). |
 | `zmk/src/ble/host_names.c` | Reads each Bluetooth host's name and keeps it per profile (below). |
 | `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. |
 | `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen` and `&ota_boot`, the bootloader keys; their binding is in `zmk/dts/bindings/behaviors/`. |
@@ -203,6 +204,19 @@ ls -l "$ws/build/roamyboard/zephyr/zmk.uf2"
 For the split halves use `-d build/roamyboard_left` with `SHIELD="roamyboard_left nice_view_adapter nice_view"` (same snippet and Studio flags), and `-d build/roamyboard_right` with `SHIELD="roamyboard_right nice_view_adapter nice_view"` without `-S studio-rpc-usb-uart` and the Studio flags. For USB logs, add the `zmk-usb-logging` snippet (`-S zmk-usb-logging`) and read the nice!nano's serial port.
 
 The host tests need only a C compiler: `zmk/tests/run.sh`.
+
+### Build ID
+
+Every firmware carries a build ID: the git commit that it was built from, as 7 hex digits ("3274ed3"), with "-dirty" appended when tracked files under `zmk/` had uncommitted changes ("3274ed3-dirty"). Only `zmk/` (the module, the keymaps and the settings) goes into the firmware, and the build image has no git-lfs, so outside `zmk/` its git would see every Git LFS file as modified. Untracked files do not count. `zmk/cmake/build_id.cmake` runs `git rev-parse` and `git diff --quiet HEAD -- .` in the module's directory and writes the ID to a generated header, `roamyboard_build_id.h`. It runs at CMake configure time and again before every build, and rewrites the header only when the ID changed, so an incremental build cannot keep a stale ID. When git is missing or fails, the ID is "unknown", the build prints why ("roamyboard build ID: unknown (...)"), and the build goes on. `roamyboard_build_id()` (`zmk/include/roamyboard/build_id.h`) returns the ID, and the firmware logs "roamyboard <id>" once at boot.
+
+The builds run git as another user than the one that owns the checkout, so `build_id.cmake` passes `-c safe.directory=*`. CI gets the real commit: `actions/checkout` leaves a `.git` directory with the commit in the workspace that the build container mounts; a pull request builds, and identifies, GitHub's merge commit. In a git worktree, `.git` is a file that points into the main checkout's `.git` directory, which the container cannot see, so the ID would be "unknown". Mount the main repository's git directory, and point `build_id.cmake` at the worktree's part of it with `ROAMYBOARD_GIT_DIR` and `ROAMYBOARD_GIT_WORK_TREE` (`GIT_DIR` itself would break west):
+
+```sh
+common=$(git rev-parse --path-format=absolute --git-common-dir)
+gitdir=$(git rev-parse --path-format=absolute --git-dir)
+docker run --rm -v "$ws:/west" -v "$PWD:/repo:ro" -v "$common:/gitcommon:ro" \
+  -e ROAMYBOARD_GIT_DIR="/gitcommon/${gitdir#"$common"/}" -e ROAMYBOARD_GIT_WORK_TREE=/repo ...
+```
 
 ## Flashing
 
