@@ -15,9 +15,13 @@ enum RoamyOTACommand {
             exit(0)
         }
 
-        var zips: [DFUZip] = []
+        var given: [DFUZip] = []
         for input in options.inputs {
-            do { zips.append(try DFUZip(contentsOf: URL(fileURLWithPath: input))) } catch { fail("\(error)", status: 1) }
+            do { given.append(try DFUZip(contentsOf: URL(fileURLWithPath: input))) } catch { fail("\(error)", status: 1) }
+        }
+        let (zips, reordered) = updateOrder(given)
+        if reordered {
+            print("Updating \(zips.map(\.name).joined(separator: ", ")) in that order: the left half relays the right half's OTA key, so it goes last.")
         }
         var settings = DFUSettings()
         settings.packetReceiptInterval = options.packetReceiptInterval

@@ -17,8 +17,9 @@ public struct Options: Equatable, Sendable {
         usage: roamy-ota [--prn N] [--timeout SECONDS] [--packet-size BYTES] [--dry-run] ZIP [ZIP ...]
 
         Updates roamyboard halves over Bluetooth. Run it, then press OTA on each half
-        in the order of the ZIPs: the first half that appears as AdaDFU gets the first
-        ZIP, the next one the second. Halves update at the same time.
+        when it asks: the first half that appears as AdaDFU gets the first ZIP, the next
+        one the second. A ZIP whose name contains "left" goes last, since the left half
+        relays the right half's OTA key. Halves update at the same time.
 
         ZIP is a DFU zip from a CI build, or a directory that holds one, such as an
         artifact fetched with `gh run download RUN -n roamyboard_left`.

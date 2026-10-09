@@ -89,4 +89,21 @@ import Testing
         #expect(summary.contains("zmk.dat, 14 bytes: 52 00 FF FF FF FF FF FF 01 00 FE FF"))
         #expect(summary.contains("50 packets of up to 20 bytes, a receipt every 8 packets (6 receipts)"))
     }
+
+    @Test func leftHalfGoesLast() throws {
+        let data = try Fixtures.zip(Fixtures.files(image: Fixtures.image(size: 100)))
+        func named(_ names: String...) throws -> [DFUZip] { try names.map { try DFUZip(name: $0, zipData: data) } }
+
+        let split = updateOrder(try named("roamyboard_left.zip", "roamyboard_right.zip"))
+        #expect(split.zips.map(\.name) == ["roamyboard_right.zip", "roamyboard_left.zip"])
+        #expect(split.reordered)
+
+        let alreadyOrdered = updateOrder(try named("roamyboard_right.zip", "roamyboard_LEFT-ota.zip"))
+        #expect(alreadyOrdered.zips.map(\.name) == ["roamyboard_right.zip", "roamyboard_LEFT-ota.zip"])
+        #expect(!alreadyOrdered.reordered)
+
+        let unibody = updateOrder(try named("roamyboard.zip"))
+        #expect(unibody.zips.map(\.name) == ["roamyboard.zip"])
+        #expect(!unibody.reordered)
+    }
 }
