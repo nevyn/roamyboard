@@ -17,9 +17,11 @@ SCENES = [
     "central-empty-name",
     "central-long-name",
     "central-bootloader",
+    "central-ota",
     "peripheral-7cols-walk",
     "peripheral-noterm-sit",
     "peripheral-bootloader",
+    "peripheral-ota",
 ]
 
 

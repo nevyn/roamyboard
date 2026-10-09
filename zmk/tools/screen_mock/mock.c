@@ -100,6 +100,14 @@ static void render(const char *dir, const char *name, const struct status_state 
     write_scene(dir, name);
 }
 
+static void render_bootloader(const char *dir, const char *name,
+                              enum roamyboard_bootloader_mode mode) {
+    screen_draw_bootloader(&screen, mode);
+    fake_ms += 1000;
+    lv_refr_now(NULL);
+    write_scene(dir, name);
+}
+
 static struct status_state base_state(int key_module_count) {
     struct status_state state = {
         .battery = 80,
@@ -183,10 +191,8 @@ int main(int argc, char **argv) {
              "Living Room iPad Pro (12.9-inch) (6th generation)");
     render(dir, "central-long-name", &state, CAT_WALK_3, 24);
 
-    screen_draw_bootloader(&screen);
-    fake_ms += 1000;
-    lv_refr_now(NULL);
-    write_scene(dir, "central-bootloader");
+    render_bootloader(dir, "central-bootloader", ROAMYBOARD_BOOTLOADER_UF2);
+    render_bootloader(dir, "central-ota", ROAMYBOARD_BOOTLOADER_OTA);
 #else
     struct status_state state = base_state(7);
     render(dir, "peripheral-7cols-walk", &state, CAT_WALK_2, 6);
@@ -195,10 +201,8 @@ int main(int argc, char **argv) {
     state.connected = false;
     render(dir, "peripheral-noterm-sit", &state, CAT_SIT, 36);
 
-    screen_draw_bootloader(&screen);
-    fake_ms += 1000;
-    lv_refr_now(NULL);
-    write_scene(dir, "peripheral-bootloader");
+    render_bootloader(dir, "peripheral-bootloader", ROAMYBOARD_BOOTLOADER_UF2);
+    render_bootloader(dir, "peripheral-ota", ROAMYBOARD_BOOTLOADER_OTA);
 #endif
     return 0;
 }

@@ -277,7 +277,7 @@ static void draw_download_icon(lv_obj_t *canvas, int y) {
     canvas_draw_rect(canvas, cx - 16, tray_y + 7, 32, 3, &ink);
 }
 
-void screen_draw_bootloader(struct screen *screen) {
+void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mode mode) {
     lv_obj_add_flag(screen->cat, LV_OBJ_FLAG_HIDDEN);
 
     lv_draw_label_dsc_t title_dsc;
@@ -288,18 +288,40 @@ void screen_draw_bootloader(struct screen *screen) {
     init_label_dsc(&small_dsc, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
 
     lv_obj_t *top = screen->canvas[SCREEN_TOP];
-    lv_canvas_fill_bg(top, LVGL_BACKGROUND, LV_OPA_COVER);
-    canvas_draw_text(top, 0, 4, CANVAS_SIZE, &title_dsc, "BOOT");
-    // The widest line that fits the 68 px canvas in Montserrat 14; 16 wraps.
-    canvas_draw_text(top, 0, 24, CANVAS_SIZE, &text_dsc, "LOADER");
-    draw_download_icon(top, 44);
-    rotate_canvas(top);
-
     lv_obj_t *middle = screen->canvas[SCREEN_MIDDLE];
+    lv_canvas_fill_bg(top, LVGL_BACKGROUND, LV_OPA_COVER);
     lv_canvas_fill_bg(middle, LVGL_BACKGROUND, LV_OPA_COVER);
-    canvas_draw_text(middle, 0, 8, CANVAS_SIZE, &text_dsc, "drop a");
-    canvas_draw_text(middle, 0, 26, CANVAS_SIZE, &text_dsc, "UF2 on");
-    canvas_draw_text(middle, 0, 48, CANVAS_SIZE, &small_dsc, "NICENANO");
+
+    switch (mode) {
+    case ROAMYBOARD_BOOTLOADER_UF2:
+        canvas_draw_text(top, 0, 4, CANVAS_SIZE, &title_dsc, "BOOT");
+        // The widest line that fits the 68 px canvas in Montserrat 14; 16 wraps.
+        canvas_draw_text(top, 0, 24, CANVAS_SIZE, &text_dsc, "LOADER");
+        draw_download_icon(top, 44);
+
+        canvas_draw_text(middle, 0, 8, CANVAS_SIZE, &text_dsc, "drop a");
+        canvas_draw_text(middle, 0, 26, CANVAS_SIZE, &text_dsc, "UF2 on");
+        canvas_draw_text(middle, 0, 48, CANVAS_SIZE, &small_dsc, "NICENANO");
+        break;
+
+    case ROAMYBOARD_BOOTLOADER_OTA: {
+        canvas_draw_text(top, 0, 4, CANVAS_SIZE, &title_dsc, "OTA");
+        canvas_draw_text(top, 0, 24, CANVAS_SIZE, &text_dsc, "BOOT");
+        lv_draw_label_dsc_t glyph_dsc;
+        init_label_dsc(&glyph_dsc, LVGL_FOREGROUND, &lv_font_montserrat_18,
+                       LV_TEXT_ALIGN_CENTER);
+        canvas_draw_text(top, 0, 44, CANVAS_SIZE, &glyph_dsc, LV_SYMBOL_BLUETOOTH);
+
+        // "Bluetooth" is too wide for the canvas in Montserrat 14.
+        lv_draw_label_dsc_t hint_dsc;
+        init_label_dsc(&hint_dsc, LVGL_FOREGROUND, &lv_font_montserrat_12,
+                       LV_TEXT_ALIGN_CENTER);
+        canvas_draw_text(middle, 0, 6, CANVAS_SIZE - 1, &hint_dsc,
+                         "send the DFU zip over Bluetooth");
+        break;
+    }
+    }
+    rotate_canvas(top);
     rotate_canvas(middle);
 
     lv_obj_t *bottom = screen->canvas[SCREEN_BOTTOM];

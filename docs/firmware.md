@@ -14,7 +14,7 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/include/roamyboard/` | Public headers: the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view. |
 | `zmk/src/ble/host_names.c` | Reads each Bluetooth host's name and keeps it per profile (below). |
 | `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. |
-| `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen`, the bootloader key; its binding is in `zmk/dts/bindings/behaviors/`. |
+| `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen` and `&ota_boot`, the bootloader keys; their binding is in `zmk/dts/bindings/behaviors/`. |
 | `zmk/tests/` | Host tests for the pure logic: `zmk/tests/run.sh`. |
 | `zmk/tools/` | `cat_frames.py` generates the cat's bitmaps; `screen_mock/run.sh` renders the status screen on the host. |
 
@@ -98,9 +98,9 @@ Releasing every held key queues one event per key at once, so each shield raises
 
 ## Keymap
 
-`zmk/config/roamyboard_split.keymap` (both halves) and `zmk/config/roamyboard.keymap` (unibody) implement the four layers in [Layout](../zmk/Layout.md), 7 key modules per half. On the split, the left half uses keymap columns 5 to 11 and the right half 12 to 18. The unibody puts the same layout on one chain, in keymap columns 10 to 16 and 17 to 23, so its key module nearest the MCU module is the right half's outer column. Every other position is `&none`. The System layer (hold L2, the left pinky's row 4 key) has Bluetooth profiles, output selection, soft off (`CONFIG_ZMK_PM_SOFT_OFF`, woken only by the reset button), `&boot_screen` and `&sys_reset`, and mouse keys (`&mkp`, `&mmv`, `&msc`, which need `CONFIG_ZMK_POINTING`).
+`zmk/config/roamyboard_split.keymap` (both halves) and `zmk/config/roamyboard.keymap` (unibody) implement the four layers in [Layout](../zmk/Layout.md), 7 key modules per half. On the split, the left half uses keymap columns 5 to 11 and the right half 12 to 18. The unibody puts the same layout on one chain, in keymap columns 10 to 16 and 17 to 23, so its key module nearest the MCU module is the right half's outer column. Every other position is `&none`. The System layer (hold L2, the left pinky's row 4 key) has Bluetooth profiles, output selection, soft off (`CONFIG_ZMK_PM_SOFT_OFF`, woken only by the reset button), `&boot_screen`, `&ota_boot` and `&sys_reset`, and mouse keys (`&mkp`, `&mmv`, `&msc`, which need `CONFIG_ZMK_POINTING`).
 
-`&boot_screen` shows the bootloader view on the status screen and then reboots into the UF2 bootloader, like ZMK's `&bootloader`. It runs on the half whose key triggered it. On the Keypad layer, the right half's outer column, row 5 (Return on QWERTY) is `&ret_boot`, a hold-tap that the keymaps define: a tap sends Return, and holding it for 1.5 s (`tapping-term-ms`, flavor `tap-preferred`, so other keys cannot make it a hold) triggers `&boot_screen`. That column is the key module nearest the MCU module, so a unibody with a single key module reaches the bootloader by holding L1 (row 4) and then row 5.
+`&boot_screen` shows the bootloader view on the status screen and then reboots into the UF2 bootloader, like ZMK's `&bootloader`. `&ota_boot` does the same for the bootloader's Bluetooth DFU mode (Updating over Bluetooth, below). Both run on the half whose key triggered them. On the Keypad layer, the right half's outer column, row 5 (Return on QWERTY) is `&ret_boot`, a hold-tap that the keymaps define: a tap sends Return, and holding it for 1.5 s (`tapping-term-ms`, flavor `tap-preferred`, so other keys cannot make it a hold) triggers `&boot_screen`. That column is the key module nearest the MCU module, so a unibody with a single key module reaches the bootloader by holding L1 (row 4) and then row 5.
 
 ## Status screen
 
@@ -135,7 +135,15 @@ Each profile's last name is stored in the settings key `roamyboard/host/<n>`, wi
 
 ### Bootloader view
 
-`&boot_screen` asks the status screen for the bootloader view: "BOOT LOADER", a download icon and "drop a UF2 on NICENANO". The display work queue draws it on all three canvases, stops every other update, and calls `lv_refr_now()`. The nice!view's 1-bit flush callback writes to the display before it returns, so the view is on the display when `lv_refr_now()` returns, and the behavior reboots into the bootloader from there. If the view has not been written within 1 s, or the display is not initialized, the behavior logs a warning and reboots without it.
+`&boot_screen` asks the status screen for the bootloader view: "BOOT LOADER", a download icon and "drop a UF2 on NICENANO". `&ota_boot` asks for the OTA view: "OTA BOOT", a Bluetooth glyph and "send the DFU zip over Bluetooth". Both are the same driver, and the behavior node's `mode` property (`uf2` or `ota`) selects the view and the bootloader mode. The display work queue draws it on all three canvases, stops every other update, and calls `lv_refr_now()`. The nice!view's 1-bit flush callback writes to the display before it returns, so the view is on the display when `lv_refr_now()` returns, and the behavior reboots into the bootloader from there. If the view has not been written within 1 s, or the display is not initialized, the behavior logs a warning and reboots without it.
+
+### Choosing the bootloader mode
+
+The nice!nano's Adafruit nRF52 bootloader reads the nRF52840's GPREGRET register after a reset: 0x57 starts UF2 over USB and 0xA8 starts DFU over Bluetooth (OTA). The register keeps its value across a soft reset.
+
+`&boot_screen` calls Zephyr's `bootmode_set(BOOT_MODE_TYPE_BOOTLOADER)`. On `nice_nano//zmk`, ZMK's `nrf52840_uf2_boot_mode.dtsi` makes the chosen `zephyr,boot-mode` partition a `zmk,bootmode-to-magic-mapper`, which turns the bootloader boot mode into `CONFIG_ZMK_BOOTMODE_BOOTLOADER_MAGIC_VALUE` (0x57) and writes it to the chosen `zmk,magic-boot-mode` partition. That partition is a one-byte `zephyr,retention` partition on the `nordic,nrf-gpregret` node at 0x4000051C, which is GPREGRET.
+
+Zephyr's boot modes have no OTA mode, so `&ota_boot` writes 0xA8 with `retention_write()` straight to the `zmk,magic-boot-mode` partition. Both keys then call `sys_reboot(SYS_REBOOT_WARM)`. On this ZMK revision nothing writes GPREGRET after that: `sys_reboot()` locks interrupts and stops the RTC1 system timer, and the Cortex-M `sys_arch_reboot()` only sets SYSRESETREQ in the SCB. ZMK's `NRF_STORE_REBOOT_TYPE_GPREGRET` symbol, which once made `sys_reboot()` store its argument in GPREGRET, has had no effect since Zephyr 3.6 removed the code behind it.
 
 ## Pins
 
@@ -175,12 +183,12 @@ Why these pins:
 
 ## Building
 
-GitHub Actions (`.github/workflows/build.yml`) builds all three UF2s on every push that touches `zmk/`, and runs the host tests. ZMK's reusable `build-user-config` workflow cannot build this repo: it expects the config and `zephyr/module.yml` at the repo root, and it checks ZMK out into `./zmk`, which is this repo's module. The workflow does the same steps with the right paths. Download the UF2s from the run's artifacts.
+GitHub Actions (`.github/workflows/build.yml`) builds all three UF2s and their DFU zips on every push that touches `zmk/`, and runs the host tests. ZMK's reusable `build-user-config` workflow cannot build this repo: it expects the config and `zephyr/module.yml` at the repo root, and it checks ZMK out into `./zmk`, which is this repo's module. The workflow does the same steps with the right paths. Download the UF2s and DFU zips from the run's artifacts.
 
-Local build with Docker, from the repo root. The west workspace lives outside the repo and is reused between builds:
+Local build with Docker, from the repo root. The west workspace lives outside the repo and is reused between builds; keep it out of /tmp, which macOS empties:
 
 ```sh
-ws=${WS:-$(mktemp -d /tmp/roamyboard-west.XXXXXX)}
+ws=${WS:-$HOME/Library/Caches/roamyboard-west}
 mkdir -p "$ws/config" && cp zmk/config/west.yml "$ws/config/"
 docker run --rm -v "$ws:/west" -v "$PWD:/repo:ro" -w /west zmkfirmware/zmk-build-arm:4.1 sh -c '
   [ -d .west ] || { west init -l config && west update --fetch-opt=--filter=tree:0; }
@@ -202,3 +210,23 @@ The host tests need only a C compiler: `zmk/tests/run.sh`.
 2. Copy the UF2 for that nice!nano onto the drive. The nice!nano flashes it and restarts.
 
 For a split, flash `roamyboard_left` onto the left half and `roamyboard_right` onto the right. If the halves do not find each other after switching from other firmware, flash ZMK's `settings_reset` firmware onto both, then the roamyboard firmware again.
+
+## Updating over Bluetooth
+
+The nice!nano's Adafruit nRF52 bootloader also has an OTA mode, which takes a DFU zip over Bluetooth from Nordic's nRF Device Firmware Update app (iOS and Android) or nRF Connect. Tried on the roamyboard: the OTA key brings up the bootloader's OTA mode, which advertises as AdaDFU, and the bootloader accepts our DFU zips. A complete update has not been confirmed yet.
+
+Every CI build uploads `<build>.zip` next to `<build>.uf2`. adafruit-nrfutil (0.5.3.post16) makes it from `zmk.hex`:
+
+```sh
+adafruit-nrfutil dfu genpkg --dev-type 0x0052 --sd-req 0xFFFE --application zmk.hex roamyboard.zip
+```
+
+The zip holds the application image (`zmk.bin`), its init packet (`zmk.dat`) and `manifest.json`. The bootloader rejects every init packet whose device type is not 0x0052. A SoftDevice requirement of 0xFFFE means any SoftDevice, which matches UF2 updates, since a UF2 file carries no SoftDevice requirement. The firmware is linked to start at 0x26000, after S140 6.1.1, either way. To make a zip locally, install adafruit-nrfutil into a virtual environment outside the repo, for example `python3 -m venv ~/Library/Caches/roamyboard-nrfutil-venv`, and run the command above on `zephyr/zmk.hex` in the build directory.
+
+To update a half:
+
+1. Press OTA on that half's System layer: under Boot on the left half, next to Boot on the right half. The status screen shows the OTA view, and the nice!nano restarts in the bootloader's OTA mode.
+2. In the nRF Device Firmware Update app, choose the DFU zip for that half, and turn Packet Receipt Notification (PRN) on and set it to 8 or less. With PRN off or above 8, the bootloader runs out of memory and the upload fails right after "DFU initialized". At PRN 4 an iPhone sends about 1.2 kB/s, so a 450 KB zip takes about six minutes; PRN 8 waits for half as many receipts.
+3. Choose the nice!nano from the app's device list and start the update.
+
+The nice!nano's bootloader updates in place, as Adafruit builds it by default: it erases the old firmware before it receives the new one, so a failed update leaves the half in the bootloader. If a transfer fails, the nice!nano has no firmware and stays in the bootloader. Send the zip again, or double-tap the reset button and flash the UF2 over USB (Flashing, above). A bootloader built with dual-bank updates keeps the old firmware until the new one is complete, but then takes only applications up to 401,408 bytes, which the unibody and left builds with ZMK Studio exceed.

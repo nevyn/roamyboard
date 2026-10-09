@@ -1,17 +1,24 @@
 /*
- * &boot_screen: the bootloader key that shows the bootloader view on the status screen
- * before it reboots into the UF2 bootloader.
+ * The bootloader keys, which show a bootloader view on the status screen before they reboot
+ * into the bootloader: &boot_screen for UF2 over USB, &ota_boot for DFU over Bluetooth.
  *
  * SPDX-License-Identifier: MIT
  */
 
 / {
     behaviors {
-        // A split central invokes it on the peripheral by name, so the name is at most 8 characters.
+        // A split central invokes these on the peripheral by name, so names are at most 8 characters.
         boot_screen: bootscr {
             compatible = "roamyboard,behavior-boot-screen";
             #binding-cells = <0>;
             display-name = "Bootloader";
+        };
+
+        ota_boot: otaboot {
+            compatible = "roamyboard,behavior-boot-screen";
+            #binding-cells = <0>;
+            mode = "ota";
+            display-name = "Bluetooth bootloader";
         };
     };
 };
