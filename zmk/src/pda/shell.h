@@ -134,8 +134,13 @@ struct pda_app {
                                bool pressed);
     /** A key position event, or NULL if the app has no use for positions. */
     enum pda_app_result (*position)(struct pda_shell *shell, uint8_t position, bool pressed);
-    /** Called every tick_ms while the app is open, focused or not; may be NULL. */
+    /** Called every tick_ms while the app is open; may be NULL. */
     enum pda_app_result (*tick)(struct pda_shell *shell);
+    /**
+     * Ticks only while the PDA has focus: a game, which waits while the keys go to the host.
+     * Without focus, pda_shell_tick_ms() is 0, so the platform does not wake for it.
+     */
+    bool focused_ticks;
     /** Draws the app into area, which lies below the title bar. */
     void (*draw)(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area);
 };
@@ -163,7 +168,10 @@ enum pda_shell_action pda_shell_key(struct pda_shell *shell, uint8_t usage, uint
 /** A key position event from the central: row * 24 + keymap column. */
 enum pda_shell_action pda_shell_position(struct pda_shell *shell, uint8_t position, bool pressed);
 
-/** The open app's tick; call it every tick_ms milliseconds while tick_ms is not 0. */
+/** How often to call pda_shell_tick() now, in milliseconds, or 0 for not at all. */
+uint32_t pda_shell_tick_ms(const struct pda_shell *shell);
+
+/** The open app's tick; call it every pda_shell_tick_ms() milliseconds while that is not 0. */
 enum pda_shell_action pda_shell_tick(struct pda_shell *shell);
 
 /** A uniformly distributed number below n, which must be at least 1. */

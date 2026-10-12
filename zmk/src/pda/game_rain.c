@@ -14,6 +14,8 @@
 #include "words.h"
 
 #define PLAY_TICK_MS 40
+/** A longer gap between ticks is a pause, which does not count as time played. */
+#define MAX_STEP_MS 200
 #define LIVES 3
 #define STATUS_H 10
 
@@ -83,8 +85,14 @@ static void lose_drop(struct pda_shell *shell, int i) {
 /** Advances the rain to now: words fall, a new one comes when it is due. */
 static void advance(struct pda_shell *shell, int height) {
     struct pda_rain_state *r = &shell->rain;
-    const uint32_t dt = shell->now_ms - r->last_ms;
+    uint32_t dt = shell->now_ms - r->last_ms;
     r->last_ms = shell->now_ms;
+    if (dt > MAX_STEP_MS) {
+        // Back from a pause: the rain goes on where it stopped, and the next word is as due as
+        // it was.
+        r->next_drop_ms += dt - PLAY_TICK_MS;
+        dt = PLAY_TICK_MS;
+    }
     for (int i = 0; i < PDA_RAIN_DROPS && !r->over; i++) {
         struct pda_rain_drop *d = &r->drops[i];
         if (!d->active) {
@@ -133,6 +141,8 @@ static void type_letter(struct pda_rain_state *r, char c) {
 static void rain_open(struct pda_shell *shell) {
     struct pda_rain_state *r = &shell->rain;
     shell->tick_ms = r->started && !r->over ? PLAY_TICK_MS : 0;
+    // The time closed does not count: the next word is as due as it was.
+    r->next_drop_ms += shell->now_ms - r->last_ms;
     r->last_ms = shell->now_ms;
 }
 
@@ -162,10 +172,7 @@ static enum pda_app_result rain_key(struct pda_shell *shell, uint8_t usage, uint
 
 static enum pda_app_result rain_tick(struct pda_shell *shell) {
     struct pda_rain_state *r = &shell->rain;
-    if (!r->started || r->over || shell->mode == ROAMYBOARD_PDA_OFF) {
-        // A pause moves the next word's time on by as long as the pause.
-        r->next_drop_ms += shell->now_ms - r->last_ms;
-        r->last_ms = shell->now_ms;
+    if (!r->started || r->over) {
         return PDA_APP_NONE;
     }
     advance(shell, play_height((struct pda_rect){0, PDA_TITLE_H, PDA_FB_W,
@@ -223,5 +230,6 @@ const struct pda_app pda_app_rain_def = {
     .open = rain_open,
     .key = rain_key,
     .tick = rain_tick,
+    .focused_ticks = true,
     .draw = rain_draw,
 };

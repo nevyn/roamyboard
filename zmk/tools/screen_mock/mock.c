@@ -171,7 +171,7 @@ static void type_letters(struct pda_shell *shell, const char *letters) {
 static void run_ms(struct pda_shell *shell, uint32_t ms) {
     const uint32_t end = shell->now_ms + ms;
     while ((int32_t)(end - shell->now_ms) > 0) {
-        shell->now_ms += shell->tick_ms ? shell->tick_ms : ms;
+        shell->now_ms += pda_shell_tick_ms(shell) ? pda_shell_tick_ms(shell) : ms;
         pda_shell_tick(shell);
     }
 }

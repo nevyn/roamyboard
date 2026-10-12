@@ -11,6 +11,15 @@
 #include "pda_test_support.h"
 #include "words.h"
 
+static int active_drop_index(const struct pda_rain_state *r) {
+    for (int i = 0; i < PDA_RAIN_DROPS; i++) {
+        if (r->drops[i].active) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 static void new_shell(struct pda_shell *shell) {
     pda_shell_init(shell, 12345);
     shell->now_ms = 1000;
@@ -151,11 +160,55 @@ static void test_calc_errors_and_type_out(void) {
     open_named(&shell, "Calc");
     calc_type(&shell, "1E0/");
     CHECK(shell.calc.error);
-    calc_type(&shell, "1"); // clears the error only
-    CHECK(!shell.calc.error && near(shell.calc.stack[0], 0));
+    CHECK(near(shell.calc.stack[0], 0) && near(shell.calc.stack[1], 1)); // nothing consumed
+    calc_type(&shell, "2"); // clears the error and counts
+    CHECK(!shell.calc.error && strcmp(shell.calc.entry, "2") == 0);
+    calc_type(&shell, "/");
+    CHECK(near(shell.calc.stack[0], 0.5));
+    calc_type(&shell, "4nr"); // the square root of -4
+    CHECK(shell.calc.error && near(shell.calc.stack[0], -4));
+    shell.calc.stack[0] = shell.calc.stack[1] = 1e300;
+    calc_type(&shell, "*"); // overflows
+    CHECK(shell.calc.error && near(shell.calc.stack[0] / 1e300, 1));
     calc_type(&shell, "3E4/");
     CHECK(tap_mods(&shell, LGUI, PDA_USAGE_RETURN) == PDA_SHELL_TYPE_OUT);
     CHECK(shell.type_out_len == 4 && memcmp(shell.type_out, "0.75", 4) == 0);
+}
+
+/* Ticks */
+
+static void test_games_do_not_tick_without_focus(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_named(&shell, "Snake");
+    tap(&shell, PDA_USAGE_RETURN);
+    CHECK(pda_shell_tick_ms(&shell) != 0);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    CHECK(pda_shell_tick_ms(&shell) == 0);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    CHECK(pda_shell_tick_ms(&shell) != 0);
+
+    open_named(&shell, "Timer");
+    tap(&shell, USAGE_SPACE);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    CHECK(pda_shell_tick_ms(&shell) != 0); // the timer counts on
+}
+
+static void test_rain_does_not_fall_during_a_pause(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_named(&shell, "Rain");
+    tap(&shell, PDA_USAGE_RETURN);
+    run_ms(&shell, 400);
+    const int i = active_drop_index(&shell.rain);
+    CHECK(i >= 0);
+    const int32_t y = shell.rain.drops[i].y_q8;
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    shell.now_ms += 60000;
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    pda_shell_tick(&shell);
+    CHECK(shell.rain.drops[i].y_q8 - y < 2 * 256);
+    CHECK(shell.rain.lives == 3);
 }
 
 /* Dice */
@@ -447,6 +500,8 @@ int main(void) {
     test_typed_minutes();
     test_calc_rpn();
     test_calc_errors_and_type_out();
+    test_games_do_not_tick_without_focus();
+    test_rain_does_not_fall_during_a_pause();
     test_dice_parse();
     test_dice_rolls();
     test_breakout_paddle_and_serve();

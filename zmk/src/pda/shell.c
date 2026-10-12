@@ -215,8 +215,16 @@ enum pda_shell_action pda_shell_position(struct pda_shell *shell, uint8_t positi
     return app_result(shell, pda_apps[shell->app]->position(shell, position, pressed));
 }
 
+uint32_t pda_shell_tick_ms(const struct pda_shell *shell) {
+    if (shell->app == PDA_SHELL_HOME || pda_apps[shell->app]->tick == NULL ||
+        (pda_apps[shell->app]->focused_ticks && shell->mode == ROAMYBOARD_PDA_OFF)) {
+        return 0;
+    }
+    return shell->tick_ms;
+}
+
 enum pda_shell_action pda_shell_tick(struct pda_shell *shell) {
-    if (shell->app == PDA_SHELL_HOME || pda_apps[shell->app]->tick == NULL) {
+    if (pda_shell_tick_ms(shell) == 0) {
         return PDA_SHELL_NONE;
     }
     return app_result(shell, pda_apps[shell->app]->tick(shell));

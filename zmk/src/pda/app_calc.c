@@ -76,6 +76,9 @@ static bool binary(struct pda_calc_state *c, char op) {
     default:
         return false;
     }
+    if (!isfinite(result)) {
+        return false;
+    }
     drop(c);
     c->X = result;
     c->lift = true;
@@ -108,12 +111,8 @@ static enum pda_app_result calc_key(struct pda_shell *shell, uint8_t usage, uint
     if (usage == PDA_USAGE_ESCAPE) {
         return PDA_APP_CLOSE;
     }
-    if (c->error) {
-        c->error = false;
-        c->X = 0;
-        c->lift = false;
-        return PDA_APP_REDRAW;
-    }
+    // An error shows until the next key, which then does its own work too.
+    c->error = false;
     if ((mods & PDA_MODS_GUI) && enter) {
         commit(c);
         format(c->X, shell->type_out, sizeof(shell->type_out), 1000, PDA_FONT_BODY);

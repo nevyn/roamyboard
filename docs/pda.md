@@ -37,7 +37,7 @@ Consumer keys, such as volume and media keys, still reach the host in PDA mode.
 
 **Dice.** Type a roll such as `2d6+3`, `d20` or `4d6-1`, then Return; the total shows in large digits, the single rolls under it, and the three rolls before it at the bottom. Space rolls a d20, and Return on an empty line rolls the latest roll again. Up to 20 dice of 2 to 1000 sides.
 
-**Tetris.** A 10 × 20 well. Left and Right (or A D, H L) move the piece, Up (W, K) or X turns it clockwise, Z anticlockwise, Down (S, J) drops it one row, Space drops it to the bottom, P pauses. The pieces come from shuffled bags of all seven; cleared lines score 100, 300, 500 or 800 times the level, which rises every 10 lines and speeds the fall.
+**Tetris.** A 10 × 20 well. Left and Right (or A D, H L) move the piece, Up (W, K) or X turns it clockwise, Z anticlockwise, Down (S, J) drops it one row, Space drops it to the bottom, P pauses. The pieces come from shuffled bags of all seven; cleared lines score 100, 300, 500 or 800 times the level plus one; the level starts at 0, rises every 10 lines and speeds the fall.
 
 **Snake.** A 17 × 32 field walled by the display. The direction keys steer; each piece of food grows the snake by two cells and speeds it up.
 

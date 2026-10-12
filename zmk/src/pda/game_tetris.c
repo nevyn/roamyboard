@@ -179,7 +179,7 @@ static void rotate(struct pda_tetris_state *t, int turns) {
 
 static void tetris_open(struct pda_shell *shell) {
     const struct pda_tetris_state *t = &shell->tetris;
-    shell->tick_ms = t->started && !t->over ? PLAY_TICK_MS : 0;
+    shell->tick_ms = t->started && !t->over && !t->paused ? PLAY_TICK_MS : 0;
 }
 
 static enum pda_app_result tetris_key(struct pda_shell *shell, uint8_t usage, uint8_t implicit_mods,
@@ -203,6 +203,7 @@ static enum pda_app_result tetris_key(struct pda_shell *shell, uint8_t usage, ui
     if (usage == USAGE_P || t->paused) {
         t->paused = !t->paused;
         t->last_fall_ms = shell->now_ms;
+        shell->tick_ms = t->paused ? 0 : PLAY_TICK_MS;
         return PDA_APP_REDRAW;
     }
     switch (pda_key_dir(usage)) {
@@ -248,8 +249,7 @@ static enum pda_app_result tetris_key(struct pda_shell *shell, uint8_t usage, ui
 
 static enum pda_app_result tetris_tick(struct pda_shell *shell) {
     struct pda_tetris_state *t = &shell->tetris;
-    // The game waits while the keys go to the host.
-    if (!t->started || t->over || t->paused || shell->mode == ROAMYBOARD_PDA_OFF) {
+    if (!t->started || t->over || t->paused) {
         t->last_fall_ms = shell->now_ms;
         return PDA_APP_NONE;
     }
@@ -317,5 +317,6 @@ const struct pda_app pda_app_tetris_def = {
     .open = tetris_open,
     .key = tetris_key,
     .tick = tetris_tick,
+    .focused_ticks = true,
     .draw = tetris_draw,
 };

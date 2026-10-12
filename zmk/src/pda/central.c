@@ -168,6 +168,11 @@ static void latency_handler(struct k_work *work) {
                                focused ? 0 : CONFIG_ZMK_SPLIT_BLE_PREF_LATENCY,
                                CONFIG_ZMK_SPLIT_BLE_PREF_TIMEOUT));
     bt_conn_unref(conn);
+    if (err == -EBUSY || err == -EAGAIN || err == -ENOMEM) {
+        LOG_DBG("Split connection latency update busy (%d); retrying", err);
+        k_work_reschedule(k_work_delayable_from_work(work), K_SECONDS(1));
+        return;
+    }
     if (err && err != -EALREADY) {
         LOG_WRN("Split connection latency update for PDA focus %d failed: %d", focused, err);
         return;
@@ -175,7 +180,7 @@ static void latency_handler(struct k_work *work) {
     fast = focused;
 }
 
-static K_WORK_DEFINE(latency_work, latency_handler);
+static K_WORK_DELAYABLE_DEFINE(latency_work, latency_handler);
 
 /* Mode. Changed on the system work queue only. */
 
@@ -188,7 +193,7 @@ static void set_mode(enum roamyboard_pda_mode new_mode) {
     }
     LOG_INF("PDA mode %d", new_mode);
     send((const uint8_t[]){PDA_LINK_MODE, new_mode}, 2);
-    k_work_submit(&latency_work);
+    k_work_reschedule(&latency_work, K_NO_WAIT);
     raise_roamyboard_pda_changed((struct roamyboard_pda_changed){});
 }
 
@@ -475,7 +480,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason) {
     atomic_clear(&link_ready);
     LOG_INF("PDA link down (reason 0x%02x)", reason);
     k_work_submit(&leave_work);
-    k_work_submit(&latency_work);
+    k_work_reschedule(&latency_work, K_NO_WAIT);
 }
 
 BT_CONN_CB_DEFINE(roamyboard_pda) = {

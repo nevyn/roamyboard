@@ -106,7 +106,7 @@ static inline void open_named(struct pda_shell *shell, const char *name) {
 static inline void run_ms(struct pda_shell *shell, uint32_t ms) {
     const uint32_t end = shell->now_ms + ms;
     while ((int32_t)(end - shell->now_ms) > 0) {
-        const uint32_t step = shell->tick_ms ? shell->tick_ms : ms;
+        const uint32_t step = pda_shell_tick_ms(shell) ? pda_shell_tick_ms(shell) : ms;
         shell->now_ms += step;
         pda_shell_tick(shell);
     }

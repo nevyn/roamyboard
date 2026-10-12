@@ -109,19 +109,23 @@ static void save_scores(void) {
     const int err = settings_save_one(SCORES_KEY, &scores, sizeof(scores));
     if (err) {
         LOG_ERR("Failed to save setting " SCORES_KEY ": %d", err);
+        k_mutex_lock(&lock, K_FOREVER);
+        shell.scores_changed = true;
+        k_mutex_unlock(&lock);
     }
 }
 
 static int settings_set(const char *name, size_t len, settings_read_cb read_cb, void *cb_arg) {
     if (strcmp(name, "scores") == 0) {
-        struct pda_scores scores;
-        if (len != sizeof(scores)) {
-            LOG_WRN("Ignoring setting " SCORES_KEY " of %u bytes: expected %u", (unsigned int)len,
-                    (unsigned int)sizeof(scores));
+        // Scores only gain fields at the end: an older, shorter value leaves the new ones 0.
+        struct pda_scores scores = {0};
+        if (len > sizeof(scores)) {
+            LOG_WRN("Ignoring setting " SCORES_KEY " of %u bytes: expected at most %u",
+                    (unsigned int)len, (unsigned int)sizeof(scores));
             return 0;
         }
-        const ssize_t got = read_cb(cb_arg, &scores, sizeof(scores));
-        if (got != sizeof(scores)) {
+        const ssize_t got = read_cb(cb_arg, &scores, len);
+        if (got != (ssize_t)len) {
             LOG_ERR("Failed to read setting " SCORES_KEY ": %d", (int)got);
             return got < 0 ? (int)got : -EIO;
         }
@@ -235,7 +239,7 @@ static K_WORK_DELAYABLE_DEFINE(app_tick_work, app_tick_handler);
 /** Follows the open app's tick_ms: ticks while it asks for them, and stops when it stops. */
 static void follow_tick(void) {
     k_mutex_lock(&lock, K_FOREVER);
-    const uint32_t interval = locked_shell()->tick_ms;
+    const uint32_t interval = pda_shell_tick_ms(locked_shell());
     k_mutex_unlock(&lock);
     if (interval == 0) {
         k_work_cancel_delayable(&app_tick_work);
@@ -422,13 +426,17 @@ static ssize_t write_to_peripheral(struct bt_conn *conn, const struct bt_gatt_at
     return len;
 }
 
+/** Without the central, nothing can leave PDA mode, so losing it leaves. */
+static void central_lost_handler(struct k_work *work) { set_mode(ROAMYBOARD_PDA_OFF); }
+static K_WORK_DEFINE(central_lost_work, central_lost_handler);
+
 static int state_listener(const zmk_event_t *eh) {
     const struct zmk_split_peripheral_status_changed *split =
         as_zmk_split_peripheral_status_changed(eh);
     if (split != NULL) {
-        // Without the central, nothing can leave PDA mode, so losing it leaves.
+        // ZMK raises this on the Bluetooth thread; settings writes belong on the work queue.
         if (!split->connected) {
-            set_mode(ROAMYBOARD_PDA_OFF);
+            k_work_submit(&central_lost_work);
         }
         // The display shows the PDA only while the central is connected.
         changed();

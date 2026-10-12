@@ -131,8 +131,9 @@ static void step(struct pda_shell *shell) {
 }
 
 static void snake_open(struct pda_shell *shell) {
-    const struct pda_snake_state *s = &shell->snake;
+    struct pda_snake_state *s = &shell->snake;
     shell->tick_ms = s->started && !s->over ? PLAY_TICK_MS : 0;
+    s->last_step_ms = shell->now_ms;
 }
 
 static bool opposite(int a, int b) {
@@ -166,8 +167,7 @@ static enum pda_app_result snake_key(struct pda_shell *shell, uint8_t usage, uin
 
 static enum pda_app_result snake_tick(struct pda_shell *shell) {
     struct pda_snake_state *s = &shell->snake;
-    if (!s->started || s->over || shell->mode == ROAMYBOARD_PDA_OFF) {
-        s->last_step_ms = shell->now_ms;
+    if (!s->started || s->over) {
         return PDA_APP_NONE;
     }
     if (shell->now_ms - s->last_step_ms < step_ms(s)) {
@@ -221,5 +221,6 @@ const struct pda_app pda_app_snake_def = {
     .open = snake_open,
     .key = snake_key,
     .tick = snake_tick,
+    .focused_ticks = true,
     .draw = snake_draw,
 };

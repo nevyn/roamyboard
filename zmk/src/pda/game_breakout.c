@@ -13,6 +13,8 @@
 #include "shell.h"
 
 #define PLAY_TICK_MS 20
+/** A longer gap between ticks is a pause, which does not count as time played. */
+#define MAX_STEP_MS 200
 #define LIVES 3
 #define STATUS_H 10
 #define FIELD_W PDA_FB_W
@@ -198,10 +200,15 @@ static enum pda_app_result breakout_key(struct pda_shell *shell, uint8_t usage,
 
 static enum pda_app_result breakout_tick(struct pda_shell *shell) {
     struct pda_breakout_state *b = &shell->breakout;
-    const uint32_t dt = shell->now_ms - b->last_ms;
+    uint32_t dt = shell->now_ms - b->last_ms;
     b->last_ms = shell->now_ms;
-    if (!b->started || b->over || shell->mode == ROAMYBOARD_PDA_OFF) {
+    if (dt > MAX_STEP_MS) {
+        // Back from a pause, which does not count as time played; keys held when focus went
+        // were released elsewhere.
+        dt = PLAY_TICK_MS;
         b->left_held = b->right_held = false;
+    }
+    if (!b->started || b->over) {
         return PDA_APP_NONE;
     }
     const int steer = (int)b->right_held - (int)b->left_held;
@@ -278,5 +285,6 @@ const struct pda_app pda_app_breakout_def = {
     .open = breakout_open,
     .key = breakout_key,
     .tick = breakout_tick,
+    .focused_ticks = true,
     .draw = breakout_draw,
 };
