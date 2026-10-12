@@ -144,6 +144,39 @@ static void typer_cancel(void) {
     tap_down = false;
 }
 
+/*
+ * Split connection latency. ZMK lets the peripheral skip up to
+ * CONFIG_ZMK_SPLIT_BLE_PREF_LATENCY connection events, so a message from the central waits up
+ * to that many intervals; while the PDA has focus, the peripheral listens at every event.
+ */
+static void latency_handler(struct k_work *work) {
+    // The latency that the link has, as far as this half asked for it; a new link starts slow.
+    static bool fast;
+    const bool focused = roamyboard_pda_mode() != ROAMYBOARD_PDA_OFF;
+    if (focused == fast) {
+        return;
+    }
+    k_mutex_lock(&lock, K_FOREVER);
+    struct bt_conn *conn = link_conn ? bt_conn_ref(link_conn) : NULL;
+    k_mutex_unlock(&lock);
+    if (conn == NULL) {
+        fast = false;
+        return;
+    }
+    const int err = bt_conn_le_param_update(
+        conn, BT_LE_CONN_PARAM(CONFIG_ZMK_SPLIT_BLE_PREF_INT, CONFIG_ZMK_SPLIT_BLE_PREF_INT,
+                               focused ? 0 : CONFIG_ZMK_SPLIT_BLE_PREF_LATENCY,
+                               CONFIG_ZMK_SPLIT_BLE_PREF_TIMEOUT));
+    bt_conn_unref(conn);
+    if (err && err != -EALREADY) {
+        LOG_WRN("Split connection latency update for PDA focus %d failed: %d", focused, err);
+        return;
+    }
+    fast = focused;
+}
+
+static K_WORK_DEFINE(latency_work, latency_handler);
+
 /* Mode. Changed on the system work queue only. */
 
 /** The output and profile that the user had chosen when PDA mode began. */
@@ -155,6 +188,7 @@ static void set_mode(enum roamyboard_pda_mode new_mode) {
     }
     LOG_INF("PDA mode %d", new_mode);
     send((const uint8_t[]){PDA_LINK_MODE, new_mode}, 2);
+    k_work_submit(&latency_work);
     raise_roamyboard_pda_changed((struct roamyboard_pda_changed){});
 }
 
@@ -441,6 +475,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason) {
     atomic_clear(&link_ready);
     LOG_INF("PDA link down (reason 0x%02x)", reason);
     k_work_submit(&leave_work);
+    k_work_submit(&latency_work);
 }
 
 BT_CONN_CB_DEFINE(roamyboard_pda) = {
