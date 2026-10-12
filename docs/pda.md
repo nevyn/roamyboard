@@ -29,6 +29,8 @@ Consumer keys, such as volume and media keys, still reach the host in PDA mode.
 
 The left half shows "PDA" or "note" in place of the host name. The right half replaces its status screen with the PDA view, inverted (white on black), so that PDA mode cannot be mistaken for typing to the host. The view shows the mode, a rule, and the end of the note with a cursor; older lines scroll off the top. `zmk/tools/screen_mock/run.sh` renders it as `peripheral-pda-*`.
 
+LVGL's built-in Montserrat has ASCII only, so the note uses `zmk/src/display/font_pda_12.c`: Montserrat 12 with Latin-1 (U+0020 to U+007E and U+00A0 to U+00FF), made by LVGL's `lv_font_conv` with the options in the file's header, from `scripts/built_in_font/Montserrat-Medium.ttf` in LVGL's repository. To add characters, run it again with a wider `-r`.
+
 ## Key capture
 
 `zmk/src/pda/central.c` subscribes to `zmk_keycode_state_changed`. In PDA mode, it sends every event of the HID keyboard page to the peripheral and returns `ZMK_EV_EVENT_HANDLED`, so ZMK's `hid_listener` never sees it. Entering PDA mode first clears the HID reports, so no key stays held on the host. The PDA receives resolved keycodes, after layers and macros, so it sees the keymap as typed, including the Keypad layer and Shift.
@@ -59,5 +61,4 @@ The peripheral keeps the note, at most 512 bytes of UTF-8, in the settings key `
 
 ## Known gaps
 
-- LVGL's built-in Montserrat fonts have no glyphs beyond ASCII, so the view draws å, ä and ö as boxes. The note stores and types them correctly.
 - Only the split build has the PDA; the unibody has no peripheral.

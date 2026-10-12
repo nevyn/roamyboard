@@ -49,6 +49,7 @@ if(CONFIG_ROAMYBOARD_STATUS_SCREEN)
     src/display/bolt.c
     src/display/cat.c
     src/display/cat_frames.c
+    src/display/font_pda_12.c
     src/display/screen.c
     src/display/status_screen.c
     src/display/util.c

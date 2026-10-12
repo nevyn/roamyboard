@@ -42,7 +42,7 @@ for role in central peripheral; do
         -DLV_CONF_INCLUDE_SIMPLE -I"$here" -I"$lvgl" -I"$lvgl/src" -I"$display" -I"$zmk_dir/include" \
         -I"$zephyr" -I"$zmk_app" \
         "$here/mock.c" "$display/screen.c" "$display/util.c" "$display/bolt.c" \
-        "$display/cat.c" "$display/cat_frames.c" "$build/liblvgl.a" -lm -o "$build/mock-$role"
+        "$display/cat.c" "$display/cat_frames.c" "$display/font_pda_12.c" "$build/liblvgl.a" -lm -o "$build/mock-$role"
     "$build/mock-$role" "$out"
 done
 python3 "$here/compose.py" "$out"

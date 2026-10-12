@@ -372,6 +372,9 @@ void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mo
     rotate_canvas(bottom);
 }
 
+// Montserrat 12 with Latin-1, for notes in Swedish; docs/pda.md, Displays.
+LV_FONT_DECLARE(roamyboard_font_pda_12);
+
 // The PDA view: a title, a rule under it, then lines of text down to the bottom of the display.
 #define PDA_TITLE_Y 2
 #define PDA_RULE_Y 20
@@ -413,7 +416,7 @@ void screen_draw_pda(struct screen *screen, int pda_mode, const char *text) {
     static char buf[ROAMYBOARD_PDA_NOTE_MAX + 2];
     snprintf(buf, sizeof(buf), "%s_", text);
     lv_draw_label_dsc_t text_dsc;
-    init_label_dsc(&text_dsc, LVGL_BACKGROUND, &lv_font_montserrat_12, LV_TEXT_ALIGN_LEFT);
+    init_label_dsc(&text_dsc, LVGL_BACKGROUND, &roamyboard_font_pda_12, LV_TEXT_ALIGN_LEFT);
     const int line_h = lv_font_get_line_height(text_dsc.font);
     const int width = CANVAS_SIZE - 2 * PDA_TEXT_X;
 

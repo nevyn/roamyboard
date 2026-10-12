@@ -408,7 +408,7 @@ int main(int argc, char **argv) {
     render(dir, "peripheral-noterm", &state);
 
     render_pda(dir, "peripheral-pda-empty", ROAMYBOARD_PDA_HOME, "");
-    render_pda(dir, "peripheral-pda-note", ROAMYBOARD_PDA_NOTE, "Köp mjölk\nRing Theo");
+    render_pda(dir, "peripheral-pda-note", ROAMYBOARD_PDA_NOTE, "Köp mjölk\nÅÄÖ åäö\nRing Theo");
     render_pda(dir, "peripheral-pda-long", ROAMYBOARD_PDA_HOME,
                "Räksmörgås till lunch. Fixa PR 32 och kolla OTA-loggen innan mötet.\n"
                "TODO:\n- spike the split data channel\n- timer app\n- tetris");
