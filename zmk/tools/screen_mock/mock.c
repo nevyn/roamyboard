@@ -151,6 +151,8 @@ static void render_pda_scenes(const char *dir) {
     pda_shell_init(&shell);
     shell.right = (struct pda_half_info){true, 7, 80, "9e2e912"};
     shell.left = (struct pda_half_info){true, 7, 64, "9e2e912-dirty"};
+    render_shell(dir, "peripheral-pda-home-no-clock", &shell);
+    shell.clock = (struct pda_clock_state){PDA_CLOCK_SET, 1, 845154330u, 0}; // 2026-10-12 21:05
     render_shell(dir, "peripheral-pda-home", &shell);
 
     pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
@@ -185,6 +187,7 @@ static struct status_state base_state(int key_module_count) {
     struct status_state state = {
         .battery = 80,
         .key_module_count = key_module_count,
+        .show_count = true,
 #if STATUS_SCREEN_CENTRAL
         .selected_endpoint = {.transport = ZMK_TRANSPORT_BLE},
         .active_profile_index = 0,
@@ -430,6 +433,7 @@ int main(int argc, char **argv) {
 
     state = base_state(7);
     state.pda_mode = ROAMYBOARD_PDA_HOME;
+    state.show_count = false;
     render_cat(dir, "central-pda", &state, CAT_SIT, 10, 0);
 
     render_cat_actions(dir);

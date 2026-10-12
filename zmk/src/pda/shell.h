@@ -14,6 +14,7 @@
 
 #include <roamyboard/pda.h>
 
+#include "clock.h"
 #include "gfx.h"
 #include "note.h"
 
@@ -36,6 +37,17 @@ struct pda_keys_state {
     /** The latest pressed position and HID usage, or -1. */
     int last_position;
     int last_usage;
+};
+
+/** The clock as the central last reported it. */
+struct pda_clock_state {
+    enum pda_clock_status status;
+    /** The profile whose host gave the time. */
+    uint8_t profile;
+    /** Local seconds since 2000-01-01 at at_ms. */
+    uint32_t seconds;
+    /** Uptime in milliseconds when the report arrived. */
+    uint32_t at_ms;
 };
 
 /** What the platform must do after an event. */
@@ -67,6 +79,9 @@ struct pda_shell {
     struct pda_keys_state keys;
     struct pda_half_info left;
     struct pda_half_info right;
+    struct pda_clock_state clock;
+    /** Uptime in milliseconds; the platform sets it before drawing, for the clock. */
+    uint32_t now_ms;
     /** The text of the latest PDA_SHELL_TYPE_OUT. */
     char type_out[PDA_NOTE_MAX];
     size_t type_out_len;
@@ -116,6 +131,9 @@ enum pda_shell_action pda_shell_key(struct pda_shell *shell, uint8_t usage, uint
 
 /** A key position event from the central: row * 24 + keymap column. */
 enum pda_shell_action pda_shell_position(struct pda_shell *shell, uint8_t position, bool pressed);
+
+/** The local time now, if the clock is set. */
+bool pda_shell_time(const struct pda_shell *shell, struct pda_date_time *out);
 
 /** Draws the whole view: the title bar, then home or the open app. */
 void pda_shell_draw(const struct pda_shell *shell, struct pda_fb *fb);

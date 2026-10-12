@@ -116,7 +116,7 @@ void screen_draw_top(struct screen *screen, const struct status_state *state) {
     canvas_draw_rect(canvas, 1, BOX_Y + 1, CANVAS_SIZE - 2, BOX_H - 2, &rect_black_dsc);
     if (state->startup_build_id != NULL) {
         draw_build_id(canvas, BUILD_ID_Y, &lv_font_montserrat_12, state->startup_build_id);
-    } else {
+    } else if (state->show_count) {
         draw_count(canvas, state->key_module_count);
     }
 

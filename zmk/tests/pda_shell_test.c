@@ -187,6 +187,21 @@ static void test_home_draws_a_band_on_the_selected_app(void) {
     CHECK(pda_fb_get(&fb, 0, PDA_TITLE_H - 2));
 }
 
+static void test_clock_runs_from_the_report(void) {
+    struct pda_shell shell;
+    pda_shell_init(&shell);
+    struct pda_date_time t;
+    CHECK(!pda_shell_time(&shell, &t));
+    // 2026-10-12 21:05:30, reported 1 s before the uptime counter wraps.
+    shell.clock = (struct pda_clock_state){PDA_CLOCK_SET, 1, 845154330u, 0xFFFFFC18u};
+    shell.now_ms = 0xFFFFFC18u + 30000u;
+    CHECK(pda_shell_time(&shell, &t));
+    CHECK(t.year == 2026 && t.month == 10 && t.day == 12);
+    CHECK(t.hour == 21 && t.minute == 6 && t.second == 0);
+    shell.clock.status = PDA_CLOCK_NO_CTS;
+    CHECK(!pda_shell_time(&shell, &t));
+}
+
 static void test_fb_clips(void) {
     static struct pda_fb fb;
     pda_fb_clear(&fb);
@@ -209,6 +224,7 @@ int main(void) {
     test_note_opened_from_home_stays_after_type_out();
     test_keys_app_tracks_positions();
     test_home_draws_a_band_on_the_selected_app();
+    test_clock_runs_from_the_report();
     test_fb_clips();
     if (failures) {
         fprintf(stderr, "pda_shell_test: %d failure(s)\n", failures);

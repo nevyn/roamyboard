@@ -44,7 +44,7 @@ for role in central peripheral; do
         -I"$zephyr" -I"$zmk_app" \
         "$here/mock.c" "$display/screen.c" "$display/util.c" "$display/bolt.c" \
         "$display/cat.c" "$display/cat_frames.c" "$display/font_pda_12.c" \
-        "$display/pda_text.c" "$pda/shell.c" "$pda/apps.c" "$pda/gfx.c" "$pda/note.c" "$pda/keys.c" "$build/liblvgl.a" -lm -o "$build/mock-$role"
+        "$display/pda_text.c" "$pda/shell.c" "$pda/apps.c" "$pda/gfx.c" "$pda/note.c" "$pda/keys.c" "$pda/clock.c" "$build/liblvgl.a" -lm -o "$build/mock-$role"
     "$build/mock-$role" "$out"
 done
 python3 "$here/compose.py" "$out"

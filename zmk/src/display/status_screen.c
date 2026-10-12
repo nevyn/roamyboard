@@ -641,6 +641,7 @@ lv_obj_t *zmk_display_status_screen(void) {
     screen_init(&screen, root);
 
     state.key_module_count = ROAMYBOARD_CHAIN_UNKNOWN;
+    state.show_count = !(STATUS_SCREEN_CENTRAL && IS_ENABLED(CONFIG_ROAMYBOARD_PDA));
     state.startup_build_id = roamyboard_build_id();
 #if IS_ENABLED(CONFIG_ROAMYBOARD_LOCAL_OTA)
     format_local_ota_hint();

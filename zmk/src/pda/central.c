@@ -33,6 +33,7 @@
 #include <roamyboard/events/pda_changed.h>
 #include <roamyboard/pda.h>
 
+#include "central.h"
 #include "keys.h"
 #include "link.h"
 #include "note.h"
@@ -219,8 +220,8 @@ static int position_listener(const zmk_event_t *eh) {
 ZMK_LISTENER(roamyboard_pda_position, position_listener);
 ZMK_SUBSCRIPTION(roamyboard_pda_position, zmk_position_state_changed);
 
-/** Sends this half's key module count, battery and build ID for the PDA's Info app. */
-static void info_handler(struct k_work *work) {
+/** Sends this half's key module count, battery and build ID, and the clock. */
+static void state_handler(struct k_work *work) {
     if (!atomic_get(&link_ready)) {
         return;
     }
@@ -231,12 +232,21 @@ static void info_handler(struct k_work *work) {
     const size_t id_len = MIN(strlen(id), sizeof(msg) - 3);
     memcpy(msg + 3, id, id_len);
     send(msg, (uint8_t)(3 + id_len));
+
+    uint32_t seconds;
+    uint8_t profile;
+    const enum pda_clock_status clock = pda_host_time_get(&seconds, &profile);
+    send((const uint8_t[]){PDA_LINK_TIME, clock, profile, seconds & 0xFF, seconds >> 8 & 0xFF,
+                           seconds >> 16 & 0xFF, seconds >> 24},
+         PDA_LINK_TIME_LEN);
 }
 
-static K_WORK_DEFINE(info_work, info_handler);
+static K_WORK_DEFINE(state_work, state_handler);
+
+void pda_central_send_state(void) { k_work_submit(&state_work); }
 
 static int info_listener(const zmk_event_t *eh) {
-    k_work_submit(&info_work);
+    pda_central_send_state();
     return ZMK_EV_EVENT_BUBBLE;
 }
 
@@ -323,7 +333,7 @@ static void subscribed(struct bt_conn *conn, uint8_t err, struct bt_gatt_subscri
     }
     LOG_INF("PDA link ready");
     atomic_set(&link_ready, true);
-    k_work_submit(&info_work);
+    pda_central_send_state();
 }
 
 static uint8_t chrc_discovered(struct bt_conn *conn, const struct bt_gatt_attr *attr,

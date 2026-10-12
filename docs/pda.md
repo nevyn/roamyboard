@@ -29,7 +29,7 @@ Consumer keys, such as volume and media keys, still reach the host in PDA mode.
 
 The Keys app shows a cell per key position, with keymap columns from top to bottom and rows from left to right, and a gap between the halves: filled while held, outlined once pressed, a dot before that. The line at the bottom names the latest position (`r2c13`: row 2, keymap column 13) and its HID usage in hex. It helps to check a new build's key modules.
 
-The Info app shows each half's key module count, battery and build ID.
+The Info app shows each half's key module count, battery and build ID, and where the clock comes from: `time BT2` for the host on Bluetooth profile 2, `no CTS` when no connected host offers the time, `time err` when a read failed, `time ...` before any host was asked.
 
 ## Displays
 
@@ -55,11 +55,18 @@ ZMK's split link carries a fixed set of messages, so the PDA brings its own GATT
 | | | Key | `02`, pressed, implicit modifier bits, HID usage ID |
 | | | Position | `03`, pressed, key position; in PDA mode only |
 | | | Info | `04`, key module count (signed), battery percent, build ID; when the link comes up and when either changes |
+| | | Time | `05`, clock status, profile, local seconds since 2000-01-01 (uint32 little-endian); sent with Info and when the clock changes |
 | Peripheral to central | notify | Text | `81`, UTF-8 bytes; appends to the text to type out |
 | | | Type out | `82`; leave PDA mode, then type the text |
 | | | Leave | `83`; leave PDA mode |
 
 Writes and notifications carry at most 20 bytes, which fits the smallest ATT MTU. A disconnect of the split link leaves PDA mode on both halves.
+
+## Clock
+
+The home screen's title shows the time, HH:MM, once a host has given it. `zmk/src/pda/host_time.c` on the central reads the Current Time characteristic (0x2A2B) of the Current Time Service from the connected hosts, in profile order, until one answers: whenever a host connection is encrypted, and every hour. The characteristic holds the host's local time, so the clock needs no time zone. The central keeps the time running on its uptime and sends it to the peripheral, which runs it on its own uptime and redraws each minute. Between reads, the clock drifts with the nice!nanos' 32 kHz crystals.
+
+Which hosts serve the time is not settled: iOS is expected to, macOS is untested. The Info app shows the outcome.
 
 ## Typing out
 
@@ -72,4 +79,4 @@ The peripheral keeps the note, at most 512 bytes of UTF-8, in the settings key `
 ## Known gaps
 
 - Only the split build has the PDA; the unibody has no peripheral.
-- There is no clock yet: the home screen's title bar will show it once a time source exists.
+- Only hosts with a Current Time Service set the clock; a companion app that sets it from any host is on the backlog.

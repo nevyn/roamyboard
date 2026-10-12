@@ -179,22 +179,21 @@ static int draw_half(struct pda_fb *fb, int y, const char *name, const struct pd
         pda_text_draw(fb, 1, y, PDA_FB_W - 2, "...", PDA_FONT_BODY, true);
         return y + body_h;
     }
-    char text[24];
+    char count[12];
     switch (half->key_module_count) {
     case ROAMYBOARD_CHAIN_UNKNOWN:
-        snprintf(text, sizeof(text), "...");
+        snprintf(count, sizeof(count), "...");
         break;
     case ROAMYBOARD_CHAIN_FAULT:
-        snprintf(text, sizeof(text), "no term");
+        snprintf(count, sizeof(count), "no term");
         break;
     default:
-        snprintf(text, sizeof(text), "%d col%s", half->key_module_count,
+        snprintf(count, sizeof(count), "%d col%s", half->key_module_count,
                  half->key_module_count == 1 ? "" : "s");
         break;
     }
-    pda_text_draw(fb, 1, y, PDA_FB_W - 2, text, PDA_FONT_BODY, true);
-    y += body_h;
-    snprintf(text, sizeof(text), "%u%%", half->battery);
+    char text[24];
+    snprintf(text, sizeof(text), "%s %u%%", count, half->battery);
     pda_text_draw(fb, 1, y, PDA_FB_W - 2, text, PDA_FONT_BODY, true);
     y += body_h + 2;
     // A "-dirty" suffix wraps to its own line, as on the status screen.
@@ -215,7 +214,25 @@ static int draw_half(struct pda_fb *fb, int y, const char *name, const struct pd
 
 static void info_draw(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area) {
     int y = draw_half(fb, area.y + 2, "Left", &shell->left);
-    draw_half(fb, y + 6, "Right", &shell->right);
+    y = draw_half(fb, y + 6, "Right", &shell->right);
+
+    // Where the clock comes from: the profile (1 to 5) whose host gave the time.
+    char text[24];
+    switch (shell->clock.status) {
+    case PDA_CLOCK_UNKNOWN:
+        snprintf(text, sizeof(text), "time ...");
+        break;
+    case PDA_CLOCK_SET:
+        snprintf(text, sizeof(text), "time BT%u", shell->clock.profile + 1);
+        break;
+    case PDA_CLOCK_NO_CTS:
+        snprintf(text, sizeof(text), "no CTS");
+        break;
+    case PDA_CLOCK_ERROR:
+        snprintf(text, sizeof(text), "time err");
+        break;
+    }
+    pda_text_draw(fb, 1, y + 4, area.w - 2, text, PDA_FONT_SMALL, true);
 }
 
 const struct pda_app pda_app_info_def = {

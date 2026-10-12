@@ -38,6 +38,8 @@ struct status_state {
     const char *startup_build_id;
     /** enum roamyboard_pda_mode. */
     uint8_t pda_mode;
+    /** The count box shows key_module_count; the split central leaves it to the PDA's Info app. */
+    bool show_count;
 #if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
     struct zmk_endpoint_instance selected_endpoint;
     int active_profile_index;

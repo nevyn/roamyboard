@@ -62,7 +62,8 @@ static void changed(void) { raise_roamyboard_pda_changed((struct roamyboard_pda_
 void roamyboard_pda_render(uint8_t bits[ROAMYBOARD_PDA_FB_BYTES]) {
     static struct pda_fb fb;
     k_mutex_lock(&lock, K_FOREVER);
-    pda_shell_draw(locked_shell(), &fb);
+    locked_shell()->now_ms = k_uptime_get_32();
+    pda_shell_draw(&shell, &fb);
     k_mutex_unlock(&lock);
     memcpy(bits, fb.bits, sizeof(fb.bits));
 }
@@ -236,6 +237,36 @@ static void set_left_info(const uint8_t *data, size_t len) {
     changed();
 }
 
+static void tick_handler(struct k_work *work);
+static K_WORK_DELAYABLE_DEFINE(tick_work, tick_handler);
+
+/** Redraws at each minute's start while the clock is set. */
+static void tick_handler(struct k_work *work) {
+    k_mutex_lock(&lock, K_FOREVER);
+    struct pda_shell *s = locked_shell();
+    s->now_ms = k_uptime_get_32();
+    struct pda_date_time now;
+    const bool set = pda_shell_time(s, &now);
+    k_mutex_unlock(&lock);
+    if (set) {
+        k_work_reschedule(&tick_work, K_SECONDS(60 - now.second));
+        changed();
+    }
+}
+
+static void set_clock(const uint8_t *data) {
+    k_mutex_lock(&lock, K_FOREVER);
+    struct pda_clock_state *clock = &locked_shell()->clock;
+    clock->status = (enum pda_clock_status)data[1];
+    clock->profile = data[2];
+    clock->seconds = (uint32_t)data[3] | (uint32_t)data[4] << 8 | (uint32_t)data[5] << 16 |
+                     (uint32_t)data[6] << 24;
+    clock->at_ms = k_uptime_get_32();
+    k_mutex_unlock(&lock);
+    k_work_reschedule(&tick_work, K_NO_WAIT);
+    changed();
+}
+
 static void update_right_info(void) {
     k_mutex_lock(&lock, K_FOREVER);
     struct pda_half_info *right = &locked_shell()->right;
@@ -282,6 +313,12 @@ static void incoming_handler(struct k_work *work) {
                     pda_shell_position(locked_shell(), msg.data[2], msg.data[1]);
                 k_mutex_unlock(&lock);
                 act(action);
+                continue;
+            }
+            break;
+        case PDA_LINK_TIME:
+            if (msg.len == PDA_LINK_TIME_LEN && msg.data[1] <= PDA_CLOCK_ERROR) {
+                set_clock(msg.data);
                 continue;
             }
             break;

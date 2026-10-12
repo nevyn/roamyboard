@@ -179,9 +179,28 @@ static void draw_home(const struct pda_shell *shell, struct pda_fb *fb, struct p
     }
 }
 
+bool pda_shell_time(const struct pda_shell *shell, struct pda_date_time *out) {
+    if (shell->clock.status != PDA_CLOCK_SET) {
+        return false;
+    }
+    *out = pda_clock_split(shell->clock.seconds + (shell->now_ms - shell->clock.at_ms) / 1000);
+    return true;
+}
+
 void pda_shell_draw(const struct pda_shell *shell, struct pda_fb *fb) {
     pda_fb_clear(fb);
-    const char *title = shell->app == PDA_SHELL_HOME ? "PDA" : pda_apps[shell->app]->name;
+    // Home shows the time, once there is one, where apps show their name.
+    char clock[8];
+    struct pda_date_time now;
+    const char *title;
+    if (shell->app != PDA_SHELL_HOME) {
+        title = pda_apps[shell->app]->name;
+    } else if (pda_shell_time(shell, &now)) {
+        snprintf(clock, sizeof(clock), "%02d:%02d", now.hour, now.minute);
+        title = clock;
+    } else {
+        title = "PDA";
+    }
     pda_text_draw(fb, 2, 2, PDA_FB_W - 22, title, PDA_FONT_TITLE, true);
     draw_battery(fb, shell->right.battery);
     pda_fb_fill(fb, (struct pda_rect){0, PDA_TITLE_H - 2, PDA_FB_W, 1}, true);

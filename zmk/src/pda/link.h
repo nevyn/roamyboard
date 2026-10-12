@@ -30,6 +30,11 @@ enum pda_link_op {
      * the central's own state, for the Info app. Sent when the link comes up and on change.
      */
     PDA_LINK_INFO = 0x04,
+    /**
+     * Central to peripheral: [op, enum pda_clock_status, profile, local seconds since
+     * 2000-01-01 as uint32 little-endian]; sent with PDA_LINK_INFO.
+     */
+    PDA_LINK_TIME = 0x05,
     /** Peripheral to central: [op, UTF-8 bytes...]; appends to the text to type out. */
     PDA_LINK_TEXT = 0x81,
     /** Peripheral to central: [op]; leave PDA mode, then type the text out to the host. */
@@ -40,5 +45,6 @@ enum pda_link_op {
 
 #define PDA_LINK_KEY_LEN 4
 #define PDA_LINK_POSITION_LEN 3
+#define PDA_LINK_TIME_LEN 7
 /** The longest message from the central; writes stay within the smallest ATT MTU (23). */
 #define PDA_LINK_WRITE_MAX 20
