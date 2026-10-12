@@ -22,6 +22,8 @@ final class FakeBootloader: DFUTransport, @unchecked Sendable {
         var disconnectAfterValidation = false
         /// Reset on Activate and Reset before acknowledging it, as the real bootloader may.
         var resetBeforeAcknowledgingActivate = false
+        /// Hold a transfer that an earlier connection left: Start DFU answers Invalid State until Reset.
+        var interruptedTransfer = false
         var revision: DFURevision? = DFURevision(major: 0, minor: 8)
         var maximumPacketLength = 20
     }
@@ -44,11 +46,13 @@ final class FakeBootloader: DFUTransport, @unchecked Sendable {
     private var readinessChecks = 0
     private var closed = false
     private var receipts: [UInt32] = []
+    private var interrupted: Bool
 
     private enum State { case idle, awaitingSizes, started, receivingInit, initDone, receivingImage, imageDone, validated, activated }
 
     init(_ faults: Faults = Faults()) {
         self.faults = faults
+        interrupted = faults.interruptedTransfer
     }
 
     var writes: [Write] { lock.withLock { log } }
@@ -61,6 +65,16 @@ final class FakeBootloader: DFUTransport, @unchecked Sendable {
     var imagePacketCount: Int { lock.withLock { imagePackets } }
     /// The byte counts of the packet receipts sent, in order.
     var receiptsSent: [UInt32] { lock.withLock { receipts } }
+    /// Whether the next connection would find an interrupted transfer: Start DFU went through and
+    /// neither Reset nor Activate and Reset followed.
+    var holdsTransfer: Bool {
+        lock.withLock {
+            switch state {
+            case .idle, .awaitingSizes, .activated: interrupted
+            case .started, .receivingInit, .initDone, .receivingImage, .imageDone, .validated: true
+            }
+        }
+    }
 
     // MARK: DFUTransport
 
@@ -107,6 +121,7 @@ final class FakeBootloader: DFUTransport, @unchecked Sendable {
             state = .activated
         case (.reset, _):
             state = .idle
+            interrupted = false
         default:
             problems.append("\(request) in state \(state)")
         }
@@ -130,6 +145,11 @@ final class FakeBootloader: DFUTransport, @unchecked Sendable {
         case .awaitingSizes:
             guard let sizes = ImageSizes(bytes: value) else {
                 problems.append("image sizes of \(value.count) bytes")
+                break
+            }
+            if interrupted {
+                state = .idle
+                respond(.startDFU, status: .invalidState)
                 break
             }
             imageSize = Int(sizes.application)

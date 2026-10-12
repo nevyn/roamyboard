@@ -31,7 +31,10 @@ enum RoamyOTACommand {
             print(zips.map { $0.summary(settings: settings) }.joined(separator: "\n\n"))
             exit(0)
         }
-        let succeeded = await HalfUpdates(zips: zips, settings: settings, discoveryTimeout: options.discoveryTimeout).run()
+        var policy = RetryPolicy()
+        policy.retries = options.retries
+        policy.readvertiseTimeout = options.discoveryTimeout
+        let succeeded = await HalfUpdates(zips: zips, settings: settings, policy: policy, discoveryTimeout: options.discoveryTimeout).run()
         exit(succeeded ? 0 : 1)
     }
 
@@ -45,11 +48,12 @@ enum RoamyOTACommand {
 struct HalfUpdates {
     let zips: [DFUZip]
     let settings: DFUSettings
+    let policy: RetryPolicy
     let discoveryTimeout: Duration
 
     private enum Outcome: Sendable {
         case updated(peripheral: String, duration: Duration)
-        case failed(peripheral: String?, message: String, firmwareErased: Bool)
+        case failed(peripheral: String?, message: String)
     }
 
     /// - Returns: Whether every half validated and activated its image.
@@ -74,14 +78,15 @@ struct HalfUpdates {
                 } catch {
                     let seconds = discoveryTimeout.formatted(.units(allowed: [.seconds]))
                     for missing in index..<zips.count {
-                        outcomes[missing] = .failed(peripheral: nil, message: "no new AdaDFU appeared within \(seconds). Press OTA on that half and run roamy-ota again with \(zips[missing].name).", firmwareErased: false)
+                        outcomes[missing] = .failed(peripheral: nil, message: "no new AdaDFU appeared within \(seconds). Press OTA on that half and run roamy-ota again with \(zips[missing].name).")
                     }
                     break
                 }
                 board.begin(index, peripheral: advertiser.shortID, status: "connecting (\(advertiser.name), RSSI \(advertiser.rssi))")
-                let settings = settings
+                let half = BluetoothHalf(central: central, advertiser: advertiser)
+                let update = HalfUpdate(update: LegacyDFUUpdate(zip: zip, settings: settings), policy: policy)
                 group.addTask {
-                    (index, await update(zip, index: index, on: advertiser, central: central, board: board, settings: settings))
+                    (index, await Self.update(update, index: index, on: half, board: board))
                 }
             }
             central.stopScanning()
@@ -95,37 +100,59 @@ struct HalfUpdates {
             case .updated(let peripheral, let duration):
                 let time = duration.formatted(.time(pattern: .minuteSecond))
                 board.say("\(dfuZip.name) (AdaDFU \(peripheral)): updated in \(time); the half validated and activated the new firmware and restarts with it.")
-            case .failed(let peripheral, let message, let erased):
+            case .failed(let peripheral, let message):
                 succeeded = false
                 let who = peripheral.map { "\(dfuZip.name) (AdaDFU \($0))" } ?? dfuZip.name
-                let recovery = erased
-                    ? " The half has no firmware now and stays in OTA mode: run roamy-ota again with \(dfuZip.name), or double-tap reset and copy the UF2 (docs/firmware.md, Flashing)."
-                    : ""
-                board.say("\(who): FAILED: \(message)\(recovery)")
+                board.say("\(who): FAILED: \(message)")
             }
         }
         return succeeded
     }
 
-    private func update(_ zip: DFUZip, index: Int, on advertiser: Advertiser, central: BluetoothCentral, board: ProgressBoard, settings: DFUSettings) async -> Outcome {
-        let link: BluetoothLink
-        do {
-            link = try await central.connect(advertiser, timeout: .seconds(20))
-        } catch {
-            let reason = error is TimeoutError ? "no connection within 20 seconds" : "\(error)"
-            board.finish(index, status: "failed to connect")
-            return .failed(peripheral: advertiser.shortID, message: "connecting failed: \(reason). The half stays in OTA mode; run roamy-ota again with \(zip.name).", firmwareErased: false)
-        }
-        defer { central.disconnect(link) }
-
+    private static func update(_ update: HalfUpdate, index: Int, on half: BluetoothHalf, board: ProgressBoard) async -> Outcome {
         let start = ContinuousClock.now
         do {
-            try await LegacyDFUUpdate(zip: zip, settings: settings).run(over: link) { board.handle(index, $0) }
-            board.finish(index, status: "done")
-            return .updated(peripheral: advertiser.shortID, duration: .now - start)
+            try await update.run(on: half) { event in
+                switch event {
+                case .connecting(let attempt):
+                    if attempt > 1 { board.show(index, status: "connecting (attempt \(attempt))") }
+                case .dfu(let event):
+                    board.handle(index, event)
+                case .retrying(let attempt, let limit, let reason):
+                    board.say(index, "starting over, attempt \(attempt) of \(limit), because \(reason.summary).")
+                case .resetInterruptedTransfer(let attempt):
+                    board.say(index, "the bootloader still held an interrupted transfer, so roamy-ota reset it; attempt \(attempt) starts over.")
+                case .waitingForAdvertisement:
+                    board.show(index, status: "waiting for the half to advertise as AdaDFU again")
+                }
+            }
+            board.show(index, status: "done")
+            return .updated(peripheral: half.advertiser.shortID, duration: .now - start)
         } catch {
-            board.finish(index, status: "failed while \(error.phase)")
-            return .failed(peripheral: advertiser.shortID, message: "\(error)", firmwareErased: error.firmwareErased)
+            if case .dfu(let failure) = error.reason {
+                board.show(index, status: "failed while \(failure.phase)")
+            } else {
+                board.show(index, status: "failed")
+            }
+            return .failed(peripheral: half.advertiser.shortID, message: "\(error)")
         }
+    }
+}
+
+/// One AdaDFU peripheral, which `HalfUpdate` connects to again by its CoreBluetooth identifier.
+struct BluetoothHalf: DFUPeripheral {
+    let central: BluetoothCentral
+    let advertiser: Advertiser
+
+    func connect(within timeout: Duration) async throws -> BluetoothLink {
+        try await central.connect(advertiser, timeout: timeout)
+    }
+
+    func waitForAdvertisement() async throws {
+        try await central.waitForAdvertisement(of: advertiser.id)
+    }
+
+    func disconnect(_ link: BluetoothLink) {
+        central.disconnect(link)
     }
 }

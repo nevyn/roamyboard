@@ -50,6 +50,7 @@ struct MailboxTests {
         #expect(options.packetSize == 20)
         #expect(options.discoveryTimeout == .seconds(120))
         #expect(!options.dryRun)
+        #expect(options.retries == 2)
     }
 
     @Test func flags() throws {
@@ -57,6 +58,8 @@ struct MailboxTests {
         #expect(options.packetReceiptInterval.packets == 4)
         #expect(options.dryRun)
         #expect(options.discoveryTimeout == .seconds(30))
+        #expect(try Options.parse(["--retries", "0", "left.zip"]).retries == 0)
+        #expect(try Options.parse(["--retries", "5", "left.zip"]).retries == 5)
     }
 
     @Test(arguments: ["0", "9", "16"])
@@ -70,5 +73,6 @@ struct MailboxTests {
         #expect(throws: OptionError.missingValue(option: "--prn")) { try Options.parse(["left.zip", "--prn"]) }
         #expect(throws: OptionError.unknownOption("--fast")) { try Options.parse(["--fast", "left.zip"]) }
         #expect(throws: OptionError.self) { try Options.parse(["--packet-size", "22", "left.zip"]) }
+        #expect(throws: OptionError.invalidValue(option: "--retries", value: "-1", reason: "it must be 0 or more")) { try Options.parse(["--retries", "-1", "left.zip"]) }
     }
 }

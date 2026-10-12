@@ -113,7 +113,8 @@ public struct DFUFailure: Error, Equatable, CustomStringConvertible {
         }
     }
 
-    public var description: String {
+    /// The phase and what went wrong, without advice: "uploading failed: the connection dropped".
+    public var summary: String {
         let what: String = switch reason {
         case .bootloaderResponse(let code): "the bootloader answered \(code)"
         case .transport(let error): "\(error)"
@@ -126,8 +127,22 @@ public struct DFUFailure: Error, Equatable, CustomStringConvertible {
         case .interruptedTransferReset: "the bootloader still held an interrupted transfer, so roamy-ota reset it"
         case .cancelled: "cancelled"
         }
+        return "\(phase) failed: \(what)"
+    }
+
+    public var description: String {
         let advice = advice.map { " \($0)" } ?? ""
-        return "\(phase) failed: \(what).\(advice)"
+        return "\(summary).\(advice)"
+    }
+
+    /// Whether the update may get further over a new connection: the link dropped or went silent,
+    /// or Start DFU found an interrupted transfer and reset it. An error response, a receipt
+    /// mismatch or a wrong DFU service fails every attempt the same way.
+    public var isRetryable: Bool {
+        switch reason {
+        case .transport(.disconnected), .transport(.droppedBeforeAcknowledgement), .timedOut, .interruptedTransferReset: true
+        default: false
+        }
     }
 
     private var advice: String? {

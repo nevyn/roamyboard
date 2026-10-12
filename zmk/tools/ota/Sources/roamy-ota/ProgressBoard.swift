@@ -33,6 +33,11 @@ final class ProgressBoard: @unchecked Sendable {
         }
     }
 
+    /// Prints `message` above the status lines, after half `index`'s name and peripheral.
+    func say(_ index: Int, _ message: String) {
+        say("\(lock.withLock { label(halves[index]) }): \(message)")
+    }
+
     /// Shows that half `index` is AdaDFU `peripheral`, with `status`.
     func begin(_ index: Int, peripheral: String, status: String) {
         lock.withLock {
@@ -45,7 +50,10 @@ final class ProgressBoard: @unchecked Sendable {
         lock.withLock {
             switch event {
             case .phase(let phase):
-                if phase == .upload { halves[index].uploadStart = .now }
+                if phase == .upload {
+                    halves[index].uploadStart = .now
+                    halves[index].printedTenths = -1
+                }
                 set(index, status: phase.description)
             case .uploaded(let sent, let total):
                 halves[index].sent = sent
@@ -65,7 +73,7 @@ final class ProgressBoard: @unchecked Sendable {
         }
     }
 
-    func finish(_ index: Int, status: String) {
+    func show(_ index: Int, status: String) {
         lock.withLock { set(index, status: status) }
     }
 
