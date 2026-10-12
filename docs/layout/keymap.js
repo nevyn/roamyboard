@@ -56,8 +56,8 @@
    * - layers: [{ id, name, bindings }] in keymap order, so a layer's index is its ZMK layer number. `name` is the
    *   layer's display-name, or its node name without one. `bindings` has COLUMNS * ROWS entries
    *   { behavior, params, raw }, row-major: position = row * COLUMNS + keymap column.
-   * - holdTaps: { label: { tappingTermMs, hold, tap } } for every hold-tap behavior that the file defines, where
-   *   hold and tap are behavior names without the "&".
+   * - holdTaps: { label: { tappingTermMs, flavor, hold, tap } } for every hold-tap behavior that the file defines,
+   *   where hold and tap are behavior names without the "&" and flavor is ZMK's flavor string or null.
    *
    * `#define NAME <number>` lines are substituted into binding parameters. Throws an Error naming the problem
    * when the file has no keymap node, a layer has no bindings, or a layer has the wrong number of bindings.
@@ -73,7 +73,8 @@
       if (!/compatible\s*=\s*"zmk,behavior-hold-tap"/.test(body)) continue;
       const refs = [...(body.match(/(?:^|[^\w-])bindings\s*=\s*([^;]*);/) || ["", ""])[1].matchAll(/&(\w+)/g)].map(r => r[1]);
       const term = body.match(/tapping-term-ms\s*=\s*<\s*(\d+)\s*>/);
-      holdTaps[m[1]] = { tappingTermMs: term ? +term[1] : null, hold: refs[0], tap: refs[1] };
+      const flavor = body.match(/flavor\s*=\s*"([\w-]+)"/);
+      holdTaps[m[1]] = { tappingTermMs: term ? +term[1] : null, flavor: flavor ? flavor[1] : null, hold: refs[0], tap: refs[1] };
     }
 
     const compat = src.search(/compatible\s*=\s*"zmk,keymap"/);
@@ -277,9 +278,14 @@
       const hold = describeBinding({ behavior: ht.hold, params: [p[0]], raw: `&${ht.hold} ${p[0]}` }, keymap);
       const tap = describeBinding({ behavior: ht.tap, params: [p[1]], raw: `&${ht.tap} ${p[1]}` }, keymap);
       if (hold.kind === "unknown" || tap.kind === "unknown") return unknown;
-      const holdFor = ht.tappingTermMs ? ` ${ht.tappingTermMs / 1000} s` : "";
+      // hold-preferred also decides a hold when another key goes down, so the hold needs no wait.
+      const holdFor = ht.flavor === "hold-preferred" ? "" : ht.tappingTermMs ? ` ${ht.tappingTermMs / 1000} s` : "";
+      const holdName = hold.name.replace(/^Hold: /, "");
+      if (tap.kind === "none") {
+        return { label: hold.label, name: `Hold${holdFor}: ${holdName}`, detail: hold.detail, kind: hold.kind === "layer" ? "layer" : "system", target: hold.target };
+      }
       return {
-        label: `${tap.label}/${hold.label}`, name: `Tap: ${tap.name}. Hold${holdFor}: ${hold.name}`,
+        label: `${tap.label}/${hold.label}`, name: `Tap: ${tap.name}. Hold${holdFor}: ${holdName}`,
         detail: hold.detail, kind: hold.kind === "layer" ? "layer" : "system", target: hold.target,
       };
     }

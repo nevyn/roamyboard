@@ -9,9 +9,9 @@ const { COLUMNS, ROWS, parseKeymap, describeBinding } = require("./keymap.js");
 const config = path.join(__dirname, "../../zmk/config");
 
 for (const file of ["roamyboard_split.keymap", "roamyboard.keymap"]) {
-  test(`${file}: four layers of ${COLUMNS * ROWS} bindings, all with labels`, () => {
+  test(`${file}: five layers of ${COLUMNS * ROWS} bindings, all with labels`, () => {
     const keymap = parseKeymap(fs.readFileSync(path.join(config, file), "utf8"));
-    assert.deepStrictEqual(keymap.layers.map(l => l.name), ["QWERTY", "Keypad", "System", "Gaming"]);
+    assert.deepStrictEqual(keymap.layers.map(l => l.name), ["QWERTY", "Keypad", "System", "Gaming", "Locked"]);
     for (const layer of keymap.layers) {
       assert.strictEqual(layer.bindings.length, COLUMNS * ROWS, layer.name);
       layer.bindings.forEach((b, i) => {
@@ -37,6 +37,9 @@ test("labels from the layout's legend", () => {
   assert.deepStrictEqual(d("&bt BT_SEL 0"), ["BT1", "Bluetooth profile 1"]);
   assert.deepStrictEqual(d("&bt BT_SEL 4"), ["BT5", "Bluetooth profile 5"]);
   assert.deepStrictEqual(d("&ret_boot 0 RET"), ["↩/Boot", "Tap: Return. Hold 1.5 s: Bootloader"]);
+  assert.deepStrictEqual(d("&thumb_lt 1 DEL"), ["fn⌫/L1", "Tap: Forward delete. Hold: Keypad"]);
+  assert.deepStrictEqual(d("&unlock 0 0"), ["To0", "Hold 1 s: Switch to QWERTY"]);
+  assert.deepStrictEqual(d("&to 4"), ["To4", "Switch to Locked"]);
   assert.deepStrictEqual(d("&ota_boot"), ["OTA", "Bluetooth bootloader"]);
   assert.deepStrictEqual(d("&mkp LCLK"), ["M1", "Left click"]);
   assert.deepStrictEqual(d("&mmv MOVE_UP"), ["M↑", "Move the pointer up"]);
