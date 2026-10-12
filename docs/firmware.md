@@ -11,11 +11,13 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/boards/shields/roamyboard/` | The unibody shield. |
 | `zmk/boards/shields/roamyboard_split/` | The `roamyboard_left` and `roamyboard_right` shields. |
 | `zmk/config/roamyboard.keymap`, `roamyboard_split.keymap` | Keymaps (below). |
-| `zmk/include/roamyboard/` | Public headers: the build ID, the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view. |
+| `zmk/include/roamyboard/` | Public headers: the build ID, the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view, rebooting into the bootloader. |
 | `zmk/cmake/build_id.cmake`, `zmk/src/build_id.c` | The build ID (Building, below). |
 | `zmk/src/ble/host_names.c` | Reads each Bluetooth host's name and keeps it per profile (below). |
 | `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. |
 | `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen` and `&ota_boot`, the bootloader keys; their binding is in `zmk/dts/bindings/behaviors/`. |
+| `zmk/src/bootloader.c` | Shows the bootloader view and reboots into the bootloader's UF2 or OTA mode, for the bootloader keys and the local OTA key. |
+| `zmk/src/local_ota.c` | The split peripheral's local OTA key (Updating over Bluetooth, below). |
 | `zmk/tests/` | Host tests for the pure logic: `zmk/tests/run.sh`. |
 | `zmk/tools/` | `cat_frames.py` generates the cat's bitmaps; `screen_mock/run.sh` renders the status screen on the host; `ota/` builds `roamy-ota`, which updates halves over Bluetooth (Updating over Bluetooth, below). |
 
@@ -113,7 +115,7 @@ The roamyboard mounts the nice!view with its contacts toward the MCU module, whi
 | --- | --- | --- |
 | Top row | Battery, and the output: USB, Bluetooth connected, disconnected, or not paired | Battery, and whether the central is connected |
 | Box below it | The key module count and the cat | The key module count and the cat |
-| Middle | The five Bluetooth profiles in a row, and the active profile's host name | Empty |
+| Middle | The five Bluetooth profiles in a row, and the active profile's host name | While the central is not connected, the local OTA key hint ("hold the 0 key 3 s for OTA"); otherwise empty |
 | Bottom | The name of the highest active layer | Empty |
 
 For the first 3 s after the keyboard starts, the box shows the firmware's build ID (Building, below) instead, on every half, and the cat appears with the count. A dirty build ID wraps after the dash. Then the box shows this half's own accepted key module count: "7 cols", "1 col", "0 cols". It shows "no term" while the accepted state is a fault, which usually means that the terminator module is missing, and "..." before the driver has accepted any count. The kscan driver raises `roamyboard_chain_state_changed` whenever it accepts a new count or a fault, and `roamyboard_chain_key_module_count()` returns the current state (`zmk/include/roamyboard/`). The split central shows only its own half's count.
@@ -238,6 +240,10 @@ adafruit-nrfutil dfu genpkg --dev-type 0x0052 --sd-req 0xFFFE --application zmk.
 The zip holds the application image (`zmk.bin`), its init packet (`zmk.dat`) and `manifest.json`. The bootloader rejects every init packet whose device type is not 0x0052. A SoftDevice requirement of 0xFFFE means any SoftDevice, which matches UF2 updates, since a UF2 file carries no SoftDevice requirement. The firmware is linked to start at 0x26000, after S140 6.1.1, either way. To make a zip locally, install adafruit-nrfutil into a virtual environment outside the repo, for example `python3 -m venv ~/Library/Caches/roamyboard-nrfutil-venv`, and run the command above on `zephyr/zmk.hex` in the build directory.
 
 Every update starts the same way: press OTA on that half's System layer, under Boot on the left half and next to Boot on the right half. The status screen shows the OTA view, and the nice!nano restarts in the bootloader's OTA mode.
+
+The right half's OTA key needs the left half: the left half runs the keymap and invokes `&ota_boot` on the right half. When the left half is down, for example after an interrupted update or with a flat battery, use the right half's **local OTA key** instead: while the right half has no connection to the left half, hold 0 for 3 s: the number row's third key from the right half's outer edge, where OTA sits on the System layer. The status screen shows the OTA view, and the right half restarts in OTA mode, exactly as with `&ota_boot`. Releasing the key earlier cancels it, and while the halves are connected the key does only what the keymap binds to it. The right half's status screen shows "hold the 0 key 3 s for OTA" while the left half is not connected.
+
+`zmk/src/local_ota.c` implements it, only in the split peripheral's build (`CONFIG_ROAMYBOARD_LOCAL_OTA`, which needs `CONFIG_ZMK_SPLIT_BLE` and not `CONFIG_ZMK_SPLIT_ROLE_CENTRAL`). The peripheral turns each kscan event into a key position with its own matrix transform and raises `zmk_position_state_changed` locally (`app/src/physical_layouts.c` in ZMK), before ZMK's split peripheral listener relays the position to the central (`app/src/split/peripheral.c`); so the right half sees its own key positions, 12 to 23 in each row, whether or not the central is there. On a press of `CONFIG_ROAMYBOARD_LOCAL_OTA_POSITION` (16: row 0, keymap column 16) while `zmk_split_bt_peripheral_is_connected()` is false, the listener schedules OTA mode after `CONFIG_ROAMYBOARD_LOCAL_OTA_HOLD_MS` (3000); a release of the key, or `zmk_split_peripheral_status_changed` reporting a connection, cancels it. The right half anchors at its terminator module, so keymap column 16 is its fifth key module from the terminator module; with fewer than 5 key modules, the key does not exist. `CONFIG_ROAMYBOARD_LOCAL_OTA_LABEL` names the key in the hint; change it with the position.
 
 The bootloader keeps each image packet in one of its 16 receive buffers until it has written the packet to flash. The sender must therefore wait for a Packet Receipt Notification (PRN) after every few packets; Adafruit's README requires one every 8 packets or fewer. With PRN off, the upload failed right after "DFU initialized".
 

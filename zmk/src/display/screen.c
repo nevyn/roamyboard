@@ -229,7 +229,11 @@ void screen_draw_middle(struct screen *screen, const struct status_state *state)
                    LV_TEXT_ALIGN_CENTER);
     canvas_draw_text(canvas, 0, NAME_Y, CANVAS_SIZE - 1, &name_dsc, text);
 #else
-    (void)state;
+    if (!state->connected && state->local_ota_hint != NULL) {
+        lv_draw_label_dsc_t hint_dsc;
+        init_label_dsc(&hint_dsc, LVGL_FOREGROUND, &lv_font_montserrat_12, LV_TEXT_ALIGN_CENTER);
+        canvas_draw_text(canvas, 0, 8, CANVAS_SIZE - 1, &hint_dsc, state->local_ota_hint);
+    }
 #endif
 
     // Rotate canvas

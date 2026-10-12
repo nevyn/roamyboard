@@ -37,6 +37,51 @@ config ROAMYBOARD_HOST_NAMES
       it per BLE profile in the settings key roamyboard/host/<n>
       (zmk/include/roamyboard/host_name.h has the format).
 
+config ROAMYBOARD_LOCAL_OTA
+    bool "Enter OTA mode with a held key on a split peripheral that has no central"
+    default y
+    depends on ZMK_SPLIT && ZMK_SPLIT_BLE && !ZMK_SPLIT_ROLE_CENTRAL
+    help
+      While the split peripheral has no connection to the central, holding the
+      key at ROAMYBOARD_LOCAL_OTA_POSITION for ROAMYBOARD_LOCAL_OTA_HOLD_MS
+      reboots into the bootloader's OTA mode with the OTA view, as &ota_boot
+      does. Releasing the key earlier, or the central connecting, cancels it.
+      While the halves are connected, the key does nothing special. This lets
+      the right half be updated over Bluetooth while the left half is down.
+
+config ROAMYBOARD_LOCAL_OTA_POSITION
+    int "Key position of the local OTA key"
+    default 16
+    range 0 119
+    depends on ROAMYBOARD_LOCAL_OTA
+    help
+      The position that the peripheral raises for the key: row * 24 + keymap
+      column, after the shield's matrix transform, whose col-offset of 12
+      places the right half in keymap columns 12 to 23. The default 16 is row 0
+      (the number row), keymap column 16: the 0 key on the QWERTY layer of
+      zmk/config/roamyboard_split.keymap, where OTA sits on the System layer.
+      The right half anchors at its terminator module, so keymap column 16 is
+      the fifth key module from the terminator module, and the key exists only
+      with 5 or more key modules.
+
+config ROAMYBOARD_LOCAL_OTA_HOLD_MS
+    int "How long to hold the local OTA key, in milliseconds"
+    default 3000
+    range 500 30000
+    depends on ROAMYBOARD_LOCAL_OTA
+    help
+      How long the local OTA key must stay pressed, in milliseconds, before the
+      peripheral enters OTA mode. Default 3000.
+
+config ROAMYBOARD_LOCAL_OTA_LABEL
+    string "Legend of the local OTA key in the status screen's hint"
+    default "0"
+    depends on ROAMYBOARD_LOCAL_OTA
+    help
+      The legend that the status screen's hint names the local OTA key by,
+      for example "0" in "hold the 0 key 3 s for OTA". Change it with
+      ROAMYBOARD_LOCAL_OTA_POSITION.
+
 DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN := roamyboard,behavior-boot-screen
 
 config ROAMYBOARD_BEHAVIOR_BOOT_SCREEN

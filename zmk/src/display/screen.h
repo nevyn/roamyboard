@@ -43,7 +43,10 @@ void screen_init(struct screen *screen, lv_obj_t *parent);
  */
 void screen_draw_top(struct screen *screen, const struct status_state *state);
 
-/** Middle canvas: Bluetooth profiles on the central and unibody, empty on the peripheral. */
+/**
+ * Middle canvas: Bluetooth profiles on the central and unibody. On the peripheral,
+ * state->local_ota_hint while the central is not connected, and otherwise nothing.
+ */
 void screen_draw_middle(struct screen *screen, const struct status_state *state);
 
 /** Bottom canvas: the highest active layer's name on the central and unibody. */

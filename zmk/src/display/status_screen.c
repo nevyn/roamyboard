@@ -6,6 +6,7 @@
  */
 
 #include <errno.h>
+#include <stdio.h>
 
 #include <zephyr/kernel.h>
 #include <zephyr/sys/atomic.h>
@@ -229,8 +230,29 @@ static struct peripheral_status_state get_state(const zmk_event_t *_eh) {
 static void set_connection_status(struct peripheral_status_state peripheral) {
     state.connected = peripheral.connected;
 
-    redraw_top();
+    if (!bootloader_shown) {
+        screen_draw_top(&screen, &state);
+        screen_draw_middle(&screen, &state);
+    }
 }
+
+#if IS_ENABLED(CONFIG_ROAMYBOARD_LOCAL_OTA)
+#define LOCAL_OTA_HOLD_DS (CONFIG_ROAMYBOARD_LOCAL_OTA_HOLD_MS / 100)
+
+/** "hold the\n0 key 3 s\nfor OTA", with tenths when the hold time needs them. */
+static char local_ota_hint[48];
+
+static void format_local_ota_hint(void) {
+    if (LOCAL_OTA_HOLD_DS % 10 == 0) {
+        snprintf(local_ota_hint, sizeof(local_ota_hint), "hold the\n%s key %d s\nfor OTA",
+                 CONFIG_ROAMYBOARD_LOCAL_OTA_LABEL, LOCAL_OTA_HOLD_DS / 10);
+    } else {
+        snprintf(local_ota_hint, sizeof(local_ota_hint), "hold the\n%s key %d.%d s\nfor OTA",
+                 CONFIG_ROAMYBOARD_LOCAL_OTA_LABEL, LOCAL_OTA_HOLD_DS / 10, LOCAL_OTA_HOLD_DS % 10);
+    }
+    state.local_ota_hint = local_ota_hint;
+}
+#endif
 
 ZMK_DISPLAY_WIDGET_LISTENER(widget_peripheral_status, struct peripheral_status_state,
                             set_connection_status, get_state)
@@ -371,6 +393,9 @@ lv_obj_t *zmk_display_status_screen(void) {
 
     state.key_module_count = ROAMYBOARD_CHAIN_UNKNOWN;
     state.startup_build_id = roamyboard_build_id();
+#if IS_ENABLED(CONFIG_ROAMYBOARD_LOCAL_OTA)
+    format_local_ota_hint();
+#endif
     screen_draw_top(&screen, &state);
     screen_draw_middle(&screen, &state);
     screen_draw_bottom(&screen, &state);

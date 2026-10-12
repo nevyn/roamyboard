@@ -48,7 +48,10 @@ struct status_state {
     /** Host name of the active profile. */
     struct roamyboard_host_name active_host;
 #else
+    /** Whether the central is connected. */
     bool connected;
+    /** How to enter OTA mode without the central, shown while it is not connected; or NULL. */
+    const char *local_ota_hint;
 #endif
 };
 
