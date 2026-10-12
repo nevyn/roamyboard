@@ -218,6 +218,13 @@
     msc: { SCRL_UP: ["W↑", "Scroll up"], SCRL_DOWN: ["W↓", "Scroll down"], SCRL_LEFT: ["W←", "Scroll left"], SCRL_RIGHT: ["W→", "Scroll right"] },
   };
 
+  // The keymap's Swedish letter behaviors (mod-morphs over Option dead-key macros): [cap label, long name, detail].
+  const LETTERS = {
+    aring: ["å", "å, or Å with Shift", "Types Option-K, A on the Mac's ABC – Extended input source."],
+    auml: ["ä", "ä, or Ä with Shift", "Types Option-U, A on the Mac's ABC – Extended input source."],
+    ouml: ["ö", "ö, or Ö with Shift", "Types Option-U, O on the Mac's ABC – Extended input source."],
+  };
+
   // Behaviors without parameters: [cap label, long name, detail].
   const PLAIN = {
     trans: ["︶", "Transparent: the layer below decides"],
@@ -268,6 +275,10 @@
     }
     if (behavior === "out" && OUT[p[0]] && p.length === 1) return { label: OUT[p[0]][0], name: OUT[p[0]][1], kind: "system" };
     if (MOUSE[behavior]?.[p[0]] && p.length === 1) return { label: MOUSE[behavior][p[0]][0], name: MOUSE[behavior][p[0]][1], kind: "key" };
+    if (LETTERS[behavior] && p.length === 0) {
+      const [label, name, detail] = LETTERS[behavior];
+      return { label, name, detail, kind: "key" };
+    }
     if (PLAIN[behavior] && (p.length === 0 || behavior === "boot_screen")) {
       const [label, name, detail] = PLAIN[behavior];
       return { label, name, detail, kind: "system" };

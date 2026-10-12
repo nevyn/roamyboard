@@ -45,6 +45,76 @@
             tapping-term-ms = <1000>;
             bindings = <&to>, <&none>;
         };
+        // Swedish letters typed as macOS Option dead keys on ABC - Extended; zmk/Layout.md explains.
+        aring_l: aring_l {
+            compatible = "zmk,behavior-macro";
+            display-name = "Swedish a-ring";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <10>;
+            bindings = <&macro_tap &kp LA(K) &kp A>;
+        };
+        aring_u: aring_u {
+            compatible = "zmk,behavior-macro";
+            display-name = "Swedish capital A-ring";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <10>;
+            bindings = <&macro_tap &kp LA(K) &kp LS(A)>;
+        };
+        auml_l: auml_l {
+            compatible = "zmk,behavior-macro";
+            display-name = "Swedish a-umlaut";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <10>;
+            bindings = <&macro_tap &kp LA(U) &kp A>;
+        };
+        auml_u: auml_u {
+            compatible = "zmk,behavior-macro";
+            display-name = "Swedish capital A-umlaut";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <10>;
+            bindings = <&macro_tap &kp LA(U) &kp LS(A)>;
+        };
+        ouml_l: ouml_l {
+            compatible = "zmk,behavior-macro";
+            display-name = "Swedish o-umlaut";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <10>;
+            bindings = <&macro_tap &kp LA(U) &kp O>;
+        };
+        ouml_u: ouml_u {
+            compatible = "zmk,behavior-macro";
+            display-name = "Swedish capital O-umlaut";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <10>;
+            bindings = <&macro_tap &kp LA(U) &kp LS(O)>;
+        };
+        aring: aring {
+            compatible = "zmk,behavior-mod-morph";
+            display-name = "Swedish a-ring";
+            #binding-cells = <0>;
+            bindings = <&aring_l>, <&aring_u>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+        auml: auml {
+            compatible = "zmk,behavior-mod-morph";
+            display-name = "Swedish a-umlaut";
+            #binding-cells = <0>;
+            bindings = <&auml_l>, <&auml_u>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+        ouml: ouml {
+            compatible = "zmk,behavior-mod-morph";
+            display-name = "Swedish o-umlaut";
+            #binding-cells = <0>;
+            bindings = <&ouml_l>, <&ouml_u>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
     };
 
     keymap {
@@ -64,11 +134,11 @@
         keypad {
             display-name = "Keypad";
             bindings = <
-            &none  &none  &none  &none  &none  &none   &none      &kp F1    &kp F2    &kp F3    &kp F4     &kp F5         &kp F6           &kp F7     &kp F8      &kp F9     &kp F10        &kp F11   &kp F12          &none  &none  &none  &none  &none
-            &none  &none  &none  &none  &none  &trans  &none      &kp INS   &kp HOME  &kp UP    &kp END    &kp PG_UP      &kp KP_MULTIPLY  &kp KP_N7  &kp KP_N8   &kp KP_N9  &kp KP_PLUS    &kp LPAR  &kp RPAR         &none  &none  &none  &none  &none
-            &none  &none  &none  &none  &none  &trans  &none      &kp DEL   &kp LEFT  &kp DOWN  &kp RIGHT  &kp PG_DN      &kp KP_DOT       &kp KP_N4  &kp KP_N5   &kp KP_N6  &kp KP_MINUS   &none     &kp TAB          &none  &none  &none  &none  &none
-            &none  &none  &none  &none  &none  &trans  &kp LSHFT  &none     &none     &none     &none      &none          &kp COMMA        &kp KP_N1  &kp KP_N2   &kp KP_N3  &kp KP_DIVIDE  &trans    &trans           &none  &none  &none  &none  &none
-            &none  &none  &none  &none  &none  &trans  &kp LCTRL  &kp LALT  &kp LGUI  &trans    &trans     &trans         &trans           &kp KP_N0  &kp KP_DOT  &trans     &trans         &trans    &ret_boot 0 RET  &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &none   &none      &kp F1    &kp F2    &kp F3    &kp F4     &kp F5         &kp F6           &kp F7     &kp F8      &kp F9     &kp F10        &kp F11  &kp F12          &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &trans  &none      &kp INS   &kp HOME  &kp UP    &kp END    &kp PG_UP      &kp KP_MULTIPLY  &kp KP_N7  &kp KP_N8   &kp KP_N9  &kp KP_PLUS    &aring   &auml            &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &trans  &none      &kp DEL   &kp LEFT  &kp DOWN  &kp RIGHT  &kp PG_DN      &kp KP_DOT       &kp KP_N4  &kp KP_N5   &kp KP_N6  &kp KP_MINUS   &ouml    &kp TAB          &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &trans  &kp LSHFT  &none     &none     &none     &none      &none          &kp COMMA        &kp KP_N1  &kp KP_N2   &kp KP_N3  &kp KP_DIVIDE  &trans   &trans           &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &trans  &kp LCTRL  &kp LALT  &kp LGUI  &trans    &trans     &trans         &trans           &kp KP_N0  &kp KP_DOT  &trans     &trans         &trans   &ret_boot 0 RET  &none  &none  &none  &none  &none
             >;
         };
 

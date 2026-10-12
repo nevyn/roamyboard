@@ -39,6 +39,7 @@ test("labels from the layout's legend", () => {
   assert.deepStrictEqual(d("&ret_boot 0 RET"), ["↩/Boot", "Tap: Return. Hold 1.5 s: Bootloader"]);
   assert.deepStrictEqual(d("&thumb_lt 1 DEL"), ["fn⌫/L1", "Tap: Forward delete. Hold: Keypad"]);
   assert.deepStrictEqual(d("&unlock 0 0"), ["To0", "Hold 1 s: Switch to QWERTY"]);
+  assert.deepStrictEqual(d("&auml"), ["ä", "ä, or Ä with Shift"]);
   assert.deepStrictEqual(d("&to 4"), ["To4", "Switch to Locked"]);
   assert.deepStrictEqual(d("&ota_boot"), ["OTA", "Bluetooth bootloader"]);
   assert.deepStrictEqual(d("&mkp LCLK"), ["M1", "Left click"]);
