@@ -1,6 +1,6 @@
 # Layout for roamyboard
 
-The layout carries Nevyn's Naya Create layout over to the roamyboard: four layers, 7 key modules per half. `zmk/config/roamyboard_split.keymap` and `roamyboard.keymap` (unibody) implement it; edits made in ZMK Studio are stored on the keyboard and override these files.
+The layout carries Nevyn's Naya Create layout over to the roamyboard: five layers, 7 key modules per half. `zmk/config/roamyboard_split.keymap` and `roamyboard.keymap` (unibody) implement it; edits made in ZMK Studio are stored on the keyboard and override these files.
 
 The tables show the left half, then the right half, as they lie on the legs. On both halves, columns are counted from the outer edge: column 1 is the pinky's outer column and column 7 the index finger's inner column. Row 1 is the SW5 end (number row), row 5 the SW1 end.
 
@@ -13,6 +13,7 @@ The tables show the left half, then the right half, as they lie on the legs. On 
 - Mouse keys on the System layer: the right hand moves the pointer with I (up) and J K L (left, down, right) and scrolls with Y (up) and H (down). The left thumb clicks: M1 (left click) on ␣, M2 (right click) on ⌫ and M3 (middle click) on fn⌫. The right thumb holds L2 meanwhile, and the right hand's fingers move the pointer; the right thumb's M1 and M2 still click when L2 is held with the left pinky.
 - ↩/Boot on the Keypad layer is ↩ when tapped and Boot when held for 1.5 s. It is the outer column of the right half, the key module nearest the MCU module on a unibody, so a unibody with a single key module reaches the bootloader by holding L1 and then ↩/Boot.
 - To3 switches to the Gaming layer and To0 back to QWERTY.
+- To4, on the System layer next to To3, locks the keyboard: on the Locked layer every key does nothing, except the left half's row 5 Control key, which returns to QWERTY when held for 1 s. The keyboard stays on and connected, and the status screen shows "Locked". Locking takes the left row 5 Control off the System layer; the right half's Control still passes through.
 
 Legend: ︶ is transparent (the layer below decides), ⊘ does nothing, an empty cell is unassigned (also does nothing).
 
@@ -44,7 +45,7 @@ Legend: ︶ is transparent (the layer below decides), ⊘ does nothing, an empty
 | Boot | BLE | ⊘ | V− | Mut | V+ | ⊘ |   | W↑ | ⊘ | M↑ | ⊘ | ⊘ | ⊘ | ⊘ |
 | OTA | USB | ⊘ | Prv | Ply | Nxt | ⊘ |   | W↓ | M← | M↓ | M→ | ⊘ | ⊘ | ⊘ |
 | ︶ | ︶ | ⊘ | Br− | ⊘ | Br+ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ︶ | ⊘ |
-| To3 | ︶ | ︶ | ︶ | M3 | M1 | M2 |   | M2 | M1 | ︶ | ︶ | ︶ | ︶ | ⊘ |
+| To3 | To4 | ︶ | ︶ | M3 | M1 | M2 |   | M2 | M1 | ︶ | ︶ | ︶ | ︶ | ⊘ |
 
 ## 3 Gaming
 
@@ -55,6 +56,16 @@ Legend: ︶ is transparent (the layer below decides), ⊘ does nothing, an empty
 | ︶ | Cps | A | S | D | F | G |   | H | J | K | L | ; | ' | \\ |
 | ︶ | ⇧ | Z | X | C | V | B |   | N | M | , | . | / | ↑ | PrS |
 | To0 | ⌃ | ⌥ | ⌘ | ︶ | ︶ | ︶ |   | ︶ | ︶ | ︶ | ↩ | ← | ↓ | → |
+
+## 4 Locked
+
+| 1 | 2 | 3 | 4 | 5 | 6 | 7 |   | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |
+| ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |
+| ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |
+| ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |
+| ⊘ | Unlock (hold 1 s) | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |
 
 # Other layouts
 Here's Lily58's layout:

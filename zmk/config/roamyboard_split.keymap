@@ -36,6 +36,15 @@
             tapping-term-ms = <200>;
             bindings = <&mo>, <&kp>;
         };
+        // Hold for 1 s to leave the Locked layer; a tap does nothing.
+        unlock: unlock {
+            compatible = "zmk,behavior-hold-tap";
+            display-name = "Unlock";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <1000>;
+            bindings = <&to>, <&none>;
+        };
     };
 
     keymap {
@@ -70,7 +79,7 @@
             &none  &none  &none  &none  &none  &boot_screen  &out OUT_BLE  &none         &kp C_VOL_DN  &kp C_MUTE    &kp C_VOL_UP  &none             &msc SCRL_UP    &none           &mmv MOVE_UP    &none            &none      &none         &none       &none  &none  &none  &none  &none
             &none  &none  &none  &none  &none  &ota_boot     &out OUT_USB  &none         &kp C_PREV    &kp C_PP      &kp C_NEXT    &none             &msc SCRL_DOWN  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &none      &none         &none       &none  &none  &none  &none  &none
             &none  &none  &none  &none  &none  &trans        &trans        &none         &kp C_BRI_DN  &none         &kp C_BRI_UP  &none             &none           &none           &none           &none            &none      &trans        &none       &none  &none  &none  &none  &none
-            &none  &none  &none  &none  &none  &to 3         &trans        &trans        &trans        &mkp MCLK     &mkp LCLK     &mkp RCLK         &mkp RCLK       &mkp LCLK       &trans          &trans           &trans     &trans        &none       &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &to 3         &to 4         &trans        &trans        &mkp MCLK     &mkp LCLK     &mkp RCLK         &mkp RCLK       &mkp LCLK       &trans          &trans           &trans     &trans        &none       &none  &none  &none  &none  &none
             >;
         };
 
@@ -82,6 +91,18 @@
             &none  &none  &none  &none  &none  &trans   &kp CAPS   &kp A     &kp S     &kp D   &kp F   &kp G       &kp H   &kp J   &kp K      &kp L    &kp SEMI  &kp SQT    &kp BSLH   &none  &none  &none  &none  &none
             &none  &none  &none  &none  &none  &trans   &kp LSHFT  &kp Z     &kp X     &kp C   &kp V   &kp B       &kp N   &kp M   &kp COMMA  &kp DOT  &kp FSLH  &kp UP     &kp PSCRN  &none  &none  &none  &none  &none
             &none  &none  &none  &none  &none  &to 0    &kp LCTRL  &kp LALT  &kp LGUI  &trans  &trans  &trans      &trans  &trans  &trans     &kp RET  &kp LEFT  &kp DOWN   &kp RIGHT  &none  &none  &none  &none  &none
+            >;
+        };
+
+        // Every key does nothing except the left half's row 5 Control key, which returns to QWERTY when held for 1 s.
+        locked {
+            display-name = "Locked";
+            bindings = <
+            &none  &none  &none  &none  &none  &none  &none        &none  &none  &none  &none  &none      &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &none  &none        &none  &none  &none  &none  &none      &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &none  &none        &none  &none  &none  &none  &none      &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &none  &none        &none  &none  &none  &none  &none      &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none
+            &none  &none  &none  &none  &none  &none  &unlock 0 0  &none  &none  &none  &none  &none      &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none
             >;
         };
     };

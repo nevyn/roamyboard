@@ -281,6 +281,9 @@
       // hold-preferred also decides a hold when another key goes down, so the hold needs no wait.
       const holdFor = ht.flavor === "hold-preferred" ? "" : ht.tappingTermMs ? ` ${ht.tappingTermMs / 1000} s` : "";
       const holdName = hold.name.replace(/^Hold: /, "");
+      if (tap.kind === "none") {
+        return { label: hold.label, name: `Hold${holdFor}: ${holdName}`, detail: hold.detail, kind: hold.kind === "layer" ? "layer" : "system", target: hold.target };
+      }
       return {
         label: `${tap.label}/${hold.label}`, name: `Tap: ${tap.name}. Hold${holdFor}: ${holdName}`,
         detail: hold.detail, kind: hold.kind === "layer" ? "layer" : "system", target: hold.target,
