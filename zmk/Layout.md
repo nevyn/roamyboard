@@ -14,6 +14,7 @@ The tables show the left half, then the right half, as they lie on the legs. On 
 - ↩/Boot on the Keypad layer is ↩ when tapped and Boot when held for 1.5 s. It is the outer column of the right half, the key module nearest the MCU module on a unibody, so a unibody with a single key module reaches the bootloader by holding L1 and then ↩/Boot.
 - To3 switches to the Gaming layer and To0 back to QWERTY.
 - To4, on the System layer next to To3, locks the keyboard: on the Locked layer every key does nothing, except the left half's row 5 Control key, which returns to QWERTY when held for 1 s. The keyboard stays on and connected, and the status screen shows "Locked". Locking takes the left row 5 Control off the System layer; the right half's Control still passes through.
+- 0 on the right half (row 1, column 3), where OTA sits on the System layer, is also the right half's local OTA key: while the right half has no connection to the left half, holding it for 3 s enters OTA mode on the right half, so that the right half can be updated while the left half is down ([Firmware](../docs/firmware.md), Updating over Bluetooth). While the halves are connected, it does only what the keymap binds to it.
 
 Legend: ︶ is transparent (the layer below decides), ⊘ does nothing, an empty cell is unassigned (also does nothing).
 

@@ -42,6 +42,14 @@ if(CONFIG_ROAMYBOARD_STATUS_SCREEN)
   )
 endif()
 
+if(CONFIG_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN OR CONFIG_ROAMYBOARD_LOCAL_OTA)
+  target_sources(app PRIVATE src/bootloader.c)
+endif()
+
 if(CONFIG_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN)
   target_sources(app PRIVATE src/behaviors/behavior_boot_screen.c)
+endif()
+
+if(CONFIG_ROAMYBOARD_LOCAL_OTA)
+  target_sources(app PRIVATE src/local_ota.c)
 endif()

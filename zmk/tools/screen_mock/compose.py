@@ -22,6 +22,7 @@ SCENES = [
     "central-ota",
     "peripheral-startup",
     "peripheral-7cols-walk",
+    "peripheral-no-central",
     "peripheral-noterm-sit",
     "peripheral-bootloader",
     "peripheral-ota",

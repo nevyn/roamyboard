@@ -137,6 +137,7 @@ static struct status_state base_state(int key_module_count) {
         .active_host = {.state = ROAMYBOARD_HOST_NAME_KNOWN, .name = "Alecto"},
 #else
         .connected = true,
+        .local_ota_hint = "hold the\n0 key 3 s\nfor OTA",
 #endif
     };
     return state;
@@ -214,6 +215,9 @@ int main(int argc, char **argv) {
 
     struct status_state state = base_state(7);
     render(dir, "peripheral-7cols-walk", &state, CAT_WALK_2, 6);
+
+    state.connected = false;
+    render(dir, "peripheral-no-central", &state, CAT_SLEEP_0, 14);
 
     state = base_state(ROAMYBOARD_CHAIN_FAULT);
     state.connected = false;
