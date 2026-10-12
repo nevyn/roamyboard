@@ -273,6 +273,15 @@ A loop under the board can't hang from a floor: floors print bottom-down, so the
 
 The slot is 35 × 3 mm, for webbing up to about 33 × 2.5 (`strapSlot`, `strapGap`; the strap on hand is unmeasured). Checked on the meshes: the tunnel floor doesn't overlap its own module's or either neighbour's parts, the screws clear it and a screwdriver reaches them, and a strap 0.5 mm smaller than the tunnel passes through.
 
+Trial, 2026-10-12: a tunnel floor on column 1's module of each half and keepers glued under both MCU floors. The glue holds, the strap passes, and the board stays on the leg while sitting. The knee-end straps (along the number row) add nothing; with only the hip-end straps nothing is lost, and putting on four straps was a hassle. On a rotated half the hip end is the SW5 end, so the hardware stays at both column ends.
+
+What the strap harness doesn't do yet, for the main use case, coding while walking:
+- **Standing**: the board slides down the leg.
+- **Sideways placement**: each time the halves go on they sit a little differently around the leg, and finding the spot that fits the hands takes many small nudges. A harness should put them in the same place every time, but still let them shift on purpose: sitting and standing postures want different spots.
+- **Height on the leg**: sitting, the board belongs far down the thigh, almost at the knee. Standing, the hands reach only halfway down the thigh, so the board belongs high up, over the trouser pockets.
+
+Ideas so far: a belt worn over the trousers that the halves hang from, like a tool belt; a short skirt of fabric that holds them in place; magnets, alone or on such a belt (built into the trousers they would modify them for good, and they would have to be strong to carry the board).
+
 Next iteration:
 - [ ] Measure the strap and set `strapSlot` and `strapGap`.
 - [ ] Terminator: a keeper built into its bottom (it prints top-down, so the keeper's bridge is printed last), and no free-face lugs.
