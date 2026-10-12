@@ -17,12 +17,23 @@
 // The key module count box on the top canvas, in upright canvas coordinates.
 #define BOX_Y 21
 #define BOX_H 42
+#define BUILD_ID_Y (BOX_Y + 3)
+#if STATUS_SCREEN_CENTRAL
 #define COUNT_Y (BOX_Y + 3)
-#define CAT_X_MIN 3
-#define CAT_Y (BOX_Y + BOX_H - 3 - CAT_HEIGHT)
+#else
+// Without the cat, the count sits in the middle of the box.
+#define COUNT_Y (BOX_Y + 12)
+#endif
 
-_Static_assert(CAT_X_MIN + CAT_TRACK_LENGTH - 1 + CAT_WIDTH <= CANVAS_SIZE - 3,
-               "the cat must stay inside the box");
+#if STATUS_SCREEN_CENTRAL
+// The box's interior, which crops the cat, and the top of the cat's frame on the floor.
+#define INTERIOR_Y (BOX_Y + 1)
+#define INTERIOR_H (BOX_H - 2)
+#define CAT_Y (BOX_Y + BOX_H - 2 - CAT_HEIGHT)
+
+_Static_assert(CAT_BOX_WIDTH == CANVAS_SIZE - 2, "the cat walks across the whole box interior");
+_Static_assert(CAT_Y - CAT_MAX_RISE_PX >= INTERIOR_Y, "the cat must jump inside the box");
+#endif
 
 /** Draws a build ID centered at y; a "-dirty" suffix wraps to a second line. */
 static void draw_build_id(lv_obj_t *canvas, int y, const lv_font_t *font, const char *build_id) {
@@ -98,11 +109,11 @@ void screen_draw_top(struct screen *screen, const struct status_state *state) {
                      state->connected ? LV_SYMBOL_WIFI : LV_SYMBOL_CLOSE);
 #endif
 
-    // Draw the key module count box; the cat is a separate image on top of it.
+    // Draw the key module count box; the cat is a separate image on top of it, on the central.
     canvas_draw_rect(canvas, 0, BOX_Y, CANVAS_SIZE, BOX_H, &rect_white_dsc);
     canvas_draw_rect(canvas, 1, BOX_Y + 1, CANVAS_SIZE - 2, BOX_H - 2, &rect_black_dsc);
     if (state->startup_build_id != NULL) {
-        draw_build_id(canvas, COUNT_Y, &lv_font_montserrat_12, state->startup_build_id);
+        draw_build_id(canvas, BUILD_ID_Y, &lv_font_montserrat_12, state->startup_build_id);
     } else {
         draw_count(canvas, state->key_module_count);
     }
@@ -268,12 +279,17 @@ void screen_draw_bottom(struct screen *screen, const struct status_state *state)
     rotate_canvas(canvas);
 }
 
-void screen_show_cat(struct screen *screen, enum cat_frame frame, int position) {
+#if STATUS_SCREEN_CENTRAL
+
+void screen_show_cat(struct screen *screen, enum cat_frame frame, int x, int y) {
     lv_image_set_src(screen->cat, cat_frames[frame]);
-    // Upright (x, y) on the top canvas lands at (CANVAS_SIZE - 1 - y, x) once rotated.
-    lv_obj_align(screen->cat, LV_ALIGN_TOP_RIGHT, -CAT_Y, CAT_X_MIN + position);
-    lv_obj_remove_flag(screen->cat, LV_OBJ_FLAG_HIDDEN);
+    // Upright (ux, uy) in the interior lands at (INTERIOR_H - 1 - uy, ux) in the rotated box.
+    const int top = CAT_Y - INTERIOR_Y - y;
+    lv_obj_set_pos(screen->cat, INTERIOR_H - top - CAT_HEIGHT, x);
+    lv_obj_remove_flag(screen->cat_box, LV_OBJ_FLAG_HIDDEN);
 }
+
+#endif
 
 static void draw_download_icon(lv_obj_t *canvas, int y) {
     lv_draw_rect_dsc_t ink;
@@ -294,7 +310,9 @@ static void draw_download_icon(lv_obj_t *canvas, int y) {
 
 void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mode mode,
                             const char *build_id) {
-    lv_obj_add_flag(screen->cat, LV_OBJ_FLAG_HIDDEN);
+#if STATUS_SCREEN_CENTRAL
+    lv_obj_add_flag(screen->cat_box, LV_OBJ_FLAG_HIDDEN);
+#endif
 
     lv_draw_label_dsc_t title_dsc;
     init_label_dsc(&title_dsc, LVGL_FOREGROUND, &lv_font_montserrat_18, LV_TEXT_ALIGN_CENTER);
@@ -400,7 +418,17 @@ void screen_init(struct screen *screen, lv_obj_t *parent) {
     screen->canvas[SCREEN_MIDDLE] = middle;
     screen->canvas[SCREEN_BOTTOM] = bottom;
 
-    // Created last, so that it is drawn over the top canvas.
-    screen->cat = lv_image_create(screen->obj);
-    lv_obj_add_flag(screen->cat, LV_OBJ_FLAG_HIDDEN);
+#if STATUS_SCREEN_CENTRAL
+    // Created last, so that it is drawn over the top canvas. LVGL clips the cat to the box.
+    lv_obj_t *box = lv_obj_create(screen->obj);
+    lv_obj_remove_style_all(box);
+    lv_obj_remove_flag(box, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_scrollbar_mode(box, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_size(box, INTERIOR_H, CAT_BOX_WIDTH);
+    // Upright (x, y) on the top canvas lands at (CANVAS_SIZE - 1 - y, x) once rotated.
+    lv_obj_align(box, LV_ALIGN_TOP_RIGHT, -INTERIOR_Y, 1);
+    lv_obj_add_flag(box, LV_OBJ_FLAG_HIDDEN);
+    screen->cat_box = box;
+    screen->cat = lv_image_create(box);
+#endif
 }

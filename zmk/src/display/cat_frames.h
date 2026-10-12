@@ -6,23 +6,40 @@
 
 #pragma once
 
-#include <lvgl.h>
-
 /** Size of every cat frame as it appears on the status screen, upright. */
 #define CAT_WIDTH 22
 #define CAT_HEIGHT 16
 
+/**
+ * The cat's frames, facing right. CAT_FACING_LEFT plus a frame is the same frame
+ * mirrored, facing left.
+ */
 enum cat_frame {
     CAT_WALK_0,
     CAT_WALK_1,
     CAT_WALK_2,
     CAT_WALK_3,
+    CAT_RUN_0,
+    CAT_RUN_1,
+    CAT_RUN_2,
+    CAT_RUN_3,
     CAT_SIT,
     CAT_BLINK,
+    CAT_SIT_UP,
+    CAT_CROUCH,
+    CAT_JUMP,
+    CAT_FALL,
+    CAT_POUNCE,
+    CAT_HUNT,
+    CAT_HUNT_UP,
+    CAT_STALK_0,
+    CAT_STALK_1,
+    CAT_READY_0,
+    CAT_READY_1,
+    CAT_LOAF,
+    CAT_STRETCH,
     CAT_SLEEP_0,
     CAT_SLEEP_1,
-    CAT_FRAME_COUNT,
+    CAT_FACING_LEFT,
+    CAT_FRAME_COUNT = 2 * CAT_FACING_LEFT,
 };
-
-/** Every frame, rotated for the status screen: CAT_HEIGHT wide, CAT_WIDTH tall. */
-extern const lv_image_dsc_t *const cat_frames[CAT_FRAME_COUNT];

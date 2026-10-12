@@ -131,7 +131,7 @@
             >;
         };
 
-        keypad {
+        keypad_layer: keypad {
             display-name = "Keypad";
             bindings = <
             &none  &none  &none  &none  &none  &none   &none      &kp F1    &kp F2    &kp F3    &kp F4     &kp F5         &kp F6           &kp F7     &kp F8      &kp F9     &kp F10        &kp F11  &kp F12          &none  &none  &none  &none  &none
@@ -142,7 +142,7 @@
             >;
         };
 
-        system {
+        system_layer: system {
             display-name = "System";
             bindings = <
             &none  &none  &none  &none  &none  &soft_off     &bt BT_CLR    &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4      &none           &none           &none           &none            &ota_boot  &boot_screen  &sys_reset  &none  &none  &none  &none  &none
@@ -153,7 +153,7 @@
             >;
         };
 
-        gaming {
+        gaming_layer: gaming {
             display-name = "Gaming";
             bindings = <
             &none  &none  &none  &none  &none  &kp ESC  &kp GRAVE  &kp N1    &kp N2    &kp N3  &kp N4  &kp N5      &kp N6  &kp N7  &kp N8     &kp N9   &kp N0    &kp MINUS  &kp EQUAL  &none  &none  &none  &none  &none
@@ -165,7 +165,7 @@
         };
 
         // Every key does nothing except the left half's row 5 Control key, which returns to QWERTY when held for 1 s.
-        locked {
+        locked_layer: locked {
             display-name = "Locked";
             bindings = <
             &none  &none  &none  &none  &none  &none  &none        &none  &none  &none  &none  &none      &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &none

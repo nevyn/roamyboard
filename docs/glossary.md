@@ -85,3 +85,6 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **OTA mode**: The mode of the nice!nano's Adafruit bootloader that takes a DFU zip over Bluetooth, entered with the OTA key (`&ota_boot`). Not: BLE DFU mode, wireless bootloader.
 - **local OTA key**: The key on the split peripheral that enters OTA mode when it is held for 3 s while the peripheral has no connection to the central; by default 0 on the right half, where OTA sits on the System layer. It reaches OTA mode on the right half when the left half is down. Not: emergency OTA key, standalone OTA.
 - **DFU zip**: The firmware package for OTA mode: the application image, its init packet and a manifest, made by adafruit-nrfutil from `zmk.hex`. Not: OTA package, DFU package, OTA zip.
+- **cat**: The animated cat in the key module count box of the status screen, on the unibody and the split central.
+- **typing key**: A key whose keycode walks the cat: letters, digits, punctuation, Space, Tab, Enter, and the keypad's digits, operators, dot and Enter. Modifiers, F-keys and layer keys are not typing keys.
+- **pose**: The cat's posture on a layer that has one (Keypad, System, Gaming, Locked), chosen by the highest active layer. Not: stance, mood.

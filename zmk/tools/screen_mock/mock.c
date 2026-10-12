@@ -89,16 +89,22 @@ static void write_scene(const char *dir, const char *name) {
 
 static struct screen screen;
 
-static void render(const char *dir, const char *name, const struct status_state *state,
-                   enum cat_frame cat_frame, int cat_position) {
+static void render(const char *dir, const char *name, const struct status_state *state) {
     screen_draw_top(&screen, state);
     screen_draw_middle(&screen, state);
     screen_draw_bottom(&screen, state);
-    screen_show_cat(&screen, cat_frame, cat_position);
     fake_ms += 1000;
     lv_refr_now(NULL);
     write_scene(dir, name);
 }
+
+#if STATUS_SCREEN_CENTRAL
+static void render_cat(const char *dir, const char *name, const struct status_state *state,
+                       enum cat_frame frame, int x, int y) {
+    screen_show_cat(&screen, frame, x, y);
+    render(dir, name, state);
+}
+#endif
 
 /** Renders the first seconds after start: the count box shows the build ID, with no cat. */
 static void render_startup(const char *dir, const char *name, struct status_state state,
@@ -107,7 +113,9 @@ static void render_startup(const char *dir, const char *name, struct status_stat
     screen_draw_top(&screen, &state);
     screen_draw_middle(&screen, &state);
     screen_draw_bottom(&screen, &state);
-    lv_obj_add_flag(screen.cat, LV_OBJ_FLAG_HIDDEN);
+#if STATUS_SCREEN_CENTRAL
+    lv_obj_add_flag(screen.cat_box, LV_OBJ_FLAG_HIDDEN);
+#endif
     fake_ms += 1000;
     lv_refr_now(NULL);
     write_scene(dir, name);
@@ -143,6 +151,166 @@ static struct status_state base_state(int key_module_count) {
     return state;
 }
 
+#if STATUS_SCREEN_CENTRAL
+
+enum input_kind { END, KEY, MOUSE_DOWN, MOUSE_UP, POSE, PROFILE };
+
+/** One event for the cat, at ms after the action begins. */
+struct input {
+    uint32_t ms;
+    enum input_kind kind;
+    int arg;
+};
+
+/** A row of the contact sheet: the cat's views from 0 to end_ms; inputs end at kind END. */
+struct action {
+    const char *name;
+    int key_module_count;
+    int x;
+    uint32_t end_ms;
+    /** Followed by at least one END. */
+    struct input inputs[24];
+};
+
+#define T(ms) {ms, KEY, CAT_KEY_TYPING}
+#define MAX_CELLS 24
+
+static const struct action actions[] = {
+    {"walk", 7, 8, 1800, {T(0), T(300), T(600), T(900), T(1200), T(1500)}},
+    {"run", 7, 8, 1000, {T(0), T(100), T(200), T(300), T(400), T(500), T(600), T(700)}},
+    {"space", 7, 8, 800, {T(0), {300, KEY, CAT_KEY_SPACE}}},
+    {"enter", 7, 22, 700, {{0, KEY, CAT_KEY_ENTER}}},
+    {"up no term", ROAMYBOARD_CHAIN_FAULT, 22, 700, {{0, KEY, CAT_KEY_UP}}},
+    {"up ...", ROAMYBOARD_CHAIN_UNKNOWN, 22, 700, {{0, KEY, CAT_KEY_UP}}},
+    {"moonwalk",
+     7,
+     30,
+     1800,
+     {T(0),
+      {300, KEY, CAT_KEY_BACKSPACE},
+      {600, KEY, CAT_KEY_BACKSPACE},
+      {900, KEY, CAT_KEY_BACKSPACE},
+      {1200, KEY, CAT_KEY_BACKSPACE},
+      {1500, KEY, CAT_KEY_BACKSPACE}}},
+    {"arrows",
+     7,
+     30,
+     2200,
+     {{0, KEY, CAT_KEY_LEFT},
+      {300, KEY, CAT_KEY_LEFT},
+      {600, KEY, CAT_KEY_RIGHT},
+      {900, KEY, CAT_KEY_DOWN},
+      {1500, KEY, CAT_KEY_UP}}},
+    {"home end", 7, 30, 1800, {{0, KEY, CAT_KEY_HOME}, {800, KEY, CAT_KEY_END}}},
+    {"wrap right",
+     7,
+     40,
+     1500,
+     {T(0), T(100), T(200), T(300), T(400), T(500), T(600), T(700), T(800), T(900), T(1000),
+      T(1100), T(1200), T(1300)}},
+    {"wrap left",
+     7,
+     10,
+     1400,
+     {{0, KEY, CAT_KEY_LEFT},
+      {100, KEY, CAT_KEY_LEFT},
+      {200, KEY, CAT_KEY_LEFT},
+      {300, KEY, CAT_KEY_LEFT},
+      {400, KEY, CAT_KEY_LEFT},
+      {500, KEY, CAT_KEY_LEFT},
+      {600, KEY, CAT_KEY_LEFT},
+      {700, KEY, CAT_KEY_LEFT},
+      {800, KEY, CAT_KEY_LEFT},
+      {900, KEY, CAT_KEY_LEFT},
+      {1000, KEY, CAT_KEY_LEFT},
+      {1100, KEY, CAT_KEY_LEFT},
+      {1200, KEY, CAT_KEY_LEFT}}},
+    {"keypad", 7, 20, 1500, {{0, POSE, CAT_POSE_KEYPAD}, T(600)}},
+    {"system",
+     7,
+     10,
+     2600,
+     {{0, POSE, CAT_POSE_SYSTEM},
+      {300, MOUSE_DOWN, CAT_MOUSE_RIGHT},
+      {1100, MOUSE_UP, CAT_MOUSE_RIGHT},
+      {1400, MOUSE_DOWN, CAT_MOUSE_CLICK},
+      {1450, MOUSE_UP, CAT_MOUSE_CLICK},
+      {2100, MOUSE_DOWN, CAT_MOUSE_UP},
+      {2400, MOUSE_UP, CAT_MOUSE_UP}}},
+    {"gaming", 7, 20, 3400, {{0, POSE, CAT_POSE_GAMING}, {1600, KEY, CAT_KEY_OTHER}}},
+    {"locked", 7, 50, 2600, {{0, POSE, CAT_POSE_LOCKED}, {1500, POSE, CAT_POSE_NONE}}},
+    {"profile", 7, 30, 800, {{0, PROFILE, 0}}},
+    {"idle", 7, 22, 32000, {T(0)}},
+};
+
+static void feed(struct cat *cat, const struct input *in) {
+    switch (in->kind) {
+    case KEY:
+        cat_key_pressed(cat, (enum cat_key)in->arg, in->ms);
+        break;
+    case MOUSE_DOWN:
+        cat_mouse_pressed(cat, (enum cat_mouse)in->arg, in->ms);
+        break;
+    case MOUSE_UP:
+        cat_mouse_released(cat, (enum cat_mouse)in->arg, in->ms);
+        break;
+    case POSE:
+        cat_set_pose(cat, (enum cat_pose)in->arg, in->ms);
+        break;
+    case PROFILE:
+        cat_profile_changed(cat, in->ms);
+        break;
+    case END:
+        break;
+    }
+}
+
+/**
+ * Renders every action as a row of scenes, one per change of the cat's view, labeled with
+ * the action and the time in the host name's place, and lists them in cat-actions.txt.
+ */
+static void render_cat_actions(const char *dir) {
+    char path[512];
+    snprintf(path, sizeof(path), "%s/cat-actions.txt", dir);
+    FILE *index = fopen(path, "w");
+    if (!index) {
+        perror(path);
+        exit(1);
+    }
+    for (size_t a = 0; a < sizeof(actions) / sizeof(actions[0]); a++) {
+        const struct action *action = &actions[a];
+        struct status_state state = base_state(action->key_module_count);
+        struct cat cat;
+        cat_init(&cat, action->x, 0);
+        size_t next = 0;
+        uint32_t t = 0;
+        fprintf(index, "%s\t", action->name);
+        for (int cell = 0; cell < MAX_CELLS && t < action->end_ms; cell++) {
+            const struct input *in = action->inputs;
+            while (in[next].kind != END && in[next].ms <= t) {
+                feed(&cat, &in[next]);
+                next++;
+            }
+            const struct cat_view view = cat_view_at(&cat, t);
+            snprintf(state.active_host.name, sizeof(state.active_host.name), "%s\n%u ms",
+                     action->name, (unsigned int)t);
+            char name[64];
+            snprintf(name, sizeof(name), "cat-%zu-%d", a, cell);
+            render_cat(dir, name, &state, view.frame, view.x, view.y);
+            fprintf(index, "%s%s", cell ? " " : "", name);
+
+            t += view.valid_ms;
+            if (action->inputs[next].kind != END && action->inputs[next].ms < t) {
+                t = action->inputs[next].ms;
+            }
+        }
+        fprintf(index, "\n");
+    }
+    fclose(index);
+}
+
+#endif
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "usage: %s OUTPUT_DIR\n", argv[0]);
@@ -166,7 +334,7 @@ int main(int argc, char **argv) {
     render_startup(dir, "central-startup-unknown", base_state(7), "unknown");
 
     struct status_state state = base_state(7);
-    render(dir, "central-7cols-walk", &state, CAT_WALK_1, 12);
+    render_cat(dir, "central-7cols-walk", &state, CAT_WALK_1, 14, 0);
 
     state = base_state(1);
     state.selected_endpoint.transport = ZMK_TRANSPORT_USB;
@@ -174,39 +342,41 @@ int main(int argc, char **argv) {
     state.layer_label = "Keypad";
     state.active_profile_index = 3;
     snprintf(state.active_host.name, sizeof(state.active_host.name), "Nevyn's MacBook Pro");
-    render(dir, "central-1col-sit", &state, CAT_SIT, 20);
+    render_cat(dir, "central-1col-sit", &state, CAT_FACING_LEFT + CAT_SIT, 22, 0);
 
     state = base_state(0);
     state.active_profile_index = 1;
     state.active_profile_connected = false;
     state.active_host = (struct roamyboard_host_name){.state = ROAMYBOARD_HOST_NAME_PENDING};
-    render(dir, "central-0cols-sleep", &state, CAT_SLEEP_1, 30);
+    render_cat(dir, "central-0cols-sleep", &state, CAT_SLEEP_1, 32, 0);
 
     state = base_state(ROAMYBOARD_CHAIN_FAULT);
     state.active_host = (struct roamyboard_host_name){.state = ROAMYBOARD_HOST_NAME_ATT_ERROR,
                                                       .error = 0x0e};
-    render(dir, "central-noterm-blink", &state, CAT_BLINK, 0);
+    render_cat(dir, "central-noterm-blink", &state, CAT_BLINK, 2, 0);
 
     state = base_state(ROAMYBOARD_CHAIN_UNKNOWN);
     state.active_host = (struct roamyboard_host_name){.state = ROAMYBOARD_HOST_NAME_READ_ERROR,
                                                       .error = -12};
-    render(dir, "central-unknown-walk", &state, CAT_WALK_0, CAT_TRACK_LENGTH - 1);
+    render_cat(dir, "central-unknown-walk", &state, CAT_WALK_0, CAT_BOX_WIDTH - 10, 0);
 
     state = base_state(7);
     state.active_profile_index = 2;
     state.active_profile_bonded = false;
     state.active_profile_connected = false;
     state.active_host = (struct roamyboard_host_name){.state = ROAMYBOARD_HOST_NAME_NONE};
-    render(dir, "central-open-profile", &state, CAT_SIT, 8);
+    render_cat(dir, "central-open-profile", &state, CAT_SIT, 10, 0);
 
     state = base_state(7);
     state.active_host.name[0] = '\0';
-    render(dir, "central-empty-name", &state, CAT_WALK_2, 16);
+    render_cat(dir, "central-empty-name", &state, CAT_FACING_LEFT + CAT_WALK_2, -8, 0);
 
     state = base_state(7);
     snprintf(state.active_host.name, sizeof(state.active_host.name),
              "Living Room iPad Pro (12.9-inch) (6th generation)");
-    render(dir, "central-long-name", &state, CAT_WALK_3, 24);
+    render_cat(dir, "central-long-name", &state, CAT_WALK_3, 26, 0);
+
+    render_cat_actions(dir);
 
     render_bootloader(dir, "central-bootloader", ROAMYBOARD_BOOTLOADER_UF2, "3274ed3-dirty");
     render_bootloader(dir, "central-ota", ROAMYBOARD_BOOTLOADER_OTA, "3274ed3");
@@ -214,14 +384,14 @@ int main(int argc, char **argv) {
     render_startup(dir, "peripheral-startup", base_state(7), "3274ed3");
 
     struct status_state state = base_state(7);
-    render(dir, "peripheral-7cols-walk", &state, CAT_WALK_2, 6);
+    render(dir, "peripheral-7cols", &state);
 
     state.connected = false;
-    render(dir, "peripheral-no-central", &state, CAT_SLEEP_0, 14);
+    render(dir, "peripheral-no-central", &state);
 
     state = base_state(ROAMYBOARD_CHAIN_FAULT);
     state.connected = false;
-    render(dir, "peripheral-noterm-sit", &state, CAT_SIT, 36);
+    render(dir, "peripheral-noterm", &state);
 
     render_bootloader(dir, "peripheral-bootloader", ROAMYBOARD_BOOTLOADER_UF2, "3274ed3");
     render_bootloader(dir, "peripheral-ota", ROAMYBOARD_BOOTLOADER_OTA, "3274ed3-dirty");

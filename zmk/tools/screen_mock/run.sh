@@ -6,6 +6,9 @@
 #   states-on-leg.png   what a person sees on the mounted nice!view, side by side
 #   screen.png          the central in use, as a person sees it
 #   screen-panel.png    the same, as the panel's own image
+#   cat-actions-on-leg.png  every cat action, one row each, as a person sees it: the count
+#                       box at each change of the cat's view, labeled with the action and time
+#   cat-actions.png     the same, as the panel's own image
 # and two PGMs per scene. ROTATE_180=0 renders without CONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180.
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
