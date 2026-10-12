@@ -138,7 +138,7 @@ static struct status_state base_state(int key_module_count) {
         .active_profile_index = 0,
         .active_profile_connected = true,
         .active_profile_bonded = true,
-        // Profiles 1 and 4 connected, 2 paired, 3 and 5 open.
+        // Profiles 1 and 4 connected, 2 paired, 3 and 5 unpaired.
         .profiles_connected = {true, false, false, true, false},
         .profiles_bonded = {true, true, false, true, false},
         .layer_label = "QWERTY",
@@ -365,7 +365,7 @@ int main(int argc, char **argv) {
     state.active_profile_bonded = false;
     state.active_profile_connected = false;
     state.active_host = (struct roamyboard_host_name){.state = ROAMYBOARD_HOST_NAME_NONE};
-    render_cat(dir, "central-open-profile", &state, CAT_SIT, 10, 0);
+    render_cat(dir, "central-unpaired-profile", &state, CAT_SIT, 10, 0);
 
     state = base_state(7);
     state.active_host.name[0] = '\0';

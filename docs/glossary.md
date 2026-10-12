@@ -88,3 +88,4 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **cat**: The animated cat in the key module count box of the status screen, on the unibody and the split central.
 - **typing key**: A key whose keycode walks the cat: letters, digits, punctuation, Space, Tab, Enter, and the keypad's digits, operators, dot and Enter. Modifiers, F-keys and layer keys are not typing keys.
 - **pose**: The cat's posture on a layer that has one (Keypad, System, Gaming, Locked), chosen by the highest active layer. Not: stance, mood.
+- **unpaired**: A Bluetooth profile with no host paired to it. The status screen shows a small dot for it and "unpaired" as its host name. Not: open (ZMK's term in its API).

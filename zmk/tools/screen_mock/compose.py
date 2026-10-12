@@ -15,7 +15,7 @@ SCENES = [
     "central-0cols-sleep",
     "central-noterm-blink",
     "central-unknown-walk",
-    "central-open-profile",
+    "central-unpaired-profile",
     "central-empty-name",
     "central-long-name",
     "central-bootloader",
