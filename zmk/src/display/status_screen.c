@@ -27,6 +27,10 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <roamyboard/chain_state.h>
 #include <roamyboard/events/chain_state_changed.h>
 #include <roamyboard/status_screen.h>
+#if IS_ENABLED(CONFIG_ROAMYBOARD_PDA)
+#include <roamyboard/events/pda_changed.h>
+#include <roamyboard/pda.h>
+#endif
 
 #include "cat.h"
 #include "screen.h"
@@ -64,10 +68,14 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 static struct screen screen;
 static struct status_state state;
 static bool bootloader_shown;
+/** The peripheral shows the PDA view instead of the status. */
+static bool pda_shown;
 static atomic_t ready;
 
+static bool status_hidden(void) { return bootloader_shown || pda_shown; }
+
 static void redraw_top(void) {
-    if (!bootloader_shown) {
+    if (!status_hidden()) {
         screen_draw_top(&screen, &state);
     }
 }
@@ -145,7 +153,7 @@ static void set_output_status(struct output_status_state output) {
         state.profiles_bonded[i] = output.profiles_bonded[i];
     }
 
-    if (!bootloader_shown) {
+    if (!status_hidden()) {
         screen_draw_top(&screen, &state);
         screen_draw_middle(&screen, &state);
     }
@@ -181,7 +189,7 @@ ZMK_SUBSCRIPTION(widget_output_status, zmk_ble_active_profile_changed);
 static void set_host_name_status(struct roamyboard_host_name host) {
     state.active_host = host;
 
-    if (!bootloader_shown) {
+    if (!status_hidden()) {
         screen_draw_middle(&screen, &state);
     }
 }
@@ -203,7 +211,7 @@ static void set_layer_status(struct layer_status_state layer) {
     state.layer_index = layer.index;
     state.layer_label = layer.label;
 
-    if (!bootloader_shown) {
+    if (!status_hidden()) {
         screen_draw_bottom(&screen, &state);
     }
 }
@@ -232,7 +240,7 @@ static struct peripheral_status_state get_state(const zmk_event_t *_eh) {
 static void set_connection_status(struct peripheral_status_state peripheral) {
     state.connected = peripheral.connected;
 
-    if (!bootloader_shown) {
+    if (!status_hidden()) {
         screen_draw_top(&screen, &state);
         screen_draw_middle(&screen, &state);
     }
@@ -261,6 +269,44 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_peripheral_status, struct peripheral_status_s
 ZMK_SUBSCRIPTION(widget_peripheral_status, zmk_split_peripheral_status_changed);
 
 #endif // STATUS_SCREEN_CENTRAL
+
+#if IS_ENABLED(CONFIG_ROAMYBOARD_PDA)
+
+struct pda_status_state {
+    uint8_t mode;
+};
+
+static void set_pda_status(struct pda_status_state pda) {
+    state.pda_mode = pda.mode;
+    if (bootloader_shown) {
+        return;
+    }
+#if STATUS_SCREEN_CENTRAL
+    screen_draw_middle(&screen, &state);
+#else
+    if (pda.mode != ROAMYBOARD_PDA_OFF) {
+        static char text[ROAMYBOARD_PDA_NOTE_MAX + 1];
+        roamyboard_pda_note_copy(text, sizeof(text));
+        pda_shown = true;
+        screen_draw_pda(&screen, pda.mode, text);
+    } else if (pda_shown) {
+        pda_shown = false;
+        screen_draw_top(&screen, &state);
+        screen_draw_middle(&screen, &state);
+        screen_draw_bottom(&screen, &state);
+    }
+#endif
+}
+
+static struct pda_status_state pda_status_get_state(const zmk_event_t *eh) {
+    return (struct pda_status_state){.mode = roamyboard_pda_mode()};
+}
+
+ZMK_DISPLAY_WIDGET_LISTENER(widget_pda_status, struct pda_status_state, set_pda_status,
+                            pda_status_get_state)
+ZMK_SUBSCRIPTION(widget_pda_status, roamyboard_pda_changed);
+
+#endif // IS_ENABLED(CONFIG_ROAMYBOARD_PDA)
 
 #if STATUS_SCREEN_CENTRAL
 
@@ -513,7 +559,9 @@ static void startup_end_handler(struct k_work *work) {
         return;
     }
     state.startup_build_id = NULL;
-    screen_draw_top(&screen, &state);
+    if (!pda_shown) {
+        screen_draw_top(&screen, &state);
+    }
 #if STATUS_SCREEN_CENTRAL
     cat_start();
 #endif
@@ -602,6 +650,10 @@ lv_obj_t *zmk_display_status_screen(void) {
     widget_layer_status_init();
 #else
     widget_peripheral_status_init();
+#endif
+
+#if IS_ENABLED(CONFIG_ROAMYBOARD_PDA)
+    widget_pda_status_init();
 #endif
 
     atomic_set(&ready, true);

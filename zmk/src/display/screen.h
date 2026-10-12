@@ -78,6 +78,15 @@ void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mo
                             const char *build_id);
 
 /**
+ * Replaces everything on the screen with the PDA view, inverted so that PDA mode cannot be
+ * mistaken for typing to the host: a title for the mode and the end of text, with a cursor.
+ *
+ * @param pda_mode enum roamyboard_pda_mode, other than ROAMYBOARD_PDA_OFF.
+ * @param text The note, UTF-8.
+ */
+void screen_draw_pda(struct screen *screen, int pda_mode, const char *text);
+
+/**
  * Turns one flushed area of a 1-bit display upside down, for a flush callback to pass on to
  * the panel's own.
  *

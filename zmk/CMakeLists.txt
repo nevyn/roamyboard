@@ -31,6 +31,19 @@ if(CONFIG_ROAMYBOARD_HOST_NAMES)
   target_sources(app PRIVATE src/ble/host_names.c)
 endif()
 
+if(CONFIG_ROAMYBOARD_PDA)
+  target_sources(app PRIVATE src/events/pda_changed.c src/pda/note.c src/pda/keys.c)
+  if(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+    target_sources(app PRIVATE src/pda/central.c)
+  else()
+    target_sources(app PRIVATE src/pda/peripheral.c)
+  endif()
+endif()
+
+if(CONFIG_ROAMYBOARD_BEHAVIOR_PDA)
+  target_sources(app PRIVATE src/behaviors/behavior_pda.c)
+endif()
+
 if(CONFIG_ROAMYBOARD_STATUS_SCREEN)
   target_sources(app PRIVATE
     src/display/bolt.c

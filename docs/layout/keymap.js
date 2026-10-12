@@ -234,6 +234,8 @@
     bootloader: ["Boot", "Bootloader", "Enters the UF2 bootloader."],
     boot_screen: ["Boot", "Bootloader", "Shows the bootloader view on the status screen, then enters the UF2 bootloader on the half that it is pressed on."],
     ota_boot: ["OTA", "Bluetooth bootloader", "Shows the OTA view on the status screen, then enters the bootloader's Bluetooth DFU mode on the half that it is pressed on, ready for a DFU zip from the nRF Device Firmware Update app."],
+    pda_sel: ["PDA", "PDA (slot 6)", "Sends the keys to the micro PDA on the right half's display instead of the host, as a sixth device; press again for the host."],
+    pda_note: ["Note", "Quick note", "Opens the micro PDA's note editor on the right half's display; Escape returns the keys to the host, and Cmd-Return types the note out to it."],
     caps_word: ["CW", "Caps word"],
     key_repeat: ["Rep", "Repeat the last key"],
   };

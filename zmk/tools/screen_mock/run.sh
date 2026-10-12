@@ -39,7 +39,7 @@ for role in central peripheral; do
     [ "${ROTATE_180:-1}" = 1 ] && defines="-DCONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180=1"
     [ "$role" = peripheral ] && defines="$defines -DCONFIG_ZMK_SPLIT=1"
     ${CC:-cc} -std=c11 -Wall -Wextra -Werror -Wno-missing-field-initializers $defines \
-        -DLV_CONF_INCLUDE_SIMPLE -I"$here" -I"$lvgl" -I"$display" -I"$zmk_dir/include" \
+        -DLV_CONF_INCLUDE_SIMPLE -I"$here" -I"$lvgl" -I"$lvgl/src" -I"$display" -I"$zmk_dir/include" \
         -I"$zephyr" -I"$zmk_app" \
         "$here/mock.c" "$display/screen.c" "$display/util.c" "$display/bolt.c" \
         "$display/cat.c" "$display/cat_frames.c" "$build/liblvgl.a" -lm -o "$build/mock-$role"

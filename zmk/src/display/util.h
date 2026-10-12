@@ -36,6 +36,8 @@ struct status_state {
     int key_module_count;
     /** Build ID that the count box shows instead of the count while the screen starts; or NULL. */
     const char *startup_build_id;
+    /** enum roamyboard_pda_mode. */
+    uint8_t pda_mode;
 #if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
     struct zmk_endpoint_instance selected_endpoint;
     int active_profile_index;

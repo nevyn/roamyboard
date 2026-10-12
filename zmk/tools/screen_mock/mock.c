@@ -17,6 +17,7 @@
 
 #include <lvgl.h>
 #include <roamyboard/chain_state.h>
+#include <roamyboard/pda.h>
 
 #include "cat.h"
 #include "screen.h"
@@ -128,6 +129,15 @@ static void render_bootloader(const char *dir, const char *name,
     lv_refr_now(NULL);
     write_scene(dir, name);
 }
+
+#if !STATUS_SCREEN_CENTRAL
+static void render_pda(const char *dir, const char *name, int pda_mode, const char *text) {
+    screen_draw_pda(&screen, pda_mode, text);
+    fake_ms += 1000;
+    lv_refr_now(NULL);
+    write_scene(dir, name);
+}
+#endif
 
 static struct status_state base_state(int key_module_count) {
     struct status_state state = {
@@ -376,6 +386,10 @@ int main(int argc, char **argv) {
              "Living Room iPad Pro (12.9-inch) (6th generation)");
     render_cat(dir, "central-long-name", &state, CAT_WALK_3, 26, 0);
 
+    state = base_state(7);
+    state.pda_mode = ROAMYBOARD_PDA_HOME;
+    render_cat(dir, "central-pda", &state, CAT_SIT, 10, 0);
+
     render_cat_actions(dir);
 
     render_bootloader(dir, "central-bootloader", ROAMYBOARD_BOOTLOADER_UF2, "3274ed3-dirty");
@@ -392,6 +406,12 @@ int main(int argc, char **argv) {
     state = base_state(ROAMYBOARD_CHAIN_FAULT);
     state.connected = false;
     render(dir, "peripheral-noterm", &state);
+
+    render_pda(dir, "peripheral-pda-empty", ROAMYBOARD_PDA_HOME, "");
+    render_pda(dir, "peripheral-pda-note", ROAMYBOARD_PDA_NOTE, "Köp mjölk\nRing Theo");
+    render_pda(dir, "peripheral-pda-long", ROAMYBOARD_PDA_HOME,
+               "Räksmörgås till lunch. Fixa PR 32 och kolla OTA-loggen innan mötet.\n"
+               "TODO:\n- spike the split data channel\n- timer app\n- tetris");
 
     render_bootloader(dir, "peripheral-bootloader", ROAMYBOARD_BOOTLOADER_UF2, "3274ed3");
     render_bootloader(dir, "peripheral-ota", ROAMYBOARD_BOOTLOADER_OTA, "3274ed3-dirty");

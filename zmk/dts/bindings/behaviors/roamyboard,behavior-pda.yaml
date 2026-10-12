@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Sends the central's keyboard keys to the micro PDA on the split peripheral's display
+  instead of the host, or back to the host if the behavior's mode is already on. It takes
+  no parameters and runs on the central. zmk/dts/behaviors/pda.dtsi defines &pda_sel and
+  &pda_note; docs/pda.md describes the PDA.
+
+compatible: "roamyboard,behavior-pda"
+
+include: zero_param.yaml
+
+properties:
+  mode:
+    type: string
+    default: "home"
+    enum:
+      - "home"
+      - "note"
+    description: |
+      "home" (the default) selects the PDA as slot 6, a sixth device beside the five
+      Bluetooth profiles. "note" opens the note editor; Escape there returns to the host.

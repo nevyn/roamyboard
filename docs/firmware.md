@@ -11,11 +11,12 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/boards/shields/roamyboard/` | The unibody shield. |
 | `zmk/boards/shields/roamyboard_split/` | The `roamyboard_left` and `roamyboard_right` shields. |
 | `zmk/config/roamyboard.keymap`, `roamyboard_split.keymap` | Keymaps (below). |
-| `zmk/include/roamyboard/` | Public headers: the build ID, the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view, rebooting into the bootloader. |
+| `zmk/include/roamyboard/` | Public headers: the build ID, the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view, rebooting into the bootloader, the PDA mode and its `roamyboard_pda_changed` event. |
 | `zmk/cmake/build_id.cmake`, `zmk/src/build_id.c` | The build ID (Building, below). |
 | `zmk/src/ble/host_names.c` | Reads each Bluetooth host's name and keeps it per profile (below). |
 | `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. `cat.c` is the cat's pure logic; `cat_frames.c` and its headers are generated. |
 | `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen` and `&ota_boot`, the bootloader keys; their binding is in `zmk/dts/bindings/behaviors/`. |
+| `zmk/src/pda/`, `zmk/src/behaviors/behavior_pda.c`, `zmk/dts/behaviors/pda.dtsi` | The micro PDA: PDA mode and the split data channel on each half, the note editor, and the PDA and Note keys ([Micro PDA](pda.md)). |
 | `zmk/src/bootloader.c` | Shows the bootloader view and reboots into the bootloader's UF2 or OTA mode, for the bootloader keys and the local OTA key. |
 | `zmk/src/local_ota.c` | The split peripheral's local OTA key (Updating over Bluetooth, below). |
 | `zmk/tests/` | Host tests for the pure logic: `zmk/tests/run.sh`. |

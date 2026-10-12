@@ -89,3 +89,9 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **typing key**: A key whose keycode walks the cat: letters, digits, punctuation, Space, Tab, Enter, and the keypad's digits, operators, dot and Enter. Modifiers, F-keys and layer keys are not typing keys.
 - **pose**: The cat's posture on a layer that has one (Keypad, System, Gaming, Locked), chosen by the highest active layer. Not: stance, mood.
 - **unpaired**: A Bluetooth profile with no host paired to it. The status screen shows a small dot for it and "unpaired" as its host name. Not: open (ZMK's term in its API).
+- **PDA**: The micro PDA on the right half's display, which takes the keys while PDA mode is on. Not: organizer, right-display app.
+- **PDA mode**: The state in which the central sends its keyboard keys to the PDA instead of the host. Its two modes are slot 6 and quick note. Not: PDA layer (it is not a keymap layer).
+- **slot 6**: PDA mode entered with the PDA key (`&pda_sel`), as if the PDA were a sixth device beside the five Bluetooth profiles. Not: profile 6 (ZMK has no sixth profile).
+- **quick note**: PDA mode entered with the Note key (`&pda_note`), straight into the note editor; Escape returns to the host.
+- **split data channel**: The PDA's own GATT service on the split peripheral, which the central writes to and subscribes to over the split connection. Not: split transport (ZMK's own messages).
+- **type out**: Sending the note to the host as key presses, with Cmd-Return in the note.

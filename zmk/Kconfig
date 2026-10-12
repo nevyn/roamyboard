@@ -82,6 +82,33 @@ config ROAMYBOARD_LOCAL_OTA_LABEL
       for example "0" in "hold the 0 key 3 s for OTA". Change it with
       ROAMYBOARD_LOCAL_OTA_POSITION.
 
+config ROAMYBOARD_PDA
+    bool "Micro PDA on the split peripheral's display"
+    default y
+    depends on ZMK_SPLIT && ZMK_SPLIT_BLE && SETTINGS
+    select BT_GATT_CLIENT if ZMK_SPLIT_ROLE_CENTRAL
+    select BT_GATT_AUTO_DISCOVER_CCC if ZMK_SPLIT_ROLE_CENTRAL
+    help
+      While PDA mode is on, the central sends its keyboard keys over the split
+      data channel to the PDA on the peripheral's display instead of the host.
+      docs/pda.md describes it.
+
+config ROAMYBOARD_PDA_TYPE_OUT_STEP_MS
+    int "Milliseconds between key presses and releases when the PDA types out"
+    default 10
+    range 1 100
+    depends on ROAMYBOARD_PDA && ZMK_SPLIT_ROLE_CENTRAL
+    help
+      The central types a note out to the host as one press or release per
+      step. Raise it if the host drops characters.
+
+DT_COMPAT_ROAMYBOARD_BEHAVIOR_PDA := roamyboard,behavior-pda
+
+config ROAMYBOARD_BEHAVIOR_PDA
+    bool
+    default $(dt_compat_enabled,$(DT_COMPAT_ROAMYBOARD_BEHAVIOR_PDA))
+    depends on ROAMYBOARD_PDA && ZMK_SPLIT_ROLE_CENTRAL
+
 DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN := roamyboard,behavior-boot-screen
 
 config ROAMYBOARD_BEHAVIOR_BOOT_SCREEN

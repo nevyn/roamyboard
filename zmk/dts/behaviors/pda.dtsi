@@ -1,0 +1,23 @@
+/*
+ * The micro PDA keys: &pda_sel selects the PDA as slot 6, &pda_note opens a quick note.
+ * Pressing either again while its mode is on returns the keys to the host.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/ {
+    behaviors {
+        pda_sel: pdasel {
+            compatible = "roamyboard,behavior-pda";
+            #binding-cells = <0>;
+            display-name = "PDA (slot 6)";
+        };
+
+        pda_note: pdanote {
+            compatible = "roamyboard,behavior-pda";
+            #binding-cells = <0>;
+            mode = "note";
+            display-name = "Quick note";
+        };
+    };
+};
