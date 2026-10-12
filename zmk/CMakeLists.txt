@@ -36,7 +36,7 @@ if(CONFIG_ROAMYBOARD_PDA)
   if(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
     target_sources(app PRIVATE src/pda/central.c)
   else()
-    target_sources(app PRIVATE src/pda/peripheral.c)
+    target_sources(app PRIVATE src/pda/peripheral.c src/pda/shell.c src/pda/apps.c src/pda/gfx.c)
   endif()
 endif()
 
@@ -50,6 +50,7 @@ if(CONFIG_ROAMYBOARD_STATUS_SCREEN)
     src/display/cat.c
     src/display/cat_frames.c
     src/display/font_pda_12.c
+    src/display/pda_text.c
     src/display/screen.c
     src/display/status_screen.c
     src/display/util.c

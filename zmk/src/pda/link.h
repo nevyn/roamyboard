@@ -23,6 +23,13 @@ enum pda_link_op {
     PDA_LINK_MODE = 0x01,
     /** Central to peripheral: [op, pressed, implicit modifier bits, HID keyboard usage ID]. */
     PDA_LINK_KEY = 0x02,
+    /** Central to peripheral, in PDA mode: [op, pressed, key position]. */
+    PDA_LINK_POSITION = 0x03,
+    /**
+     * Central to peripheral: [op, key module count as int8, battery percent, build ID...];
+     * the central's own state, for the Info app. Sent when the link comes up and on change.
+     */
+    PDA_LINK_INFO = 0x04,
     /** Peripheral to central: [op, UTF-8 bytes...]; appends to the text to type out. */
     PDA_LINK_TEXT = 0x81,
     /** Peripheral to central: [op]; leave PDA mode, then type the text out to the host. */
@@ -32,3 +39,6 @@ enum pda_link_op {
 };
 
 #define PDA_LINK_KEY_LEN 4
+#define PDA_LINK_POSITION_LEN 3
+/** The longest message from the central; writes stay within the smallest ATT MTU (23). */
+#define PDA_LINK_WRITE_MAX 20

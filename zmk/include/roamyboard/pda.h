@@ -8,9 +8,13 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
 
-/** The longest note in bytes of UTF-8, without the terminating NUL. */
-#define ROAMYBOARD_PDA_NOTE_MAX 512
+/** The PDA's framebuffer: the whole nice!view, upright, one bit per pixel. */
+#define ROAMYBOARD_PDA_FB_WIDTH 68
+#define ROAMYBOARD_PDA_FB_HEIGHT 160
+#define ROAMYBOARD_PDA_FB_STRIDE ((ROAMYBOARD_PDA_FB_WIDTH + 7) / 8)
+#define ROAMYBOARD_PDA_FB_BYTES (ROAMYBOARD_PDA_FB_STRIDE * ROAMYBOARD_PDA_FB_HEIGHT)
 
 enum roamyboard_pda_mode {
     /** Keys go to the host. */
@@ -35,8 +39,9 @@ enum roamyboard_pda_mode roamyboard_pda_mode(void);
 int roamyboard_pda_select(enum roamyboard_pda_mode mode);
 
 /**
- * Peripheral only. Copies the note's UTF-8 text, NUL-terminated and cut to size - 1 bytes.
+ * Peripheral only. Draws the PDA's current view into bits: ROAMYBOARD_PDA_FB_HEIGHT rows of
+ * ROAMYBOARD_PDA_FB_STRIDE bytes, MSB leftmost, a set bit lit (the PDA draws light on dark).
  *
- * @return The text's length in bytes before the cut.
+ * Call it on the display work queue only: apps draw text with LVGL.
  */
-size_t roamyboard_pda_note_copy(char *buf, size_t size);
+void roamyboard_pda_render(uint8_t bits[ROAMYBOARD_PDA_FB_BYTES]);

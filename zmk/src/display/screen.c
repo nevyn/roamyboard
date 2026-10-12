@@ -11,7 +11,6 @@
 
 #include <roamyboard/chain_state.h>
 
-#include <misc/lv_text_private.h>
 #include <roamyboard/pda.h>
 
 #include "cat.h"
@@ -372,80 +371,24 @@ void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mo
     rotate_canvas(bottom);
 }
 
-// Montserrat 12 with Latin-1, for notes in Swedish; docs/pda.md, Displays.
-LV_FONT_DECLARE(roamyboard_font_pda_12);
-
-// The PDA view: a title, a rule under it, then lines of text down to the bottom of the display.
-#define PDA_TITLE_Y 2
-#define PDA_RULE_Y 20
-#define PDA_TEXT_Y 23
-#define PDA_TEXT_X 1
-#define PDA_DISPLAY_H (2 * CANVAS_SIZE + 24)
-#define PDA_MAX_LINES 96
-
-/** Draws a band of the view that starts at y on the whole display, on every canvas it crosses. */
-static void pda_draw_text(struct screen *screen, int y, lv_draw_label_dsc_t *dsc,
-                          const char *text) {
-    const int h = lv_font_get_line_height(dsc->font);
-    for (int c = 0; c < SCREEN_CANVAS_COUNT; c++) {
-        const int top = c * CANVAS_SIZE;
-        if (y + h > top && y < top + CANVAS_SIZE) {
-            canvas_draw_text(screen->canvas[c], PDA_TEXT_X, y - top, CANVAS_SIZE - 2 * PDA_TEXT_X,
-                             dsc, text);
-        }
-    }
-}
-
-void screen_draw_pda(struct screen *screen, int pda_mode, const char *text) {
+void screen_draw_pda(struct screen *screen, const uint8_t *bits, bool focused) {
 #if STATUS_SCREEN_CENTRAL
     lv_obj_add_flag(screen->cat_box, LV_OBJ_FLAG_HIDDEN);
 #endif
+    // Focused, lit pixels are light on dark, the inverse of the status screen.
+    const lv_color_t lit = focused ? LVGL_BACKGROUND : LVGL_FOREGROUND;
+    const lv_color_t dark = focused ? LVGL_FOREGROUND : LVGL_BACKGROUND;
     for (int c = 0; c < SCREEN_CANVAS_COUNT; c++) {
-        lv_canvas_fill_bg(screen->canvas[c], LVGL_FOREGROUND, LV_OPA_COVER);
-    }
-
-    lv_draw_label_dsc_t title_dsc;
-    init_label_dsc(&title_dsc, LVGL_BACKGROUND, &lv_font_montserrat_14, LV_TEXT_ALIGN_CENTER);
-    canvas_draw_text(screen->canvas[SCREEN_TOP], 0, PDA_TITLE_Y, CANVAS_SIZE, &title_dsc,
-                     pda_mode == ROAMYBOARD_PDA_NOTE ? "NOTE" : "PDA");
-    lv_draw_rect_dsc_t rule_dsc;
-    init_rect_dsc(&rule_dsc, LVGL_BACKGROUND);
-    canvas_draw_rect(screen->canvas[SCREEN_TOP], 0, PDA_RULE_Y, CANVAS_SIZE, 1, &rule_dsc);
-
-    // The text with a cursor, wrapped; the last lines that fit are shown, as on a receipt.
-    static char buf[ROAMYBOARD_PDA_NOTE_MAX + 2];
-    snprintf(buf, sizeof(buf), "%s_", text);
-    lv_draw_label_dsc_t text_dsc;
-    init_label_dsc(&text_dsc, LVGL_BACKGROUND, &roamyboard_font_pda_12, LV_TEXT_ALIGN_LEFT);
-    const int line_h = lv_font_get_line_height(text_dsc.font);
-    const int width = CANVAS_SIZE - 2 * PDA_TEXT_X;
-
-    static uint32_t starts[PDA_MAX_LINES + 1];
-    int lines = 0;
-    const uint32_t len = strlen(buf);
-    for (uint32_t pos = 0; pos < len && lines < PDA_MAX_LINES;) {
-        starts[lines++] = pos;
-        const uint32_t n = lv_text_get_next_line(buf + pos, len - pos, text_dsc.font, 0, width,
-                                                 NULL, LV_TEXT_FLAG_NONE);
-        pos += n ? n : 1;
-    }
-    starts[lines] = len;
-
-    const int visible = (PDA_DISPLAY_H - PDA_TEXT_Y) / line_h;
-    const int first = lines > visible ? lines - visible : 0;
-    for (int i = first; i < lines; i++) {
-        static char line[ROAMYBOARD_PDA_NOTE_MAX + 2];
-        uint32_t n = starts[i + 1] - starts[i];
-        memcpy(line, buf + starts[i], n);
-        while (n > 0 && (line[n - 1] == '\n' || line[n - 1] == ' ')) {
-            n--;
+        lv_obj_t *canvas = screen->canvas[c];
+        for (int y = 0; y < CANVAS_SIZE; y++) {
+            const int fb_y = c * CANVAS_SIZE + y;
+            for (int x = 0; x < CANVAS_SIZE; x++) {
+                const bool on = fb_y < ROAMYBOARD_PDA_FB_HEIGHT &&
+                                (bits[fb_y * ROAMYBOARD_PDA_FB_STRIDE + x / 8] & (0x80 >> (x % 8)));
+                lv_canvas_set_px(canvas, x, y, on ? lit : dark, LV_OPA_COVER);
+            }
         }
-        line[n] = '\0';
-        pda_draw_text(screen, PDA_TEXT_Y + (i - first) * line_h, &text_dsc, line);
-    }
-
-    for (int c = 0; c < SCREEN_CANVAS_COUNT; c++) {
-        rotate_canvas(screen->canvas[c]);
+        rotate_canvas(canvas);
     }
 }
 

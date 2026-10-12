@@ -34,15 +34,17 @@ if [ ! -f "$build/liblvgl.a" ]; then
 fi
 
 display="$zmk_dir/src/display"
+pda="$zmk_dir/src/pda"
 for role in central peripheral; do
     defines=""
     [ "${ROTATE_180:-1}" = 1 ] && defines="-DCONFIG_ROAMYBOARD_STATUS_SCREEN_ROTATE_180=1"
     [ "$role" = peripheral ] && defines="$defines -DCONFIG_ZMK_SPLIT=1"
     ${CC:-cc} -std=c11 -Wall -Wextra -Werror -Wno-missing-field-initializers $defines \
-        -DLV_CONF_INCLUDE_SIMPLE -I"$here" -I"$lvgl" -I"$lvgl/src" -I"$display" -I"$zmk_dir/include" \
+        -DLV_CONF_INCLUDE_SIMPLE -I"$here" -I"$lvgl" -I"$lvgl/src" -I"$display" -I"$pda" -I"$zmk_dir/include" \
         -I"$zephyr" -I"$zmk_app" \
         "$here/mock.c" "$display/screen.c" "$display/util.c" "$display/bolt.c" \
-        "$display/cat.c" "$display/cat_frames.c" "$display/font_pda_12.c" "$build/liblvgl.a" -lm -o "$build/mock-$role"
+        "$display/cat.c" "$display/cat_frames.c" "$display/font_pda_12.c" \
+        "$display/pda_text.c" "$pda/shell.c" "$pda/apps.c" "$pda/gfx.c" "$pda/note.c" "$pda/keys.c" "$build/liblvgl.a" -lm -o "$build/mock-$role"
     "$build/mock-$role" "$out"
 done
 python3 "$here/compose.py" "$out"

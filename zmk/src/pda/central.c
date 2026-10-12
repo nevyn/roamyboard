@@ -18,12 +18,18 @@
 
 #include <dt-bindings/zmk/hid_usage_pages.h>
 #include <dt-bindings/zmk/modifiers.h>
+#include <zmk/battery.h>
 #include <zmk/endpoints.h>
 #include <zmk/event_manager.h>
+#include <zmk/events/battery_state_changed.h>
 #include <zmk/events/ble_active_profile_changed.h>
 #include <zmk/events/endpoint_changed.h>
 #include <zmk/events/keycode_state_changed.h>
+#include <zmk/events/position_state_changed.h>
 
+#include <roamyboard/build_id.h>
+#include <roamyboard/chain_state.h>
+#include <roamyboard/events/chain_state_changed.h>
 #include <roamyboard/events/pda_changed.h>
 #include <roamyboard/pda.h>
 
@@ -53,7 +59,7 @@ static uint16_t service_end_handle;
 /* Messages to the peripheral, sent in order from the system work queue. */
 struct outgoing {
     uint8_t len;
-    uint8_t data[PDA_LINK_KEY_LEN];
+    uint8_t data[PDA_LINK_WRITE_MAX];
 };
 K_MSGQ_DEFINE(outgoing_msgq, sizeof(struct outgoing), 32, 1);
 
@@ -200,6 +206,44 @@ static int capture_listener(const zmk_event_t *eh) {
     return ZMK_EV_EVENT_HANDLED;
 }
 
+/** Key positions, for apps such as Keys; the keymap still gets them, to leave PDA mode. */
+static int position_listener(const zmk_event_t *eh) {
+    const struct zmk_position_state_changed *ev = as_zmk_position_state_changed(eh);
+    if (ev != NULL && roamyboard_pda_mode() != ROAMYBOARD_PDA_OFF && ev->position <= UINT8_MAX) {
+        send((const uint8_t[]){PDA_LINK_POSITION, ev->state, (uint8_t)ev->position},
+             PDA_LINK_POSITION_LEN);
+    }
+    return ZMK_EV_EVENT_BUBBLE;
+}
+
+ZMK_LISTENER(roamyboard_pda_position, position_listener);
+ZMK_SUBSCRIPTION(roamyboard_pda_position, zmk_position_state_changed);
+
+/** Sends this half's key module count, battery and build ID for the PDA's Info app. */
+static void info_handler(struct k_work *work) {
+    if (!atomic_get(&link_ready)) {
+        return;
+    }
+    uint8_t msg[PDA_LINK_WRITE_MAX] = {PDA_LINK_INFO,
+                                       (uint8_t)(int8_t)roamyboard_chain_key_module_count(),
+                                       zmk_battery_state_of_charge()};
+    const char *id = roamyboard_build_id();
+    const size_t id_len = MIN(strlen(id), sizeof(msg) - 3);
+    memcpy(msg + 3, id, id_len);
+    send(msg, (uint8_t)(3 + id_len));
+}
+
+static K_WORK_DEFINE(info_work, info_handler);
+
+static int info_listener(const zmk_event_t *eh) {
+    k_work_submit(&info_work);
+    return ZMK_EV_EVENT_BUBBLE;
+}
+
+ZMK_LISTENER(roamyboard_pda_info, info_listener);
+ZMK_SUBSCRIPTION(roamyboard_pda_info, roamyboard_chain_state_changed);
+ZMK_SUBSCRIPTION(roamyboard_pda_info, zmk_battery_state_changed);
+
 /**
  * Choosing another output or profile leaves PDA mode, as choosing another device would. ZMK
  * raises the same events when the host connects or disconnects, which must not.
@@ -279,6 +323,7 @@ static void subscribed(struct bt_conn *conn, uint8_t err, struct bt_gatt_subscri
     }
     LOG_INF("PDA link ready");
     atomic_set(&link_ready, true);
+    k_work_submit(&info_work);
 }
 
 static uint8_t chrc_discovered(struct bt_conn *conn, const struct bt_gatt_attr *attr,

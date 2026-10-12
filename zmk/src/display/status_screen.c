@@ -274,6 +274,10 @@ ZMK_SUBSCRIPTION(widget_peripheral_status, zmk_split_peripheral_status_changed);
 
 struct pda_status_state {
     uint8_t mode;
+#if !STATUS_SCREEN_CENTRAL
+    /** The PDA needs the central; without it, the status screen shows the local OTA hint. */
+    bool central_connected;
+#endif
 };
 
 static void set_pda_status(struct pda_status_state pda) {
@@ -284,11 +288,11 @@ static void set_pda_status(struct pda_status_state pda) {
 #if STATUS_SCREEN_CENTRAL
     screen_draw_middle(&screen, &state);
 #else
-    if (pda.mode != ROAMYBOARD_PDA_OFF) {
-        static char text[ROAMYBOARD_PDA_NOTE_MAX + 1];
-        roamyboard_pda_note_copy(text, sizeof(text));
+    if (pda.central_connected) {
+        static uint8_t bits[ROAMYBOARD_PDA_FB_BYTES];
+        roamyboard_pda_render(bits);
         pda_shown = true;
-        screen_draw_pda(&screen, pda.mode, text);
+        screen_draw_pda(&screen, bits, pda.mode != ROAMYBOARD_PDA_OFF);
     } else if (pda_shown) {
         pda_shown = false;
         screen_draw_top(&screen, &state);
@@ -299,7 +303,12 @@ static void set_pda_status(struct pda_status_state pda) {
 }
 
 static struct pda_status_state pda_status_get_state(const zmk_event_t *eh) {
-    return (struct pda_status_state){.mode = roamyboard_pda_mode()};
+    return (struct pda_status_state){
+        .mode = roamyboard_pda_mode(),
+#if !STATUS_SCREEN_CENTRAL
+        .central_connected = zmk_split_bt_peripheral_is_connected(),
+#endif
+    };
 }
 
 ZMK_DISPLAY_WIDGET_LISTENER(widget_pda_status, struct pda_status_state, set_pda_status,

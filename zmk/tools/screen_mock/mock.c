@@ -21,6 +21,7 @@
 
 #include "cat.h"
 #include "screen.h"
+#include "shell.h"
 
 #define WIDTH 160
 #define HEIGHT 68
@@ -131,11 +132,52 @@ static void render_bootloader(const char *dir, const char *name,
 }
 
 #if !STATUS_SCREEN_CENTRAL
-static void render_pda(const char *dir, const char *name, int pda_mode, const char *text) {
-    screen_draw_pda(&screen, pda_mode, text);
+static void render_shell(const char *dir, const char *name, const struct pda_shell *shell) {
+    static struct pda_fb fb;
+    pda_shell_draw(shell, &fb);
+    screen_draw_pda(&screen, fb.bits, shell->mode != ROAMYBOARD_PDA_OFF);
     fake_ms += 1000;
     lv_refr_now(NULL);
     write_scene(dir, name);
+}
+
+static void tap(struct pda_shell *shell, uint8_t usage) {
+    pda_shell_key(shell, usage, 0, true);
+    pda_shell_key(shell, usage, 0, false);
+}
+
+static void render_pda_scenes(const char *dir) {
+    static struct pda_shell shell;
+    pda_shell_init(&shell);
+    shell.right = (struct pda_half_info){true, 7, 80, "9e2e912"};
+    shell.left = (struct pda_half_info){true, 7, 64, "9e2e912-dirty"};
+    render_shell(dir, "peripheral-pda-home", &shell);
+
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    tap(&shell, 0x51); // Down: Keys highlighted
+    render_shell(dir, "peripheral-pda-home-focused", &shell);
+
+    tap(&shell, 0x28); // Return: Keys
+    for (int position = 5; position < 120; position += 13) {
+        pda_shell_position(&shell, (uint8_t)position, true);
+        pda_shell_position(&shell, (uint8_t)position, false);
+    }
+    pda_shell_position(&shell, 37, true);
+    pda_shell_key(&shell, 0x0A, 0, true);
+    render_shell(dir, "peripheral-pda-keys", &shell);
+    pda_shell_position(&shell, 37, false);
+    pda_shell_key(&shell, 0x0A, 0, false);
+    tap(&shell, 0x29);
+
+    tap(&shell, 0x20); // 3: Info
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    render_shell(dir, "peripheral-pda-info", &shell);
+
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_NOTE);
+    const char *text = "Köp mjölk\nÅÄÖ åäö\nRing Theo";
+    pda_note_set_text(&shell.note, text, strlen(text));
+    render_shell(dir, "peripheral-pda-note", &shell);
+    pda_note_set_text(&shell.note, "", 0);
 }
 #endif
 
@@ -407,11 +449,7 @@ int main(int argc, char **argv) {
     state.connected = false;
     render(dir, "peripheral-noterm", &state);
 
-    render_pda(dir, "peripheral-pda-empty", ROAMYBOARD_PDA_HOME, "");
-    render_pda(dir, "peripheral-pda-note", ROAMYBOARD_PDA_NOTE, "Köp mjölk\nÅÄÖ åäö\nRing Theo");
-    render_pda(dir, "peripheral-pda-long", ROAMYBOARD_PDA_HOME,
-               "Räksmörgås till lunch. Fixa PR 32 och kolla OTA-loggen innan mötet.\n"
-               "TODO:\n- spike the split data channel\n- timer app\n- tetris");
+    render_pda_scenes(dir);
 
     render_bootloader(dir, "peripheral-bootloader", ROAMYBOARD_BOOTLOADER_UF2, "3274ed3");
     render_bootloader(dir, "peripheral-ota", ROAMYBOARD_BOOTLOADER_OTA, "3274ed3-dirty");
