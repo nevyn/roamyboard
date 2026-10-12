@@ -158,6 +158,85 @@ static void test_calc_errors_and_type_out(void) {
     CHECK(shell.type_out_len == 4 && memcmp(shell.type_out, "0.75", 4) == 0);
 }
 
+/* Dice */
+
+static void test_dice_parse(void) {
+    int n, m, k;
+    CHECK(pda_dice_parse("2d6+3", &n, &m, &k) && n == 2 && m == 6 && k == 3);
+    CHECK(pda_dice_parse("d20", &n, &m, &k) && n == 1 && m == 20 && k == 0);
+    CHECK(pda_dice_parse("3d8-1", &n, &m, &k) && n == 3 && m == 8 && k == -1);
+    CHECK(!pda_dice_parse("0d6", &n, &m, &k));
+    CHECK(!pda_dice_parse("21d6", &n, &m, &k));
+    CHECK(!pda_dice_parse("d1", &n, &m, &k));
+    CHECK(!pda_dice_parse("2d", &n, &m, &k));
+    CHECK(!pda_dice_parse("d6+", &n, &m, &k));
+    CHECK(!pda_dice_parse("2d6x", &n, &m, &k));
+    CHECK(!pda_dice_parse("99999999d6", &n, &m, &k));
+}
+
+static void test_dice_rolls(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_named(&shell, "Dice");
+    tap(&shell, USAGE_2);
+    tap(&shell, 0x07); // d
+    tap(&shell, 0x23); // 6
+    tap_mods(&shell, LSHIFT, USAGE_EQUAL);
+    tap(&shell, USAGE_3);
+    CHECK(strcmp(shell.dice.entry, "2d6+3") == 0);
+    for (int i = 0; i < 50; i++) {
+        tap(&shell, PDA_USAGE_RETURN); // the first rolls the entry, the rest roll it again
+        CHECK(shell.dice.total >= 5 && shell.dice.total <= 15);
+        CHECK(shell.dice.roll_count == 2 && !shell.dice.invalid);
+    }
+    CHECK(strcmp(shell.dice.history[0], "2d6+3") == 0);
+    tap(&shell, USAGE_SPACE);
+    CHECK(strcmp(shell.dice.last, "d20") == 0);
+    CHECK(shell.dice.total >= 1 && shell.dice.total <= 20);
+}
+
+/* Breakout */
+
+static void test_breakout_paddle_and_serve(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_named(&shell, "Bricks");
+    tap(&shell, PDA_USAGE_RETURN);
+    struct pda_breakout_state *b = &shell.breakout;
+    CHECK(b->started && b->serving && shell.tick_ms != 0);
+    const int32_t paddle = b->paddle_q8;
+    pda_shell_key(&shell, USAGE_LEFT, 0, true);
+    run_ms(&shell, 200);
+    pda_shell_key(&shell, USAGE_LEFT, 0, false);
+    CHECK(b->paddle_q8 < paddle);
+    const int32_t moved = b->paddle_q8;
+    run_ms(&shell, 200);
+    CHECK(b->paddle_q8 == moved);
+    // The ball rides on the paddle until the serve.
+    CHECK(b->ball_x_q8 > b->paddle_q8);
+    tap(&shell, USAGE_SPACE);
+    CHECK(!b->serving && b->vy_q8 < 0);
+    run_ms(&shell, 4000);
+    CHECK(b->score > 0);
+}
+
+static void test_breakout_loses_a_ball(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_named(&shell, "Bricks");
+    tap(&shell, PDA_USAGE_RETURN);
+    struct pda_breakout_state *b = &shell.breakout;
+    tap(&shell, USAGE_SPACE);
+    // A ball falling past the paddle's far side.
+    b->paddle_q8 = 0;
+    b->ball_x_q8 = 60 * 256;
+    b->ball_y_q8 = 120 * 256;
+    b->vx_q8 = 0;
+    b->vy_q8 = 60 * 256;
+    run_ms(&shell, 400);
+    CHECK(b->lives == 2 && b->serving);
+}
+
 /* Tetris */
 
 static void test_tetris_clears_a_line(void) {
@@ -368,6 +447,10 @@ int main(void) {
     test_typed_minutes();
     test_calc_rpn();
     test_calc_errors_and_type_out();
+    test_dice_parse();
+    test_dice_rolls();
+    test_breakout_paddle_and_serve();
+    test_breakout_loses_a_ball();
     test_tetris_clears_a_line();
     test_tetris_gravity_waits_for_focus();
     test_tetris_rotates_off_the_wall();

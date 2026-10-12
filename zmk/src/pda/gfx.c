@@ -105,6 +105,21 @@ void pda_fb_seven_segment_pair(struct pda_fb *fb, struct pda_rect area, int y, i
     pda_fb_seven_segment(fb, x, y, cd % 10, lit);
 }
 
+void pda_fb_seven_segment_number(struct pda_fb *fb, struct pda_rect area, int y, int value,
+                                 bool lit) {
+    int digits = 1;
+    for (int v = value; v >= 10 && digits < 4; v /= 10) {
+        digits++;
+    }
+    const int width = digits * PDA_SEGMENT_W + (digits - 1) * SEG_GAP;
+    int x = area.x + (area.w - width) / 2 + (digits - 1) * (PDA_SEGMENT_W + SEG_GAP);
+    for (int i = 0; i < digits; i++) {
+        pda_fb_seven_segment(fb, x, y, value % 10, lit);
+        value /= 10;
+        x -= PDA_SEGMENT_W + SEG_GAP;
+    }
+}
+
 void pda_fb_invert(struct pda_fb *fb, struct pda_rect r) {
     r = clip(r);
     for (int y = r.y; y < r.y + r.h; y++) {

@@ -52,6 +52,28 @@ struct pda_calc_state {
     bool error;
 };
 
+#define PDA_DICE_ENTRY 12
+#define PDA_DICE_ROLLS 20
+#define PDA_DICE_HISTORY 3
+
+/** Dice: an expression NdM+K typed, and the latest rolls. */
+struct pda_dice_state {
+    char entry[PDA_DICE_ENTRY + 1];
+    uint8_t entry_len;
+    /** The latest expression rolled, for Return on an empty line. */
+    char last[PDA_DICE_ENTRY + 1];
+    int total;
+    bool rolled;
+    /** The expression could not be read. */
+    bool invalid;
+    uint16_t rolls[PDA_DICE_ROLLS];
+    uint8_t roll_count;
+    int16_t bonus;
+    /** Earlier results, newest first: the expression and its total. */
+    char history[PDA_DICE_HISTORY][PDA_DICE_ENTRY + 1];
+    int history_total[PDA_DICE_HISTORY];
+};
+
 #define PDA_TETRIS_W 10
 #define PDA_TETRIS_H 20
 
@@ -108,6 +130,27 @@ struct pda_words_state {
     bool started, over, won;
 };
 
+#define PDA_BREAKOUT_COLS 6
+#define PDA_BREAKOUT_ROWS 6
+
+struct pda_breakout_state {
+    /** Bit c of row r: the brick in column c is still there. */
+    uint8_t bricks[PDA_BREAKOUT_ROWS];
+    /** Paddle's left edge and ball's top left, in pixels times 256, from the field's corner. */
+    int32_t paddle_q8;
+    int32_t ball_x_q8, ball_y_q8;
+    /** Ball velocity in pixels per second times 256. */
+    int32_t vx_q8, vy_q8;
+    /** The direction keys held. */
+    bool left_held, right_held;
+    /** The ball sits on the paddle until Space. */
+    bool serving;
+    uint8_t lives, level;
+    uint32_t score;
+    uint32_t last_ms;
+    bool started, over;
+};
+
 #define PDA_RAIN_DROPS 4
 #define PDA_RAIN_WORD_MAX 8
 
@@ -138,9 +181,17 @@ extern const struct pda_app pda_app_note_def;
 extern const struct pda_app pda_app_clock_def;
 extern const struct pda_app pda_app_timer_def;
 extern const struct pda_app pda_app_calc_def;
+extern const struct pda_app pda_app_dice_def;
 extern const struct pda_app pda_app_tetris_def;
 extern const struct pda_app pda_app_snake_def;
 extern const struct pda_app pda_app_words_def;
 extern const struct pda_app pda_app_rain_def;
+extern const struct pda_app pda_app_breakout_def;
 extern const struct pda_app pda_app_keys_def;
 extern const struct pda_app pda_app_info_def;
+
+/**
+ * Parses a Dice roll: NdM, NdM+K or NdM-K, where N may be left out for 1. N is 1 to 20, M 2 to
+ * 1000, K 0 to 999.
+ */
+bool pda_dice_parse(const char *text, int *count, int *sides, int *bonus);

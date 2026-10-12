@@ -10,9 +10,9 @@
 #include "keys.h"
 
 const struct pda_app *const pda_apps[] = {
-    &pda_app_note_def,  &pda_app_clock_def, &pda_app_timer_def, &pda_app_calc_def,
-    &pda_app_tetris_def, &pda_app_snake_def, &pda_app_words_def, &pda_app_rain_def,
-    &pda_app_keys_def,  &pda_app_info_def,
+    &pda_app_note_def,   &pda_app_clock_def, &pda_app_timer_def,    &pda_app_calc_def,
+    &pda_app_dice_def,   &pda_app_tetris_def, &pda_app_snake_def,   &pda_app_breakout_def,
+    &pda_app_words_def,  &pda_app_rain_def,  &pda_app_keys_def,     &pda_app_info_def,
 };
 const int pda_app_count = sizeof(pda_apps) / sizeof(pda_apps[0]);
 const int pda_app_note = 0;
@@ -263,7 +263,11 @@ static void draw_home(const struct pda_shell *shell, struct pda_fb *fb, struct p
             pda_fb_fill(fb, (struct pda_rect){area.x, y, area.w, row_h}, true);
         }
         char label[24];
-        snprintf(label, sizeof(label), "%d %s", (i + 1) % 10, pda_apps[i]->name);
+        if (i < 10) {
+            snprintf(label, sizeof(label), "%d %s", (i + 1) % 10, pda_apps[i]->name);
+        } else {
+            snprintf(label, sizeof(label), "  %s", pda_apps[i]->name);
+        }
         pda_text_draw(fb, area.x + 3, y + 1, area.w - 3, label, PDA_FONT_BODY, !selected);
     }
     // Marks on the right edge show that the list goes on above or below.

@@ -47,6 +47,7 @@ struct pda_scores {
     uint32_t tetris;
     uint32_t snake;
     uint32_t rain;
+    uint32_t breakout;
     uint16_t words_won;
     uint16_t words_played;
 };
@@ -92,10 +93,12 @@ struct pda_shell {
     struct pda_clock_app_state clock_app;
     struct pda_timer_state timer;
     struct pda_calc_state calc;
+    struct pda_dice_state dice;
     struct pda_tetris_state tetris;
     struct pda_snake_state snake;
     struct pda_words_state words;
     struct pda_rain_state rain;
+    struct pda_breakout_state breakout;
 
     struct pda_half_info left;
     struct pda_half_info right;

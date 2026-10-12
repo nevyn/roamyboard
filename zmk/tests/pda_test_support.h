@@ -84,15 +84,22 @@ static inline int app_index(const char *name) {
     return -1;
 }
 
-/** Focuses the PDA and opens the app with its digit key from home. */
+/** Focuses the PDA and opens the app from home: by its digit key, or with Down and Return. */
 static inline void open_named(struct pda_shell *shell, const char *name) {
     pda_shell_set_mode(shell, ROAMYBOARD_PDA_HOME);
     while (shell->app != PDA_SHELL_HOME) {
         tap(shell, PDA_USAGE_ESCAPE);
     }
     const int i = app_index(name);
-    CHECK(i >= 0 && i < 10);
-    tap(shell, (uint8_t)(USAGE_1 + i)); // USAGE_1 + 9 is the 0 key
+    CHECK(i >= 0);
+    if (i < 10) {
+        tap(shell, (uint8_t)(USAGE_1 + i)); // USAGE_1 + 9 is the 0 key
+        return;
+    }
+    while (shell->selected != i) {
+        tap(shell, USAGE_DOWN);
+    }
+    tap(shell, PDA_USAGE_RETURN);
 }
 
 /** Advances time by ms in ticks of the open app's tick_ms, as the platform would. */

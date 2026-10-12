@@ -73,9 +73,11 @@ void pda_text_draw(struct pda_fb *fb, int x, int y, int max_w, const char *text,
     dsc.color = lv_color_white();
     dsc.font = lv;
     dsc.text = text;
+    // One line, cut at max_w below; LVGL would otherwise wrap the rest out of sight.
+    dsc.flag = LV_TEXT_FLAG_EXPAND;
     lv_layer_t layer;
     lv_canvas_init_layer(scratch, &layer);
-    const lv_area_t coords = {0, 0, w - 1, h - 1};
+    const lv_area_t coords = {0, 0, SCRATCH_W - 1, h - 1};
     lv_draw_label(&layer, &dsc, &coords);
     lv_canvas_finish_layer(scratch, &layer);
 

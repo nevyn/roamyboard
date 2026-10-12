@@ -14,6 +14,14 @@ static void test_keys_go_nowhere_without_focus(void) {
     CHECK(shell.app == PDA_SHELL_HOME);
 }
 
+static void test_zero_opens_the_tenth_app(void) {
+    struct pda_shell shell;
+    pda_shell_init(&shell, 1);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    CHECK(tap(&shell, 0x27) == PDA_SHELL_REDRAW); // 0
+    CHECK(shell.app == 9);
+}
+
 static void test_home_navigation(void) {
     struct pda_shell shell;
     pda_shell_init(&shell, 1);
@@ -33,8 +41,8 @@ static void test_home_navigation(void) {
     CHECK(strcmp(app_name(&shell), pda_apps[1]->name) == 0);
     CHECK(tap(&shell, PDA_USAGE_ESCAPE) == PDA_SHELL_REDRAW);
     CHECK(shell.app == PDA_SHELL_HOME);
-    CHECK(tap(&shell, (uint8_t)(USAGE_1 + app_index("Info"))) == PDA_SHELL_REDRAW);
-    CHECK(strcmp(app_name(&shell), "Info") == 0);
+    CHECK(tap(&shell, (uint8_t)(USAGE_1 + app_index("Calc"))) == PDA_SHELL_REDRAW);
+    CHECK(strcmp(app_name(&shell), "Calc") == 0);
     tap(&shell, PDA_USAGE_ESCAPE);
     CHECK(tap(&shell, PDA_USAGE_ESCAPE) == PDA_SHELL_LEAVE);
     CHECK(shell.app == PDA_SHELL_HOME);
@@ -177,6 +185,7 @@ static void test_fb_clips(void) {
 int main(void) {
     test_keys_go_nowhere_without_focus();
     test_home_navigation();
+    test_zero_opens_the_tenth_app();
     test_leaving_focus_keeps_the_view();
     test_quick_note_returns_to_the_view_it_replaced();
     test_slot_6_during_quick_note_keeps_note_open();

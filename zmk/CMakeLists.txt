@@ -44,6 +44,8 @@ if(CONFIG_ROAMYBOARD_PDA)
       src/pda/app_clock.c
       src/pda/app_timer.c
       src/pda/app_calc.c
+      src/pda/app_dice.c
+      src/pda/game_breakout.c
       src/pda/game_tetris.c
       src/pda/game_snake.c
       src/pda/game_words.c

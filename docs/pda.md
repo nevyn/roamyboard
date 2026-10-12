@@ -1,6 +1,6 @@
 # Micro PDA
 
-The micro PDA runs on the split peripheral (the right half) and is always on its nice!view while the central (the left half) is connected. While PDA mode is on, the PDA has focus: the central sends its keyboard keys to the PDA instead of the host. Leaving PDA mode keeps the PDA's view on the display, so an app stays visible while the keys go to the host. The PDA's home screen launches its apps: Note, Clock, Timer, Calc, the games Tetris, Snake, Words and Rain, Keys and Info.
+The micro PDA runs on the split peripheral (the right half) and is always on its nice!view while the central (the left half) is connected. While PDA mode is on, the PDA has focus: the central sends its keyboard keys to the PDA instead of the host. Leaving PDA mode keeps the PDA's view on the display, so an app stays visible while the keys go to the host. The PDA's home screen launches its apps: Note, Clock, Timer, Calc, Dice, the games Tetris, Snake, Bricks, Words and Rain, Keys and Info.
 
 ## Keys
 
@@ -11,7 +11,7 @@ Both keys sit on the System layer of `zmk/config/roamyboard_split.keymap`:
 
 Pressing the key of the mode that is on returns the keys to the host. Choosing another Bluetooth profile or output (`&bt BT_SEL`, `&out`) also returns them, as choosing another device would. A host that connects or disconnects meanwhile does not, and neither does selecting the profile that is already chosen.
 
-On the home screen, the digits (or the keypad's) open the apps, 1 the first and 0 the tenth; J and K, W and S, or the arrow keys move the highlight, and Return or Right opens it. The list scrolls, and a mark at its right edge shows that it goes on. In an app, Escape returns to the home screen; on the home screen, it returns the keys to the host. An app keeps its state when it closes: a game or a running timer is where it was when it opens again.
+On the home screen, the digits (or the keypad's) open the first ten apps, 1 the first and 0 the tenth; J and K, W and S, or the arrow keys move the highlight, and Return or Right opens it. The list scrolls, and a mark at its right edge shows that it goes on. In an app, Escape returns to the home screen; on the home screen, it returns the keys to the host. An app keeps its state when it closes: a game or a running timer is where it was when it opens again.
 
 Consumer keys, such as volume and media keys, still reach the host in PDA mode.
 
@@ -35,9 +35,13 @@ Consumer keys, such as volume and media keys, still reach the host in PDA mode.
 
 **Calc.** An RPN calculator with a four-level stack, as on HP's: Return or Space pushes X; + - * / combine Y and X (Shift-= and Shift-8 on the main keys, or the keypad's); N negates, S swaps X and Y, R takes the square root, C clears; Backspace deletes a digit, or clears X. Cmd-Return types X out to the host.
 
+**Dice.** Type a roll such as `2d6+3`, `d20` or `4d6-1`, then Return; the total shows in large digits, the single rolls under it, and the three rolls before it at the bottom. Space rolls a d20, and Return on an empty line rolls the latest roll again. Up to 20 dice of 2 to 1000 sides.
+
 **Tetris.** A 10 × 20 well. Left and Right (or A D, H L) move the piece, Up (W, K) or X turns it clockwise, Z anticlockwise, Down (S, J) drops it one row, Space drops it to the bottom, P pauses. The pieces come from shuffled bags of all seven; cleared lines score 100, 300, 500 or 800 times the level, which rises every 10 lines and speeds the fall.
 
 **Snake.** A 17 × 32 field walled by the display. The direction keys steer; each piece of food grows the snake by two cells and speeds it up.
+
+**Bricks.** Breakout: Left and Right move the paddle while they are held, Space serves the ball. The paddle's edges send the ball off steeper. A brick scores more the higher its row; clearing the wall builds a new one and speeds the ball up. Three balls.
 
 **Words.** Guess the five-letter word in six tries: a filled cell is the right letter in the right place, a framed cell a letter that the word has elsewhere. Any five letters count as a guess, since the PDA has no dictionary. Under the grid, the letters not yet ruled out. The answers come from `zmk/src/pda/words.c`, which `zmk/tools/pda_words.py` generates.
 
@@ -53,7 +57,7 @@ The games wait while the keys go to the host, under a "paused" banner. Their bes
 
 The left half shows "PDA" or "note" in place of the host name while the PDA has focus. The right half shows the PDA instead of its status screen while the left half is connected; without it, the status screen returns, with the local OTA key's hint. The PDA draws dark on light like the status screen, and inverts while it has focus, so that PDA mode cannot be mistaken for typing to the host. Its title bar shows the app and the right half's battery. `zmk/tools/screen_mock/run.sh` renders the PDA as `peripheral-pda-*`, from the shell's own drawing code.
 
-The PDA draws into a 1-bit framebuffer of the whole display, 68 × 160 pixels (`zmk/src/pda/gfx.h`): apps draw shapes in pure C and text through `pda_text_draw()`, which `zmk/src/display/pda_text.c` renders with LVGL's fonts on a hidden scratch canvas. `roamyboard_pda_render()` runs the drawing on the display work queue, and `screen_draw_pda()` copies the framebuffer onto the three canvases. The shell and the apps (`zmk/src/pda/shell.c`, `apps.c`, `app_*.c`, `game_*.c`) are pure C; `zmk/tests/pda_shell_test.c` and `pda_apps_test.c` drive them by key and tick, with stubbed text.
+The PDA draws into a 1-bit framebuffer of the whole display, 68 × 160 pixels (`zmk/src/pda/gfx.h`): apps draw shapes in pure C and text through `pda_text_draw()`, one line cut at its width, which `zmk/src/display/pda_text.c` renders with LVGL's fonts on a hidden scratch canvas. `roamyboard_pda_render()` runs the drawing on the display work queue, and `screen_draw_pda()` copies the framebuffer onto the three canvases. The shell and the apps (`zmk/src/pda/shell.c`, `apps.c`, `app_*.c`, `game_*.c`) are pure C; `zmk/tests/pda_shell_test.c` and `pda_apps_test.c` drive them by key and tick, with stubbed text.
 
 An app that runs on its own, such as Timer or a game, sets the shell's `tick_ms`; the peripheral then calls `pda_shell_tick()` that often while the app is open, focused or not, and redraws only when the app asks. A redraw writes only the canvases whose pixels changed.
 

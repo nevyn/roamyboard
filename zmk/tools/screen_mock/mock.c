@@ -153,7 +153,10 @@ static void open_named(struct pda_shell *shell, const char *name) {
     }
     for (int i = 0; i < pda_app_count; i++) {
         if (strcmp(pda_apps[i]->name, name) == 0) {
-            tap(shell, (uint8_t)(0x1E + i));
+            while (shell->selected != i) {
+                tap(shell, 0x51); // Down
+            }
+            tap(shell, 0x28); // Return
         }
     }
 }
@@ -229,6 +232,25 @@ static void render_pda_scenes(const char *dir) {
         tap(&shell, calc_keys[i]); // 2 Enter 3 Enter 45.7
     }
     render_shell(dir, "peripheral-pda-calc", &shell);
+
+    open_named(&shell, "Dice");
+    const uint8_t dice_keys[] = {0x1F, 0x07, 0x23, 0x28, 0x2C, 0x21, 0x07, 0x23};
+    for (size_t i = 0; i < sizeof(dice_keys); i++) {
+        tap(&shell, dice_keys[i]); // 2d6 Return, Space (d20), 4d6
+    }
+    pda_shell_key(&shell, 0xE1, 0, true);
+    tap(&shell, 0x2E); // +
+    pda_shell_key(&shell, 0xE1, 0, false);
+    tap(&shell, 0x1E); // 1
+    tap(&shell, 0x28);
+    render_shell(dir, "peripheral-pda-dice", &shell);
+
+    open_named(&shell, "Bricks");
+    render_shell(dir, "peripheral-pda-breakout-start", &shell);
+    tap(&shell, 0x28);
+    tap(&shell, 0x2C);
+    run_ms(&shell, 3500);
+    render_shell(dir, "peripheral-pda-breakout", &shell);
 
     open_named(&shell, "Tetris");
     render_shell(dir, "peripheral-pda-tetris-start", &shell);

@@ -65,6 +65,10 @@ void pda_fb_seven_segment(struct pda_fb *fb, int x, int y, int digit, bool lit);
 void pda_fb_seven_segment_pair(struct pda_fb *fb, struct pda_rect area, int y, int ab, int cd,
                                bool lit);
 
+/** Draws value, 0 to 9999, in seven-segment digits centred across area's width at y. */
+void pda_fb_seven_segment_number(struct pda_fb *fb, struct pda_rect area, int y, int value,
+                                 bool lit);
+
 /** Height of one line of font, in pixels. */
 int pda_text_line_height(enum pda_font font);
 
