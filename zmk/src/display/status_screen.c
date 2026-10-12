@@ -7,6 +7,8 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <zephyr/kernel.h>
 #include <zephyr/sys/atomic.h>
@@ -18,7 +20,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/display.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/battery_state_changed.h>
-#include <zmk/events/position_state_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
 #include <zmk/usb.h>
 
@@ -36,11 +37,15 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #endif
 
 #if STATUS_SCREEN_CENTRAL
+#include <dt-bindings/zmk/pointing.h>
 #include <zmk/ble.h>
+#include <zmk/behavior.h>
 #include <zmk/endpoints.h>
 #include <zmk/events/ble_active_profile_changed.h>
 #include <zmk/events/endpoint_changed.h>
+#include <zmk/events/keycode_state_changed.h>
 #include <zmk/events/layer_state_changed.h>
+#include <zmk/events/position_state_changed.h>
 #include <zmk/keymap.h>
 #if IS_ENABLED(CONFIG_ROAMYBOARD_HOST_NAMES)
 #include <roamyboard/events/host_name_changed.h>
@@ -54,9 +59,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #if IS_ENABLED(CONFIG_NICE_VIEW_WIDGET_STATUS)
 #error "Set CONFIG_NICE_VIEW_WIDGET_STATUS=n: the roamyboard status screen replaces the nice!view's"
 #endif
-
-/** Shortest time between two walk frames; key presses in between are shown together. */
-#define CAT_FRAME_MS 40
 
 // Everything below is touched on the display work queue only, except the atomics.
 static struct screen screen;
@@ -260,60 +262,248 @@ ZMK_SUBSCRIPTION(widget_peripheral_status, zmk_split_peripheral_status_changed);
 
 #endif // STATUS_SCREEN_CENTRAL
 
+#if STATUS_SCREEN_CENTRAL
+
+/** Shortest time between two redraws of the cat; events in between are shown together. */
+#define CAT_FRAME_MS 40
+
+/** Where the cat stands when it appears. */
+#define CAT_START_X 2
+
+// Layers with a pose, by node label in the keymap; ZMK's layer ID is the layer's child index.
+#define CAT_LAYER_ID(label)                                                                        \
+    COND_CODE_1(DT_NODE_EXISTS(DT_NODELABEL(label)), (DT_NODE_CHILD_IDX(DT_NODELABEL(label))), (-1))
+#define CAT_LAYER_IS_IN_KEYMAP(node) DT_SAME_NODE(DT_PARENT(node), DT_INST(0, zmk_keymap))
+#define CAT_LAYER_IN_KEYMAP(label)                                                                 \
+    BUILD_ASSERT(COND_CODE_1(DT_NODE_EXISTS(DT_NODELABEL(label)),                                  \
+                             (CAT_LAYER_IS_IN_KEYMAP(DT_NODELABEL(label))), (1)),                  \
+                 #label " must label a layer of the keymap")
+
+CAT_LAYER_IN_KEYMAP(keypad_layer);
+CAT_LAYER_IN_KEYMAP(system_layer);
+CAT_LAYER_IN_KEYMAP(gaming_layer);
+CAT_LAYER_IN_KEYMAP(locked_layer);
+
+enum cat_event_kind {
+    CAT_EVENT_KEY,
+    CAT_EVENT_MOUSE_PRESSED,
+    CAT_EVENT_MOUSE_RELEASED,
+    CAT_EVENT_POSE,
+    CAT_EVENT_PROFILE,
+};
+
+struct cat_event {
+    uint32_t ms;
+    uint8_t kind;
+    /** enum cat_key, enum cat_mouse or enum cat_pose, by kind. */
+    uint8_t arg;
+};
+
+// Events reach the display work queue through a queue, since ZMK raises them on other threads.
+K_MSGQ_DEFINE(cat_events, sizeof(struct cat_event), 32, 4);
+
 static struct cat cat;
-static atomic_t cat_presses;
-static atomic_t cat_last_press_ms;
+static struct cat_view cat_shown = {.frame = CAT_FRAME_COUNT};
 static atomic_t cat_last_frame_ms;
-static enum cat_frame cat_shown_frame = CAT_FRAME_COUNT;
-static int cat_shown_position = -1;
 
 /** The cat appears with the key module count, once the startup build ID is gone. */
 static atomic_t cat_started;
 
+/** Position of each held mouse key, by enum cat_mouse, or -1; its release ends the stalk. */
+static atomic_t cat_mouse_positions[CAT_MOUSE_CLICK + 1] = {
+    ATOMIC_INIT(-1), ATOMIC_INIT(-1), ATOMIC_INIT(-1), ATOMIC_INIT(-1), ATOMIC_INIT(-1)};
+
 static void cat_work_handler(struct k_work *work);
 static K_WORK_DELAYABLE_DEFINE(cat_work, cat_work_handler);
+
+static enum cat_pose cat_pose_of_layer(zmk_keymap_layer_id_t layer) {
+    if (layer == CAT_LAYER_ID(keypad_layer)) {
+        return CAT_POSE_KEYPAD;
+    }
+    if (layer == CAT_LAYER_ID(system_layer)) {
+        return CAT_POSE_SYSTEM;
+    }
+    if (layer == CAT_LAYER_ID(gaming_layer)) {
+        return CAT_POSE_GAMING;
+    }
+    if (layer == CAT_LAYER_ID(locked_layer)) {
+        return CAT_POSE_LOCKED;
+    }
+    return CAT_POSE_NONE;
+}
+
+static enum cat_pose cat_current_pose(void) {
+    return cat_pose_of_layer(zmk_keymap_layer_index_to_id(zmk_keymap_highest_layer_active()));
+}
+
+static void cat_feed(const struct cat_event *ev) {
+    switch (ev->kind) {
+    case CAT_EVENT_KEY:
+        cat_key_pressed(&cat, (enum cat_key)ev->arg, ev->ms);
+        break;
+    case CAT_EVENT_MOUSE_PRESSED:
+        cat_mouse_pressed(&cat, (enum cat_mouse)ev->arg, ev->ms);
+        break;
+    case CAT_EVENT_MOUSE_RELEASED:
+        cat_mouse_released(&cat, (enum cat_mouse)ev->arg, ev->ms);
+        break;
+    case CAT_EVENT_POSE:
+        cat_set_pose(&cat, (enum cat_pose)ev->arg, ev->ms);
+        break;
+    case CAT_EVENT_PROFILE:
+        cat_profile_changed(&cat, ev->ms);
+        break;
+    default:
+        LOG_ERR("Unknown cat event kind %d", ev->kind);
+        break;
+    }
+}
 
 static void cat_work_handler(struct k_work *work) {
     if (bootloader_shown) {
         return;
     }
 
-    cat_walk(&cat, (uint32_t)atomic_clear(&cat_presses));
-    // Read before now, so that a key press in between cannot make idle_ms negative.
-    const uint32_t last_press_ms = (uint32_t)atomic_get(&cat_last_press_ms);
+    struct cat_event ev;
+    while (k_msgq_get(&cat_events, &ev, K_NO_WAIT) == 0) {
+        cat_feed(&ev);
+    }
+    // Read after the events, so that no event lies after now.
     const uint32_t now = k_uptime_get_32();
-    uint32_t valid_ms;
-    const enum cat_frame frame = cat_frame_at(&cat, now - last_press_ms, &valid_ms);
-    if (frame != cat_shown_frame || cat.position != cat_shown_position) {
-        screen_show_cat(&screen, frame, cat.position);
-        cat_shown_frame = frame;
-        cat_shown_position = cat.position;
+    const struct cat_view view = cat_view_at(&cat, now);
+    if (view.frame != cat_shown.frame || view.x != cat_shown.x || view.y != cat_shown.y) {
+        screen_show_cat(&screen, view.frame, view.x, view.y);
+        cat_shown = view;
     }
     atomic_set(&cat_last_frame_ms, (atomic_val_t)now);
 
-    // Does nothing if a key press has rescheduled the work while this handler ran.
-    k_work_schedule_for_queue(zmk_display_work_q(), &cat_work, K_MSEC(valid_ms));
+    // Does nothing if an event has rescheduled the work while this handler ran.
+    k_work_schedule_for_queue(zmk_display_work_q(), &cat_work, K_MSEC(view.valid_ms));
 }
 
-static int cat_key_listener(const zmk_event_t *eh) {
-    const struct zmk_position_state_changed *ev = as_zmk_position_state_changed(eh);
-    if (ev == NULL || !ev->state || !atomic_get(&cat_started)) {
-        return ZMK_EV_EVENT_BUBBLE;
+static void cat_post(enum cat_event_kind kind, int arg) {
+    if (!atomic_get(&cat_started)) {
+        return;
+    }
+    const uint32_t now = k_uptime_get_32();
+    const struct cat_event ev = {.ms = now, .kind = kind, .arg = (uint8_t)arg};
+    if (k_msgq_put(&cat_events, &ev, K_NO_WAIT) != 0) {
+        LOG_WRN("Cat event queue full; dropped event kind %d, arg %d", kind, arg);
+        return;
     }
 
-    const uint32_t now = k_uptime_get_32();
-    atomic_inc(&cat_presses);
-    atomic_set(&cat_last_press_ms, (atomic_val_t)now);
-
-    // Every press within one frame period asks for the same deadline, so none postpones it.
+    // Every event within one frame period asks for the same deadline, so none postpones it.
     const uint32_t since_frame = now - (uint32_t)atomic_get(&cat_last_frame_ms);
     const uint32_t delay = since_frame >= CAT_FRAME_MS ? 0 : CAT_FRAME_MS - since_frame;
     k_work_reschedule_for_queue(zmk_display_work_q(), &cat_work, K_MSEC(delay));
+}
+
+static bool binding_is(const struct zmk_behavior_binding *binding, const char *behavior) {
+    return binding->behavior_dev != NULL && strcmp(binding->behavior_dev, behavior) == 0;
+}
+
+/** The binding that a press at position triggers: the highest active one that is not &trans. */
+static const struct zmk_behavior_binding *active_binding_at(uint32_t position) {
+    const zmk_keymap_layer_id_t base = zmk_keymap_layer_default();
+    for (int index = ZMK_KEYMAP_LAYERS_LEN - 1; index >= 0; index--) {
+        const zmk_keymap_layer_id_t layer = zmk_keymap_layer_index_to_id(index);
+        if (layer == ZMK_KEYMAP_LAYER_ID_INVAL || !zmk_keymap_layer_active(layer)) {
+            continue;
+        }
+        const struct zmk_behavior_binding *binding =
+            zmk_keymap_get_layer_binding_at_idx(layer, position);
+        if (binding == NULL) {
+            return NULL;
+        }
+        if (!binding_is(binding, DEVICE_DT_NAME(DT_NODELABEL(trans))) || layer == base) {
+            return binding;
+        }
+    }
+    return NULL;
+}
+
+/** Mouse keys raise no keycode event, so the cat looks up the binding: enum cat_mouse, or -1. */
+static int mouse_key_at(uint32_t position) {
+    const struct zmk_behavior_binding *binding = active_binding_at(position);
+    if (binding == NULL) {
+        return -1;
+    }
+#if DT_NODE_HAS_STATUS_OKAY(DT_NODELABEL(mkp))
+    if (binding_is(binding, DEVICE_DT_NAME(DT_NODELABEL(mkp)))) {
+        return CAT_MOUSE_CLICK;
+    }
+#endif
+#if DT_NODE_HAS_STATUS_OKAY(DT_NODELABEL(mmv))
+    if (binding_is(binding, DEVICE_DT_NAME(DT_NODELABEL(mmv)))) {
+        const int x = MOVE_X_DECODE(binding->param1);
+        const int y = MOVE_Y_DECODE(binding->param1);
+        if (abs(x) >= abs(y)) {
+            return x < 0 ? CAT_MOUSE_LEFT : CAT_MOUSE_RIGHT;
+        }
+        return y < 0 ? CAT_MOUSE_UP : CAT_MOUSE_DOWN;
+    }
+#endif
+    return -1;
+}
+
+static void cat_position_changed(const struct zmk_position_state_changed *ev) {
+    if (ev->state) {
+        const int mouse = mouse_key_at(ev->position);
+        if (mouse >= 0) {
+            atomic_set(&cat_mouse_positions[mouse], (atomic_val_t)ev->position);
+            cat_post(CAT_EVENT_MOUSE_PRESSED, mouse);
+        }
+        return;
+    }
+    for (int mouse = 0; mouse <= CAT_MOUSE_CLICK; mouse++) {
+        if (atomic_cas(&cat_mouse_positions[mouse], (atomic_val_t)ev->position, -1)) {
+            cat_post(CAT_EVENT_MOUSE_RELEASED, mouse);
+        }
+    }
+}
+
+static int cat_listener(const zmk_event_t *eh) {
+    const struct zmk_keycode_state_changed *keycode = as_zmk_keycode_state_changed(eh);
+    if (keycode != NULL) {
+        if (keycode->state) {
+            cat_post(CAT_EVENT_KEY, cat_classify_key(keycode->usage_page, keycode->keycode));
+        }
+        return ZMK_EV_EVENT_BUBBLE;
+    }
+    const struct zmk_position_state_changed *position = as_zmk_position_state_changed(eh);
+    if (position != NULL) {
+        cat_position_changed(position);
+        return ZMK_EV_EVENT_BUBBLE;
+    }
+    if (as_zmk_layer_state_changed(eh) != NULL) {
+        cat_post(CAT_EVENT_POSE, cat_current_pose());
+        return ZMK_EV_EVENT_BUBBLE;
+    }
+#if defined(CONFIG_ZMK_BLE)
+    if (as_zmk_ble_active_profile_changed(eh) != NULL) {
+        cat_post(CAT_EVENT_PROFILE, 0);
+    }
+#endif
     return ZMK_EV_EVENT_BUBBLE;
 }
 
-ZMK_LISTENER(roamyboard_cat, cat_key_listener);
+ZMK_LISTENER(roamyboard_cat, cat_listener);
+ZMK_SUBSCRIPTION(roamyboard_cat, zmk_keycode_state_changed);
 ZMK_SUBSCRIPTION(roamyboard_cat, zmk_position_state_changed);
+ZMK_SUBSCRIPTION(roamyboard_cat, zmk_layer_state_changed);
+#if defined(CONFIG_ZMK_BLE)
+ZMK_SUBSCRIPTION(roamyboard_cat, zmk_ble_active_profile_changed);
+#endif
+
+static void cat_start(void) {
+    const uint32_t now = k_uptime_get_32();
+    cat_init(&cat, CAT_START_X, now);
+    cat_set_pose(&cat, cat_current_pose(), now);
+    atomic_set(&cat_started, true);
+    k_work_schedule_for_queue(zmk_display_work_q(), &cat_work, K_NO_WAIT);
+}
+
+#endif // STATUS_SCREEN_CENTRAL
 
 /** How long the count box shows the build ID after the screen starts. */
 #define STARTUP_BUILD_ID_MS 3000
@@ -324,9 +514,9 @@ static void startup_end_handler(struct k_work *work) {
     }
     state.startup_build_id = NULL;
     screen_draw_top(&screen, &state);
-    atomic_set(&cat_last_press_ms, (atomic_val_t)k_uptime_get_32());
-    atomic_set(&cat_started, true);
-    k_work_schedule_for_queue(zmk_display_work_q(), &cat_work, K_NO_WAIT);
+#if STATUS_SCREEN_CENTRAL
+    cat_start();
+#endif
 }
 
 static K_WORK_DELAYABLE_DEFINE(startup_end_work, startup_end_handler);
@@ -336,7 +526,9 @@ static enum roamyboard_bootloader_mode bootloader_mode;
 
 static void bootloader_work_handler(struct k_work *work) {
     bootloader_shown = true;
+#if STATUS_SCREEN_CENTRAL
     k_work_cancel_delayable(&cat_work);
+#endif
     screen_draw_bootloader(&screen, bootloader_mode, roamyboard_build_id());
     // The 1-bit flush callback writes to the display before it returns, so the whole view
     // is on the display once lv_refr_now() returns.

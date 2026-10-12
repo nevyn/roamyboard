@@ -12,7 +12,8 @@
 
 #include <roamyboard/status_screen.h>
 
-#include "cat_frames.h"
+#include "cat.h"
+#include "cat_frame_images.h"
 #include "util.h"
 
 #define STATUS_SCREEN_CENTRAL                                                                      \
@@ -30,7 +31,11 @@ enum screen_canvas {
 struct screen {
     lv_obj_t *obj;
     lv_obj_t *canvas[SCREEN_CANVAS_COUNT];
+#if STATUS_SCREEN_CENTRAL
+    /** The count box's interior, rotated; it crops the cat, its child. */
+    lv_obj_t *cat_box;
     lv_obj_t *cat;
+#endif
     uint8_t cbuf[SCREEN_CANVAS_COUNT][CANVAS_BUF_SIZE];
 };
 
@@ -52,13 +57,18 @@ void screen_draw_middle(struct screen *screen, const struct status_state *state)
 /** Bottom canvas: the highest active layer's name on the central and unibody. */
 void screen_draw_bottom(struct screen *screen, const struct status_state *state);
 
+#if STATUS_SCREEN_CENTRAL
 /**
- * Shows the cat in the key module count box.
+ * Shows the cat in the key module count box, cropped to the box's interior. The split
+ * peripheral has no cat.
  *
- * @param frame The frame to show.
- * @param position Distance from the left end of the box's floor, 0 to CAT_TRACK_LENGTH - 1.
+ * @param frame The frame to show, CAT_FACING_LEFT + frame for a left-facing one.
+ * @param x Left edge of the frame from the left edge of the interior, in pixels; any value,
+ *          but only -CAT_WIDTH + 1 to CAT_BOX_WIDTH - 1 show part of the cat.
+ * @param y Height of the frame above the cat's floor, 0 to CAT_MAX_RISE_PX.
  */
-void screen_show_cat(struct screen *screen, enum cat_frame frame, int position);
+void screen_show_cat(struct screen *screen, enum cat_frame frame, int x, int y);
+#endif
 
 /**
  * Replaces everything on the screen with the view for a bootloader mode, with build_id in
