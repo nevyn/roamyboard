@@ -39,6 +39,31 @@ bool pda_clock_from_cts(const uint8_t *value, size_t len, uint32_t *seconds) {
     return true;
 }
 
+/** Weekday, 1 for Monday to 7 for Sunday; days before 2000 count negative. */
+static int weekday_of(int year, int month, int day) {
+    const int32_t days = days_from_civil(year, month, day) + 5; // 2000-01-01 was a Saturday
+    return (int)((days % 7 + 7) % 7) + 1;
+}
+
+static int weeks_in_year(int year) {
+    // A year has 53 weeks if it starts on a Thursday, or on a Wednesday in a leap year.
+    const int jan1 = weekday_of(year, 1, 1);
+    return jan1 == 4 || (jan1 == 3 && leap(year)) ? 53 : 52;
+}
+
+int pda_clock_iso_week(struct pda_date_time t) {
+    const int ordinal = (int)(days_from_civil(t.year, t.month, t.day) -
+                              days_from_civil(t.year, 1, 1)) + 1;
+    const int week = (ordinal - t.weekday + 10) / 7;
+    if (week < 1) {
+        return weeks_in_year(t.year - 1);
+    }
+    if (week > weeks_in_year(t.year)) {
+        return 1;
+    }
+    return week;
+}
+
 struct pda_date_time pda_clock_split(uint32_t seconds) {
     struct pda_date_time t;
     uint32_t days = seconds / 86400u;

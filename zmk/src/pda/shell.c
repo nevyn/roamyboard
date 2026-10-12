@@ -9,55 +9,104 @@
 
 #include "keys.h"
 
-extern const struct pda_app pda_app_note_def;
-extern const struct pda_app pda_app_keys_def;
-extern const struct pda_app pda_app_info_def;
-
-const struct pda_app *const pda_apps[] = {&pda_app_note_def, &pda_app_keys_def,
-                                          &pda_app_info_def};
+const struct pda_app *const pda_apps[] = {
+    &pda_app_note_def,  &pda_app_clock_def, &pda_app_timer_def, &pda_app_calc_def,
+    &pda_app_tetris_def, &pda_app_snake_def, &pda_app_words_def, &pda_app_rain_def,
+    &pda_app_keys_def,  &pda_app_info_def,
+};
 const int pda_app_count = sizeof(pda_apps) / sizeof(pda_apps[0]);
 const int pda_app_note = 0;
 
 enum {
+    USAGE_A = 0x04,
+    USAGE_D = 0x07,
+    USAGE_H = 0x0B,
     USAGE_J = 0x0D,
+    USAGE_L = 0x0F,
+    USAGE_S = 0x16,
+    USAGE_W = 0x1A,
     USAGE_1 = 0x1E,
+    USAGE_0 = 0x27,
     USAGE_RIGHT = 0x4F,
+    USAGE_LEFT = 0x50,
     USAGE_DOWN = 0x51,
     USAGE_UP = 0x52,
     USAGE_KP_1 = 0x59,
+    USAGE_KP_0 = 0x62,
 };
 
-void pda_shell_init(struct pda_shell *shell) {
+enum pda_dir pda_key_dir(uint8_t usage) {
+    switch (usage) {
+    case USAGE_UP:
+    case USAGE_W:
+    case PDA_USAGE_K:
+        return PDA_DIR_UP;
+    case USAGE_DOWN:
+    case USAGE_S:
+    case USAGE_J:
+        return PDA_DIR_DOWN;
+    case USAGE_LEFT:
+    case USAGE_A:
+    case USAGE_H:
+        return PDA_DIR_LEFT;
+    case USAGE_RIGHT:
+    case USAGE_D:
+    case USAGE_L:
+        return PDA_DIR_RIGHT;
+    }
+    return PDA_DIR_NONE;
+}
+
+void pda_shell_init(struct pda_shell *shell, uint32_t seed) {
     memset(shell, 0, sizeof(*shell));
     shell->app = PDA_SHELL_HOME;
     shell->before_quick = PDA_SHELL_HOME;
+    // xorshift32 never leaves 0, so 0 is not a seed.
+    shell->random_state = seed ? seed : 0x9E3779B9u;
     pda_note_init(&shell->note);
     shell->keys.last_position = -1;
     shell->keys.last_usage = -1;
 }
 
+uint32_t pda_shell_random(struct pda_shell *shell, uint32_t n) {
+    uint32_t x = shell->random_state;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    shell->random_state = x;
+    return x % n;
+}
+
 static void open_app(struct pda_shell *shell, int app) {
     shell->app = app;
     shell->selected = app;
+    shell->tick_ms = 0;
     if (pda_apps[app]->open) {
         pda_apps[app]->open(shell);
     }
 }
 
-/** Ends quick note: back to the app that it replaced. */
+static void go_home(struct pda_shell *shell) {
+    shell->app = PDA_SHELL_HOME;
+    shell->tick_ms = 0;
+}
+
+/** Ends quick note: back to the app that it replaced, which opens again. */
 static void end_quick(struct pda_shell *shell) {
     if (!shell->quick) {
         return;
     }
     shell->quick = false;
-    shell->app = shell->before_quick;
-    if (shell->app != PDA_SHELL_HOME) {
-        shell->selected = shell->app;
+    if (shell->before_quick == PDA_SHELL_HOME) {
+        go_home(shell);
+    } else {
+        open_app(shell, shell->before_quick);
     }
 }
 
 enum pda_shell_action pda_shell_set_mode(struct pda_shell *shell, enum roamyboard_pda_mode mode) {
     pda_note_reset_keys(&shell->note);
+    shell->held_mods = 0;
     if (mode == shell->mode) {
         return PDA_SHELL_NONE;
     }
@@ -78,12 +127,12 @@ enum pda_shell_action pda_shell_set_mode(struct pda_shell *shell, enum roamyboar
     return PDA_SHELL_REDRAW;
 }
 
-/** The app that a digit key opens, or -1. */
+/** The app that a digit key opens, or -1: 1 to 9 open the first nine, 0 the tenth. */
 static int app_for_digit(uint8_t usage) {
     int n = -1;
-    if (usage >= USAGE_1 && usage < USAGE_1 + 9) {
+    if (usage >= USAGE_1 && usage <= USAGE_0) {
         n = usage - USAGE_1;
-    } else if (usage >= USAGE_KP_1 && usage < USAGE_KP_1 + 9) {
+    } else if (usage >= USAGE_KP_1 && usage <= USAGE_KP_0) {
         n = usage - USAGE_KP_1;
     }
     return n < pda_app_count ? n : -1;
@@ -95,22 +144,30 @@ static enum pda_shell_action home_key(struct pda_shell *shell, uint8_t usage) {
         open_app(shell, digit_app);
         return PDA_SHELL_REDRAW;
     }
-    switch (usage) {
-    case PDA_USAGE_ESCAPE:
+    if (usage == PDA_USAGE_ESCAPE) {
         return PDA_SHELL_LEAVE;
-    case USAGE_J:
-    case USAGE_DOWN:
-        shell->selected = (shell->selected + 1) % pda_app_count;
-        return PDA_SHELL_REDRAW;
-    case PDA_USAGE_K:
-    case USAGE_UP:
-        shell->selected = (shell->selected + pda_app_count - 1) % pda_app_count;
-        return PDA_SHELL_REDRAW;
-    case PDA_USAGE_RETURN:
-    case PDA_USAGE_KP_ENTER:
-    case USAGE_RIGHT:
+    }
+    if (usage == PDA_USAGE_RETURN || usage == PDA_USAGE_KP_ENTER) {
         open_app(shell, shell->selected);
         return PDA_SHELL_REDRAW;
+    }
+    switch (pda_key_dir(usage)) {
+    case PDA_DIR_DOWN:
+        shell->selected = (shell->selected + 1) % pda_app_count;
+        return PDA_SHELL_REDRAW;
+    case PDA_DIR_UP:
+        shell->selected = (shell->selected + pda_app_count - 1) % pda_app_count;
+        return PDA_SHELL_REDRAW;
+    case PDA_DIR_RIGHT:
+        // Only the arrow: L and D could be meant as letters someday.
+        if (usage == USAGE_RIGHT) {
+            open_app(shell, shell->selected);
+            return PDA_SHELL_REDRAW;
+        }
+        break;
+    case PDA_DIR_LEFT:
+    case PDA_DIR_NONE:
+        break;
     }
     return PDA_SHELL_NONE;
 }
@@ -126,12 +183,9 @@ static enum pda_shell_action app_result(struct pda_shell *shell, enum pda_app_re
             end_quick(shell);
             return PDA_SHELL_LEAVE;
         }
-        shell->app = PDA_SHELL_HOME;
+        go_home(shell);
         return PDA_SHELL_REDRAW;
     case PDA_APP_TYPE_OUT:
-        shell->type_out_len = shell->note.len;
-        memcpy(shell->type_out, shell->note.text, shell->note.len);
-        pda_note_clear(&shell->note);
         end_quick(shell);
         return PDA_SHELL_TYPE_OUT;
     }
@@ -142,6 +196,10 @@ enum pda_shell_action pda_shell_key(struct pda_shell *shell, uint8_t usage, uint
                                     bool pressed) {
     if (shell->mode == ROAMYBOARD_PDA_OFF) {
         return PDA_SHELL_NONE;
+    }
+    if (usage >= PDA_USAGE_LEFT_CONTROL && usage <= PDA_USAGE_RIGHT_GUI) {
+        const uint8_t bit = (uint8_t)(1u << (usage - PDA_USAGE_LEFT_CONTROL));
+        shell->held_mods = pressed ? (shell->held_mods | bit) : (shell->held_mods & ~bit);
     }
     if (shell->app != PDA_SHELL_HOME) {
         return app_result(shell, pda_apps[shell->app]->key(shell, usage, implicit_mods, pressed));
@@ -157,8 +215,36 @@ enum pda_shell_action pda_shell_position(struct pda_shell *shell, uint8_t positi
     return app_result(shell, pda_apps[shell->app]->position(shell, position, pressed));
 }
 
+enum pda_shell_action pda_shell_tick(struct pda_shell *shell) {
+    if (shell->app == PDA_SHELL_HOME || pda_apps[shell->app]->tick == NULL) {
+        return PDA_SHELL_NONE;
+    }
+    return app_result(shell, pda_apps[shell->app]->tick(shell));
+}
+
+void pda_text_center(struct pda_fb *fb, struct pda_rect area, int y, const char *text,
+                     enum pda_font font, bool lit) {
+    const int w = pda_text_width(text, font);
+    const int x = area.x + (w < area.w ? (area.w - w) / 2 : 0);
+    pda_text_draw(fb, x, y, area.w - (x - area.x), text, font, lit);
+}
+
+void pda_game_banner(struct pda_fb *fb, struct pda_rect area, int y, const char *const lines[3]) {
+    const int line_h = pda_text_line_height(PDA_FONT_BODY);
+    int count = 0;
+    while (count < 3 && lines[count]) {
+        count++;
+    }
+    const struct pda_rect banner = {area.x + 2, y, area.w - 4, count * line_h + 6};
+    pda_fb_fill(fb, banner, false);
+    pda_fb_frame(fb, banner, true);
+    for (int i = 0; i < count; i++) {
+        pda_text_center(fb, area, y + 3 + i * line_h, lines[i], PDA_FONT_BODY, true);
+    }
+}
+
 static void draw_battery(struct pda_fb *fb, uint8_t percent) {
-    const struct pda_rect body = {PDA_FB_W - 17, 6, 14, 8};
+    const struct pda_rect body = {PDA_FB_W - 14, 6, 11, 8};
     pda_fb_frame(fb, body, true);
     pda_fb_fill(fb, (struct pda_rect){body.x + body.w, body.y + 2, 2, 4}, true);
     const int fill = (body.w - 4) * (percent > 100 ? 100 : percent) / 100;
@@ -167,15 +253,25 @@ static void draw_battery(struct pda_fb *fb, uint8_t percent) {
 
 static void draw_home(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area) {
     const int row_h = pda_text_line_height(PDA_FONT_BODY) + 3;
-    for (int i = 0; i < pda_app_count; i++) {
-        const int y = area.y + 2 + i * row_h;
+    const int visible = (area.h - 2) / row_h;
+    // Scrolls just enough to keep the highlight in view.
+    const int first = shell->selected >= visible ? shell->selected - visible + 1 : 0;
+    for (int i = first; i < pda_app_count && i < first + visible; i++) {
+        const int y = area.y + 2 + (i - first) * row_h;
         const bool selected = i == shell->selected;
         if (selected) {
             pda_fb_fill(fb, (struct pda_rect){area.x, y, area.w, row_h}, true);
         }
         char label[24];
-        snprintf(label, sizeof(label), "%d %s", i + 1, pda_apps[i]->name);
+        snprintf(label, sizeof(label), "%d %s", (i + 1) % 10, pda_apps[i]->name);
         pda_text_draw(fb, area.x + 3, y + 1, area.w - 3, label, PDA_FONT_BODY, !selected);
+    }
+    // Marks on the right edge show that the list goes on above or below.
+    if (first > 0) {
+        pda_fb_fill(fb, (struct pda_rect){area.x + area.w - 3, area.y + 2, 2, 2}, true);
+    }
+    if (first + visible < pda_app_count) {
+        pda_fb_fill(fb, (struct pda_rect){area.x + area.w - 3, area.y + area.h - 3, 2, 2}, true);
     }
 }
 
@@ -201,7 +297,7 @@ void pda_shell_draw(const struct pda_shell *shell, struct pda_fb *fb) {
     } else {
         title = "PDA";
     }
-    pda_text_draw(fb, 2, 2, PDA_FB_W - 22, title, PDA_FONT_TITLE, true);
+    pda_text_draw(fb, 2, 2, PDA_FB_W - 17, title, PDA_FONT_TITLE, true);
     draw_battery(fb, shell->right.battery);
     pda_fb_fill(fb, (struct pda_rect){0, PDA_TITLE_H - 2, PDA_FB_W, 1}, true);
 

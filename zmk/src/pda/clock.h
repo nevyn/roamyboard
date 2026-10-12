@@ -40,3 +40,7 @@ bool pda_clock_from_cts(const uint8_t *value, size_t len, uint32_t *seconds);
 
 /** Splits seconds since 2000-01-01 00:00 into a date and time. */
 struct pda_date_time pda_clock_split(uint32_t seconds);
+
+/** The ISO 8601 week number, 1 to 53, of t's date: weeks start on Monday, and week 1 holds
+ * the year's first Thursday. */
+int pda_clock_iso_week(struct pda_date_time t);

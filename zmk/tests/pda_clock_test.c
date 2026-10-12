@@ -75,7 +75,26 @@ static void test_rejects_bad_values(void) {
     CHECK(pda_clock_from_cts(v, 7, &seconds));
 }
 
+static int week_of(int y, int mo, int d) {
+    uint8_t v[10];
+    cts(v, y, mo, d, 12, 0, 0);
+    uint32_t seconds = 0;
+    CHECK(pda_clock_from_cts(v, sizeof(v), &seconds));
+    return pda_clock_iso_week(pda_clock_split(seconds));
+}
+
+static void test_iso_weeks(void) {
+    CHECK(week_of(2026, 10, 12) == 42);
+    CHECK(week_of(2026, 1, 1) == 1);   // a Thursday
+    CHECK(week_of(2021, 1, 1) == 53);  // a Friday: the last week of 2020
+    CHECK(week_of(2020, 12, 31) == 53);
+    CHECK(week_of(2024, 12, 30) == 1); // a Monday in 2025's first week
+    CHECK(week_of(2027, 1, 3) == 53);  // a Sunday: 2026 has 53 weeks
+    CHECK(week_of(2000, 1, 1) == 52);  // a Saturday: the last week of 1999
+}
+
 int main(void) {
+    test_iso_weeks();
     test_round_trips();
     test_epoch_is_zero();
     test_rejects_bad_values();

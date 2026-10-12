@@ -36,7 +36,20 @@ if(CONFIG_ROAMYBOARD_PDA)
   if(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
     target_sources(app PRIVATE src/pda/central.c src/pda/host_time.c)
   else()
-    target_sources(app PRIVATE src/pda/peripheral.c src/pda/shell.c src/pda/apps.c src/pda/gfx.c)
+    target_sources(app PRIVATE
+      src/pda/peripheral.c
+      src/pda/shell.c
+      src/pda/gfx.c
+      src/pda/apps.c
+      src/pda/app_clock.c
+      src/pda/app_timer.c
+      src/pda/app_calc.c
+      src/pda/game_tetris.c
+      src/pda/game_snake.c
+      src/pda/game_words.c
+      src/pda/game_rain.c
+      src/pda/words.c
+    )
   endif()
 endif()
 

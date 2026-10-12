@@ -33,6 +33,7 @@
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define SETTINGS_KEY "roamyboard/pda/note"
+#define SCORES_KEY "roamyboard/pda/scores"
 
 /** Notifications stay within the smallest ATT MTU (23), whatever the link negotiated. */
 #define NOTIFY_MAX 20
@@ -48,12 +49,16 @@ static K_MUTEX_DEFINE(lock);
 static struct pda_shell shell;
 static bool shell_ready;
 
-/** Settings may load before anything else touches the shell. Call with lock held. */
+/**
+ * The shell, with now_ms set; settings may load before anything else touches it. Call with
+ * lock held.
+ */
 static struct pda_shell *locked_shell(void) {
     if (!shell_ready) {
-        pda_shell_init(&shell);
+        pda_shell_init(&shell, k_cycle_get_32());
         shell_ready = true;
     }
+    shell.now_ms = k_uptime_get_32();
     return &shell;
 }
 
@@ -62,8 +67,7 @@ static void changed(void) { raise_roamyboard_pda_changed((struct roamyboard_pda_
 void roamyboard_pda_render(uint8_t bits[ROAMYBOARD_PDA_FB_BYTES]) {
     static struct pda_fb fb;
     k_mutex_lock(&lock, K_FOREVER);
-    locked_shell()->now_ms = k_uptime_get_32();
-    pda_shell_draw(&shell, &fb);
+    pda_shell_draw(locked_shell(), &fb);
     k_mutex_unlock(&lock);
     memcpy(bits, fb.bits, sizeof(fb.bits));
 }
@@ -91,9 +95,44 @@ static void save_note(void) {
     saved_len = len;
 }
 
+/** Writes the best scores if a game changed them. System work queue only. */
+static void save_scores(void) {
+    struct pda_scores scores;
+    k_mutex_lock(&lock, K_FOREVER);
+    const bool changed_scores = locked_shell()->scores_changed;
+    scores = shell.scores;
+    shell.scores_changed = false;
+    k_mutex_unlock(&lock);
+    if (!changed_scores) {
+        return;
+    }
+    const int err = settings_save_one(SCORES_KEY, &scores, sizeof(scores));
+    if (err) {
+        LOG_ERR("Failed to save setting " SCORES_KEY ": %d", err);
+    }
+}
+
 static int settings_set(const char *name, size_t len, settings_read_cb read_cb, void *cb_arg) {
+    if (strcmp(name, "scores") == 0) {
+        struct pda_scores scores;
+        if (len != sizeof(scores)) {
+            LOG_WRN("Ignoring setting " SCORES_KEY " of %u bytes: expected %u", (unsigned int)len,
+                    (unsigned int)sizeof(scores));
+            return 0;
+        }
+        const ssize_t got = read_cb(cb_arg, &scores, sizeof(scores));
+        if (got != sizeof(scores)) {
+            LOG_ERR("Failed to read setting " SCORES_KEY ": %d", (int)got);
+            return got < 0 ? (int)got : -EIO;
+        }
+        k_mutex_lock(&lock, K_FOREVER);
+        locked_shell()->scores = scores;
+        k_mutex_unlock(&lock);
+        return 0;
+    }
     if (strcmp(name, "note") != 0 || len > PDA_NOTE_MAX) {
-        LOG_WRN("Ignoring setting roamyboard/pda/%s of %u bytes: expected note, at most %d bytes",
+        LOG_WRN("Ignoring setting roamyboard/pda/%s of %u bytes: expected note or scores, "
+                "a note of at most %d bytes",
                 name, (unsigned int)len, PDA_NOTE_MAX);
         return 0;
     }
@@ -190,8 +229,24 @@ static void send_job(const char *text, size_t len, uint8_t final) {
     k_work_schedule(&out_work, K_NO_WAIT);
 }
 
-/** Carries out what the shell asked for. System work queue only. */
+static void app_tick_handler(struct k_work *work);
+static K_WORK_DELAYABLE_DEFINE(app_tick_work, app_tick_handler);
+
+/** Follows the open app's tick_ms: ticks while it asks for them, and stops when it stops. */
+static void follow_tick(void) {
+    k_mutex_lock(&lock, K_FOREVER);
+    const uint32_t interval = locked_shell()->tick_ms;
+    k_mutex_unlock(&lock);
+    if (interval == 0) {
+        k_work_cancel_delayable(&app_tick_work);
+    } else if (!k_work_delayable_is_pending(&app_tick_work)) {
+        k_work_schedule(&app_tick_work, K_MSEC(interval));
+    }
+}
+
+/** Carries out what the shell asked for, then follows its tick. System work queue only. */
 static void act(enum pda_shell_action action) {
+    follow_tick();
     switch (action) {
     case PDA_SHELL_NONE:
         return;
@@ -213,6 +268,13 @@ static void act(enum pda_shell_action action) {
     changed();
 }
 
+static void app_tick_handler(struct k_work *work) {
+    k_mutex_lock(&lock, K_FOREVER);
+    const enum pda_shell_action action = pda_shell_tick(locked_shell());
+    k_mutex_unlock(&lock);
+    act(action);
+}
+
 static void set_mode(enum roamyboard_pda_mode new_mode) {
     atomic_set(&mode, new_mode);
     k_mutex_lock(&lock, K_FOREVER);
@@ -220,6 +282,7 @@ static void set_mode(enum roamyboard_pda_mode new_mode) {
     k_mutex_unlock(&lock);
     if (new_mode == ROAMYBOARD_PDA_OFF) {
         save_note();
+        save_scores();
     }
     act(action);
 }
@@ -299,8 +362,14 @@ static void incoming_handler(struct k_work *work) {
         case PDA_LINK_KEY:
             if (msg.len == PDA_LINK_KEY_LEN) {
                 k_mutex_lock(&lock, K_FOREVER);
+                struct pda_shell *s = locked_shell();
+                // The moments of key presses keep the games' random numbers unpredictable.
+                s->random_state ^= k_cycle_get_32();
+                if (s->random_state == 0) {
+                    s->random_state = 1;
+                }
                 const enum pda_shell_action action =
-                    pda_shell_key(locked_shell(), msg.data[3], msg.data[2], msg.data[1]);
+                    pda_shell_key(s, msg.data[3], msg.data[2], msg.data[1]);
                 k_mutex_unlock(&lock);
                 act(action);
                 continue;

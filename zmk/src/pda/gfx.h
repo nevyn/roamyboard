@@ -51,6 +51,20 @@ void pda_fb_frame(struct pda_fb *fb, struct pda_rect r, bool lit);
 /** Inverts every pixel of r, clipped to the display. */
 void pda_fb_invert(struct pda_fb *fb, struct pda_rect r);
 
+/** Size of a seven-segment digit. */
+#define PDA_SEGMENT_W 11
+#define PDA_SEGMENT_H 22
+
+/** Draws a seven-segment digit, 0 to 9, with its top left at (x, y). */
+void pda_fb_seven_segment(struct pda_fb *fb, int x, int y, int digit, bool lit);
+
+/**
+ * Draws "ab:cd" in seven-segment digits, centred across area's width at y: two two-digit
+ * numbers, such as hours and minutes; each is shown modulo 100.
+ */
+void pda_fb_seven_segment_pair(struct pda_fb *fb, struct pda_rect area, int y, int ab, int cd,
+                               bool lit);
+
 /** Height of one line of font, in pixels. */
 int pda_text_line_height(enum pda_font font);
 

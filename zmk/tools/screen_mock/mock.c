@@ -146,20 +146,52 @@ static void tap(struct pda_shell *shell, uint8_t usage) {
     pda_shell_key(shell, usage, 0, false);
 }
 
+static void open_named(struct pda_shell *shell, const char *name) {
+    pda_shell_set_mode(shell, ROAMYBOARD_PDA_HOME);
+    while (shell->app != PDA_SHELL_HOME) {
+        tap(shell, 0x29);
+    }
+    for (int i = 0; i < pda_app_count; i++) {
+        if (strcmp(pda_apps[i]->name, name) == 0) {
+            tap(shell, (uint8_t)(0x1E + i));
+        }
+    }
+}
+
+static void type_letters(struct pda_shell *shell, const char *letters) {
+    for (const char *c = letters; *c; c++) {
+        tap(shell, (uint8_t)(0x04 + (*c - 'a')));
+    }
+}
+
+/** Advances the mock's time by ms in the open app's ticks. */
+static void run_ms(struct pda_shell *shell, uint32_t ms) {
+    const uint32_t end = shell->now_ms + ms;
+    while ((int32_t)(end - shell->now_ms) > 0) {
+        shell->now_ms += shell->tick_ms ? shell->tick_ms : ms;
+        pda_shell_tick(shell);
+    }
+}
+
 static void render_pda_scenes(const char *dir) {
     static struct pda_shell shell;
-    pda_shell_init(&shell);
+    pda_shell_init(&shell, 7);
+    shell.now_ms = 1000;
     shell.right = (struct pda_half_info){true, 7, 80, "9e2e912"};
     shell.left = (struct pda_half_info){true, 7, 64, "9e2e912-dirty"};
     render_shell(dir, "peripheral-pda-home-no-clock", &shell);
-    shell.clock = (struct pda_clock_state){PDA_CLOCK_SET, 1, 845154330u, 0}; // 2026-10-12 21:05
+    shell.clock = (struct pda_clock_state){PDA_CLOCK_SET, 1, 845154330u, 1000}; // 21:05
     render_shell(dir, "peripheral-pda-home", &shell);
 
     pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
-    tap(&shell, 0x51); // Down: Keys highlighted
+    tap(&shell, 0x51); // Down
     render_shell(dir, "peripheral-pda-home-focused", &shell);
+    for (int i = 0; i < pda_app_count - 2; i++) {
+        tap(&shell, 0x51);
+    }
+    render_shell(dir, "peripheral-pda-home-scrolled", &shell);
 
-    tap(&shell, 0x28); // Return: Keys
+    open_named(&shell, "Keys");
     for (int position = 5; position < 120; position += 13) {
         pda_shell_position(&shell, (uint8_t)position, true);
         pda_shell_position(&shell, (uint8_t)position, false);
@@ -169,12 +201,83 @@ static void render_pda_scenes(const char *dir) {
     render_shell(dir, "peripheral-pda-keys", &shell);
     pda_shell_position(&shell, 37, false);
     pda_shell_key(&shell, 0x0A, 0, false);
-    tap(&shell, 0x29);
 
-    tap(&shell, 0x20); // 3: Info
+    open_named(&shell, "Info");
     pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
     render_shell(dir, "peripheral-pda-info", &shell);
 
+    open_named(&shell, "Clock");
+    render_shell(dir, "peripheral-pda-clock", &shell);
+    const struct pda_clock_state clock = shell.clock;
+    shell.clock.status = PDA_CLOCK_NO_CTS;
+    render_shell(dir, "peripheral-pda-clock-unset", &shell);
+    shell.clock = clock;
+
+    open_named(&shell, "Timer");
+    tap(&shell, 0x13); // P: 25 minutes
+    tap(&shell, 0x2C);
+    run_ms(&shell, 12 * 60000 + 26000);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    render_shell(dir, "peripheral-pda-timer", &shell);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    run_ms(&shell, 13 * 60000);
+    render_shell(dir, "peripheral-pda-timer-done", &shell);
+
+    open_named(&shell, "Calc");
+    const uint8_t calc_keys[] = {0x1F, 0x28, 0x20, 0x28, 0x21, 0x22, 0x37, 0x24};
+    for (size_t i = 0; i < sizeof(calc_keys); i++) {
+        tap(&shell, calc_keys[i]); // 2 Enter 3 Enter 45.7
+    }
+    render_shell(dir, "peripheral-pda-calc", &shell);
+
+    open_named(&shell, "Tetris");
+    render_shell(dir, "peripheral-pda-tetris-start", &shell);
+    tap(&shell, 0x28);
+    const uint8_t moves[] = {0x50, 0x50, 0x50, 0x2C, 0x4F, 0x4F, 0x2C, 0x52, 0x2C,
+                             0x50, 0x2C, 0x4F, 0x4F, 0x4F, 0x4F, 0x2C, 0x52, 0x50};
+    for (size_t i = 0; i < sizeof(moves); i++) {
+        tap(&shell, moves[i]);
+    }
+    run_ms(&shell, 1500);
+    render_shell(dir, "peripheral-pda-tetris", &shell);
+
+    open_named(&shell, "Snake");
+    tap(&shell, 0x28);
+    for (int i = 0; i < 6; i++) {
+        shell.snake.food = (uint16_t)(shell.snake.body[shell.snake.head] + 1);
+        run_ms(&shell, 160);
+    }
+    tap(&shell, 0x52); // Up
+    run_ms(&shell, 1200);
+    tap(&shell, 0x50); // Left
+    run_ms(&shell, 600);
+    render_shell(dir, "peripheral-pda-snake", &shell);
+
+    open_named(&shell, "Words");
+    memcpy(shell.words.answer, "crane", 6);
+    type_letters(&shell, "slate");
+    tap(&shell, 0x28);
+    type_letters(&shell, "pride");
+    tap(&shell, 0x28);
+    type_letters(&shell, "cra");
+    render_shell(dir, "peripheral-pda-words", &shell);
+    type_letters(&shell, "ne");
+    tap(&shell, 0x28);
+    render_shell(dir, "peripheral-pda-words-won", &shell);
+
+    open_named(&shell, "Rain");
+    tap(&shell, 0x28);
+    run_ms(&shell, 7000);
+    for (int i = 0; i < PDA_RAIN_DROPS; i++) {
+        if (shell.rain.drops[i].active) {
+            tap(&shell, (uint8_t)(0x04 + shell.rain.drops[i].word[0] - 'a'));
+            tap(&shell, (uint8_t)(0x04 + shell.rain.drops[i].word[1] - 'a'));
+            break;
+        }
+    }
+    render_shell(dir, "peripheral-pda-rain", &shell);
+
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
     pda_shell_set_mode(&shell, ROAMYBOARD_PDA_NOTE);
     const char *text = "Köp mjölk\nÅÄÖ åäö\nRing Theo";
     pda_note_set_text(&shell.note, text, strlen(text));

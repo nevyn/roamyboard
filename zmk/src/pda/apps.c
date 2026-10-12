@@ -1,5 +1,5 @@
 /*
- * The PDA's apps: Note, Keys and Info. docs/pda.md describes what each shows.
+ * The PDA's small apps: Note, Keys and Info. docs/pda.md describes what each shows.
  *
  * SPDX-License-Identifier: MIT
  */
@@ -24,6 +24,9 @@ static enum pda_app_result note_key(struct pda_shell *shell, uint8_t usage, uint
     case PDA_NOTE_CHANGED:
         return PDA_APP_REDRAW;
     case PDA_NOTE_TYPE_OUT:
+        memcpy(shell->type_out, shell->note.text, shell->note.len);
+        shell->type_out_len = shell->note.len;
+        pda_note_clear(&shell->note);
         return PDA_APP_TYPE_OUT;
     case PDA_NOTE_LEAVE:
         return PDA_APP_CLOSE;
@@ -88,12 +91,6 @@ static void set_bit(uint8_t *map, int position, bool on) {
     map[position / 8] = on ? (map[position / 8] | mask) : (map[position / 8] & ~mask);
 }
 
-static void keys_open(struct pda_shell *shell) {
-    memset(&shell->keys, 0, sizeof(shell->keys));
-    shell->keys.last_position = -1;
-    shell->keys.last_usage = -1;
-}
-
 static enum pda_app_result keys_key(struct pda_shell *shell, uint8_t usage, uint8_t implicit_mods,
                                     bool pressed) {
     (void)implicit_mods;
@@ -102,6 +99,13 @@ static enum pda_app_result keys_key(struct pda_shell *shell, uint8_t usage, uint
     }
     if (usage == PDA_USAGE_ESCAPE) {
         return PDA_APP_CLOSE;
+    }
+    // Cmd-Backspace starts over, for testing another build.
+    if (usage == PDA_USAGE_BACKSPACE && (shell->held_mods & PDA_MODS_GUI)) {
+        memset(&shell->keys, 0, sizeof(shell->keys));
+        shell->keys.last_position = -1;
+        shell->keys.last_usage = -1;
+        return PDA_APP_REDRAW;
     }
     shell->keys.last_usage = usage;
     return PDA_APP_REDRAW;
@@ -156,7 +160,6 @@ static void keys_draw(const struct pda_shell *shell, struct pda_fb *fb, struct p
 
 const struct pda_app pda_app_keys_def = {
     .name = "Keys",
-    .open = keys_open,
     .key = keys_key,
     .position = keys_position,
     .draw = keys_draw,
