@@ -558,7 +558,7 @@
   <article class="step" id="get-firmware" data-title="Get the firmware">
     <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Firmware</span><h3>Get the firmware</h3><a class="anchor" href="#get-firmware">#</a></div>
     <div class="step-body single"><div class="step-text">
-      <p>GitHub Actions builds three UF2 files on every push that touches <code>zmk/</code>: download them from the latest run's artifacts in <a href="https://github.com/nevyn/roamyboard/actions/workflows/build.yml">the Build workflow</a>, or build locally with Docker (<a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md#building">instructions</a>).</p>
+      <p>GitHub Actions builds three UF2 files on every push that touches <code>zmk/</code>: download them from the latest run's artifacts in <a href="https://github.com/nevyn/roamyboard/actions/workflows/build.yml">the Firmware workflow</a>, or build locally with Docker (<a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md#building">instructions</a>).</p>
       <div class="table-wrap"><table><thead><tr><th>File</th><th>For</th><th>ZMK Studio</th></tr></thead><tbody>
         <tr data-layout-row="unibody"><td><code>roamyboard</code></td><td>A unibody keyboard: one half</td><td>yes</td></tr>
         <tr data-layout-row="split"><td><code>roamyboard_left</code></td><td>The left half of a split, which the computer connects to</td><td>yes</td></tr>
@@ -576,6 +576,7 @@
         <li>A drive named <code>NICENANO</code> appears. Copy the UF2 for this half onto it; the nice!nano flashes it and restarts.</li>
       </ol>
       <div class="warn"><p>If the nice!nano ran other firmware before, flash ZMK's <code>settings_reset</code> first, then the Roamyboard firmware. The first MCU module still carried Lily58 settings with behaviors that no longer existed. For a split, reset both halves if they do not find each other.</p></div>
+      <div class="note"><p>Only the first flash needs USB. Later updates can go over Bluetooth, from a Mac or a phone: hold L2 for the System layer and press <b>OTA</b> on the half (<a href="../layout/">the keyboard layout</a> shows where), then send the firmware as <a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md#updating-over-bluetooth">Updating over Bluetooth</a> describes.</p></div>
     </div>
     <div class="step-media"><figure><img class="diagram" src="images/flash.svg" alt="Double-tap reset, the NICENANO drive, copy the UF2"></figure></div></div>
   </article>
