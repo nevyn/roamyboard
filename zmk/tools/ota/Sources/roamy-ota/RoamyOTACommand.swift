@@ -19,22 +19,23 @@ enum RoamyOTACommand {
         for input in options.inputs {
             do { given.append(try DFUZip(contentsOf: URL(fileURLWithPath: input))) } catch { fail("\(error)", status: 1) }
         }
-        let (zips, reordered) = updateOrder(given)
-        if reordered {
-            print("Updating \(zips.map(\.name).joined(separator: ", ")) in that order: the left half relays the right half's OTA key, so it goes last.")
-        }
         var settings = DFUSettings()
         settings.packetReceiptInterval = options.packetReceiptInterval
         settings.packetSize = options.packetSize
 
         if options.dryRun {
-            print(zips.map { $0.summary(settings: settings) }.joined(separator: "\n\n"))
+            let order = UpdateOrder(given, alreadyAdvertising: 0)
+            if let explanation = order.explanation { print(explanation) }
+            if given.count > 1 {
+                print("If an AdaDFU already advertises when roamy-ota starts, roamy-ota keeps the order on the command line instead.")
+            }
+            print(order.zips.map { $0.summary(settings: settings) }.joined(separator: "\n\n"))
             exit(0)
         }
         var policy = RetryPolicy()
         policy.retries = options.retries
         policy.readvertiseTimeout = options.discoveryTimeout
-        let succeeded = await HalfUpdates(zips: zips, settings: settings, policy: policy, discoveryTimeout: options.discoveryTimeout).run()
+        let succeeded = await HalfUpdates(given: given, settings: settings, policy: policy, discoveryTimeout: options.discoveryTimeout).run()
         exit(succeeded ? 0 : 1)
     }
 
@@ -44,9 +45,11 @@ enum RoamyOTACommand {
     }
 }
 
-/// Assigns DFU zips to AdaDFU peripherals in discovery order and updates them concurrently.
+/// Assigns DFU zips to AdaDFU peripherals in discovery order, as `UpdateOrder` arranges them, and
+/// updates them concurrently.
 struct HalfUpdates {
-    let zips: [DFUZip]
+    /// The zips in the order on the command line.
+    let given: [DFUZip]
     let settings: DFUSettings
     let policy: RetryPolicy
     let discoveryTimeout: Duration
@@ -56,25 +59,38 @@ struct HalfUpdates {
         case failed(peripheral: String?, message: String)
     }
 
+    /// How long `roamy-ota` looks for AdaDFU peripherals that already advertise before it asks
+    /// for the first half.
+    static let initialScan: Duration = .seconds(2)
+
     /// - Returns: Whether every half validated and activated its image.
     func run() async -> Bool {
-        let board = ProgressBoard(names: zips.map(\.name))
         let central = BluetoothCentral()
         do {
             try await central.waitUntilPoweredOn()
         } catch {
-            board.say("roamy-ota: \(error)")
+            print("roamy-ota: \(error)")
             return false
         }
         central.startScanning()
+        try? await Task.sleep(for: Self.initialScan)
+        var alreadyAdvertising = central.discoveries.takeQueued()
+        let order = UpdateOrder(given, alreadyAdvertising: alreadyAdvertising.count)
+        let zips = order.zips
+        if let explanation = order.explanation { print(explanation) }
 
+        let board = ProgressBoard(names: zips.map(\.name))
         var outcomes = [Outcome?](repeating: nil, count: zips.count)
         await withTaskGroup(of: (Int, Outcome).self) { group in
             for (index, zip) in zips.enumerated() {
-                board.say("Press OTA on the half for \(zip.name).")
                 let advertiser: Advertiser
                 do {
-                    advertiser = try await withTimeout(discoveryTimeout) { try await central.discoveries.receive() }
+                    if !alreadyAdvertising.isEmpty {
+                        advertiser = alreadyAdvertising.removeFirst()
+                    } else {
+                        board.say("Press OTA on the half for \(zip.name).")
+                        advertiser = try await withTimeout(discoveryTimeout) { try await central.discoveries.receive() }
+                    }
                 } catch {
                     let seconds = discoveryTimeout.formatted(.units(allowed: [.seconds]))
                     for missing in index..<zips.count {

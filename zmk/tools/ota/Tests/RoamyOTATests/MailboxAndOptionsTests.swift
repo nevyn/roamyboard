@@ -34,6 +34,16 @@ struct MailboxTests {
         #expect(try await mailbox.receive() == 7)
     }
 
+    @Test func takeQueuedEmptiesTheQueueWithoutWaiting() async throws {
+        let mailbox = Mailbox<Int>()
+        #expect(mailbox.takeQueued().isEmpty)
+        mailbox.post(1)
+        mailbox.post(2)
+        #expect(mailbox.takeQueued() == [1, 2])
+        mailbox.post(3)
+        #expect(try await mailbox.receive() == 3)
+    }
+
     @Test func timeoutCancelsAWaitingReceiverInsteadOfHanging() async throws {
         let mailbox = Mailbox<Int>()
         await #expect(throws: TimeoutError(duration: .milliseconds(50))) {

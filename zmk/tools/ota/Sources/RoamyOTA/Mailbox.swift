@@ -44,6 +44,15 @@ public final class Mailbox<Element: Sendable>: @unchecked Sendable {
         lock.withLock { buffer.removeAll() }
     }
 
+    /// Removes and returns the queued values, oldest first, without waiting. Values posted later
+    /// go to the next `receive()`.
+    public func takeQueued() -> [Element] {
+        lock.withLock {
+            defer { buffer.removeAll() }
+            return buffer
+        }
+    }
+
     /// The next value, oldest first.
     /// - Throws: The error passed to `close` once no values are queued, or `CancellationError`
     ///   if the calling task is cancelled while it waits.

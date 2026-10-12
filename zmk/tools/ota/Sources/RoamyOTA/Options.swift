@@ -23,6 +23,10 @@ public struct Options: Equatable, Sendable {
         one the second. A ZIP whose name contains "left" goes last, since the left half
         relays the right half's OTA key. Halves update at the same time.
 
+        A half that already advertises as AdaDFU when roamy-ota starts, such as a half
+        stuck in OTA mode after a failed update, gets the first ZIP, and roamy-ota then
+        keeps the order of the ZIPs as given. Name the stuck half's ZIP first.
+
         When the connection to a half drops, roamy-ota waits for that half to
         advertise as AdaDFU again, resets an interrupted transfer, and starts the
         half's update over.
