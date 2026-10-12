@@ -164,7 +164,7 @@ static void host_text(const struct status_state *state, char *text, size_t size)
     const struct roamyboard_host_name *host = &state->active_host;
     switch (host->state) {
     case ROAMYBOARD_HOST_NAME_NONE:
-        snprintf(text, size, "%s", state->active_profile_bonded ? "no name" : "open");
+        snprintf(text, size, "%s", state->active_profile_bonded ? "no name" : "unpaired");
         break;
     case ROAMYBOARD_HOST_NAME_PENDING:
         snprintf(text, size, "...");
