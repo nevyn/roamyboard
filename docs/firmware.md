@@ -14,7 +14,7 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/include/roamyboard/` | Public headers: the build ID, the key module count getter, the `roamyboard_chain_state_changed` event, the host names and their settings format, the status screen's bootloader view, rebooting into the bootloader. |
 | `zmk/cmake/build_id.cmake`, `zmk/src/build_id.c` | The build ID (Building, below). |
 | `zmk/src/ble/host_names.c` | Reads each Bluetooth host's name and keeps it per profile (below). |
-| `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. |
+| `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. `cat.c` is the cat's pure logic; `cat_frames.c` and its headers are generated. |
 | `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen` and `&ota_boot`, the bootloader keys; their binding is in `zmk/dts/bindings/behaviors/`. |
 | `zmk/src/bootloader.c` | Shows the bootloader view and reboots into the bootloader's UF2 or OTA mode, for the bootloader keys and the local OTA key. |
 | `zmk/src/local_ota.c` | The split peripheral's local OTA key (Updating over Bluetooth, below). |
@@ -114,17 +114,40 @@ The roamyboard mounts the nice!view with its contacts toward the MCU module, whi
 | Part | Unibody and split central | Split peripheral |
 | --- | --- | --- |
 | Top row | Battery, and the output: USB, Bluetooth connected, disconnected, or not paired | Battery, and whether the central is connected |
-| Box below it | The key module count and the cat | The key module count and the cat |
+| Box below it | The key module count and the cat | The key module count |
 | Middle | The five Bluetooth profiles in a row, and the active profile's host name | While the central is not connected, the local OTA key hint ("hold the 0 key 3 s for OTA"); otherwise empty |
 | Bottom | The name of the highest active layer | Empty |
 
-For the first 3 s after the keyboard starts, the box shows the firmware's build ID (Building, below) instead, on every half, and the cat appears with the count. A dirty build ID wraps after the dash. Then the box shows this half's own accepted key module count: "7 cols", "1 col", "0 cols". It shows "no term" while the accepted state is a fault, which usually means that the terminator module is missing, and "..." before the driver has accepted any count. The kscan driver raises `roamyboard_chain_state_changed` whenever it accepts a new count or a fault, and `roamyboard_chain_key_module_count()` returns the current state (`zmk/include/roamyboard/`). The split central shows only its own half's count.
+For the first 3 s after the keyboard starts, the box shows the firmware's build ID (Building, below) instead, on every half, and the cat appears with the count on the unibody and the split central. A dirty build ID wraps after the dash. Then the box shows this half's own accepted key module count: "7 cols", "1 col", "0 cols". It shows "no term" while the accepted state is a fault, which usually means that the terminator module is missing, and "..." before the driver has accepted any count. The kscan driver raises `roamyboard_chain_state_changed` whenever it accepts a new count or a fault, and `roamyboard_chain_key_module_count()` returns the current state (`zmk/include/roamyboard/`). The split central shows only its own half's count.
 
-The cat walks when a key is pressed: every key press moves it 2 px to the right along the box's floor and advances its walk cycle, and it wraps from the right end to the left. On the split central, key presses on both halves count; the peripheral counts only its own. When no key has been pressed for 2 s the cat sits down, and it blinks every 4 s while sitting. After 30 s it curls up and sleeps, with a z that comes and goes every second.
+The cat lives in the box on the unibody and the split central. The split peripheral has no cat; its box shows only the key module count, in the middle of the box.
 
-The cat is an LVGL image on top of the top canvas, so a step redraws only the few rows that it covers instead of the whole canvas. Its frames are stored already rotated. Key presses are counted on the thread that raises them, and the display work queue draws at most one frame per 40 ms, so a burst of key presses moves the cat several steps in one redraw.
+The cat reacts to keycodes, not to key positions: it listens to `zmk_keycode_state_changed`, which the keymap raises after it has resolved layers, hold-taps and the like, so the same physical key does different things on different layers. `cat_classify_key()` (`cat.c`) sorts keyboard-page usages into typing keys and special keys; the host tests cover it.
 
-`zmk/tools/cat_frames.py` holds the cat's pixel art and generates `cat_frames.c` and `cat_frames.h` from it. `zmk/tools/screen_mock/run.sh` compiles `screen.c` and LVGL from the west workspace on the host and renders the screen in several states to `/tmp/roamy-screen/`, so a layout change can be checked without hardware: `states.png` shows the panel's own image (line 1 at the top) and `states-on-leg.png` what a person sees on the mounted nice!view.
+| Key | What the cat does |
+| --- | --- |
+| Letters, digits, punctuation, Tab, the keypad's digits, operators and dot | Walks 2 px right and advances its walk cycle. Typing keys less than 150 ms apart make it run instead, 4 px per key with a run cycle, until the pace slows again. |
+| Space | Walks, with a small hop mid-stride. |
+| Enter, keypad Enter, Up | Jumps up and comes back down, in place. |
+| Backspace, Delete | Moonwalks: walks 2 px left while it faces right, with the walk cycle played backwards. |
+| Left, Right | Turns to face that way and walks that way. |
+| Down | Flattens into a crouch for a moment. |
+| Home, End | Scampers to the left or right end of the box. |
+| Modifiers, F-keys, Esc, Caps Lock, Print Screen, media keys, layer keys | Nothing. |
+
+The cat also takes a pose from the highest active layer. On Keypad it sits up with its ears perked. On System it drops into a hunting crouch: holding a mouse-move key makes it stalk that way, 2 px every 200 ms (up raises its head, down flattens it), and a mouse click makes it pounce. On Gaming it gets ready to pounce and wiggles its rump for a second, and every key press, typing key or not, is a leap forward; Left and Right turn it first. On Locked it scampers to the middle of the box and flops down as a loaf, and nothing moves it, like a cat sleeping on the keyboard. When the Locked layer goes away, it stretches and gets up. Arrows and typing keys work on every layer except Gaming and Locked; on Keypad and System the cat returns to its pose 400 ms after a stride. When the active Bluetooth profile changes, the cat dashes off the right edge and comes back in from the left to where it was; a profile change before the cat has appeared (at boot) does nothing.
+
+Mouse keys raise no keycode event: `&mkp` and `&mmv` report straight to Zephyr's input subsystem, and ZMK no longer raises `zmk_mouse_button_state_changed`. So the cat also listens to `zmk_position_state_changed` and looks up the binding that a press triggers: the highest active layer's binding at that position that is not `&trans`, through `zmk_keymap_get_layer_binding_at_idx()`. It compares the binding's behavior device name with those of `&mkp` and `&mmv`, and decodes the direction of `&mmv` from its parameter with `MOVE_X_DECODE` and `MOVE_Y_DECODE`. It remembers which position started a stalk and ends the stalk when that position is released, even if the layer has changed in between.
+
+The keymaps mark the layers that have a pose with the node labels `keypad_layer`, `system_layer`, `gaming_layer` and `locked_layer`. `status_screen.c` turns each label into a layer ID at compile time with `DT_NODE_CHILD_IDX`, since ZMK numbers layer IDs by the keymap node's children; the build fails if a label marks something other than a layer of the keymap. The ID stays the same when ZMK Studio reorders or renames layers. A keymap without one of the labels has no layer with that pose. `DT_NODE_CHILD_IDX` counts disabled children too, so the IDs match ZMK's only while every layer of the keymap has status "okay", as in both keymaps.
+
+The cat's x runs from just off the left edge of the box interior to just off its right edge. Walking or running off one side crops it out, and it comes back in, cropped, from the other side, in both directions. When no key has been pressed for 2 s the cat sits down, with no layer pose, and it blinks every 4 s while sitting. After 30 s it curls up and sleeps, in every pose, with a z that comes and goes every second.
+
+The cat is an LVGL image inside a container that covers the box interior (in the screen's rotated coordinates), so LVGL crops whatever lies outside the box, and a step redraws only the few rows that the cat covers instead of the whole canvas. The frames are stored already rotated, with a transparent background, so that the cat's ink lies over the count text when the two meet. Jumps rise at most 5 px, which keeps the cat clear of the count text. Each frame has a mirror image for facing left; the z of the sleeping frames stays unmirrored.
+
+`cat.c` is pure logic without Zephyr: a small state machine that takes events with their times (keys, mouse keys, poses, profile changes) and answers which frame the cat shows at a given time, where, facing which way, and for how long that stays correct. Each action is a short script of timed frames with offsets, after an optional run. The listener in `status_screen.c` queues events with their time on the thread that raises them, and the display work queue feeds them to the cat and redraws when the view changes, at most once per 40 ms for key-driven motion, so a burst of key presses moves the cat several steps in one redraw. The memory LCD redraws only on change: the Gaming wiggle stops after a second, sleeping redraws once a second, and other poses hold still.
+
+`zmk/tools/cat_frames.py` holds the cat's pixel art and generates `cat_frames.c`, `cat_frames.h` (the frame enum, with no LVGL, for the host tests) and `cat_frame_images.h` from it, and renders every frame to `/tmp/roamy-screen/frames.png`. `zmk/tools/screen_mock/run.sh` compiles `screen.c`, `cat.c` and LVGL from the west workspace on the host and renders the screen in several states to `/tmp/roamy-screen/`, so a layout change can be checked without hardware: `states.png` shows the panel's own image (line 1 at the top) and `states-on-leg.png` what a person sees on the mounted nice!view. `cat-actions-on-leg.png` shows every cat action as a row of the count box, one cell per change of the cat's view, labeled with the action and the time; `cat-actions.png` shows the same as the panel's own image.
 
 ### Host names
 
