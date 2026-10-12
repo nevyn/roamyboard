@@ -134,7 +134,7 @@ public struct HalfUpdateFailure: Error, Equatable, CustomStringConvertible {
 
 /// Updates one half with `LegacyDFUUpdate`, and starts the update over on a new connection when
 /// an attempt fails in a way that `HalfUpdateFailure.Reason.isRetryable` allows. See
-/// docs/firmware.md, "From a Mac".
+/// docs/firmware.md, "Updating over Bluetooth".
 public struct HalfUpdate: Sendable {
     public let update: LegacyDFUUpdate
     public let policy: RetryPolicy
