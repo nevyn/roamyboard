@@ -66,7 +66,7 @@ Writes and notifications carry at most 20 bytes, which fits the smallest ATT MTU
 
 The home screen's title shows the time, HH:MM, once a host has given it. `zmk/src/pda/host_time.c` on the central reads the Current Time characteristic (0x2A2B) of the Current Time Service from the connected hosts, in profile order, until one answers: whenever a host connection is encrypted, and every hour. The characteristic holds the host's local time, so the clock needs no time zone. The central keeps the time running on its uptime and sends it to the peripheral, which runs it on its own uptime and redraws each minute. Between reads, the clock drifts with the nice!nanos' 32 kHz crystals.
 
-Which hosts serve the time is not settled: iOS is expected to, macOS is untested. The Info app shows the outcome.
+An iPhone serves the time; macOS does not (tried 2026-10-12). Connecting the phone for a few seconds sets the clock, and the clock keeps running when the phone goes: a later read that finds no host with the time leaves it as it is. The Info app shows which profile gave the time.
 
 ## Typing out
 
