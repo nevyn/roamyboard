@@ -90,20 +90,42 @@ import Testing
         #expect(summary.contains("50 packets of up to 20 bytes, a receipt every 8 packets (6 receipts)"))
     }
 
-    @Test func leftHalfGoesLast() throws {
+    private func named(_ names: String...) throws -> [DFUZip] {
         let data = try Fixtures.zip(Fixtures.files(image: Fixtures.image(size: 100)))
-        func named(_ names: String...) throws -> [DFUZip] { try names.map { try DFUZip(name: $0, zipData: data) } }
+        return try names.map { try DFUZip(name: $0, zipData: data) }
+    }
 
-        let split = updateOrder(try named("roamyboard_left.zip", "roamyboard_right.zip"))
+    @Test func leftHalfGoesLastWhenNoAdaDFUAdvertises() throws {
+        let split = UpdateOrder(try named("roamyboard_left.zip", "roamyboard_right.zip"), alreadyAdvertising: 0)
         #expect(split.zips.map(\.name) == ["roamyboard_right.zip", "roamyboard_left.zip"])
-        #expect(split.reordered)
+        #expect(split.explanation == "Updating roamyboard_right.zip, roamyboard_left.zip in that order: the left half relays the right half's OTA key, so it goes last.")
 
-        let alreadyOrdered = updateOrder(try named("roamyboard_right.zip", "roamyboard_LEFT-ota.zip"))
+        let alreadyOrdered = UpdateOrder(try named("roamyboard_right.zip", "roamyboard_LEFT-ota.zip"), alreadyAdvertising: 0)
         #expect(alreadyOrdered.zips.map(\.name) == ["roamyboard_right.zip", "roamyboard_LEFT-ota.zip"])
-        #expect(!alreadyOrdered.reordered)
+        #expect(alreadyOrdered.explanation == nil)
 
-        let unibody = updateOrder(try named("roamyboard.zip"))
+        let unibody = UpdateOrder(try named("roamyboard.zip"), alreadyAdvertising: 0)
         #expect(unibody.zips.map(\.name) == ["roamyboard.zip"])
-        #expect(!unibody.reordered)
+        #expect(unibody.explanation == nil)
+    }
+
+    @Test func stuckHalfKeepsTheGivenOrder() throws {
+        let stuckLeft = UpdateOrder(try named("roamyboard_left.zip", "roamyboard_right.zip"), alreadyAdvertising: 1)
+        #expect(stuckLeft.zips.map(\.name) == ["roamyboard_left.zip", "roamyboard_right.zip"])
+        #expect(stuckLeft.explanation == "An AdaDFU is already advertising, and roamy-ota cannot tell which half it is, so it keeps your order: that half gets roamyboard_left.zip. Name the stuck half's zip first.")
+
+        let stuckRight = UpdateOrder(try named("roamyboard_right.zip", "roamyboard_left.zip"), alreadyAdvertising: 1)
+        #expect(stuckRight.zips.map(\.name) == ["roamyboard_right.zip", "roamyboard_left.zip"])
+        #expect(stuckRight.explanation?.contains("that half gets roamyboard_right.zip") == true)
+
+        let unibody = UpdateOrder(try named("roamyboard.zip"), alreadyAdvertising: 1)
+        #expect(unibody.zips.map(\.name) == ["roamyboard.zip"])
+        #expect(unibody.explanation == "An AdaDFU is already advertising, and roamy-ota cannot tell which half it is, so it keeps your order: that half gets roamyboard.zip.")
+    }
+
+    @Test func severalAdvertisingAdaDFUsGetTheFirstZipsInOrder() throws {
+        let both = UpdateOrder(try named("roamyboard_left.zip", "roamyboard_right.zip"), alreadyAdvertising: 2)
+        #expect(both.zips.map(\.name) == ["roamyboard_left.zip", "roamyboard_right.zip"])
+        #expect(both.explanation == "2 AdaDFUs are already advertising, and roamy-ota cannot tell which half each one is, so it keeps your order: they get roamyboard_left.zip and roamyboard_right.zip in the order that they were found. If a half gets the other half's firmware, flash its UF2 over USB (docs/firmware.md, Flashing).")
     }
 }

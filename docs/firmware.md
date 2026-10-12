@@ -138,7 +138,7 @@ Each profile's last name is stored in the settings key `roamyboard/host/<n>`, wi
 
 ### Bootloader view
 
-`&boot_screen` asks the status screen for the bootloader view: "BOOT LOADER", a download icon and "drop a UF2 on NICENANO". `&ota_boot` asks for the OTA view: "OTA BOOT", a Bluetooth glyph and "send the DFU zip over Bluetooth". Both views show the build ID in small text at the bottom, so it stays on the display while the bootloader runs, as long as the display keeps its power there. Both are the same driver, and the behavior node's `mode` property (`uf2` or `ota`) selects the view and the bootloader mode. The display work queue draws it on all three canvases, stops every other update, and calls `lv_refr_now()`. The nice!view's 1-bit flush callback writes to the display before it returns, so the view is on the display when `lv_refr_now()` returns, and the behavior reboots into the bootloader from there. If the view has not been written within 1 s, or the display is not initialized, the behavior logs a warning and reboots without it.
+`&boot_screen` asks the status screen for the bootloader view: "BOOT LOADER", a download icon and "drop a UF2 on NICENANO". `&ota_boot` asks for the OTA view: "OTA BOOT", a Bluetooth glyph and "send the DFU zip over Bluetooth". Both views show the build ID in small text at the bottom, so it stays on the display while the bootloader runs: the nice!nano keeps VCC on there, which powers the display. Both are the same driver, and the behavior node's `mode` property (`uf2` or `ota`) selects the view and the bootloader mode. The display work queue draws it on all three canvases, stops every other update, and calls `lv_refr_now()`. The nice!view's 1-bit flush callback writes to the display before it returns, so the view is on the display when `lv_refr_now()` returns, and the behavior reboots into the bootloader from there. If the view has not been written within 1 s, or the display is not initialized, the behavior logs a warning and reboots without it.
 
 ### Choosing the bootloader mode
 
@@ -222,65 +222,57 @@ docker run --rm -v "$ws:/west" -v "$PWD:/repo:ro" -v "$common:/gitcommon:ro" \
 
 ## Flashing
 
-1. Connect the nice!nano over USB and double-tap its reset button, or press Boot on the System layer, or hold L1 and hold the right half's outer row 5 key for 1.5 s. It mounts as a USB drive named NICENANO. The two keys first put the bootloader view on the status screen; whether it stays there while the bootloader runs depends on whether the nice!nano keeps VCC on in the bootloader, which has not been tested.
+1. Connect the nice!nano over USB and double-tap its reset button, or press Boot on the System layer, or hold L1 and hold the right half's outer row 5 key for 1.5 s. It mounts as a USB drive named NICENANO. The two keys first put the bootloader view on the status screen, and it stays there while the bootloader runs, since the nice!nano keeps VCC on there.
 2. Copy the UF2 for that nice!nano onto the drive. The nice!nano flashes it and restarts.
 
 For a split, flash `roamyboard_left` onto the left half and `roamyboard_right` onto the right. If the halves do not find each other after switching from other firmware, flash ZMK's `settings_reset` firmware onto both, then the roamyboard firmware again.
 
+Once a half runs roamyboard firmware, later updates can go over Bluetooth instead (Updating over Bluetooth, below).
+
 ## Updating over Bluetooth
 
-The nice!nano's Adafruit nRF52 bootloader also has an OTA mode, which takes a DFU zip over Bluetooth: from a Mac with `roamy-ota`, or from a phone with Nordic's nRF Device Firmware Update app (iOS and Android) or nRF Connect. Both work on the roamyboard: the iOS app updated the left half, and `roamy-ota` updated both halves of the split in one run. After each update, the status screen showed the new build ID at startup.
-
-Every CI build uploads `<build>.zip` next to `<build>.uf2`. adafruit-nrfutil (0.5.3.post16) makes it from `zmk.hex`:
-
-```sh
-adafruit-nrfutil dfu genpkg --dev-type 0x0052 --sd-req 0xFFFE --application zmk.hex roamyboard.zip
-```
-
-The zip holds the application image (`zmk.bin`), its init packet (`zmk.dat`) and `manifest.json`. The bootloader rejects every init packet whose device type is not 0x0052. A SoftDevice requirement of 0xFFFE means any SoftDevice, which matches UF2 updates, since a UF2 file carries no SoftDevice requirement. The firmware is linked to start at 0x26000, after S140 6.1.1, either way. To make a zip locally, install adafruit-nrfutil into a virtual environment outside the repo, for example `python3 -m venv ~/Library/Caches/roamyboard-nrfutil-venv`, and run the command above on `zephyr/zmk.hex` in the build directory.
-
-Every update starts the same way: press OTA on that half's System layer, under Boot on the left half and next to Boot on the right half. The status screen shows the OTA view, and the nice!nano restarts in the bootloader's OTA mode.
-
-The right half's OTA key needs the left half: the left half runs the keymap and invokes `&ota_boot` on the right half. When the left half is down, for example after an interrupted update or with a flat battery, use the right half's **local OTA key** instead: while the right half has no connection to the left half, hold 0 for 3 s: the number row's third key from the right half's outer edge, where OTA sits on the System layer. The status screen shows the OTA view, and the right half restarts in OTA mode, exactly as with `&ota_boot`. Releasing the key earlier cancels it, and while the halves are connected the key does only what the keymap binds to it. The right half's status screen shows "hold the 0 key 3 s for OTA" while the left half is not connected.
-
-`zmk/src/local_ota.c` implements it, only in the split peripheral's build (`CONFIG_ROAMYBOARD_LOCAL_OTA`, which needs `CONFIG_ZMK_SPLIT_BLE` and not `CONFIG_ZMK_SPLIT_ROLE_CENTRAL`). The peripheral turns each kscan event into a key position with its own matrix transform and raises `zmk_position_state_changed` locally (`app/src/physical_layouts.c` in ZMK), before ZMK's split peripheral listener relays the position to the central (`app/src/split/peripheral.c`); so the right half sees its own key positions, 12 to 23 in each row, whether or not the central is there. On a press of `CONFIG_ROAMYBOARD_LOCAL_OTA_POSITION` (16: row 0, keymap column 16) while `zmk_split_bt_peripheral_is_connected()` is false, the listener schedules OTA mode after `CONFIG_ROAMYBOARD_LOCAL_OTA_HOLD_MS` (3000); a release of the key, or `zmk_split_peripheral_status_changed` reporting a connection, cancels it. The right half anchors at its terminator module, so keymap column 16 is its fifth key module from the terminator module; with fewer than 5 key modules, the key does not exist. `CONFIG_ROAMYBOARD_LOCAL_OTA_LABEL` names the key in the hint; change it with the position.
-
-The bootloader keeps each image packet in one of its 16 receive buffers until it has written the packet to flash. The sender must therefore wait for a Packet Receipt Notification (PRN) after every few packets; Adafruit's README requires one every 8 packets or fewer. With PRN off, the upload failed right after "DFU initialized".
+Once a half runs roamyboard firmware, later updates can go over Bluetooth instead of USB. The nice!nano's Adafruit nRF52 bootloader has an OTA mode, which takes a DFU zip over Bluetooth: from a Mac with `roamy-ota`, or from a phone with Nordic's nRF Device Firmware Update app (iOS and Android) or nRF Connect. Both work on the roamyboard: the iOS app updated the left half, and `roamy-ota` updated both halves of the split in one run. After each update, the status screen showed the new build ID at startup.
 
 ### From a Mac
 
-`zmk/tools/ota` is a Swift package that builds `roamy-ota`, which speaks the bootloader's protocol: Nordic's legacy DFU from nRF5 SDK 11. Build it:
+You need:
 
-```sh
-swift build -c release --package-path zmk/tools/ota
-```
+- A Mac with macOS 14 or later, and the Swift 6 toolchain from Xcode or its command-line tools.
+- [`gh`](https://cli.github.com), signed in to GitHub, to download the DFU zips of a CI run.
+- A terminal app that may use Bluetooth. On the first run of `roamy-ota`, macOS asks whether the terminal app may use Bluetooth. A process that macOS cannot attribute to an app that may ask, such as an agent's shell, is killed instead.
 
-Download the DFU zips of a CI run. With several `-n`, `gh` puts each artifact in its own directory, and `roamy-ota` takes such a directory in place of the zip inside it:
+Run each step from the repo root:
 
-```sh
-gh run list --workflow Firmware --limit 5
-gh run download RUN_ID -n roamyboard_left -n roamyboard_right -D fw
-```
+1. Download the DFU zips of a run of the Firmware workflow, for example the latest successful one on main. With several `-n`, `gh` puts each artifact in its own directory, and `roamy-ota` takes such a directory in place of the zip inside it. For a unibody, download `-n roamyboard` instead.
 
-`--dry-run` shows what `roamy-ota` would send, and checks each zip, without Bluetooth:
+   ```sh
+   gh run list --workflow Firmware --branch main --status success --limit 5
+   gh run download RUN_ID -n roamyboard_left -n roamyboard_right -D fw
+   ```
 
-```sh
-zmk/tools/ota/.build/release/roamy-ota --dry-run fw/roamyboard_left fw/roamyboard_right
-```
+2. Build `roamy-ota` once, and again whenever `zmk/tools/ota` changes:
 
-Then run it from a terminal app. On the first run, macOS asks whether the terminal app may use Bluetooth. A process that macOS cannot attribute to an app that may ask, such as an agent's shell, is killed instead.
+   ```sh
+   swift build -c release --package-path zmk/tools/ota
+   ```
 
-```sh
-zmk/tools/ota/.build/release/roamy-ota fw/roamyboard_left fw/roamyboard_right
-```
+   `--dry-run` shows what `roamy-ota` would send, and checks each zip, without Bluetooth:
 
-`roamy-ota` asks for one half at a time, for example "Press OTA on the half for roamyboard_right.zip." The first half that appears as AdaDFU gets the first zip, and the next new one gets the second, so press OTA in the order that `roamy-ota` asks. On a split keyboard the right half goes first: its OTA key works only while the left half, which runs the keymap, still runs its firmware. `roamy-ota` therefore moves a zip whose name contains "left" to the end and says so. A half that is already in OTA mode when `roamy-ota` starts, for example after a failed update, appears first; name its zip first. Both halves update at the same time, each with a progress line. `roamy-ota` exits with 0 once every half has validated and activated its new firmware; each half then restarts with it.
+   ```sh
+   zmk/tools/ota/.build/release/roamy-ota --dry-run fw/roamyboard_left fw/roamyboard_right
+   ```
 
-`roamy-ota` sends 20-byte packets and asks for a receipt after every 8 by default (`--prn 1` to `--prn 8`). Each receipt costs a round trip, so 8 is the fastest allowed value. We estimate about 2.5 kB/s at PRN 8, so about three minutes for a 450 KB image; that has not been measured. `--packet-size` sends larger packets, which the bootloader accepts in whole 4-byte words up to the connection's MTU; that has not been tried on the roamyboard.
+3. Run `roamy-ota` with both zips, from a terminal app:
 
-When the connection to a half drops, or the half stops answering, `roamy-ota` starts that half's update over by itself, at most `--retries` times (default 2; `--retries 0` turns this off). It waits for the half to advertise as AdaDFU again, up to `--timeout` seconds, and connects to the same peripheral: the one with the same CoreBluetooth identifier. If the half's bootloader still holds the interrupted transfer, it answers Start DFU with "invalid state"; `roamy-ota` then sends Reset, waits for the half to advertise again, and runs the update from Start DFU once more within the same attempt. The same happens on the first attempt when an earlier run left a transfer behind. A failed connection also counts as a retryable attempt. Each new attempt prints a line that names the half, the attempt and why the previous one failed, and every attempt has the full timeouts of a first one. The `HalfUpdate` type in `zmk/tools/ota` holds this policy, and its tests run it against a fake bootloader.
+   ```sh
+   zmk/tools/ota/.build/release/roamy-ota fw/roamyboard_left fw/roamyboard_right
+   ```
 
-If an update fails for good, `roamy-ota` names the half, the phase, the bootloader's response code and the number of attempts, and says what to do next. An error response (such as a CRC error, or an image larger than the bootloader's application area), a packet receipt with the wrong byte count, or a bad DFU zip fails at once, since another attempt would fail the same way. When the failure comes after the bootloader has erased the old firmware and the connection is still up, `roamy-ota` asks the bootloader to reset, and the half restarts in OTA mode: run `roamy-ota` again with that half's zip. When the half does not advertise again in time, press OTA on it if it still runs its firmware, and otherwise flash the UF2 over USB (Flashing, above), which works in every case.
+4. Press OTA on each half when `roamy-ota` asks for it, and not before: the first half that appears in OTA mode gets the first zip. `roamy-ota` asks for the right half first ("Press OTA on the half for roamyboard_right.zip."), and then for the left half. OTA is on the System layer: hold L2 (the right thumb's fn⌫ key), and press OTA next to Boot on the right half, or under Boot on the left half. The status screen shows the OTA view while the half is in OTA mode.
+
+   Both halves update at the same time, each with a progress line; updating both takes about three and a half minutes. `roamy-ota` exits with 0 once every half has validated and activated its new firmware, and each half then restarts with it.
+
+5. When a half restarts, check the build ID that its status screen shows for the first 3 s: it is the commit of the new firmware, which `gh run view RUN_ID --json headSha` shows for the run.
 
 ### From a phone
 
@@ -291,4 +283,55 @@ If an update fails for good, `roamy-ota` names the half, the phase, the bootload
 
 ### When an update fails
 
-The nice!nano's bootloader updates in place, as Adafruit builds it by default: it erases the old firmware before it receives the new one, so a failed update leaves the half in the bootloader with no firmware. Send the zip again, or double-tap the reset button and flash the UF2 over USB (Flashing, above). A bootloader built with dual-bank updates keeps the old firmware until the new one is complete, but then takes only applications up to 401,408 bytes, which the unibody and left builds with ZMK Studio exceed.
+The nice!nano's bootloader updates in place, as Adafruit builds it by default: it erases the old firmware before it receives the new one, so a failed update leaves the half in the bootloader with no firmware. Send the zip again, or double-tap the reset button and flash the UF2 over USB (Flashing, above), which works in every case. A bootloader built with dual-bank updates keeps the old firmware until the new one is complete, but then takes only applications up to 401,408 bytes, which the unibody and left builds with ZMK Studio exceed.
+
+`roamy-ota` starts a half's update over by itself when the connection drops (How it works, below). If an update fails for good, `roamy-ota` names the half, the phase, the bootloader's response code and the number of attempts, and says what to do next:
+
+- When the failure comes after the bootloader has erased the old firmware and the connection is still up, `roamy-ota` asks the bootloader to reset, and the half restarts in OTA mode. Run `roamy-ota` again with that half's zip.
+- When the half does not advertise again in time, press OTA on it if it still runs its firmware, and otherwise flash the UF2 over USB.
+
+A half that is stuck in OTA mode advertises as AdaDFU as soon as `roamy-ota` starts. Both halves advertise as "AdaDFU", so `roamy-ota` cannot tell which half it is. `roamy-ota` therefore looks for 2 s before it asks for any half: an AdaDFU that it finds in that time gets the first zip, and `roamy-ota` keeps the zips in the order that you named them instead of moving the left half's zip to the end. It prints which zip that half gets. Name the stuck half's zip first, for example with the left half stuck:
+
+```sh
+zmk/tools/ota/.build/release/roamy-ota fw/roamyboard_left fw/roamyboard_right
+```
+
+When the stuck half is the left half, the right half's OTA key on the System layer does nothing, since the left half runs the keymap. When `roamy-ota` asks for the right half, use the right half's local OTA key instead: hold 0 for 3 s.
+
+To leave OTA mode without an update, one press of the reset button probably restarts the half's firmware, if the half still has firmware. Nobody has tried it yet.
+
+### How it works
+
+#### OTA mode and the OTA keys
+
+Every update starts the same way: press OTA on that half's System layer, under Boot on the left half and next to Boot on the right half. The status screen shows the OTA view, and the nice!nano restarts in the bootloader's OTA mode. The OTA view stays on the status screen while the bootloader runs, since the nice!nano keeps VCC on there.
+
+The right half's OTA key needs the left half: the left half runs the keymap and invokes `&ota_boot` on the right half. When the left half is down, for example after an interrupted update or with a flat battery, use the right half's **local OTA key** instead: while the right half has no connection to the left half, hold 0 for 3 s: the number row's third key from the right half's outer edge, where OTA sits on the System layer. The status screen shows the OTA view, and the right half restarts in OTA mode, exactly as with `&ota_boot`. Releasing the key earlier cancels it, and while the halves are connected the key does only what the keymap binds to it. The right half's status screen shows "hold the 0 key 3 s for OTA" while the left half is not connected.
+
+So the right half reaches OTA mode even while the left half is in the bootloader. Updating the right half first, as `roamy-ota` asks, is a convenience: it lets both halves use the OTA key on the System layer.
+
+`zmk/src/local_ota.c` implements the local OTA key, only in the split peripheral's build (`CONFIG_ROAMYBOARD_LOCAL_OTA`, which needs `CONFIG_ZMK_SPLIT_BLE` and not `CONFIG_ZMK_SPLIT_ROLE_CENTRAL`). The peripheral turns each kscan event into a key position with its own matrix transform and raises `zmk_position_state_changed` locally (`app/src/physical_layouts.c` in ZMK), before ZMK's split peripheral listener relays the position to the central (`app/src/split/peripheral.c`); so the right half sees its own key positions, 12 to 23 in each row, whether or not the central is there. On a press of `CONFIG_ROAMYBOARD_LOCAL_OTA_POSITION` (16: row 0, keymap column 16) while `zmk_split_bt_peripheral_is_connected()` is false, the listener schedules OTA mode after `CONFIG_ROAMYBOARD_LOCAL_OTA_HOLD_MS` (3000); a release of the key, or `zmk_split_peripheral_status_changed` reporting a connection, cancels it. The right half anchors at its terminator module, so keymap column 16 is its fifth key module from the terminator module; with fewer than 5 key modules, the key does not exist. `CONFIG_ROAMYBOARD_LOCAL_OTA_LABEL` names the key in the hint; change it with the position.
+
+#### The DFU zip
+
+Every CI build uploads `<build>.zip` next to `<build>.uf2`. adafruit-nrfutil (0.5.3.post16) makes it from `zmk.hex`:
+
+```sh
+adafruit-nrfutil dfu genpkg --dev-type 0x0052 --sd-req 0xFFFE --application zmk.hex roamyboard.zip
+```
+
+The zip holds the application image (`zmk.bin`), its init packet (`zmk.dat`) and `manifest.json`. The bootloader rejects every init packet whose device type is not 0x0052. A SoftDevice requirement of 0xFFFE means any SoftDevice, which matches UF2 updates, since a UF2 file carries no SoftDevice requirement. The firmware is linked to start at 0x26000, after S140 6.1.1, either way. To make a zip locally, install adafruit-nrfutil into a virtual environment outside the repo, for example `python3 -m venv ~/Library/Caches/roamyboard-nrfutil-venv`, and run the command above on `zephyr/zmk.hex` in the build directory.
+
+#### The transfer
+
+`zmk/tools/ota` is a Swift package that builds `roamy-ota`, which speaks the bootloader's protocol: Nordic's legacy DFU from nRF5 SDK 11.
+
+The bootloader keeps each image packet in one of its 16 receive buffers until it has written the packet to flash. The sender must therefore wait for a Packet Receipt Notification (PRN) after every few packets; Adafruit's README requires one every 8 packets or fewer. With PRN off, the upload failed right after "DFU initialized".
+
+`roamy-ota` sends 20-byte packets and asks for a receipt after every 8 by default (`--prn 1` to `--prn 8`). Each receipt costs a round trip, so 8 is the fastest allowed value. Measured early in one run at PRN 8, with both halves updating at once, the right half received 1.7 kB/s (365 KB image, about 3:11 to go) and the left half 2.3 kB/s (455 KB image, about 2:56 to go). `--packet-size` sends larger packets, which the bootloader accepts in whole 4-byte words up to the connection's MTU; that has not been tried on the roamyboard.
+
+`roamy-ota` gives the first half that appears as AdaDFU the first zip, and the next new one the second. When no AdaDFU advertises during its first 2 s, it moves a zip whose name contains "left" to the end and says so, because the right half's OTA key on the System layer works only while the left half still runs its firmware. When an AdaDFU already advertises, it keeps the order as given (When an update fails, above). `UpdateOrder` in `zmk/tools/ota` holds this rule.
+
+When the connection to a half drops, or the half stops answering, `roamy-ota` starts that half's update over by itself, at most `--retries` times (default 2; `--retries 0` turns this off). It waits for the half to advertise as AdaDFU again, up to `--timeout` seconds, and connects to the same peripheral: the one with the same CoreBluetooth identifier. If the half's bootloader still holds the interrupted transfer, it answers Start DFU with "invalid state"; `roamy-ota` then sends Reset, waits for the half to advertise again, and runs the update from Start DFU once more within the same attempt. The same happens on the first attempt when an earlier run left a transfer behind. A failed connection also counts as a retryable attempt. Each new attempt prints a line that names the half, the attempt and why the previous one failed, and every attempt has the full timeouts of a first one. The `HalfUpdate` type in `zmk/tools/ota` holds this policy, and its tests run it against a fake bootloader.
+
+An error response (such as a CRC error, or an image larger than the bootloader's application area), a packet receipt with the wrong byte count, or a bad DFU zip fails at once, since another attempt would fail the same way.

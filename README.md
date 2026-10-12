@@ -46,6 +46,8 @@ The hardware and layout is based on [![](https://typeractive.xyz/cdn/shop/files
 ## Firmware and layout
 The firmware is ZMK with a custom driver for the key modules' shift register chain; the module and config live in `zmk/`. Read more in [Firmware](docs/firmware.md), and about the layout in [[Layout]].
 
+After the first flash over USB, firmware updates can go over Bluetooth, from a Mac with `roamy-ota` or from a phone: see [Updating over Bluetooth](docs/firmware.md#updating-over-bluetooth).
+
 The stock Lily58 firmware images are still in `firmware/`.
 
 ## Wiring
