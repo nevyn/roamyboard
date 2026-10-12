@@ -10,6 +10,7 @@
 
 #include <lvgl.h>
 
+#include <roamyboard/pda.h>
 #include <roamyboard/status_screen.h>
 
 #include "cat.h"
@@ -37,6 +38,11 @@ struct screen {
     lv_obj_t *cat;
 #endif
     uint8_t cbuf[SCREEN_CANVAS_COUNT][CANVAS_BUF_SIZE];
+    /** The PDA's framebuffer on the canvases, so that a redraw writes only changed canvases. */
+    uint8_t pda_bits[ROAMYBOARD_PDA_FB_BYTES];
+    bool pda_focused;
+    /** The canvases hold pda_bits; any status drawing clears it. */
+    bool pda_shown;
 };
 
 /** Creates the screen's objects as children of parent, which should be 160 x 68 px. */

@@ -67,6 +67,7 @@ static void draw_count(lv_obj_t *canvas, int key_module_count) {
 }
 
 void screen_draw_top(struct screen *screen, const struct status_state *state) {
+    screen->pda_shown = false;
     lv_obj_t *canvas = screen->canvas[SCREEN_TOP];
 
     lv_draw_label_dsc_t label_dsc;
@@ -227,6 +228,7 @@ static const lv_font_t *fit_text(char *text, size_t size) {
 #endif // STATUS_SCREEN_CENTRAL
 
 void screen_draw_middle(struct screen *screen, const struct status_state *state) {
+    screen->pda_shown = false;
     lv_obj_t *canvas = screen->canvas[SCREEN_MIDDLE];
 
     // Fill background
@@ -258,6 +260,7 @@ void screen_draw_middle(struct screen *screen, const struct status_state *state)
 }
 
 void screen_draw_bottom(struct screen *screen, const struct status_state *state) {
+    screen->pda_shown = false;
     lv_obj_t *canvas = screen->canvas[SCREEN_BOTTOM];
 
     // Fill background
@@ -316,6 +319,7 @@ static void draw_download_icon(lv_obj_t *canvas, int y) {
 
 void screen_draw_bootloader(struct screen *screen, enum roamyboard_bootloader_mode mode,
                             const char *build_id) {
+    screen->pda_shown = false;
 #if STATUS_SCREEN_CENTRAL
     lv_obj_add_flag(screen->cat_box, LV_OBJ_FLAG_HIDDEN);
 #endif
@@ -376,20 +380,34 @@ void screen_draw_pda(struct screen *screen, const uint8_t *bits, bool focused) {
     lv_obj_add_flag(screen->cat_box, LV_OBJ_FLAG_HIDDEN);
 #endif
     // Focused, lit pixels are light on dark, the inverse of the status screen.
-    const lv_color_t lit = focused ? LVGL_BACKGROUND : LVGL_FOREGROUND;
-    const lv_color_t dark = focused ? LVGL_FOREGROUND : LVGL_BACKGROUND;
+    const uint8_t lit = lv_color_luminance(focused ? LVGL_BACKGROUND : LVGL_FOREGROUND);
+    const uint8_t dark = lv_color_luminance(focused ? LVGL_FOREGROUND : LVGL_BACKGROUND);
+    const bool redraw_all = !screen->pda_shown || focused != screen->pda_focused;
+
     for (int c = 0; c < SCREEN_CANVAS_COUNT; c++) {
-        lv_obj_t *canvas = screen->canvas[c];
+        const int first_row = c * CANVAS_SIZE;
+        const int rows = LV_MIN(CANVAS_SIZE, ROAMYBOARD_PDA_FB_HEIGHT - first_row);
+        const size_t offset = first_row * ROAMYBOARD_PDA_FB_STRIDE;
+        const size_t len = rows * ROAMYBOARD_PDA_FB_STRIDE;
+        if (!redraw_all && memcmp(screen->pda_bits + offset, bits + offset, len) == 0) {
+            continue;
+        }
+        // Writes the canvas's bytes in place, already rotated, since lv_canvas_set_px
+        // invalidates the canvas once per pixel. Upright (x, y) lands at (CANVAS_SIZE - 1 - y, x).
+        lv_draw_buf_t *buf = lv_canvas_get_draw_buf(screen->canvas[c]);
+        const uint32_t stride = buf->header.stride;
         for (int y = 0; y < CANVAS_SIZE; y++) {
-            const int fb_y = c * CANVAS_SIZE + y;
+            const uint8_t *row = bits + (first_row + y) * ROAMYBOARD_PDA_FB_STRIDE;
             for (int x = 0; x < CANVAS_SIZE; x++) {
-                const bool on = fb_y < ROAMYBOARD_PDA_FB_HEIGHT &&
-                                (bits[fb_y * ROAMYBOARD_PDA_FB_STRIDE + x / 8] & (0x80 >> (x % 8)));
-                lv_canvas_set_px(canvas, x, y, on ? lit : dark, LV_OPA_COVER);
+                const bool on = y < rows && (row[x / 8] & (0x80 >> (x % 8)));
+                buf->data[x * stride + (CANVAS_SIZE - 1 - y)] = on ? lit : dark;
             }
         }
-        rotate_canvas(canvas);
+        lv_obj_invalidate(screen->canvas[c]);
     }
+    memcpy(screen->pda_bits, bits, ROAMYBOARD_PDA_FB_BYTES);
+    screen->pda_focused = focused;
+    screen->pda_shown = true;
 }
 
 static uint8_t reverse_bits(uint8_t b) {

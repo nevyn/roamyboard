@@ -79,9 +79,11 @@ void pda_text_draw(struct pda_fb *fb, int x, int y, int max_w, const char *text,
     lv_draw_label(&layer, &dsc, &coords);
     lv_canvas_finish_layer(scratch, &layer);
 
+    const lv_draw_buf_t *buf = lv_canvas_get_draw_buf(scratch);
     for (int sy = 0; sy < h; sy++) {
+        const uint8_t *row = buf->data + sy * buf->header.stride;
         for (int sx = 0; sx < w; sx++) {
-            if (lv_canvas_get_px(scratch, sx, sy).red >= 0x80) {
+            if (row[sx] >= 0x80) {
                 pda_fb_set(fb, x + sx, y + sy, lit);
             }
         }
