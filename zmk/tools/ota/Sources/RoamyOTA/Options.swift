@@ -5,8 +5,10 @@ public struct Options: Equatable, Sendable {
     public var packetReceiptInterval: PacketReceiptInterval = .default
     /// Bytes per image packet; see `DFUSettings.packetSize`.
     public var packetSize = 20
-    /// How long to wait for each half to appear as AdaDFU.
+    /// How long to wait for each half to appear as AdaDFU, at first and after a failed attempt.
     public var discoveryTimeout: Duration = .seconds(120)
+    /// How many times a half's update may start over; see `RetryPolicy.retries`.
+    public var retries = 2
     /// Parse and describe the zips without using Bluetooth.
     public var dryRun = false
     public var help = false
@@ -14,18 +16,26 @@ public struct Options: Equatable, Sendable {
     public init() {}
 
     public static let usage = """
-        usage: roamy-ota [--prn N] [--timeout SECONDS] [--packet-size BYTES] [--dry-run] ZIP [ZIP ...]
+        usage: roamy-ota [--prn N] [--timeout SECONDS] [--retries N] [--packet-size BYTES] [--dry-run] ZIP [ZIP ...]
 
         Updates roamyboard halves over Bluetooth. Run it, then press OTA on each half
         when it asks: the first half that appears as AdaDFU gets the first ZIP, the next
         one the second. A ZIP whose name contains "left" goes last, since the left half
         relays the right half's OTA key. Halves update at the same time.
 
+        When the connection to a half drops, roamy-ota waits for that half to
+        advertise as AdaDFU again, resets an interrupted transfer, and starts the
+        half's update over.
+
         ZIP is a DFU zip from a CI build, or a directory that holds one, such as an
         artifact fetched with `gh run download RUN -n roamyboard_left`.
 
           --prn N              packets per receipt, 1 to 8 (default 8)
-          --timeout SECONDS    how long to wait for each half (default 120)
+          --timeout SECONDS    how long to wait for each half to appear as AdaDFU,
+                               at first and after a dropped connection (default 120)
+          --retries N          how often a half's update may start over after the
+                               connection dropped or went silent (default 2;
+                               0 never reconnects)
           --dry-run            describe what would be sent; no Bluetooth
           --packet-size BYTES  bytes per packet, a multiple of 4 (default 20;
                                larger is untested on the roamyboard)
@@ -59,6 +69,10 @@ public struct Options: Equatable, Sendable {
                 let seconds = try integer(for: argument)
                 guard seconds > 0 else { throw .invalidValue(option: argument, value: String(seconds), reason: "it must be at least 1 second") }
                 options.discoveryTimeout = .seconds(seconds)
+            case "--retries":
+                let retries = try integer(for: argument)
+                guard retries >= 0 else { throw .invalidValue(option: argument, value: String(retries), reason: "it must be 0 or more") }
+                options.retries = retries
             case "--dry-run":
                 options.dryRun = true
             case "-h", "--help":

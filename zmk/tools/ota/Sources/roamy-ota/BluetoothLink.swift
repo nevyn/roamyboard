@@ -22,6 +22,8 @@ final class BluetoothLink: NSObject, CBPeripheralDelegate, DFUTransport, @unchec
     private var revision: CBCharacteristic?
     private var packetsWritten = 0
     private var closed: DFUTransportError?
+    /// Whether CoreBluetooth reported the connection; confined to `queue`.
+    private(set) var didComeUp = false
 
     private enum SetupStep: Sendable {
         case connected
@@ -44,6 +46,7 @@ final class BluetoothLink: NSObject, CBPeripheralDelegate, DFUTransport, @unchec
     // MARK: Called by BluetoothCentral on `queue`
 
     func didConnect() {
+        didComeUp = true
         setupSteps.post(.connected)
     }
 
@@ -214,6 +217,8 @@ enum BluetoothError: Error, CustomStringConvertible {
     case unsupported
     case notReady
     case setup(String)
+    /// Bluetooth left the powered-on state; the associated value is the `CBManagerState` raw value.
+    case stopped(Int)
 
     var description: String {
         switch self {
@@ -222,6 +227,7 @@ enum BluetoothError: Error, CustomStringConvertible {
         case .unsupported: "this Mac has no Bluetooth LE."
         case .notReady: "Bluetooth did not become ready within 60 seconds. If macOS asked whether the terminal app may use Bluetooth, allow it and run roamy-ota again."
         case .setup(let reason): reason
+        case .stopped(let state): "Bluetooth stopped (state \(state)). Turn it on and run roamy-ota again."
         }
     }
 }

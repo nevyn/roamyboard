@@ -24,6 +24,8 @@ final class BluetoothCentral: NSObject, CBCentralManagerDelegate, @unchecked Sen
 
     private var seen: [UUID: CBPeripheral] = [:]
     private var links: [UUID: BluetoothLink] = [:]
+    private var discovering = false
+    private var advertisementWaiters: [UUID: Mailbox<Void>] = [:]
 
     override init() {
         super.init()
@@ -52,14 +54,52 @@ final class BluetoothCentral: NSObject, CBCentralManagerDelegate, @unchecked Sen
         }
     }
 
+    /// Starts posting new AdaDFU peripherals to `discoveries`.
     func startScanning() {
         queue.async { [self] in
-            manager.scanForPeripherals(withServices: [CBUUID(string: LegacyDFUService.service)])
+            discovering = true
+            updateScan()
         }
     }
 
+    /// Stops posting to `discoveries`; waits for advertisements go on.
     func stopScanning() {
-        queue.async { [self] in manager.stopScan() }
+        queue.async { [self] in
+            discovering = false
+            updateScan()
+        }
+    }
+
+    /// Returns at the next advertisement of the peripheral with identifier `id`.
+    /// - Throws: `CancellationError` when the task is cancelled, or `BluetoothError.stopped` when
+    ///   Bluetooth stops.
+    func waitForAdvertisement(of id: UUID) async throws {
+        let mailbox = Mailbox<Void>()
+        queue.sync {
+            advertisementWaiters[id] = mailbox
+            updateScan()
+        }
+        defer {
+            queue.async { [self] in
+                if advertisementWaiters[id] === mailbox { advertisementWaiters[id] = nil }
+                updateScan()
+            }
+        }
+        try await mailbox.receive()
+    }
+
+    /// On `queue`. Waits for advertisements need duplicates: CoreBluetooth otherwise reports a
+    /// peripheral once per scan.
+    private func updateScan() {
+        guard manager.state == .poweredOn else { return }
+        let services = [CBUUID(string: LegacyDFUService.service)]
+        if !advertisementWaiters.isEmpty {
+            manager.scanForPeripherals(withServices: services, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
+        } else if discovering {
+            manager.scanForPeripherals(withServices: services)
+        } else {
+            manager.stopScan()
+        }
     }
 
     /// Connects to `advertiser` and prepares its DFU service.
@@ -88,7 +128,7 @@ final class BluetoothCentral: NSObject, CBCentralManagerDelegate, @unchecked Sen
         queue.async { [self] in
             manager.cancelPeripheralConnection(link.peripheral)
             link.close(reason: "roamy-ota disconnected")
-            links[link.peripheral.identifier] = nil
+            if links[link.peripheral.identifier] === link { links[link.peripheral.identifier] = nil }
         }
     }
 
@@ -96,13 +136,17 @@ final class BluetoothCentral: NSObject, CBCentralManagerDelegate, @unchecked Sen
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         states.post(central.state)
-        if central.state != .poweredOn {
+        if central.state == .poweredOn {
+            updateScan()
+        } else {
             for link in links.values { link.close(reason: "Bluetooth stopped (state \(central.state.rawValue))") }
+            for waiter in advertisementWaiters.values { waiter.close(throwing: BluetoothError.stopped(central.state.rawValue)) }
         }
     }
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi: NSNumber) {
-        guard seen[peripheral.identifier] == nil else { return }
+        advertisementWaiters[peripheral.identifier]?.post(())
+        guard seen[peripheral.identifier] == nil, discovering else { return }
         seen[peripheral.identifier] = peripheral
         let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? peripheral.name ?? "unnamed"
         discoveries.post(Advertiser(id: peripheral.identifier, name: name, rssi: rssi.intValue))
@@ -117,6 +161,8 @@ final class BluetoothCentral: NSObject, CBCentralManagerDelegate, @unchecked Sen
     }
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
-        links[peripheral.identifier]?.close(reason: error?.localizedDescription)
+        // A late disconnect of the previous connection must not close a link that is still connecting.
+        guard let link = links[peripheral.identifier], link.didComeUp else { return }
+        link.close(reason: error?.localizedDescription)
     }
 }
