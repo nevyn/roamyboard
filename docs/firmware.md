@@ -55,23 +55,26 @@ The driver scans every `poll-period-ms` (10 ms) while idle, and every `debounce-
 
 ## Columns and anchors
 
-The **physical column** is a key module's position in the chain: 0 is the key module nearest the MCU module. The MCU module sits at the right end of a half and the terminator module at the left end, so physical columns count right to left.
+The **physical column** is a key module's position in the chain: 0 is the key module nearest the MCU module. On the left half and a unibody, the MCU module sits at the right end and the terminator module at the left end, so physical columns count right to left. The right half of a split is the same hardware turned by 180 degrees in the plane of its keys (a **rotated half**): its MCU module sits at its left end, next to the left half, so its physical columns count left to right.
 
 The **keymap column** is where a key module's keys land in the 24-column keymap. Each shield's chain node owns `columns` keymap columns and has an **anchor**, the end of the half that keymap columns are counted from:
 
 | Anchor | Keymap column of physical column p | With fewer key modules than columns |
 | --- | --- | --- |
 | `mcu` | columns − 1 − p | the leftmost keymap columns never fire |
+| `mcu`, `rotated` | p | the rightmost keymap columns never fire |
 | `terminator` | count − 1 − p | the rightmost keymap columns never fire |
 
-The `terminator` anchor is the only mapping that depends on the key module count: adding a key module anywhere moves every keymap column. Key modules that map outside `0` to `columns − 1` are ignored: with the `mcu` anchor those are the ones nearest the terminator module, with the `terminator` anchor the ones nearest the MCU module.
+The chain node's `rotated` property mirrors the column order (column c becomes columns − 1 − c) and the row order: on a rotated half SW1 is the top key, so row r reads input r instead of input rows − 1 − r. It also turns `ROAMYBOARD_STATUS_SCREEN_ROTATE_180` off by default, since the turned half shows the nice!view the right way up. All three follow the one property, so they cannot disagree.
 
-A split roamyboard anchors both halves at the middle of the keyboard:
+The `terminator` anchor is the only mapping that depends on the key module count: adding a key module anywhere moves every keymap column. No shipped build uses it. Key modules that map outside `0` to `columns − 1` are ignored: with the `mcu` anchor those are the ones nearest the terminator module, with the `terminator` anchor the ones nearest the MCU module.
+
+A split roamyboard anchors both halves at their MCU modules, which sit at the middle of the keyboard:
 
 ```
-              left half, anchor mcu                            right half, anchor terminator
- terminator  [8]  [9]  [10] [11]  MCU module  |  terminator  [12] [13] [14] [15]  MCU module
-             p=3  p=2  p=1  p=0               |              p=3  p=2  p=1  p=0
+              left half, anchor mcu                       right half, anchor mcu, rotated
+ terminator  [8]  [9]  [10] [11]  MCU module  |  MCU module  [12] [13] [14] [15]  terminator
+             p=3  p=2  p=1  p=0               |              p=0  p=1  p=2  p=3
 ```
 
 Keymap columns are in brackets. With five key modules on each half, the left half fills keymap columns 7 to 11 and the right half 12 to 16, wherever in the half the fifth one goes.
@@ -88,7 +91,7 @@ Every build uses one physical layout, 24 × 5 keys (positions `row * 24 + column
 | --- | --- | --- | --- | --- | --- |
 | `roamyboard` | `roamyboard` | unibody | 0 to 23 | `mcu` | yes |
 | `roamyboard_left` | `roamyboard_left` | split central | 0 to 11 | `mcu` | yes |
-| `roamyboard_right` | `roamyboard_right` | split peripheral | 12 to 23 | `terminator` | no |
+| `roamyboard_right` | `roamyboard_right` | split peripheral | 12 to 23 | `mcu`, rotated | no |
 
 The split role is fixed at compile time. ZMK Studio runs over BLE and over USB (the `studio-rpc-usb-uart` snippet), with locking off; the peripheral cannot host it.
 

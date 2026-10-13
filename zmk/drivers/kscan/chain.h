@@ -53,6 +53,12 @@ struct chain_config {
      * stable_scans count as stable_scans.
      */
     int recovery_scans;
+    /**
+     * The half is mounted turned by 180 degrees in the plane of its keys, so the MCU module
+     * sits at the other end of the half and SW1 is the top key. Mirrors both the column and
+     * the row order, so that keymap columns and rows stay where the user sees them.
+     */
+    bool rotated;
 };
 
 /** Called once per key event, with keymap coordinates within this half. */

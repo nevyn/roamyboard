@@ -50,6 +50,16 @@ properties:
       nearest the terminator module is keymap column 0, so every key module's
       keymap column changes when a key module is added or removed.
 
+  rotated:
+    type: boolean
+    description: |
+      The half is mounted turned by 180 degrees in the plane of its keys: its MCU
+      module sits at the half's other end and SW1 is its top key. The driver mirrors the
+      column and the row order, so that keymap columns and rows stay where the
+      user sees them, and the status screen is drawn the other way up
+      (ROAMYBOARD_STATUS_SCREEN_ROTATE_180 defaults to off). With anchor "mcu",
+      the key module nearest the MCU module is keymap column 0.
+
   rows:
     type: int
     default: 5

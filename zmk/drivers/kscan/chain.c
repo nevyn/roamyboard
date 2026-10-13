@@ -30,8 +30,9 @@ int chain_count_key_modules(const uint8_t *buf, size_t len) {
 }
 
 int chain_keymap_column(const struct chain_config *config, int count, int physical) {
-    const int column = config->anchor == CHAIN_ANCHOR_MCU ? config->columns - 1 - physical
-                                                          : count - 1 - physical;
+    const int unrotated = config->anchor == CHAIN_ANCHOR_MCU ? config->columns - 1 - physical
+                                                             : count - 1 - physical;
+    const int column = config->rotated ? config->columns - 1 - unrotated : unrotated;
     return (column >= 0 && column < config->columns) ? column : -1;
 }
 
@@ -78,7 +79,7 @@ enum chain_scan_result chain_scan(struct chain *chain, const uint8_t *buf, size_
             continue;
         }
         for (int row = 0; row < config->rows; row++) {
-            const int bit = config->rows - 1 - row;
+            const int bit = config->rotated ? row : config->rows - 1 - row;
             active[row * config->columns + column] = (buf[physical] >> bit) & 1;
         }
     }

@@ -55,8 +55,8 @@
   }
   const moduleCount = side => halves[side][1] - halves[side][0] + 1;
 
-  // Anchors: the left half counts from its MCU module and the right half from its terminator module, so both keep
-  // the keymap columns nearest the middle of the keyboard.
+  // Anchors: both halves count from their MCU modules, which sit at the middle of the keyboard (the right half is
+  // turned by 180 degrees), so both keep the keymap columns nearest the middle.
   const attached = col => col < HALF ? col > halves.left[1] - state.count.left : col < halves.right[0] + state.count.right;
   const isThumb = (col, row) => row === ROWS - 1 && ((col <= halves.left[1] && col > halves.left[1] - 3) || (col >= halves.right[0] && col < halves.right[0] + 3));
 
@@ -91,7 +91,10 @@
       half.setAttribute("role", "group");
       half.setAttribute("aria-label", `${side === "left" ? "Left" : "Right"} half`);
       half.dataset.side = side;
-      half.append(el("div", "terminator", { title: "Terminator module" }));
+      const mcu = el("div", "mcu", { title: "MCU module" });
+      mcu.append(el("div", "screen"));
+      const terminator = el("div", "terminator", { title: "Terminator module" });
+      half.append(side === "right" ? mcu : terminator);
       for (let col = halves[side][0]; col <= halves[side][1]; col++) {
         const mod = el("div", "key-module");
         mod.dataset.col = col;
@@ -105,9 +108,7 @@
         }
         half.append(mod);
       }
-      const mcu = el("div", "mcu", { title: "MCU module" });
-      mcu.append(el("div", "screen"));
-      half.append(mcu);
+      half.append(side === "right" ? terminator : mcu);
       board.append(half);
 
       const slider = $(`[data-count=${side}]`);

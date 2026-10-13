@@ -1,6 +1,7 @@
 /*
- * Right half of a split roamyboard, the peripheral: keymap columns 12 to 23,
- * filled from the terminator module at the half's left (inner) end.
+ * Right half of a split roamyboard, the peripheral: keymap columns 12 to 23.
+ * The half is the left half's hardware turned by 180 degrees, so its MCU module
+ * sits at its left (inner) end and columns fill outward from it.
  *
  * SPDX-License-Identifier: MIT
  */
@@ -13,5 +14,6 @@
 
 &roamyboard_chain {
     columns = <12>;
-    anchor = "terminator";
+    anchor = "mcu";
+    rotated;
 };

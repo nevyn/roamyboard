@@ -171,18 +171,43 @@ static void test_n_modules_anchor_terminator(void) {
 }
 
 static void test_column_mapping(void) {
-    const struct chain_config mcu = {CHAIN_ANCHOR_MCU, 15, 5, 3, 3};
+    const struct chain_config mcu = {CHAIN_ANCHOR_MCU, 15, 5, 3, 3, false};
     CHECK_EQ(chain_keymap_column(&mcu, 3, 0), 14);
     CHECK_EQ(chain_keymap_column(&mcu, 3, 2), 12);
     CHECK_EQ(chain_keymap_column(&mcu, 20, 14), 0);
     CHECK_EQ(chain_keymap_column(&mcu, 20, 15), -1);
 
-    const struct chain_config term = {CHAIN_ANCHOR_TERMINATOR, 15, 5, 3, 3};
+    const struct chain_config term = {CHAIN_ANCHOR_TERMINATOR, 15, 5, 3, 3, false};
     CHECK_EQ(chain_keymap_column(&term, 3, 0), 2);
     CHECK_EQ(chain_keymap_column(&term, 3, 2), 0);
     CHECK_EQ(chain_keymap_column(&term, 20, 19), 0);
     CHECK_EQ(chain_keymap_column(&term, 20, 5), 14);
     CHECK_EQ(chain_keymap_column(&term, 20, 4), -1);
+}
+
+static void test_rotated_half(void) {
+    struct fixture f;
+    setup(&f, CHAIN_ANCHOR_MCU, 12, 3);
+    f.chain.config.rotated = true;
+    /* Nearest the MCU module: SW1, now the top key. Third from it: SW5, now the bottom key. */
+    const uint8_t modules[] = {SW(1), 0x00, SW(5)};
+    CHECK_EQ(settle(&f, modules, 3), CHAIN_SCAN_KEYS);
+    CHECK(active_at(&f, 0, 0));
+    CHECK(active_at(&f, 4, 2));
+    CHECK_EQ(active_total(&f), 2);
+
+    /*
+     * Turning the old right half (terminator at the inner end, columns counted from it) by 180
+     * degrees puts its MCU module at the inner end: each key module keeps its keymap column.
+     */
+    const struct chain_config before = {CHAIN_ANCHOR_TERMINATOR, 12, 5, 3, 3, false};
+    const struct chain_config after = {CHAIN_ANCHOR_MCU, 12, 5, 3, 3, true};
+    for (int count = 1; count <= 12; count++) {
+        for (int inner = 0; inner < count; inner++) {
+            CHECK_EQ(chain_keymap_column(&after, count, inner),
+                     chain_keymap_column(&before, count, count - 1 - inner));
+        }
+    }
 }
 
 static void test_more_modules_than_columns(void) {
@@ -344,7 +369,7 @@ static void test_count_change_releases_held_keys(void) {
 static void test_seven_rows(void) {
     struct fixture f;
     memset(&f, 0, sizeof(f));
-    const struct chain_config config = {CHAIN_ANCHOR_MCU, 2, 7, 1, 1};
+    const struct chain_config config = {CHAIN_ANCHOR_MCU, 2, 7, 1, 1, false};
     chain_init(&f.chain, &config, f.reported);
     const uint8_t modules[] = {0x40 /* G, SW7 */, 0x20 /* F, SW6 */};
     uint8_t buf[MAX_MODULES + 1];
@@ -362,6 +387,7 @@ int main(void) {
     test_n_modules_anchor_mcu();
     test_n_modules_anchor_terminator();
     test_column_mapping();
+    test_rotated_half();
     test_more_modules_than_columns();
     test_missing_sentinel();
     test_fault_recovery_needs_a_longer_run();

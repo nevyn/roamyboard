@@ -157,7 +157,7 @@ test("a full half maps onto exactly the bound columns, and a short one keeps the
 
   // Both halves keep the columns nearest the middle of the keyboard, as docs/layout/ draws them.
   assert.deepStrictEqual(cols("split", 0, 3), [l1 - 2, l1 - 1, l1], "left half anchors at its MCU module");
-  assert.deepStrictEqual(cols("split", 1, 3), [r0, r0 + 1, r0 + 2], "right half anchors at its terminator");
+  assert.deepStrictEqual(cols("split", 1, 3), [r0, r0 + 1, r0 + 2], "right half anchors at its MCU module, at its left end");
   assert.strictEqual(K.keymapColumn("unibody", 0, 14, 13), K.BOUND.unibody.left[1]);
 
   // More key modules than the keymap binds: the extra ones fall off the end, and the page draws them blank.

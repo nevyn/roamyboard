@@ -53,14 +53,14 @@
         <div class="field"><label for="count-right">Key modules on the right half</label>
           <div class="range"><input type="range" id="count-right" min="1" max="7" value="7" data-count="right"><output for="count-right" data-count-out="right">7</output></div>
         </div>
-        <p class="summary">The left half's anchor is its MCU module and the right half's is its terminator module, so with fewer key modules each half keeps the keymap columns nearest the middle of the keyboard, and the keys of the faded key modules never fire.</p>
+        <p class="summary">Both halves count their keymap columns from their MCU modules, which sit at the middle of the keyboard, so with fewer key modules each half keeps the keymap columns nearest the middle, and the keys of the faded key modules never fire.</p>
       </div>
     </div>
   </section>
 
   <section class="notes" aria-labelledby="notes-title">
     <h2 id="notes-title">How the layout works</h2>
-    <p>Each half is drawn as it lies on the leg: the terminator module at the left end, then the key modules, then the MCU module with its status screen at the right end. Row 1 is the number row at the SW5 end; row 5 is at the SW1 end, which faces the hip.</p>
+    <p>Each half is drawn as it lies on the leg, with the MCU module and its status screen at the middle of the keyboard: on the left half at the right end, and on the right half, which is turned by 180 degrees, at the left end. Row 1 is the number row and row 5 the thumb row, at the hip.</p>
     <ul>
       <li><b>Thumb keys</b> are row 5 of the three inner key modules of each half: fn⌫ ␣ ⌫ on the left and ⌫ ␣ fn⌫ on the right, so both thumbs have space and backspace. fn⌫ is forward delete, and ⇧⌃ is Shift and Control in one key.</li>
       <li><b>Layer keys</b> sit under the pinkies. The left pinky's outer column holds L1 (Keypad) and L2 (System), and the right pinky's outer column holds L1. A pinky that holds a layer key cannot press the other keys of its column, so the held key is transparent on its layer. To reach the right pinky's column on the Keypad layer, hold L1 with the left pinky.</li>

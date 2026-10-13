@@ -608,7 +608,6 @@
       <div class="table-wrap"><table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead><tbody>
         <tr><td>No keys at all; the log reports a fault</td><td>No sentinel: the terminator module is missing, DATA or /PL is broken, or there are more key modules than <code>max-key-modules</code> (32)</td><td>Put the terminator module on; check DATA and /PL continuity through each joint</td></tr>
         <tr><td>The count reads right at rest and drops to zero while a key is held; every byte goes to <code>0xFF</code></td><td>The 74HC165s have no supply and run on what leaks in through CLK and /PL</td><td>Check +3.3V and GND from the nice!nano to the socket board's socket joints, not to the J_RIGHT pads</td></tr>
-        <tr><td>Keys fire in the wrong columns after adding a module</td><td>Expected with the <code>terminator</code> anchor on the right half of a split: every keymap column moves</td><td>See <a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md#columns-and-anchors">columns and anchors</a></td></tr>
         <tr><td>Bootloader will not start</td><td>The reset taps are too fast</td><td>Tap twice about half a second apart</td></tr>
         <tr><td>Strange behaviour right after flashing</td><td>Settings left by earlier firmware</td><td>Flash <code>settings_reset</code>, then the Roamyboard firmware</td></tr>
         <tr><td>Floor will not sit flat</td><td>Solder or glue under the connector bodies; the tightest spot is 0.3 mm under the tilted headers</td><td>Trim the fillet or bead</td></tr>

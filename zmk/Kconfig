@@ -20,12 +20,14 @@ config ROAMYBOARD_STATUS_SCREEN
 
 config ROAMYBOARD_STATUS_SCREEN_ROTATE_180
     bool "Turn the status screen upside down"
-    default y
+    default y if !$(dt_nodelabel_bool_prop,roamyboard_chain,rotated)
     depends on ROAMYBOARD_STATUS_SCREEN
     help
       Rotates every image by 180 degrees on its way to the nice!view. The
       roamyboard mounts the nice!view with its contacts toward the MCU module,
-      which shows the unrotated image upside down.
+      which shows the unrotated image upside down. A rotated half (the chain
+      node's rotated property) turns the nice!view the right way up, so this
+      defaults to off there.
 
 config ROAMYBOARD_HOST_NAMES
     bool "Read the Bluetooth hosts' names for the status screen"

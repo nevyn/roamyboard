@@ -313,6 +313,7 @@ static const struct kscan_driver_api kscan_chain_api = {
                 .rows = DT_INST_PROP(n, rows),                                                     \
                 .stable_scans = DT_INST_PROP(n, stable_scans),                                     \
                 .recovery_scans = DT_INST_PROP(n, recovery_scans),                                 \
+                .rotated = DT_INST_PROP(n, rotated),                                               \
             },                                                                                     \
         .debounce =                                                                                \
             {                                                                                      \

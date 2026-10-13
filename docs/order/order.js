@@ -302,7 +302,11 @@
     for (let s = 0; s < state.halves; s++) {
       const half = el("div", "half", { role: "group" });
       half.setAttribute("aria-label", state.halves === 2 ? `${s ? "Right" : "Left"} half` : "The half");
-      half.append(el("div", "terminator", { title: "Terminator module" }));
+      const rotated = state.halves === 2 && s === 1; // the right half is turned by 180 degrees: MCU module at its left end
+      const mcu = el("div", "mcu", { title: "MCU module" });
+      mcu.append(el("div", "screen"));
+      const terminator = el("div", "terminator", { title: "Terminator module" });
+      half.append(rotated ? mcu : terminator);
       for (let c = 0; c < state.cols; c++) {
         const mod = el("div", "key-module");
         for (let r = 0; r < state.rows; r++) {
@@ -314,9 +318,7 @@
         }
         half.append(mod);
       }
-      const mcu = el("div", "mcu", { title: "MCU module" });
-      mcu.append(el("div", "screen"));
-      half.append(mcu);
+      half.append(rotated ? terminator : mcu);
       board.append(half);
     }
     const keys = $$(".key", board);
