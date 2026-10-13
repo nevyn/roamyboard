@@ -211,6 +211,63 @@ static void test_rain_does_not_fall_during_a_pause(void) {
     CHECK(shell.rain.lives == 3);
 }
 
+/* Kana */
+
+static void test_kana_table(void) {
+    for (int i = 0; i < PDA_KANA_COUNT; i++) {
+        const unsigned char *g = (const unsigned char *)pda_kana_glyph(i);
+        CHECK(strlen((const char *)g) == 3 && g[0] == 0xE3); // one kana, U+3040 to U+30FF
+        for (const char *r = pda_kana_romaji(i); *r; r++) {
+            CHECK(*r >= 'a' && *r <= 'z');
+        }
+    }
+    // Katakana mirror hiragana's order.
+    for (int i = 0; i < PDA_KANA_COUNT / 2; i++) {
+        CHECK(strcmp(pda_kana_romaji(i), pda_kana_romaji(i + PDA_KANA_COUNT / 2)) == 0);
+    }
+}
+
+static int kana_index(const char *glyph) {
+    for (int i = 0; i < PDA_KANA_COUNT; i++) {
+        if (strcmp(pda_kana_glyph(i), glyph) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+static void test_kana_drill(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_named(&shell, "Kana");
+    struct pda_kana_state *k = &shell.kana;
+    CHECK(k->current >= 0 && k->current < PDA_KANA_COUNT / 2); // hiragana first
+
+    const int shi = kana_index("し");
+    k->current = (int8_t)shi;
+    type(&shell, "si");
+    CHECK(k->phase == PDA_KANA_RIGHT && k->right == 1 && k->weight[shi] == 2);
+
+    tap(&shell, PDA_USAGE_RETURN); // next
+    CHECK(k->phase == PDA_KANA_ASKING && k->current != shi);
+    k->current = (int8_t)shi;
+    type(&shell, "sa");
+    CHECK(k->phase == PDA_KANA_WRONG && k->streak == 0 && k->weight[shi] == 6);
+    CHECK(shell.kana_changed);
+
+    // A letter after a result starts the next kana's answer.
+    type(&shell, "k");
+    CHECK(k->current != shi && strcmp(k->typed, "k") == 0);
+
+    tap(&shell, PDA_USAGE_TAB);
+    CHECK(k->set == PDA_KANA_KATAKANA && k->current >= PDA_KANA_COUNT / 2);
+    for (int i = 0; i < 200; i++) {
+        tap(&shell, PDA_USAGE_RETURN);
+        tap(&shell, USAGE_A); // a right or wrong answer, then on
+        CHECK(k->current >= PDA_KANA_COUNT / 2);
+    }
+}
+
 /* Dice */
 
 static void test_dice_parse(void) {
@@ -502,6 +559,8 @@ int main(void) {
     test_calc_errors_and_type_out();
     test_games_do_not_tick_without_focus();
     test_rain_does_not_fall_during_a_pause();
+    test_kana_table();
+    test_kana_drill();
     test_dice_parse();
     test_dice_rolls();
     test_breakout_paddle_and_serve();

@@ -34,6 +34,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define SETTINGS_KEY "roamyboard/pda/note"
 #define SCORES_KEY "roamyboard/pda/scores"
+#define KANA_KEY "roamyboard/pda/kana"
 
 /** Notifications stay within the smallest ATT MTU (23), whatever the link negotiated. */
 #define NOTIFY_MAX 20
@@ -115,7 +116,44 @@ static void save_scores(void) {
     }
 }
 
+/** Writes the Kana drill's weights and counts if they changed. System work queue only. */
+static void save_kana(void) {
+    static uint8_t blob[PDA_KANA_SAVED];
+    k_mutex_lock(&lock, K_FOREVER);
+    const bool changed_kana = locked_shell()->kana_changed;
+    memcpy(blob, &shell.kana, sizeof(blob));
+    shell.kana_changed = false;
+    k_mutex_unlock(&lock);
+    if (!changed_kana) {
+        return;
+    }
+    const int err = settings_save_one(KANA_KEY, blob, sizeof(blob));
+    if (err) {
+        LOG_ERR("Failed to save setting " KANA_KEY ": %d", err);
+        k_mutex_lock(&lock, K_FOREVER);
+        shell.kana_changed = true;
+        k_mutex_unlock(&lock);
+    }
+}
+
 static int settings_set(const char *name, size_t len, settings_read_cb read_cb, void *cb_arg) {
+    if (strcmp(name, "kana") == 0) {
+        static uint8_t blob[PDA_KANA_SAVED];
+        if (len != sizeof(blob)) {
+            LOG_WRN("Ignoring setting " KANA_KEY " of %u bytes: expected %u", (unsigned int)len,
+                    (unsigned int)sizeof(blob));
+            return 0;
+        }
+        const ssize_t got = read_cb(cb_arg, blob, len);
+        if (got != (ssize_t)len) {
+            LOG_ERR("Failed to read setting " KANA_KEY ": %d", (int)got);
+            return got < 0 ? (int)got : -EIO;
+        }
+        k_mutex_lock(&lock, K_FOREVER);
+        memcpy(&locked_shell()->kana, blob, sizeof(blob));
+        k_mutex_unlock(&lock);
+        return 0;
+    }
     if (strcmp(name, "scores") == 0) {
         // Scores only gain fields at the end: an older, shorter value leaves the new ones 0.
         struct pda_scores scores = {0};
@@ -287,6 +325,7 @@ static void set_mode(enum roamyboard_pda_mode new_mode) {
     if (new_mode == ROAMYBOARD_PDA_OFF) {
         save_note();
         save_scores();
+        save_kana();
     }
     act(action);
 }

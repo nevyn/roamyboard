@@ -94,6 +94,7 @@ struct pda_shell {
     struct pda_timer_state timer;
     struct pda_calc_state calc;
     struct pda_dice_state dice;
+    struct pda_kana_state kana;
     struct pda_tetris_state tetris;
     struct pda_snake_state snake;
     struct pda_words_state words;
@@ -106,6 +107,8 @@ struct pda_shell {
     struct pda_scores scores;
     /** The scores differ from settings. */
     bool scores_changed;
+    /** Kana's weights and counts differ from settings. */
+    bool kana_changed;
 
     /** The text of the latest PDA_SHELL_TYPE_OUT, which the app fills in. */
     char type_out[PDA_NOTE_MAX];

@@ -11,7 +11,8 @@
 
 const struct pda_app *const pda_apps[] = {
     &pda_app_note_def,   &pda_app_clock_def, &pda_app_timer_def,    &pda_app_calc_def,
-    &pda_app_dice_def,   &pda_app_tetris_def, &pda_app_snake_def,   &pda_app_breakout_def,
+    &pda_app_dice_def,   &pda_app_kana_def,  &pda_app_tetris_def,   &pda_app_snake_def,
+    &pda_app_breakout_def,
     &pda_app_words_def,  &pda_app_rain_def,  &pda_app_keys_def,     &pda_app_info_def,
 };
 const int pda_app_count = sizeof(pda_apps) / sizeof(pda_apps[0]);

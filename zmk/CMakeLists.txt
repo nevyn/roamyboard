@@ -45,6 +45,7 @@ if(CONFIG_ROAMYBOARD_PDA)
       src/pda/app_timer.c
       src/pda/app_calc.c
       src/pda/app_dice.c
+      src/pda/app_kana.c
       src/pda/game_breakout.c
       src/pda/game_tetris.c
       src/pda/game_snake.c
@@ -65,6 +66,7 @@ if(CONFIG_ROAMYBOARD_STATUS_SCREEN)
     src/display/cat.c
     src/display/cat_frames.c
     src/display/font_pda_12.c
+    src/display/font_kana_40.c
     src/display/pda_text.c
     src/display/screen.c
     src/display/status_screen.c

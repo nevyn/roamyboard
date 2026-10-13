@@ -1,6 +1,6 @@
 # Micro PDA
 
-The micro PDA runs on the split peripheral (the right half) and is always on its nice!view while the central (the left half) is connected. While PDA mode is on, the PDA has focus: the central sends its keyboard keys to the PDA instead of the host. Leaving PDA mode keeps the PDA's view on the display, so an app stays visible while the keys go to the host. The PDA's home screen launches its apps: Note, Clock, Timer, Calc, Dice, the games Tetris, Snake, Bricks, Words and Rain, Keys and Info.
+The micro PDA runs on the split peripheral (the right half) and is always on its nice!view while the central (the left half) is connected. While PDA mode is on, the PDA has focus: the central sends its keyboard keys to the PDA instead of the host. Leaving PDA mode keeps the PDA's view on the display, so an app stays visible while the keys go to the host. The PDA's home screen launches its apps: Note, Clock, Timer, Calc, Dice, Kana, the games Tetris, Snake, Bricks, Words and Rain, Keys and Info.
 
 ## Keys
 
@@ -36,6 +36,10 @@ Consumer keys, such as volume and media keys, still reach the host in PDA mode.
 **Calc.** An RPN calculator with a four-level stack, as on HP's: Return or Space pushes X; + - * / combine Y and X (Shift-= and Shift-8 on the main keys, or the keypad's); N negates, S swaps X and Y, R takes the square root, C clears; Backspace deletes a digit, or clears X. Cmd-Return types X out to the host.
 
 **Dice.** Type a roll such as `2d6+3`, `d20` or `4d6-1`, then Return; the total shows in large digits, the single rolls under it, and the three rolls before it at the bottom. Space rolls a d20, and Return on an empty line rolls the latest roll again. Up to 20 dice of 2 to 1000 sides.
+
+**Kana.** A drill of the 46 basic hiragana and katakana: type a kana's romaji (Hepburn; si, ti, tu, hu and o for を also count). The kana fills its box when right; when wrong, its box is framed and the answer shows. Any key goes on to the next kana, and a letter starts its answer. A kana answered wrong comes back more often, one answered right less; the weights, the counts and the longest run are kept in the settings key `roamyboard/pda/kana`, written when PDA mode ends. Tab switches between hiragana, katakana and both.
+
+The kana come from `zmk/src/display/font_kana_40.c`: Noto Sans JP at 40 px, 1 bit per pixel, only the 92 kana, made by `zmk/tools/pda_kana_font.sh`. Noto Sans JP is under the SIL Open Font License 1.1; `font_kana_40.LICENSE` holds its copyright notice and the license.
 
 **Tetris.** A 10 × 20 well. Left and Right (or A D, H L) move the piece, Up (W, K) or X turns it clockwise, Z anticlockwise, Down (S, J) drops it one row, Space drops it to the bottom, P pauses. The pieces come from shuffled bags of all seven; cleared lines score 100, 300, 500 or 800 times the level plus one; the level starts at 0, rises every 10 lines and speeds the fall.
 
@@ -98,7 +102,7 @@ The central types the text as `zmk_keycode_state_changed` events, one press or r
 
 ## Storage
 
-The peripheral keeps the note, at most 512 bytes of UTF-8, in the settings key `roamyboard/pda/note`, and the games' best scores in `roamyboard/pda/scores`. It writes both when PDA mode ends, and only when they changed.
+The peripheral keeps the note, at most 512 bytes of UTF-8, in the settings key `roamyboard/pda/note`, the games' best scores in `roamyboard/pda/scores`, and the Kana drill's weights in `roamyboard/pda/kana`. It writes both when PDA mode ends, and only when they changed.
 
 ## Latency
 

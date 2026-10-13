@@ -14,9 +14,10 @@
 
 // Montserrat 12 with Latin-1, for notes in Swedish; docs/pda.md, Displays.
 LV_FONT_DECLARE(roamyboard_font_pda_12);
+LV_FONT_DECLARE(roamyboard_font_kana_40);
 
 #define SCRATCH_W ROAMYBOARD_PDA_FB_WIDTH
-#define SCRATCH_H 20
+#define SCRATCH_H 40
 
 static uint8_t scratch_buf[LV_CANVAS_BUF_SIZE(SCRATCH_W, SCRATCH_H, 8, LV_DRAW_BUF_STRIDE_ALIGN)];
 static lv_obj_t *scratch;
@@ -27,6 +28,8 @@ static const lv_font_t *lv_font(enum pda_font font) {
         return &lv_font_montserrat_14;
     case PDA_FONT_SMALL:
         return &lv_font_unscii_8;
+    case PDA_FONT_KANA:
+        return &roamyboard_font_kana_40;
     case PDA_FONT_BODY:
         break;
     }

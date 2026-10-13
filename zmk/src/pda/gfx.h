@@ -38,6 +38,8 @@ enum pda_font {
     PDA_FONT_TITLE,
     /** Unscii 8, monospaced ASCII, for dense data. */
     PDA_FONT_SMALL,
+    /** Noto Sans JP 40, the basic hiragana and katakana only, for the Kana drill. */
+    PDA_FONT_KANA,
 };
 
 void pda_fb_clear(struct pda_fb *fb);

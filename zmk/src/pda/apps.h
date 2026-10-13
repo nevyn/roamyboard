@@ -8,6 +8,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 /** Keys: which key positions are held now and which have been pressed. */
@@ -73,6 +74,43 @@ struct pda_dice_state {
     char history[PDA_DICE_HISTORY][PDA_DICE_ENTRY + 1];
     int history_total[PDA_DICE_HISTORY];
 };
+
+#define PDA_KANA_COUNT 92
+
+enum pda_kana_set {
+    PDA_KANA_HIRAGANA,
+    PDA_KANA_KATAKANA,
+    PDA_KANA_BOTH,
+};
+
+enum pda_kana_phase {
+    PDA_KANA_ASKING,
+    PDA_KANA_RIGHT,
+    PDA_KANA_WRONG,
+};
+
+/** Kana: the drill's weights, kept in settings, and the kana asked now. */
+struct pda_kana_state {
+    /** How often each kana comes up, relative to the others; 0 before the first drill. */
+    uint8_t weight[PDA_KANA_COUNT];
+    uint16_t right, asked, streak, best_streak;
+    /** enum pda_kana_set. */
+    uint8_t set;
+    /* Not kept: */
+    int8_t current;
+    char typed[5];
+    uint8_t typed_len;
+    /** enum pda_kana_phase. */
+    uint8_t phase;
+    bool started;
+};
+
+/** The size of struct pda_kana_state's part that settings keep. */
+#define PDA_KANA_SAVED offsetof(struct pda_kana_state, current)
+
+/** Kana i, 0 to PDA_KANA_COUNT - 1, as UTF-8, and its Hepburn romaji. */
+const char *pda_kana_glyph(int i);
+const char *pda_kana_romaji(int i);
 
 #define PDA_TETRIS_W 10
 #define PDA_TETRIS_H 20
@@ -182,6 +220,7 @@ extern const struct pda_app pda_app_clock_def;
 extern const struct pda_app pda_app_timer_def;
 extern const struct pda_app pda_app_calc_def;
 extern const struct pda_app pda_app_dice_def;
+extern const struct pda_app pda_app_kana_def;
 extern const struct pda_app pda_app_tetris_def;
 extern const struct pda_app pda_app_snake_def;
 extern const struct pda_app pda_app_words_def;

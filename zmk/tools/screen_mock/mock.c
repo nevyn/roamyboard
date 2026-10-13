@@ -245,6 +245,21 @@ static void render_pda_scenes(const char *dir) {
     tap(&shell, 0x28);
     render_shell(dir, "peripheral-pda-dice", &shell);
 
+    open_named(&shell, "Kana");
+    shell.kana.current = 11; // し
+    render_shell(dir, "peripheral-pda-kana", &shell);
+    type_letters(&shell, "sh");
+    render_shell(dir, "peripheral-pda-kana-typing", &shell);
+    type_letters(&shell, "i");
+    render_shell(dir, "peripheral-pda-kana-right", &shell);
+    tap(&shell, 0x28);
+    shell.kana.current = 17; // つ
+    type_letters(&shell, "ts");
+    tap(&shell, 0x2B); // Tab: katakana
+    shell.kana.current = 46 + 27; // フ
+    type_letters(&shell, "ho");
+    render_shell(dir, "peripheral-pda-kana-wrong", &shell);
+
     open_named(&shell, "Bricks");
     render_shell(dir, "peripheral-pda-breakout-start", &shell);
     tap(&shell, 0x28);
