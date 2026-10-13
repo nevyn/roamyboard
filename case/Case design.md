@@ -259,3 +259,6 @@ Checked on the meshes: the socket side meets the JointSide contract; shell, floo
 
 Untested: all of it on the printer.
 
+## Harness
+
+The harness holds each half by identical lugs at both column ends. Keep every harness point-symmetric: the right half is the left half's hardware turned by 180 degrees (a rotated half, [[firmware]]), so a harness that differs between the column ends fits only one of the halves.
