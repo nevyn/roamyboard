@@ -12,7 +12,8 @@
 #include "keys.h"
 #include "shell.h"
 
-#define PLAY_TICK_MS 20
+/** About 30 frames a second, which the nice!view keeps up with. */
+#define PLAY_TICK_MS 33
 /** A longer gap between ticks is a pause, which does not count as time played. */
 #define MAX_STEP_MS 200
 #define LIVES 3
@@ -218,17 +219,25 @@ static enum pda_app_result breakout_tick(struct pda_shell *shell) {
     } else if (b->paddle_q8 > (FIELD_W - PADDLE_W) * 256) {
         b->paddle_q8 = (FIELD_W - PADDLE_W) * 256;
     }
+    // Redraws only when something moved by a whole pixel.
+    const int paddle_px = (int)(b->paddle_q8 >> 8);
+    const int ball_x = (int)(b->ball_x_q8 >> 8), ball_y = (int)(b->ball_y_q8 >> 8);
+    const uint32_t score = b->score;
+    const uint8_t lives = b->lives;
     if (b->serving) {
         b->ball_x_q8 = b->paddle_q8 + (PADDLE_W / 2 - BALL / 2) * 256;
-        return steer ? PDA_APP_REDRAW : PDA_APP_NONE;
+    } else {
+        // Small steps, so that the ball cannot pass through a brick between two ticks.
+        for (uint32_t done = 0; done < dt && !b->over && !b->serving;) {
+            const uint32_t step = dt - done > 10 ? 10 : dt - done;
+            move_ball(shell, step);
+            done += step;
+        }
     }
-    // Small steps, so that the ball cannot pass through a brick between two ticks.
-    for (uint32_t done = 0; done < dt && !b->over && !b->serving;) {
-        const uint32_t step = dt - done > 10 ? 10 : dt - done;
-        move_ball(shell, step);
-        done += step;
-    }
-    return PDA_APP_REDRAW;
+    const bool moved = paddle_px != (int)(b->paddle_q8 >> 8) ||
+                       ball_x != (int)(b->ball_x_q8 >> 8) || ball_y != (int)(b->ball_y_q8 >> 8) ||
+                       score != b->score || lives != b->lives || b->over;
+    return moved ? PDA_APP_REDRAW : PDA_APP_NONE;
 }
 
 static void breakout_draw(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area) {

@@ -281,7 +281,9 @@ static void follow_tick(void) {
     k_mutex_unlock(&lock);
     if (interval == 0) {
         k_work_cancel_delayable(&app_tick_work);
-    } else if (!k_work_delayable_is_pending(&app_tick_work)) {
+    } else if (!(k_work_delayable_busy_get(&app_tick_work) & (K_WORK_DELAYED | K_WORK_QUEUED))) {
+        // Not k_work_delayable_is_pending(): that is true while the tick itself runs, and the
+        // tick calls this to schedule the next one.
         k_work_schedule(&app_tick_work, K_MSEC(interval));
     }
 }

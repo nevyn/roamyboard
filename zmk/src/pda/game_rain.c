@@ -175,9 +175,19 @@ static enum pda_app_result rain_tick(struct pda_shell *shell) {
     if (!r->started || r->over) {
         return PDA_APP_NONE;
     }
+    // Redraws only when a word moved by a whole pixel, came or went.
+    int32_t before[PDA_RAIN_DROPS];
+    for (int i = 0; i < PDA_RAIN_DROPS; i++) {
+        before[i] = r->drops[i].active ? r->drops[i].y_q8 >> 8 : -1;
+    }
+    const uint8_t lives = r->lives;
     advance(shell, play_height((struct pda_rect){0, PDA_TITLE_H, PDA_FB_W,
-                                                          PDA_FB_H - PDA_TITLE_H}));
-    return PDA_APP_REDRAW;
+                                                 PDA_FB_H - PDA_TITLE_H}));
+    bool moved = lives != r->lives || r->over;
+    for (int i = 0; i < PDA_RAIN_DROPS; i++) {
+        moved = moved || before[i] != (r->drops[i].active ? r->drops[i].y_q8 >> 8 : -1);
+    }
+    return moved ? PDA_APP_REDRAW : PDA_APP_NONE;
 }
 
 static void rain_draw(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area) {
