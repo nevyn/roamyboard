@@ -16,6 +16,8 @@ Like the terminator, a touch module has no 74HC165. PL, CLK and DATA pass straig
 
 The keyboard runs ZMK on a nice!nano. Verify that current ZMK ships an input driver for the Cirque Pinnacle over I2C before committing to the design; the MCU module's firmware then exposes the pad as a pointing device and the key-column scan is untouched.
 
+[[Pointing device survey]] compares this pad with Azoteq's trackpads, custom PCB sensors and trackballs (2026-10-16).
+
 ## Open questions
 
 - Width. A 35 mm pad does not fit a 16.5 mm key column. This is a wide module in the MCU module's class, and the 8° joint angle means the flat pad spans a curved stretch of leg. The case design decides this, after case v4.

@@ -7,9 +7,10 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 ## Modules
 
 - **half**: One row of modules, from a terminator module through the key modules to an MCU module. A unibody keyboard is one half, a split keyboard two. Not: side, hand.
-- **module**: One printed unit of the keyboard that couples to its neighbours side by side. Kinds: key module, MCU module, terminator module. Not: block, piece.
+- **module**: One printed unit of the keyboard that couples to its neighbours side by side. Kinds: key module, MCU module, terminator module, and the planned pointing module. Not: block, piece.
 - **key module**: A module carrying one column of five keys: shell, floor and board. `KeyModule*` in `case/roamy-v4`. Not: column module, column (for the part).
 - **MCU module**: The module at the header-side end of a half, carrying the nice!nano, battery and display. It has a socket side only, so no header pins stand exposed. Not: brain module, controller module.
+- **pointing module**: A module carrying a trackpad or trackball instead of keys; candidates are in `electronics/Pointing device survey.md`. Not: touch module, trackpad column, mouse module.
 - **terminator module**: The module at the socket-side end of a half. It has a header side only: two headers, embedded in the print, tie DATA to +3.3V so the chain reads the end-of-chain sentinel. Not: end cap, terminator plug.
 - **MCU board**: The MCU module's planned PCB: sockets at the key module board's positions, the nice!nano and the power parts.
 - **socket board**: A spare key module board with only its sockets populated, wired to the nice!nano; it stands in for the MCU board. The MCU module takes either.
