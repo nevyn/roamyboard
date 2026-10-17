@@ -86,7 +86,7 @@ static enum pda_app_result words_key(struct pda_shell *shell, uint8_t usage, uin
     }
     const bool enter = usage == PDA_USAGE_RETURN || usage == PDA_USAGE_KP_ENTER;
     if (w->over) {
-        if (enter) {
+        if (enter || usage == 0x2C /* Space */) {
             start(shell);
             return PDA_APP_REDRAW;
         }
@@ -178,7 +178,7 @@ static void words_draw(const struct pda_shell *shell, struct pda_fb *fb, struct 
             snprintf(first, sizeof(first), "%s %u/%u", answer, shell->scores.words_won,
                      shell->scores.words_played);
         }
-        const char *const banner[3] = {first, "ret: again", NULL};
+        const char *const banner[3] = {first, "spc: again", NULL};
         const int banner_h = 2 * pda_text_line_height(PDA_FONT_BODY) + 6;
         pda_game_banner(fb, area, area.y + area.h - banner_h - 1, banner);
     }

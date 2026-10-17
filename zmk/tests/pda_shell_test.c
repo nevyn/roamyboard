@@ -26,26 +26,54 @@ static void test_home_navigation(void) {
     struct pda_shell shell;
     pda_shell_init(&shell, 1);
     CHECK(pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME) == PDA_SHELL_REDRAW);
-    CHECK(tap(&shell, USAGE_J) == PDA_SHELL_REDRAW);
-    CHECK(shell.selected == 1);
-    tap(&shell, USAGE_DOWN);
-    CHECK(shell.selected == 2);
-    tap(&shell, USAGE_UP);
-    tap(&shell, PDA_USAGE_K);
-    tap(&shell, PDA_USAGE_K);
-    CHECK(shell.selected == pda_app_count - 1);
-    tap(&shell, USAGE_DOWN);
-    CHECK(shell.selected == 0);
-    tap(&shell, USAGE_DOWN);
+    // A grid of PDA_HOME_COLUMNS: sideways by one, wrapping; up and down by a row.
     CHECK(tap(&shell, USAGE_RIGHT) == PDA_SHELL_REDRAW);
+    CHECK(shell.selected == 1);
+    tap(&shell, 0x07); // D
+    CHECK(shell.selected == 2);
+    tap(&shell, USAGE_DOWN);
+    CHECK(shell.selected == 2 + PDA_HOME_COLUMNS);
+    tap(&shell, USAGE_J);
+    tap(&shell, 0x16); // S
+    CHECK(shell.selected == 2 + 3 * PDA_HOME_COLUMNS);
+    tap(&shell, 0x1A); // W
+    tap(&shell, PDA_USAGE_K);
+    tap(&shell, USAGE_UP);
+    CHECK(shell.selected == 2);
+    CHECK(tap(&shell, USAGE_UP) == PDA_SHELL_NONE); // the top row stops
+    tap(&shell, USAGE_LEFT);
+    tap(&shell, USAGE_A);
+    tap(&shell, USAGE_H);
+    CHECK(shell.selected == pda_app_count - 1);
+    CHECK(tap(&shell, USAGE_DOWN) == PDA_SHELL_NONE); // the bottom row stops
+    tap(&shell, USAGE_RIGHT);
+    CHECK(shell.selected == 0);
+    tap(&shell, USAGE_RIGHT);
+    CHECK(tap(&shell, USAGE_SPACE) == PDA_SHELL_REDRAW);
     CHECK(strcmp(app_name(&shell), pda_apps[1]->name) == 0);
     CHECK(tap(&shell, PDA_USAGE_ESCAPE) == PDA_SHELL_REDRAW);
     CHECK(shell.app == PDA_SHELL_HOME);
+    CHECK(tap(&shell, PDA_USAGE_RETURN) == PDA_SHELL_REDRAW);
+    tap(&shell, PDA_USAGE_ESCAPE);
     CHECK(tap(&shell, (uint8_t)(USAGE_1 + app_index("Calc"))) == PDA_SHELL_REDRAW);
     CHECK(strcmp(app_name(&shell), "Calc") == 0);
     tap(&shell, PDA_USAGE_ESCAPE);
     CHECK(tap(&shell, PDA_USAGE_ESCAPE) == PDA_SHELL_LEAVE);
     CHECK(shell.app == PDA_SHELL_HOME);
+}
+
+static void test_show_restores_a_view_by_name(void) {
+    struct pda_shell shell;
+    pda_shell_init(&shell, 1);
+    CHECK(strcmp(pda_shell_view_name(&shell), "") == 0);
+    CHECK(pda_shell_show(&shell, "Clock"));
+    CHECK(strcmp(app_name(&shell), "Clock") == 0);
+    CHECK(shell.mode == ROAMYBOARD_PDA_OFF && shell.tick_ms != 0);
+    CHECK(strcmp(pda_shell_view_name(&shell), "Clock") == 0);
+    CHECK(!pda_shell_show(&shell, "Solitaire"));
+    CHECK(strcmp(app_name(&shell), "Clock") == 0);
+    CHECK(pda_shell_show(&shell, ""));
+    CHECK(shell.app == PDA_SHELL_HOME && shell.tick_ms == 0);
 }
 
 static void test_leaving_focus_keeps_the_view(void) {
@@ -128,22 +156,30 @@ static void test_home_scrolls_to_the_highlight(void) {
     struct pda_shell shell;
     pda_shell_init(&shell, 1);
     static struct pda_fb fb;
-    const int row_h = pda_text_line_height(PDA_FONT_BODY) + 3;
-    const int first_row_y = PDA_TITLE_H + 2 + row_h / 2;
+    const int cell = 22;
+    const int x0 = (PDA_FB_W - PDA_HOME_COLUMNS * cell) / 2;
+    const int top = PDA_TITLE_H + 2;
 
+    // The highlighted cell is lit at its corner, where no icon reaches.
     shell.selected = 1;
     pda_shell_draw(&shell, &fb);
-    CHECK(pda_fb_get(&fb, PDA_FB_W / 2, first_row_y + row_h));
-    CHECK(!pda_fb_get(&fb, PDA_FB_W / 2, first_row_y));
-    // The rule under the title.
-    CHECK(pda_fb_get(&fb, 0, PDA_TITLE_H - 2));
+    CHECK(pda_fb_get(&fb, x0 + cell, top));
+    CHECK(!pda_fb_get(&fb, x0, top));
+    CHECK(pda_fb_get(&fb, 0, PDA_TITLE_H - 2)); // the rule under the title
 
-    // The last app, past the bottom of the list, scrolls into the last visible row.
+    // The last app, past the bottom of the grid, scrolls into the last visible row.
     shell.selected = pda_app_count - 1;
     pda_shell_draw(&shell, &fb);
-    const int visible = (PDA_FB_H - PDA_TITLE_H - 2) / row_h;
-    CHECK(visible < pda_app_count);
-    CHECK(pda_fb_get(&fb, PDA_FB_W / 2, first_row_y + (visible - 1) * row_h));
+    const int visible = (PDA_FB_H - PDA_TITLE_H - 2 - pda_text_line_height(PDA_FONT_BODY) - 3) /
+                        cell;
+    const int rows = (pda_app_count + PDA_HOME_COLUMNS - 1) / PDA_HOME_COLUMNS;
+    if (rows > visible) {
+        CHECK(pda_fb_get(&fb, x0 + (pda_app_count - 1) % PDA_HOME_COLUMNS * cell,
+                         top + (visible - 1) * cell));
+    } else {
+        CHECK(pda_fb_get(&fb, x0 + (pda_app_count - 1) % PDA_HOME_COLUMNS * cell,
+                         top + (rows - 1) * cell));
+    }
 }
 
 static void test_clock_runs_from_the_report(void) {
@@ -185,6 +221,7 @@ static void test_fb_clips(void) {
 int main(void) {
     test_keys_go_nowhere_without_focus();
     test_home_navigation();
+    test_show_restores_a_view_by_name();
     test_zero_opens_the_tenth_app();
     test_leaving_focus_keeps_the_view();
     test_quick_note_returns_to_the_view_it_replaced();

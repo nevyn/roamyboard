@@ -35,6 +35,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define SETTINGS_KEY "roamyboard/pda/note"
 #define SCORES_KEY "roamyboard/pda/scores"
 #define KANA_KEY "roamyboard/pda/kana"
+#define VIEW_KEY "roamyboard/pda/app"
+#define VIEW_NAME_MAX 16
 
 /** Notifications stay within the smallest ATT MTU (23), whatever the link negotiated. */
 #define NOTIFY_MAX 20
@@ -116,6 +118,26 @@ static void save_scores(void) {
     }
 }
 
+/** The view in settings, which opens again at startup. System work queue only, except at load. */
+static char saved_view[VIEW_NAME_MAX];
+
+static void save_view(void) {
+    char view[VIEW_NAME_MAX];
+    k_mutex_lock(&lock, K_FOREVER);
+    strncpy(view, pda_shell_view_name(locked_shell()), sizeof(view) - 1);
+    view[sizeof(view) - 1] = '\0';
+    k_mutex_unlock(&lock);
+    if (strcmp(view, saved_view) == 0) {
+        return;
+    }
+    const int err = settings_save_one(VIEW_KEY, view, strlen(view));
+    if (err) {
+        LOG_ERR("Failed to save setting " VIEW_KEY ": %d", err);
+        return;
+    }
+    strcpy(saved_view, view);
+}
+
 /** Writes the Kana drill's weights and counts if they changed. System work queue only. */
 static void save_kana(void) {
     static uint8_t blob[PDA_KANA_SAVED];
@@ -137,6 +159,27 @@ static void save_kana(void) {
 }
 
 static int settings_set(const char *name, size_t len, settings_read_cb read_cb, void *cb_arg) {
+    if (strcmp(name, "app") == 0) {
+        if (len >= sizeof(saved_view)) {
+            LOG_WRN("Ignoring setting " VIEW_KEY " of %u bytes: expected fewer than %u",
+                    (unsigned int)len, (unsigned int)sizeof(saved_view));
+            return 0;
+        }
+        const ssize_t got = read_cb(cb_arg, saved_view, len);
+        if (got != (ssize_t)len) {
+            LOG_ERR("Failed to read setting " VIEW_KEY ": %d", (int)got);
+            saved_view[0] = '\0';
+            return got < 0 ? (int)got : -EIO;
+        }
+        saved_view[len] = '\0';
+        k_mutex_lock(&lock, K_FOREVER);
+        const bool shown = pda_shell_show(locked_shell(), saved_view);
+        k_mutex_unlock(&lock);
+        if (!shown) {
+            LOG_WRN("Setting " VIEW_KEY " names no app: \"%s\"", saved_view);
+        }
+        return 0;
+    }
     if (strcmp(name, "kana") == 0) {
         static uint8_t blob[PDA_KANA_SAVED];
         if (len != sizeof(blob)) {
@@ -328,6 +371,7 @@ static void set_mode(enum roamyboard_pda_mode new_mode) {
         save_note();
         save_scores();
         save_kana();
+        save_view();
     }
     act(action);
 }
@@ -471,14 +515,16 @@ static ssize_t write_to_peripheral(struct bt_conn *conn, const struct bt_gatt_at
 static void central_lost_handler(struct k_work *work) { set_mode(ROAMYBOARD_PDA_OFF); }
 static K_WORK_DEFINE(central_lost_work, central_lost_handler);
 
+/** The PDA shows again: the app that it shows, perhaps restored at startup, ticks again. */
+static void central_found_handler(struct k_work *work) { act(PDA_SHELL_REDRAW); }
+static K_WORK_DEFINE(central_found_work, central_found_handler);
+
 static int state_listener(const zmk_event_t *eh) {
     const struct zmk_split_peripheral_status_changed *split =
         as_zmk_split_peripheral_status_changed(eh);
     if (split != NULL) {
         // ZMK raises this on the Bluetooth thread; settings writes belong on the work queue.
-        if (!split->connected) {
-            k_work_submit(&central_lost_work);
-        }
+        k_work_submit(split->connected ? &central_found_work : &central_lost_work);
         // The display shows the PDA only while the central is connected.
         changed();
         return ZMK_EV_EVENT_BUBBLE;

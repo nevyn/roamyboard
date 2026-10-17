@@ -97,7 +97,7 @@ static inline void open_named(struct pda_shell *shell, const char *name) {
         return;
     }
     while (shell->selected != i) {
-        tap(shell, USAGE_DOWN);
+        tap(shell, USAGE_RIGHT);
     }
     tap(shell, PDA_USAGE_RETURN);
 }

@@ -276,10 +276,10 @@ static void breakout_draw(const struct pda_shell *shell, struct pda_fb *fb, stru
     char best[24];
     snprintf(best, sizeof(best), "best %lu", (unsigned long)shell->scores.breakout);
     if (!b->started) {
-        const char *const lines[3] = {"Bricks", best, "ret: play"};
+        const char *const lines[3] = {"Bricks", best, "spc: play"};
         pda_game_banner(fb, area, area.y + 50, lines);
     } else if (b->over) {
-        const char *const lines[3] = {"game over", best, "ret: again"};
+        const char *const lines[3] = {"game over", best, "spc: again"};
         pda_game_banner(fb, area, area.y + 50, lines);
     } else if (shell->mode == ROAMYBOARD_PDA_OFF) {
         const char *const lines[3] = {"paused", NULL, NULL};

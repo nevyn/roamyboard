@@ -494,7 +494,7 @@ static void test_words_game(void) {
     tap(&shell, PDA_USAGE_RETURN);
     CHECK(w->over && w->won);
     CHECK(shell.scores.words_played == 1 && shell.scores.words_won == 1);
-    tap(&shell, PDA_USAGE_RETURN);
+    tap(&shell, USAGE_SPACE);
     CHECK(!w->over && w->count == 0);
 }
 

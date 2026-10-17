@@ -301,10 +301,10 @@ static void tetris_draw(const struct pda_shell *shell, struct pda_fb *fb, struct
     char best[24];
     snprintf(best, sizeof(best), "best %lu", (unsigned long)shell->scores.tetris);
     if (!t->started) {
-        const char *const lines[3] = {"Tetris", best, "ret: play"};
+        const char *const lines[3] = {"Tetris", best, "spc: play"};
         pda_game_banner(fb, area, area.y + 40, lines);
     } else if (t->over) {
-        const char *const lines[3] = {"game over", best, "ret: again"};
+        const char *const lines[3] = {"game over", best, "spc: again"};
         pda_game_banner(fb, area, area.y + 40, lines);
     } else if (t->paused || shell->mode == ROAMYBOARD_PDA_OFF) {
         const char *const lines[3] = {"paused", NULL, NULL};

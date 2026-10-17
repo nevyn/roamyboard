@@ -11,7 +11,11 @@ Both keys sit on the System layer of `zmk/config/roamyboard_split.keymap`:
 
 Pressing the key of the mode that is on returns the keys to the host. Choosing another Bluetooth profile or output (`&bt BT_SEL`, `&out`) also returns them, as choosing another device would. A host that connects or disconnects meanwhile does not, and neither does selecting the profile that is already chosen.
 
-On the home screen, the digits (or the keypad's) open the first ten apps, 1 the first and 0 the tenth; J and K, W and S, or the arrow keys move the highlight, and Return or Right opens it. The list scrolls, and a mark at its right edge shows that it goes on. In an app, Escape returns to the home screen; on the home screen, it returns the keys to the host. An app keeps its state when it closes: a game or a running timer is where it was when it opens again.
+The home screen shows the apps as a grid of icons, three to a row, with the highlighted app's name under the grid. The arrow keys, W A S D or H J K L move the highlight: sideways by one, wrapping from row to row, and up or down by a row. Return or Space opens the highlighted app, and the digits (or the keypad's) open the first ten directly, 1 the first and 0 the tenth. A grid taller than the display scrolls by rows, with a mark at its right edge where it goes on. In an app, Escape returns to the home screen; on the home screen, it returns the keys to the host. An app keeps its state when it closes: a game or a running timer is where it was when it opens again.
+
+The PDA remembers the app that it shows: when PDA mode ends, the peripheral writes the app's name to the settings key `roamyboard/pda/app` (empty for the home screen), and opens that app again when it starts. The icons are 16 × 16 pixel art in `zmk/tools/pda_icons.py`, which generates `zmk/src/pda/icons.c`; the shell finds an app's icon by its name in lowercase.
+
+The games start, and start again after a game over, with Space or Return.
 
 Consumer keys, such as volume and media keys, still reach the host in PDA mode.
 

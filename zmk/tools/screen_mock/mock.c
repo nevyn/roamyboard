@@ -154,7 +154,7 @@ static void open_named(struct pda_shell *shell, const char *name) {
     for (int i = 0; i < pda_app_count; i++) {
         if (strcmp(pda_apps[i]->name, name) == 0) {
             while (shell->selected != i) {
-                tap(shell, 0x51); // Down
+                tap(shell, 0x4F); // Right
             }
             tap(shell, 0x28); // Return
         }

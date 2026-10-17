@@ -157,6 +157,19 @@ extern const int pda_app_note;
 /** Resets the shell; seed starts the random numbers that games use. */
 void pda_shell_init(struct pda_shell *shell, uint32_t seed);
 
+/** Columns of app icons on the home screen. */
+#define PDA_HOME_COLUMNS 3
+
+/**
+ * Shows the app named name (as in pda_apps), or the home screen for "", without focusing the
+ * PDA; for restoring the view at startup.
+ * @return False, and nothing changed, if no app has that name.
+ */
+bool pda_shell_show(struct pda_shell *shell, const char *name);
+
+/** The name of the app shown, or "" for the home screen; pda_shell_show() takes it back. */
+const char *pda_shell_view_name(const struct pda_shell *shell);
+
 /**
  * Follows the central's mode. Slot 6 focuses the view as it is. Quick note opens the Note
  * app; when quick note ends, the view returns to the app that it replaced. Leaving PDA mode
