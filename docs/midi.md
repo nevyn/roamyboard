@@ -46,6 +46,6 @@ It prints every message from every MIDI source, with the gap since the previous 
 
 ## Known gaps
 
-- Every gap between notes that the Mac received from the right half was a multiple of 15 ms, so the host may time the notes by their arrival rather than by their BLE-MIDI timestamps.
+- The host plays the notes at their BLE-MIDI timestamps, to the millisecond for keys on the left half. A key on the right half gets its timestamp when it reaches the central (`app/src/split/central.c` in ZMK stamps it with `k_uptime_get()`), so its notes fall on the split link's connection events: the Mac showed them in steps of 15 ms (tried 2026-10-17). The Piano layer has its drums on the left half for this reason.
 - Only the split keymap has the MIDI layers.
 - Nothing shows the octave, transpose, velocity or channel.
