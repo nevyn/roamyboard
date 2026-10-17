@@ -21,7 +21,7 @@ Each notification carries one message: a header byte (`0x80` | timestamp bits 12
 
 ## Hosts
 
-macOS 13 and later bring a paired BLE-MIDI peripheral online by themselves. If the keyboard was paired before its firmware had the service, macOS may keep the old GATT database; removing the keyboard in System Settings > Bluetooth and pairing again fixes that.
+macOS and iPadOS bring the keyboard's MIDI online by themselves once it is paired as a keyboard, though its advertisement lists only HID (tried 2026-10-17): it shows up as the MIDI source "roamyboard Bluetooth", and in iPadOS's Bluetooth MIDI device list. A host that paired before the firmware had the service learns of it from the GATT Service Changed indication; if it does not, removing the keyboard from the host's Bluetooth settings and pairing again fixes that.
 
 `roamy-midi` (`zmk/tools/midi`) checks the connection from a Mac, run from the user's own terminal app:
 
@@ -31,9 +31,9 @@ zmk/tools/midi/.build/release/roamy-midi --listen   # print MIDI only
 zmk/tools/midi/.build/release/roamy-midi            # also hand the keyboard to CoreMIDI
 ```
 
-It prints every message from every MIDI source, with the gap since the previous message. Without `--listen`, it first finds the keyboard among the connected peripherals, by the MIDI service or else by its name among HID peripherals, lists its services, and calls `MIDIBluetoothDriverActivateAllConnections()`, which turns a CoreBluetooth connection to a BLE-MIDI service into a CoreMIDI device.
+It prints every message from every MIDI source, with the gap since the previous message. Without `--listen`, for a host that does not bring the keyboard online by itself, it first finds the keyboard among the connected peripherals, by the MIDI service or else by its name among HID peripherals, lists its services, and calls `MIDIBluetoothDriverActivateAllConnections()`, which turns a CoreBluetooth connection to a BLE-MIDI service into a CoreMIDI device.
 
 ## Known gaps
 
-- The advertisement lists only HID, as ZMK builds it (`zmk_ble_ad` in ZMK's `app/src/ble.c`), so a host that finds BLE-MIDI devices by scanning, such as iOS's Bluetooth MIDI picker, may not see the keyboard.
+- Every gap between notes that the Mac received from the right half was a multiple of 15 ms, so the host may time the notes by their arrival rather than by their BLE-MIDI timestamps.
 - Channel and velocity are fixed; there is no MIDI layer yet.
