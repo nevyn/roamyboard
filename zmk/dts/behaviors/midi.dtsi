@@ -1,15 +1,40 @@
 /*
- * MIDI keys: &midi_note N plays MIDI note N (60 is middle C) while the key is held.
+ * The MIDI keys. &midi_note N plays note N (60 is middle C), shifted by the octave and
+ * transpose; &midi_drum N plays note N on channel 10; &midi_ctl MIDI_* changes octave,
+ * transpose, velocity or channel, or panics; &midi_cc CC VAL holds a control change.
  *
  * SPDX-License-Identifier: MIT
  */
 
+#include <dt-bindings/roamyboard/midi.h>
+
 / {
     behaviors {
         midi_note: midinote {
-            compatible = "roamyboard,behavior-midi-note";
+            compatible = "roamyboard,behavior-midi-key";
             #binding-cells = <1>;
+            kind = "note";
             display-name = "MIDI note";
+        };
+
+        midi_drum: mididrum {
+            compatible = "roamyboard,behavior-midi-key";
+            #binding-cells = <1>;
+            kind = "drum";
+            display-name = "MIDI drum";
+        };
+
+        midi_ctl: midictl {
+            compatible = "roamyboard,behavior-midi-key";
+            #binding-cells = <1>;
+            kind = "ctl";
+            display-name = "MIDI control";
+        };
+
+        midi_cc: midicc {
+            compatible = "roamyboard,behavior-midi-cc";
+            #binding-cells = <2>;
+            display-name = "MIDI CC";
         };
     };
 };

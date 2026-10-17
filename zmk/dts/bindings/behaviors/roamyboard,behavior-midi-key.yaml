@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  A MIDI key with one parameter, sent to the host on the active Bluetooth profile over
+  BLE-MIDI. It runs on the central. zmk/dts/behaviors/midi.dtsi defines &midi_note,
+  &midi_drum and &midi_ctl; docs/midi.md describes them.
+
+compatible: "roamyboard,behavior-midi-key"
+
+include: one_param.yaml
+
+properties:
+  kind:
+    type: string
+    required: true
+    enum:
+      - "note"
+      - "drum"
+      - "ctl"
+    description: |
+      "note": the parameter is a MIDI note number (60 is middle C), shifted by the octave
+      and transpose, played on the current channel while the key is held.
+      "drum": the parameter is a MIDI note number, played as it is on channel 10 while the
+      key is held.
+      "ctl": the parameter is one of the MIDI_* controls of dt-bindings/roamyboard/midi.h,
+      applied when the key goes down.

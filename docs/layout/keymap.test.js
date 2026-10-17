@@ -8,10 +8,11 @@ const { COLUMNS, ROWS, parseKeymap, describeBinding } = require("./keymap.js");
 
 const config = path.join(__dirname, "../../zmk/config");
 
-for (const file of ["roamyboard_split.keymap", "roamyboard.keymap"]) {
-  test(`${file}: five layers of ${COLUMNS * ROWS} bindings, all with labels`, () => {
+const LAYERS = ["QWERTY", "Keypad", "System", "Gaming", "Locked"];
+for (const [file, layers] of [["roamyboard_split.keymap", [...LAYERS, "Piano", "Grid"]], ["roamyboard.keymap", LAYERS]]) {
+  test(`${file}: ${layers.length} layers of ${COLUMNS * ROWS} bindings, all with labels`, () => {
     const keymap = parseKeymap(fs.readFileSync(path.join(config, file), "utf8"));
-    assert.deepStrictEqual(keymap.layers.map(l => l.name), ["QWERTY", "Keypad", "System", "Gaming", "Locked"]);
+    assert.deepStrictEqual(keymap.layers.map(l => l.name), layers);
     for (const layer of keymap.layers) {
       assert.strictEqual(layer.bindings.length, COLUMNS * ROWS, layer.name);
       layer.bindings.forEach((b, i) => {
@@ -48,6 +49,10 @@ test("labels from the layout's legend", () => {
   assert.deepStrictEqual(d("&midi_note 60"), ["C4", "MIDI note C4"]);
   assert.deepStrictEqual(d("&midi_note 61"), ["C♯4", "MIDI note C♯4"]);
   assert.deepStrictEqual(d("&midi_note 128"), ["&midi_note 128", "&midi_note 128"]);
+  assert.deepStrictEqual(d("&midi_drum 36"), ["Kick", "Bass drum"]);
+  assert.deepStrictEqual(d("&midi_ctl MIDI_OCT_UP"), ["Oct+", "Octave up"]);
+  assert.deepStrictEqual(d("&midi_cc 64 127"), ["Sus", "Sustain pedal"]);
+  assert.deepStrictEqual(d("&midi_cc 1 100"), ["CC1", "MIDI CC 1 = 100 while held"]);
   assert.deepStrictEqual(d("&none"), ["", "Nothing"]);
   assert.deepStrictEqual(d("&kp NOT_A_KEY"), ["&kp NOT_A_KEY", "&kp NOT_A_KEY"]);
 });

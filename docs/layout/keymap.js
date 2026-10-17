@@ -209,6 +209,21 @@
 
   // MIDI note number to its name, with middle C (60) as C4.
   const midiNoteName = (n) => ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"][n % 12] + (Math.floor(n / 12) - 1);
+  // General MIDI drums, channel 10: [cap label, long name] per note number.
+  const MIDI_DRUMS = {
+    35: ["Kick", "Acoustic bass drum"], 36: ["Kick", "Bass drum"], 37: ["Rim", "Side stick"], 38: ["Snare", "Snare"],
+    39: ["Clap", "Hand clap"], 40: ["Snr2", "Electric snare"], 41: ["Flr L", "Low floor tom"], 42: ["HH", "Closed hi-hat"],
+    43: ["Flr H", "High floor tom"], 44: ["PHH", "Pedal hi-hat"], 45: ["Tom L", "Low tom"], 46: ["OHH", "Open hi-hat"],
+    47: ["Tom M", "Low-mid tom"], 48: ["Tom H", "High-mid tom"], 49: ["Crash", "Crash cymbal"], 50: ["Tom H", "High tom"],
+    51: ["Ride", "Ride cymbal"],
+  };
+  // &midi_ctl's parameters: [cap label, long name].
+  const MIDI_CTL = {
+    MIDI_OCT_DN: ["Oct−", "Octave down"], MIDI_OCT_UP: ["Oct+", "Octave up"], MIDI_TR_DN: ["Tr−", "Transpose down a semitone"],
+    MIDI_TR_UP: ["Tr+", "Transpose up a semitone"], MIDI_VEL_DN: ["Vel−", "Softer"], MIDI_VEL_UP: ["Vel+", "Louder"],
+    MIDI_CH_DN: ["Ch−", "MIDI channel down"], MIDI_CH_UP: ["Ch+", "MIDI channel up"],
+    MIDI_PANIC: ["Panic", "All notes off", "Releases every held MIDI note, then sends All Notes Off and sustain off on all 16 channels."],
+  };
   const layerName = (layers, n) => layers[+n] ? layers[+n].name : `layer ${n}`;
   const BT = { BT_CLR: ["BT×", "Clear the selected Bluetooth profile's pairing"], BT_CLR_ALL: ["BT×*", "Clear every Bluetooth profile's pairing"],
     BT_NXT: ["BT→", "Next Bluetooth profile"], BT_PRV: ["BT←", "Previous Bluetooth profile"] };
@@ -279,7 +294,19 @@
     }
     if (behavior === "midi_note" && p.length === 1 && /^\d+$/.test(p[0]) && +p[0] <= 127) {
       const note = midiNoteName(+p[0]);
-      return { label: note, name: `MIDI note ${note}`, detail: `Plays MIDI note ${p[0]} on channel 1 while held.`, kind: "key" };
+      return { label: note, name: `MIDI note ${note}`, detail: `Plays MIDI note ${p[0]}, shifted by the octave and transpose, while held.`, kind: "key" };
+    }
+    if (behavior === "midi_drum" && p.length === 1 && MIDI_DRUMS[p[0]]) {
+      const [label, name] = MIDI_DRUMS[p[0]];
+      return { label, name, detail: `Plays General MIDI drum ${p[0]} on channel 10 while held.`, kind: "key" };
+    }
+    if (behavior === "midi_ctl" && p.length === 1 && MIDI_CTL[p[0]]) {
+      const [label, name, detail] = MIDI_CTL[p[0]];
+      return { label, name, detail, kind: "system" };
+    }
+    if (behavior === "midi_cc" && p.length === 2 && /^\d+$/.test(p[0]) && /^\d+$/.test(p[1])) {
+      if (p[0] === "64") return { label: "Sus", name: "Sustain pedal", detail: "Holds MIDI CC 64 at 127 while held.", kind: "key" };
+      return { label: `CC${p[0]}`, name: `MIDI CC ${p[0]} = ${p[1]} while held`, kind: "key" };
     }
     if (behavior === "out" && OUT[p[0]] && p.length === 1) return { label: OUT[p[0]][0], name: OUT[p[0]][1], kind: "system" };
     if (MOUSE[behavior]?.[p[0]] && p.length === 1) return { label: MOUSE[behavior][p[0]][0], name: MOUSE[behavior][p[0]][1], kind: "key" };

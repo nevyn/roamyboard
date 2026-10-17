@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  A momentary MIDI control change, sent to the host on the active Bluetooth profile over
+  BLE-MIDI: controller param1 goes to value param2 when the key goes down, and to 0 when it
+  comes up, on the current channel. &midi_cc 64 127 is a sustain pedal. It runs on the
+  central. zmk/dts/behaviors/midi.dtsi defines &midi_cc; docs/midi.md describes it.
+
+compatible: "roamyboard,behavior-midi-cc"
+
+include: two_param.yaml

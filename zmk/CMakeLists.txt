@@ -88,9 +88,9 @@ if(CONFIG_ROAMYBOARD_LOCAL_OTA)
 endif()
 
 if(CONFIG_ROAMYBOARD_MIDI)
-  target_sources(app PRIVATE src/midi/ble_midi.c)
+  target_sources(app PRIVATE src/midi/ble_midi.c src/midi/state.c)
 endif()
 
-if(CONFIG_ROAMYBOARD_BEHAVIOR_MIDI_NOTE)
-  target_sources(app PRIVATE src/behaviors/behavior_midi_note.c)
+if(CONFIG_ROAMYBOARD_BEHAVIOR_MIDI)
+  target_sources(app PRIVATE src/behaviors/behavior_midi.c)
 endif()

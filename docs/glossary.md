@@ -100,3 +100,7 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **tick**: The PDA shell's periodic call to the open app, at the interval in `tick_ms` that the app asks for; timers and games run on it. Not: frame, timer interrupt.
 - **BLE-MIDI**: MIDI over Bluetooth LE: the GATT service that the central offers each host beside HID, which carries the MIDI keys' messages ([MIDI](midi.md)). Not: Bluetooth MIDI, MIDI over GATT.
 - **MIDI key**: A key bound to a MIDI behavior, such as `&midi_note`, that sends MIDI messages over BLE-MIDI instead of a HID key code. Not: note key, MIDI button.
+- **MIDI layer**: A keymap layer of MIDI keys: Piano or Grid. Not: MIDI mode (the keys still go through the keymap, unlike PDA mode).
+- **control strip**: Row 1 of both MIDI layers: To0, octave, velocity, transpose, channel, Panic and the swap to the other MIDI layer.
+- **Piano**: The MIDI layer with two octaves of piano keys, General MIDI drums and DAW keys. Not: claviature, keys layer.
+- **Grid**: The isomorphic MIDI layer: a semitone per column, a fourth per row. Not: isomorphic layer, Push layout.

@@ -4,7 +4,18 @@ The central (the left half, or a unibody) is a Bluetooth LE MIDI device as well 
 
 ## Keys
 
-`&midi_note N` (`zmk/dts/behaviors/midi.dtsi`) sends note on for MIDI note N, channel 1, velocity 100, when the key goes down, and note off when it comes up. 60 is middle C, C4. The System layer has C4 and E4 on the 8 and 9 keys.
+`zmk/dts/behaviors/midi.dtsi` defines the MIDI keys; `zmk/src/behaviors/behavior_midi.c` runs them on the central, over the pure state in `zmk/src/midi/state.c`, which `zmk/tests/midi_state_test.c` tests.
+
+| Binding | Does |
+|---|---|
+| `&midi_note N` | Note N (60 is middle C, C4), shifted by the octave and transpose, on the current channel while held. |
+| `&midi_drum N` | Note N as it is, on channel 10 (General MIDI drums), while held. |
+| `&midi_ctl MIDI_…` | On press: `MIDI_OCT_DN`/`UP` step the octave (±3), `MIDI_TR_DN`/`UP` the transpose (±11 semitones), `MIDI_VEL_DN`/`UP` the velocity (pp 40, p 64, mf 90, f 110, ff 127; mf at start), `MIDI_CH_DN`/`UP` the channel (1 to 16). `MIDI_PANIC` releases every held note, then sends All Notes Off and sustain off on all 16 channels. `dt-bindings/roamyboard/midi.h` lists them. |
+| `&midi_cc CC VAL` | Control change CC to VAL on press and to 0 on release, on the current channel. `&midi_cc 64 127` is a sustain pedal. |
+
+A held key remembers the note and channel that it sent, so its note off matches its note on even when the octave, transpose or channel changes in between. The state starts over at every boot.
+
+The split keymap has two MIDI layers, Piano and Grid, reached with To5 and To6 on the System layer; [Layout](../zmk/Layout.md) shows them.
 
 ## GATT service
 
@@ -36,4 +47,5 @@ It prints every message from every MIDI source, with the gap since the previous 
 ## Known gaps
 
 - Every gap between notes that the Mac received from the right half was a multiple of 15 ms, so the host may time the notes by their arrival rather than by their BLE-MIDI timestamps.
-- Channel and velocity are fixed; there is no MIDI layer yet.
+- Only the split keymap has the MIDI layers.
+- Nothing shows the octave, transpose, velocity or channel.

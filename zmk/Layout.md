@@ -1,6 +1,6 @@
 # Layout for roamyboard
 
-The layout carries Nevyn's Naya Create layout over to the roamyboard: five layers, 7 key modules per half. `zmk/config/roamyboard_split.keymap` and `roamyboard.keymap` (unibody) implement it; edits made in ZMK Studio are stored on the keyboard and override these files.
+The layout carries Nevyn's Naya Create layout over to the roamyboard: five layers, 7 key modules per half, and on the split two MIDI layers. `zmk/config/roamyboard_split.keymap` and `roamyboard.keymap` (unibody, without the MIDI layers) implement it; edits made in ZMK Studio are stored on the keyboard and override these files.
 
 The tables show the left half, then the right half, as they lie on the legs. On both halves, columns are counted from the outer edge: column 1 is the pinky's outer column and column 7 the index finger's inner column. Row 1 is the number row and row 5 the thumb row: on the left half row 1 is the SW5 end, and on the right half, which is turned by 180 degrees, it is the SW1 end.
 
@@ -11,7 +11,7 @@ The tables show the left half, then the right half, as they lie on the legs. On 
 - ⇧⌃ is Shift + Control in one key. fn⌫ is forward delete.
 - System: BT1 to BT5 select Bluetooth profiles 0 to 4, all five that ZMK keeps; BT× clears the selected profile's pairing; BLE and USB choose the output. Pwr turns the keyboard off (ZMK soft off); only the reset button turns it back on, because the polled chain cannot wake the nice!nano. Pwr, Boot, OTA and To3 sit in the left pinky's column, which the pinky that holds L2 cannot press, so another finger has to reach over for them, and pressing one by accident is less likely. To3 is where To0 is on the Gaming layer, so one key position goes into and out of Gaming. Boot shows the bootloader view on the nice!view and then enters the UF2 bootloader, on the half that it is pressed on, so each half has one. OTA, next to Boot on each half, does the same for the bootloader's Bluetooth mode, which takes a DFU zip from a Mac or a phone ([Firmware](../docs/firmware.md), Updating over Bluetooth). Rst restarts the firmware.
 - PDA, on the System layer's 6 key next to BT5, sends the keys to the micro PDA on the right half's display instead of the host, as a sixth device; pressing it again, or choosing a Bluetooth profile or output, gives the keys back to the host. Note, on the 7 key, opens the PDA's note editor directly; Escape returns to the host ([PDA](../docs/pda.md)).
-- C4 and E4, on the System layer's 8 and 9 keys, play MIDI notes 60 and 64 to the host while held ([MIDI](../docs/midi.md)).
+- To5 and To6, on the System layer's 8 and 9 keys, switch to the MIDI layers, Piano and Grid ([MIDI](../docs/midi.md)).
 - The System layer passes the modifiers through: ⇧, ⌃, ⌥ and ⌘ keep their QWERTY positions (on the left half, ⌃ only in row 5), so they combine with the mouse keys, for example ⌘ + click or ⇧ + scroll.
 - Mouse keys on the System layer: the right hand moves the pointer with I (up) and J K L (left, down, right) and scrolls with Y (up) and H (down). The left thumb clicks: M1 (left click) on ␣, M2 (right click) on ⌫ and M3 (middle click) on fn⌫. The right thumb holds L2 meanwhile, and the right hand's fingers move the pointer; the right thumb's M1 and M2 still click when L2 is held with the left pinky.
 - ↩/Boot on the Keypad layer is ↩ when tapped and Boot when held for 1.5 s. It is the outer column of the right half, the key module nearest the MCU module on a unibody, so a unibody with a single key module reaches the bootloader by holding L1 and then ↩/Boot.
@@ -45,7 +45,7 @@ Legend: ︶ is transparent (the layer below decides), ⊘ does nothing, an empty
 
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |   | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Pwr | BT× | BT1 | BT2 | BT3 | BT4 | BT5 |   | PDA | Note | C4 | E4 | OTA | Boot | Rst |
+| Pwr | BT× | BT1 | BT2 | BT3 | BT4 | BT5 |   | PDA | Note | To5 | To6 | OTA | Boot | Rst |
 | Boot | BLE | ⊘ | V− | Mut | V+ | ⊘ |   | W↑ | ⊘ | M↑ | ⊘ | ⊘ | ⊘ | ⊘ |
 | OTA | USB | ⊘ | Prv | Ply | Nxt | ⊘ |   | W↓ | M← | M↓ | M→ | ⊘ | ⊘ | ⊘ |
 | ︶ | ︶ | ⊘ | Br− | ⊘ | Br+ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ︶ | ⊘ |
@@ -70,6 +70,30 @@ Legend: ︶ is transparent (the layer below decides), ⊘ does nothing, an empty
 | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |
 | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |
 | ⊘ | Unlock (hold 1 s) | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ |
+
+## 5 Piano
+
+MIDI keys, sent to the host over Bluetooth ([MIDI](../docs/midi.md)). Row 1 is the control strip, the same on both MIDI layers: To0 leaves, To6 swaps to Grid, Oct, Vel, Tr and Ch step the octave, velocity, transpose and channel, and Panic silences everything. Rows 2 and 3 are two octaves of piano keys, black above white, with the white keys on the home row and middle C (C4) in the right index finger's inner column; there are no black keys above E and B. Rows 4 and 5 of the left half are General MIDI drums on channel 10, which octave and transpose do not move, with a kick under each of the left thumb's ␣ and fn⌫ keys. The right half's rows 4 and 5 keep the keys that music apps use: arrows, ⌘Z, ␣ and ↩, Sus (the sustain pedal, MIDI CC 64) on the right thumb's ⌫ key, and the modifiers in their QWERTY places.
+
+| 1 | 2 | 3 | 4 | 5 | 6 | 7 |   | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| To0 | Oct− | Oct+ | Vel− | Vel+ | Tr− | Tr+ |   | Ch− | Ch+ | ⊘ | ⊘ | ⊘ | Panic | To6 |
+| C♯3 | D♯3 | ⊘ | F♯3 | G♯3 | A♯3 | ⊘ |   | C♯4 | D♯4 | ⊘ | F♯4 | G♯4 | A♯4 | ⊘ |
+| C3 | D3 | E3 | F3 | G3 | A3 | B3 |   | C4 | D4 | E4 | F4 | G4 | A4 | B4 |
+| Crash | OHH | Tom L | Tom M | Snare | HH | PHH |   | ← | ↓ | ↑ | → | ⌘Z | ︶ | ⊘ |
+| Ride | Clap | Rim | Tom H | Kick | Kick | Snare |   | Sus | ␣ | ↩ | ︶ | ︶ | ︶ | ︶ |
+
+## 6 Grid
+
+The same control strip; To5 swaps to Piano. Rows 2 to 5 are an isomorphic grid: each column is a semitone above the one to its left, and each row a fourth (five semitones) above the row below it, so a chord or scale has the same shape in every key. Row 5 starts at C3; middle C is in the right index finger's inner column on row 4.
+
+| 1 | 2 | 3 | 4 | 5 | 6 | 7 |   | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| To0 | Oct− | Oct+ | Vel− | Vel+ | Tr− | Tr+ |   | Ch− | Ch+ | ⊘ | ⊘ | ⊘ | Panic | To5 |
+| D♯4 | E4 | F4 | F♯4 | G4 | G♯4 | A4 |   | A♯4 | B4 | C5 | C♯5 | D5 | D♯5 | E5 |
+| A♯3 | B3 | C4 | C♯4 | D4 | D♯4 | E4 |   | F4 | F♯4 | G4 | G♯4 | A4 | A♯4 | B4 |
+| F3 | F♯3 | G3 | G♯3 | A3 | A♯3 | B3 |   | C4 | C♯4 | D4 | D♯4 | E4 | F4 | F♯4 |
+| C3 | C♯3 | D3 | D♯3 | E3 | F3 | F♯3 |   | G3 | G♯3 | A3 | A♯3 | B3 | C4 | C♯4 |
 
 # Other layouts
 Here's Lily58's layout:
