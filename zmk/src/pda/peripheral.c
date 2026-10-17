@@ -118,14 +118,14 @@ static void save_scores(void) {
     }
 }
 
-/** The last app in settings, which opens again at startup. System work queue only, except at load. */
+/** The view in settings, which opens again at startup. System work queue only, except at load. */
 static char saved_view[VIEW_NAME_MAX];
 
-/** Writes the last app opened when it differs from settings. */
-static void save_last_app(void) {
+/** Writes the view shown when it differs from settings, so that it outlives a power-off. */
+static void save_view(void) {
     char view[VIEW_NAME_MAX];
     k_mutex_lock(&lock, K_FOREVER);
-    strncpy(view, pda_shell_last_app_name(locked_shell()), sizeof(view) - 1);
+    strncpy(view, pda_shell_view_name(locked_shell()), sizeof(view) - 1);
     view[sizeof(view) - 1] = '\0';
     k_mutex_unlock(&lock);
     if (strcmp(view, saved_view) == 0) {
@@ -373,6 +373,7 @@ static void set_mode(enum roamyboard_pda_mode new_mode) {
         save_scores();
         save_kana();
     }
+    save_view();
     act(action);
 }
 
@@ -481,8 +482,7 @@ static void incoming_handler(struct k_work *work) {
                 const enum pda_shell_action action =
                     pda_shell_key(s, msg.data[3], msg.data[2], msg.data[1]);
                 k_mutex_unlock(&lock);
-                // An app opened is kept at once, in case the keyboard goes off in PDA mode.
-                save_last_app();
+                save_view();
                 act(action);
                 continue;
             }

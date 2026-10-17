@@ -66,7 +66,6 @@ void pda_shell_init(struct pda_shell *shell, uint32_t seed) {
     memset(shell, 0, sizeof(*shell));
     shell->app = PDA_SHELL_HOME;
     shell->before_quick = PDA_SHELL_HOME;
-    shell->last_app = PDA_SHELL_HOME;
     // xorshift32 never leaves 0, so 0 is not a seed.
     shell->random_state = seed ? seed : 0x9E3779B9u;
     pda_note_init(&shell->note);
@@ -106,21 +105,15 @@ bool pda_shell_show(struct pda_shell *shell, const char *name) {
     for (int i = 0; i < pda_app_count; i++) {
         if (strcmp(pda_apps[i]->name, name) == 0) {
             open_app(shell, i);
-            shell->last_app = i;
             return true;
         }
     }
     return false;
 }
 
-const char *pda_shell_last_app_name(const struct pda_shell *shell) {
-    return shell->last_app == PDA_SHELL_HOME ? "" : pda_apps[shell->last_app]->name;
-}
-
-/** Opens an app that the home screen chose: it becomes the last app. */
-static void open_from_home(struct pda_shell *shell, int app) {
-    open_app(shell, app);
-    shell->last_app = app;
+const char *pda_shell_view_name(const struct pda_shell *shell) {
+    const int app = shell->quick ? shell->before_quick : shell->app;
+    return app == PDA_SHELL_HOME ? "" : pda_apps[app]->name;
 }
 
 /** Ends quick note: back to the app that it replaced, which opens again. */
@@ -173,14 +166,14 @@ static int app_for_digit(uint8_t usage) {
 static enum pda_shell_action home_key(struct pda_shell *shell, uint8_t usage) {
     const int digit_app = app_for_digit(usage);
     if (digit_app >= 0) {
-        open_from_home(shell, digit_app);
+        open_app(shell, digit_app);
         return PDA_SHELL_REDRAW;
     }
     if (usage == PDA_USAGE_ESCAPE) {
         return PDA_SHELL_LEAVE;
     }
     if (usage == PDA_USAGE_RETURN || usage == PDA_USAGE_KP_ENTER || usage == USAGE_SPACE) {
-        open_from_home(shell, shell->selected);
+        open_app(shell, shell->selected);
         return PDA_SHELL_REDRAW;
     }
     const int selected = shell->selected;

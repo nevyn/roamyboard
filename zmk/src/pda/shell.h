@@ -93,11 +93,6 @@ struct pda_shell {
     bool quick;
     /** The app that quick note replaced, PDA_SHELL_HOME included; it returns afterwards. */
     int before_quick;
-    /**
-     * The app last opened from the home screen, which the PDA opens again at startup, or
-     * PDA_SHELL_HOME before any; going home and quick notes leave it.
-     */
-    int last_app;
     /** PDA_MOD_* bits of the modifier keys held now. */
     uint8_t held_mods;
     /** Uptime in milliseconds; the platform sets it before every call. */
@@ -183,14 +178,17 @@ void pda_shell_init(struct pda_shell *shell, uint32_t seed);
 #define PDA_HOME_COLUMNS 3
 
 /**
- * Opens the app named name (as in pda_apps) without focusing the PDA, and makes it the last
- * app; for restoring last_app at startup. "" shows the home screen.
+ * Shows the app named name (as in pda_apps), or the home screen for "", without focusing the
+ * PDA; for restoring the view at startup.
  * @return False, and nothing changed, if no app has that name.
  */
 bool pda_shell_show(struct pda_shell *shell, const char *name);
 
-/** last_app's name, or "" before any; pda_shell_show() takes it back. */
-const char *pda_shell_last_app_name(const struct pda_shell *shell);
+/**
+ * The name of the app shown, or "" for the home screen; during a quick note, the view that the
+ * note replaced. pda_shell_show() takes it back.
+ */
+const char *pda_shell_view_name(const struct pda_shell *shell);
 
 /**
  * Follows the central's mode. Slot 6 focuses the view as it is. Quick note opens the Note
