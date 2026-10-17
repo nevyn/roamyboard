@@ -69,15 +69,36 @@ static void test_home_navigation(void) {
 static void test_show_restores_a_view_by_name(void) {
     struct pda_shell shell;
     pda_shell_init(&shell, 1);
-    CHECK(strcmp(pda_shell_view_name(&shell), "") == 0);
+    CHECK(strcmp(pda_shell_last_app_name(&shell), "") == 0);
     CHECK(pda_shell_show(&shell, "Clock"));
     CHECK(strcmp(app_name(&shell), "Clock") == 0);
     CHECK(shell.mode == ROAMYBOARD_PDA_OFF && shell.tick_ms != 0);
-    CHECK(strcmp(pda_shell_view_name(&shell), "Clock") == 0);
+    CHECK(strcmp(pda_shell_last_app_name(&shell), "Clock") == 0);
     CHECK(!pda_shell_show(&shell, "Solitaire"));
     CHECK(strcmp(app_name(&shell), "Clock") == 0);
     CHECK(pda_shell_show(&shell, ""));
     CHECK(shell.app == PDA_SHELL_HOME && shell.tick_ms == 0);
+}
+
+static void test_last_app_survives_going_home_and_quick_notes(void) {
+    struct pda_shell shell;
+    pda_shell_init(&shell, 1);
+    open_named(&shell, "Tetris");
+    CHECK(strcmp(pda_shell_last_app_name(&shell), "Tetris") == 0);
+    // Escape to the grid, then out of PDA mode: the last app is still Tetris.
+    tap(&shell, PDA_USAGE_ESCAPE);
+    CHECK(tap(&shell, PDA_USAGE_ESCAPE) == PDA_SHELL_LEAVE);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    CHECK(shell.app == PDA_SHELL_HOME);
+    CHECK(strcmp(pda_shell_last_app_name(&shell), "Tetris") == 0);
+    // A quick note does not count as an app opened.
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_NOTE);
+    tap(&shell, PDA_USAGE_ESCAPE);
+    CHECK(strcmp(pda_shell_last_app_name(&shell), "Tetris") == 0);
+    // The grid's Return, Space and digits all count.
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    tap(&shell, (uint8_t)(USAGE_1 + app_index("Calc")));
+    CHECK(strcmp(pda_shell_last_app_name(&shell), "Calc") == 0);
 }
 
 static void test_leaving_focus_keeps_the_view(void) {
@@ -270,6 +291,7 @@ int main(void) {
     test_keys_go_nowhere_without_focus();
     test_home_navigation();
     test_show_restores_a_view_by_name();
+    test_last_app_survives_going_home_and_quick_notes();
     test_zero_opens_the_tenth_app();
     test_leaving_focus_keeps_the_view();
     test_quick_note_returns_to_the_view_it_replaced();
