@@ -1,0 +1,15 @@
+/*
+ * MIDI keys: &midi_note N plays MIDI note N (60 is middle C) while the key is held.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/ {
+    behaviors {
+        midi_note: midinote {
+            compatible = "roamyboard,behavior-midi-note";
+            #binding-cells = <1>;
+            display-name = "MIDI note";
+        };
+    };
+};

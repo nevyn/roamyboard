@@ -45,6 +45,9 @@ test("labels from the layout's legend", () => {
   assert.deepStrictEqual(d("&mkp LCLK"), ["M1", "Left click"]);
   assert.deepStrictEqual(d("&mmv MOVE_UP"), ["M↑", "Move the pointer up"]);
   assert.deepStrictEqual(d("&msc SCRL_DOWN"), ["W↓", "Scroll down"]);
+  assert.deepStrictEqual(d("&midi_note 60"), ["C4", "MIDI note C4"]);
+  assert.deepStrictEqual(d("&midi_note 61"), ["C♯4", "MIDI note C♯4"]);
+  assert.deepStrictEqual(d("&midi_note 128"), ["&midi_note 128", "&midi_note 128"]);
   assert.deepStrictEqual(d("&none"), ["", "Nothing"]);
   assert.deepStrictEqual(d("&kp NOT_A_KEY"), ["&kp NOT_A_KEY", "&kp NOT_A_KEY"]);
 });

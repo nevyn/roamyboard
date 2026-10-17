@@ -17,10 +17,11 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/src/display/` | The status screen on the nice!view (below). `screen.c` draws with LVGL only; `status_screen.c` feeds it ZMK's state. `cat.c` is the cat's pure logic; `cat_frames.c` and its headers are generated. |
 | `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen` and `&ota_boot`, the bootloader keys; their binding is in `zmk/dts/bindings/behaviors/`. |
 | `zmk/src/pda/`, `zmk/src/behaviors/behavior_pda.c`, `zmk/dts/behaviors/pda.dtsi` | The micro PDA: PDA mode and the split data channel on each half, the note editor, and the PDA and Note keys ([Micro PDA](pda.md)). |
+| `zmk/src/midi/`, `zmk/src/behaviors/behavior_midi_note.c`, `zmk/dts/behaviors/midi.dtsi` | The BLE-MIDI service on the central and the MIDI note key ([MIDI](midi.md)). |
 | `zmk/src/bootloader.c` | Shows the bootloader view and reboots into the bootloader's UF2 or OTA mode, for the bootloader keys and the local OTA key. |
 | `zmk/src/local_ota.c` | The split peripheral's local OTA key (Updating over Bluetooth, below). |
 | `zmk/tests/` | Host tests for the pure logic: `zmk/tests/run.sh`. |
-| `zmk/tools/` | `cat_frames.py` generates the cat's bitmaps; `screen_mock/run.sh` renders the status screen on the host; `ota/` builds `roamy-ota`, which updates halves over Bluetooth (Updating over Bluetooth, below). |
+| `zmk/tools/` | `cat_frames.py` generates the cat's bitmaps; `screen_mock/run.sh` renders the status screen on the host; `ota/` builds `roamy-ota`, which updates halves over Bluetooth (Updating over Bluetooth, below); `midi/` builds `roamy-midi`, which checks the keyboard's MIDI from a Mac ([MIDI](midi.md)). |
 
 ## Reading the chain
 

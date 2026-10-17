@@ -98,3 +98,5 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **split data channel**: The PDA's own GATT service on the split peripheral, which the central writes to and subscribes to over the split connection. Not: split transport (ZMK's own messages).
 - **type out**: Sending the note to the host as key presses, with Cmd-Return in the note.
 - **tick**: The PDA shell's periodic call to the open app, at the interval in `tick_ms` that the app asks for; timers and games run on it. Not: frame, timer interrupt.
+- **BLE-MIDI**: MIDI over Bluetooth LE: the GATT service that the central offers each host beside HID, which carries the MIDI keys' messages ([MIDI](midi.md)). Not: Bluetooth MIDI, MIDI over GATT.
+- **MIDI key**: A key bound to a MIDI behavior, such as `&midi_note`, that sends MIDI messages over BLE-MIDI instead of a HID key code. Not: note key, MIDI button.

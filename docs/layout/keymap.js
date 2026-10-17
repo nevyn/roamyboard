@@ -207,6 +207,8 @@
     return KEYS[code] || null;
   }
 
+  // MIDI note number to its name, with middle C (60) as C4.
+  const midiNoteName = (n) => ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"][n % 12] + (Math.floor(n / 12) - 1);
   const layerName = (layers, n) => layers[+n] ? layers[+n].name : `layer ${n}`;
   const BT = { BT_CLR: ["BT×", "Clear the selected Bluetooth profile's pairing"], BT_CLR_ALL: ["BT×*", "Clear every Bluetooth profile's pairing"],
     BT_NXT: ["BT→", "Next Bluetooth profile"], BT_PRV: ["BT←", "Previous Bluetooth profile"] };
@@ -274,6 +276,10 @@
     if (behavior === "bt") {
       if (p[0] === "BT_SEL" && /^\d+$/.test(p[1] ?? "")) return { label: `BT${+p[1] + 1}`, name: `Bluetooth profile ${+p[1] + 1}`, detail: `Selects profile ${p[1]} (BT_SEL ${p[1]}).`, kind: "system" };
       if (BT[p[0]] && p.length === 1) return { label: BT[p[0]][0], name: BT[p[0]][1], kind: "system" };
+    }
+    if (behavior === "midi_note" && p.length === 1 && /^\d+$/.test(p[0]) && +p[0] <= 127) {
+      const note = midiNoteName(+p[0]);
+      return { label: note, name: `MIDI note ${note}`, detail: `Plays MIDI note ${p[0]} on channel 1 while held.`, kind: "key" };
     }
     if (behavior === "out" && OUT[p[0]] && p.length === 1) return { label: OUT[p[0]][0], name: OUT[p[0]][1], kind: "system" };
     if (MOUSE[behavior]?.[p[0]] && p.length === 1) return { label: MOUSE[behavior][p[0]][0], name: MOUSE[behavior][p[0]][1], kind: "key" };

@@ -116,3 +116,19 @@ DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN := roamyboard,behavior-boot-screen
 config ROAMYBOARD_BEHAVIOR_BOOT_SCREEN
     bool
     default $(dt_compat_enabled,$(DT_COMPAT_ROAMYBOARD_BEHAVIOR_BOOT_SCREEN))
+
+config ROAMYBOARD_MIDI
+    bool "MIDI to the host over Bluetooth LE MIDI"
+    default y
+    depends on ZMK_BLE && (!ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL)
+    help
+      Adds the BLE-MIDI GATT service beside ZMK's HID service, so a host that
+      subscribes to it receives the MIDI keys' messages on the active
+      Bluetooth profile. docs/midi.md describes it.
+
+DT_COMPAT_ROAMYBOARD_BEHAVIOR_MIDI_NOTE := roamyboard,behavior-midi-note
+
+config ROAMYBOARD_BEHAVIOR_MIDI_NOTE
+    bool
+    default $(dt_compat_enabled,$(DT_COMPAT_ROAMYBOARD_BEHAVIOR_MIDI_NOTE))
+    depends on ROAMYBOARD_MIDI

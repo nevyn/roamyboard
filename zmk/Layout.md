@@ -11,6 +11,7 @@ The tables show the left half, then the right half, as they lie on the legs. On 
 - ⇧⌃ is Shift + Control in one key. fn⌫ is forward delete.
 - System: BT1 to BT5 select Bluetooth profiles 0 to 4, all five that ZMK keeps; BT× clears the selected profile's pairing; BLE and USB choose the output. Pwr turns the keyboard off (ZMK soft off); only the reset button turns it back on, because the polled chain cannot wake the nice!nano. Pwr, Boot, OTA and To3 sit in the left pinky's column, which the pinky that holds L2 cannot press, so another finger has to reach over for them, and pressing one by accident is less likely. To3 is where To0 is on the Gaming layer, so one key position goes into and out of Gaming. Boot shows the bootloader view on the nice!view and then enters the UF2 bootloader, on the half that it is pressed on, so each half has one. OTA, next to Boot on each half, does the same for the bootloader's Bluetooth mode, which takes a DFU zip from a Mac or a phone ([Firmware](../docs/firmware.md), Updating over Bluetooth). Rst restarts the firmware.
 - PDA, on the System layer's 6 key next to BT5, sends the keys to the micro PDA on the right half's display instead of the host, as a sixth device; pressing it again, or choosing a Bluetooth profile or output, gives the keys back to the host. Note, on the 7 key, opens the PDA's note editor directly; Escape returns to the host ([PDA](../docs/pda.md)).
+- C4 and E4, on the System layer's 8 and 9 keys, play MIDI notes 60 and 64 to the host while held ([MIDI](../docs/midi.md)).
 - The System layer passes the modifiers through: ⇧, ⌃, ⌥ and ⌘ keep their QWERTY positions (on the left half, ⌃ only in row 5), so they combine with the mouse keys, for example ⌘ + click or ⇧ + scroll.
 - Mouse keys on the System layer: the right hand moves the pointer with I (up) and J K L (left, down, right) and scrolls with Y (up) and H (down). The left thumb clicks: M1 (left click) on ␣, M2 (right click) on ⌫ and M3 (middle click) on fn⌫. The right thumb holds L2 meanwhile, and the right hand's fingers move the pointer; the right thumb's M1 and M2 still click when L2 is held with the left pinky.
 - ↩/Boot on the Keypad layer is ↩ when tapped and Boot when held for 1.5 s. It is the outer column of the right half, the key module nearest the MCU module on a unibody, so a unibody with a single key module reaches the bootloader by holding L1 and then ↩/Boot.
@@ -44,7 +45,7 @@ Legend: ︶ is transparent (the layer below decides), ⊘ does nothing, an empty
 
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |   | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Pwr | BT× | BT1 | BT2 | BT3 | BT4 | BT5 |   | PDA | Note | ⊘ | ⊘ | OTA | Boot | Rst |
+| Pwr | BT× | BT1 | BT2 | BT3 | BT4 | BT5 |   | PDA | Note | C4 | E4 | OTA | Boot | Rst |
 | Boot | BLE | ⊘ | V− | Mut | V+ | ⊘ |   | W↑ | ⊘ | M↑ | ⊘ | ⊘ | ⊘ | ⊘ |
 | OTA | USB | ⊘ | Prv | Ply | Nxt | ⊘ |   | W↓ | M← | M↓ | M→ | ⊘ | ⊘ | ⊘ |
 | ︶ | ︶ | ⊘ | Br− | ⊘ | Br+ | ⊘ |   | ⊘ | ⊘ | ⊘ | ⊘ | ⊘ | ︶ | ⊘ |
