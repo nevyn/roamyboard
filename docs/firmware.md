@@ -219,7 +219,7 @@ GitHub Actions (`.github/workflows/build.yml`) builds all three UF2s and their D
 Local build with Docker, from the repo root. The west workspace lives outside the repo and is reused between builds; keep it out of /tmp, which macOS empties:
 
 ```sh
-ws=${WS:-$HOME/Library/Caches/roamyboard-west}
+ws=${WS:-$HOME/.cache/roamyboard-west}
 mkdir -p "$ws/config" && cp zmk/config/west.yml "$ws/config/"
 docker run --rm -v "$ws:/west" -v "$PWD:/repo:ro" -w /west zmkfirmware/zmk-build-arm:4.1 sh -c '
   [ -d .west ] || { west init -l config && west update --fetch-opt=--filter=tree:0; }
