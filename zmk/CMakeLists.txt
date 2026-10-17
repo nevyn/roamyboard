@@ -31,6 +31,11 @@ if(CONFIG_ROAMYBOARD_HOST_NAMES)
   target_sources(app PRIVATE src/ble/host_names.c)
 endif()
 
+if((CONFIG_ROAMYBOARD_STATUS_SCREEN OR CONFIG_ROAMYBOARD_PDA) AND
+   (CONFIG_ZMK_SPLIT_ROLE_CENTRAL OR NOT CONFIG_ZMK_SPLIT))
+  target_sources(app PRIVATE src/keymap_binding.c)
+endif()
+
 if(CONFIG_ROAMYBOARD_PDA)
   target_sources(app PRIVATE src/events/pda_changed.c src/pda/note.c src/pda/keys.c src/pda/clock.c)
   if(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)

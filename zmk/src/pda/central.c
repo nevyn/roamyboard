@@ -16,6 +16,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/atomic.h>
 
+#include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/hid_usage_pages.h>
 #include <dt-bindings/zmk/modifiers.h>
 #include <zmk/battery.h>
@@ -28,6 +29,7 @@
 #include <zmk/events/position_state_changed.h>
 
 #include <roamyboard/build_id.h>
+#include <roamyboard/keymap_binding.h>
 #include <roamyboard/chain_state.h>
 #include <roamyboard/events/chain_state_changed.h>
 #include <roamyboard/events/pda_changed.h>
@@ -246,12 +248,47 @@ static int capture_listener(const zmk_event_t *eh) {
     return ZMK_EV_EVENT_HANDLED;
 }
 
+static atomic_t pressed_position;
+
+/**
+ * A key that chooses where the keys go, &bt's profile selection or &out, leaves PDA mode, even
+ * for the profile or output already chosen, which raises no ZMK event.
+ */
+static void output_key_handler(struct k_work *work) {
+    if (roamyboard_pda_mode() == ROAMYBOARD_PDA_OFF) {
+        return;
+    }
+    const struct zmk_behavior_binding *binding =
+        roamyboard_keymap_binding_at((uint32_t)atomic_get(&pressed_position));
+    if (binding == NULL) {
+        return;
+    }
+    const bool profile =
+        roamyboard_binding_is(binding, DEVICE_DT_NAME(DT_NODELABEL(bt))) &&
+        (binding->param1 == BT_SEL_CMD || binding->param1 == BT_NXT_CMD ||
+         binding->param1 == BT_PRV_CMD);
+    const bool output = roamyboard_binding_is(binding, DEVICE_DT_NAME(DT_NODELABEL(out)));
+    if (profile || output) {
+        set_mode(ROAMYBOARD_PDA_OFF);
+    }
+}
+
+static K_WORK_DEFINE(output_key_work, output_key_handler);
+
 /** Key positions, for apps such as Keys; the keymap still gets them, to leave PDA mode. */
 static int position_listener(const zmk_event_t *eh) {
     const struct zmk_position_state_changed *ev = as_zmk_position_state_changed(eh);
-    if (ev != NULL && roamyboard_pda_mode() != ROAMYBOARD_PDA_OFF && ev->position <= UINT8_MAX) {
+    if (ev == NULL || roamyboard_pda_mode() == ROAMYBOARD_PDA_OFF) {
+        return ZMK_EV_EVENT_BUBBLE;
+    }
+    if (ev->position <= UINT8_MAX) {
         send((const uint8_t[]){PDA_LINK_POSITION, ev->state, (uint8_t)ev->position},
              PDA_LINK_POSITION_LEN);
+    }
+    if (ev->state) {
+        // Hold-tap decides a layer key only after this listener, so look the binding up later.
+        atomic_set(&pressed_position, (atomic_val_t)ev->position);
+        k_work_submit(&output_key_work);
     }
     return ZMK_EV_EVENT_BUBBLE;
 }
