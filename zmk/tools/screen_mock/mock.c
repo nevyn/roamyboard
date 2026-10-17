@@ -261,11 +261,11 @@ static void render_pda_scenes(const char *dir) {
     render_shell(dir, "peripheral-pda-kana-wrong", &shell);
 
     open_named(&shell, "Bricks");
-    render_shell(dir, "peripheral-pda-breakout-start", &shell);
+    render_shell(dir, "peripheral-pda-bricks-start", &shell);
     tap(&shell, 0x28);
     tap(&shell, 0x2C);
     run_ms(&shell, 3500);
-    render_shell(dir, "peripheral-pda-breakout", &shell);
+    render_shell(dir, "peripheral-pda-bricks", &shell);
 
     open_named(&shell, "Tetris");
     render_shell(dir, "peripheral-pda-tetris-start", &shell);

@@ -1,0 +1,44 @@
+/* The PDA manual; colours, type, cards, buttons and the topbar come from assembly/guide.css,
+   the page frame from landing.css. */
+
+.pda-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: center; padding: 40px 0 8px; }
+.pda-hero h1 { font-size: clamp(2.6rem, 6vw, 4.4rem); margin: 0; letter-spacing: -.04em; line-height: 1; }
+.pda-hero h1 span { background: linear-gradient(90deg, var(--accent), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.pda-hero .tagline { font-size: clamp(1.25rem, 2.4vw, 1.7rem); font-weight: 750; letter-spacing: -.02em; margin: .3em 0 .6em; }
+.shelf { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+
+/* A screenshot in the nice!view's dark bezel. The PNGs are the display's own 68 x 160 pixels. */
+.screen { margin: 0; display: inline-flex; flex-direction: column; align-items: center; gap: 6px; }
+.screen img {
+  display: block; width: 136px; height: 320px; image-rendering: pixelated; image-rendering: crisp-edges;
+  padding: 10px; background: #26232b; border-radius: 12px; box-shadow: var(--shadow);
+}
+.screen.big img { width: 204px; height: 480px; padding: 14px; border-radius: 16px; }
+.screen figcaption { font-size: .8rem; color: var(--muted); text-align: center; max-width: 150px; }
+
+.pair { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.cards.three { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.card h3 { font-size: 1.12rem; margin: 2px 0 .4em; }
+.card p { margin: 0 0 .6em; font-size: .95rem; }
+
+.split { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: start; }
+.split table { margin-top: 4px; }
+
+.apps { display: grid; gap: 18px; }
+.app { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 22px; align-items: start; }
+.app h3 { font-size: 1.3rem; margin: 2px 0 .3em; display: flex; align-items: baseline; gap: 10px; }
+.app h3 .digit { font: 600 .8rem var(--mono); color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
+.app p { margin: 0 0 .7em; }
+.app table { font-size: .88rem; }
+.app td:first-child { white-space: nowrap; width: 1%; }
+.app .shots { display: flex; gap: 10px; flex-wrap: wrap; }
+.app .shots .screen img { width: 102px; height: 240px; padding: 8px; border-radius: 10px; }
+
+.pda-note { margin-top: 18px; }
+
+@media (max-width: 860px) {
+  .pda-hero, .split, .app { grid-template-columns: minmax(0, 1fr); }
+  .cards.three { grid-template-columns: minmax(0, 1fr); }
+  .shelf { justify-content: flex-start; }
+}

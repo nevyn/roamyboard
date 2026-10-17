@@ -1,5 +1,5 @@
-# Publishes docs/ as the site root: the landing page (docs/index.html), the assembly guide, the layout page and
-# the order page, at /, /assembly/, /layout/ and /order/. The pages fetch the keymaps from docs/keymaps, a
+# Publishes docs/ as the site root: the landing page (docs/index.html), the assembly guide, the layout page, the
+# PDA manual and the order page, at /, /assembly/, /layout/, /pda/ and /order/. The pages fetch the keymaps from docs/keymaps, a
 # symlink to zmk/config; this job publishes copies of the keymaps there. The pages' relative paths stay inside
 # docs/, so the same files also work served from the repo root at /docs/. The old /docs/<page>/ URLs redirect.
 name: Pages
@@ -13,6 +13,7 @@ on:
       - "docs/assembly/**"
       - "docs/layout/**"
       - "docs/order/**"
+      - "docs/pda/**"
       - "docs/parts.js"
       - "docs/images/**"
       - "zmk/config/*.keymap"
@@ -41,7 +42,7 @@ jobs:
       - name: Assemble the site
         run: |
           mkdir -p _site/keymaps
-          cp -R docs/index.html docs/landing.css docs/parts.js docs/assembly docs/images docs/layout docs/order _site/
+          cp -R docs/index.html docs/landing.css docs/parts.js docs/assembly docs/images docs/layout docs/order docs/pda _site/
           cp zmk/config/*.keymap _site/keymaps/
           # Fails the job if a model is still an LFS pointer rather than a GLB.
           for f in _site/assembly/models/*.glb; do

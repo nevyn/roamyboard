@@ -28,7 +28,8 @@ a.btn { text-decoration: none; }
 .band p { font-size: 1.08rem; max-width: 75ch; margin: 0; }
 .band .signoff { margin-top: .5em; color: var(--muted); }
 
-.cards.how, .cards.ways { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.cards.how { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.cards.ways { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .card h3 { font-size: 1.12rem; margin: 2px 0 .4em; }
 .card p { margin: 0 0 .6em; font-size: .95rem; }
 .way { display: flex; flex-direction: column; color: var(--ink); text-decoration: none; transition: border-color .2s, transform .2s; }
@@ -43,7 +44,7 @@ a.btn { text-decoration: none; }
 .gallery figcaption { font-size: .82rem; color: var(--muted); padding: 8px 12px 12px; }
 
 @media (max-width: 1100px) {
-  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gallery, .cards.ways { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 860px) {
   .cards.how, .cards.ways { grid-template-columns: minmax(0, 1fr); }

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roamyboard: the micro PDA</title>
+<meta name="description" content="The Roamyboard's right half carries a tiny PDA: notes, a clock, a timer, a calculator, a kana drill and games, on its display and its own keys.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='6' width='7' height='20' rx='2' fill='%236b3fa0'/%3E%3Crect x='12.5' y='5' width='7' height='20' rx='2' fill='%236b3fa0' transform='rotate(8 16 15)'/%3E%3Crect x='22' y='7' width='7' height='20' rx='2' fill='%23e8871e' transform='rotate(16 25 17)'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assembly/guide.css">
+<link rel="stylesheet" href="../landing.css">
+<link rel="stylesheet" href="pda.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="7" height="20" rx="2" fill="#6b3fa0"/><rect x="12.5" y="5" width="7" height="20" rx="2" fill="#6b3fa0" transform="rotate(8 16 15)"/><rect x="22" y="7" width="7" height="20" rx="2" fill="#e8871e" transform="rotate(16 25 17)"/></svg>
+    <span>Roamyboard<small>The micro PDA</small></span>
+  </a>
+  <nav class="topbar-links" aria-label="Pages">
+    <a class="btn" href="../assembly/">Assembly guide</a>
+    <a class="btn" href="../layout/">Layout</a>
+    <a class="btn" href="../pda/" aria-current="page">PDA</a>
+    <a class="btn primary" href="../order/">Order one</a>
+  </nav>
+</header>
+
+<main class="page">
+  <section class="pda-hero">
+    <div>
+      <h1>The micro <span>PDA</span></h1>
+      <p class="tagline">A tiny computer in your keyboard</p>
+      <p class="lead">The right half's display is a little PDA. Jot a note and type it out later, keep a clock or a timer in view, add up a bill, roll dice, drill kana, or play Tetris while you walk. One key gives the keyboard to the PDA, and one key gives it back to your computer.</p>
+    </div>
+    <div class="shelf" aria-label="Screens from the PDA">
+      <figure class="screen big"><img src="screens/home.png" alt="The PDA's home screen: a grid of app icons, with the time in the title bar" width="68" height="160"></figure>
+      <figure class="screen big"><img src="screens/tetris.png" alt="Tetris on the PDA" width="68" height="160"></figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="how-title">
+    <h2 id="how-title">How it works</h2>
+    <div class="cards three">
+      <article class="card">
+        <h3>Always on the right half</h3>
+        <p>While the halves are connected, the right half's display shows the PDA instead of a status screen. Leave an app open, a clock or a running timer, and it stays in view while you type to your computer.</p>
+      </article>
+      <article class="card">
+        <h3>It takes the keys when you ask</h3>
+        <p>In PDA mode, every key goes to the PDA instead of your computer, and the display turns white on black so that you always know where your typing goes. Volume and media keys still reach the computer.</p>
+      </article>
+      <article class="card">
+        <h3>And types back out</h3>
+        <p>A note, or a number from the calculator, goes to your computer with <kbd>⌘</kbd> <kbd>Return</kbd>: the keyboard leaves PDA mode and types it out, key by key, wherever your cursor is.</p>
+      </article>
+    </div>
+    <div class="pair" aria-label="The same screen without and with the keys">
+      <figure class="screen"><img src="screens/home.png" alt="The home screen, dark on light: the keys go to the computer" width="68" height="160"><figcaption>Keys go to the computer</figcaption></figure>
+      <figure class="screen"><img src="screens/home-focused.png" alt="The home screen, light on dark: the keys go to the PDA" width="68" height="160"><figcaption>Keys go to the PDA</figcaption></figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="open-title">
+    <h2 id="open-title">Opening the PDA</h2>
+    <p>Both keys are on the System layer: hold the right thumb's <kbd>fn⌫</kbd> key, and press <kbd>6</kbd> or <kbd>7</kbd>. The <a href="../layout/">layout page</a> shows where they sit.</p>
+    <table>
+      <thead><tr><th>Keys</th><th>Does</th></tr></thead>
+      <tbody>
+        <tr><td><kbd>fn⌫</kbd> <kbd>6</kbd></td><td>Selects the PDA as a sixth device beside the five Bluetooth connections, and gives it the keys. Press it again to give the keys back.</td></tr>
+        <tr><td><kbd>fn⌫</kbd> <kbd>7</kbd></td><td>Opens a quick note right away. <kbd>Esc</kbd> gives the keys back, and the PDA returns to whatever it showed before.</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>In an app: back to the home screen. On the home screen: gives the keys back to your computer.</td></tr>
+        <tr><td><kbd>fn⌫</kbd> <kbd>1</kbd>–<kbd>5</kbd></td><td>Choosing another Bluetooth connection also gives the keys back, to that connection.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section aria-labelledby="home-title">
+    <h2 id="home-title">The home screen</h2>
+    <div class="split">
+      <figure class="screen"><img src="screens/home-focused.png" alt="The home screen with Calc highlighted" width="68" height="160"></figure>
+      <div>
+        <p>The apps sit in a grid of icons, three to a row. The highlighted app's name shows under the grid, and once the PDA knows the time, it shows in the title bar.</p>
+        <table>
+          <thead><tr><th>Keys</th><th>Does</th></tr></thead>
+          <tbody>
+            <tr><td>Arrows, <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>, <kbd>H</kbd><kbd>J</kbd><kbd>K</kbd><kbd>L</kbd></td><td>Move the highlight: sideways by one, up and down by a row.</td></tr>
+            <tr><td><kbd>Space</kbd>, <kbd>Return</kbd></td><td>Open the highlighted app.</td></tr>
+            <tr><td><kbd>1</kbd>–<kbd>9</kbd>, <kbd>0</kbd></td><td>Open the first ten apps directly; the number shows next to the app's name.</td></tr>
+          </tbody>
+        </table>
+        <p class="pda-note">The PDA remembers the app it shows, so it comes back to the same one when the keyboard starts. Every app keeps its state when you leave it: a game waits where you left it, and a timer keeps counting.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="apps-title">
+    <h2 id="apps-title">The apps</h2>
+    <div class="apps">
+
+      <article class="card app" id="note">
+        <figure class="screen"><img src="screens/note.png" alt="A note: Köp mjölk, ÅÄÖ åäö, Ring Theo" width="68" height="160"></figure>
+        <div>
+          <h3>Note <span class="digit">1</span></h3>
+          <p>A note to type into while you think, kept when the keyboard restarts. Swedish letters work, through the Keypad layer's å, ä and ö.</p>
+          <table><tbody>
+            <tr><td><kbd>Return</kbd></td><td>A new line.</td></tr>
+            <tr><td><kbd>⌫</kbd> · <kbd>⌘</kbd> <kbd>⌫</kbd></td><td>Delete the last character · the whole note.</td></tr>
+            <tr><td><kbd>⌘</kbd> <kbd>Return</kbd></td><td>Type the note out to your computer, then empty it.</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Close the note; it stays for next time.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+
+      <article class="card app" id="clock">
+        <div class="shots">
+          <figure class="screen"><img src="screens/clock.png" alt="The clock: 21:05, Monday 12 Oct 2026, week 42" width="68" height="160"></figure>
+          <figure class="screen"><img src="screens/clock-unset.png" alt="The clock before it knows the time" width="68" height="160"></figure>
+        </div>
+        <div>
+          <h3>Clock <span class="digit">2</span></h3>
+          <p>The time in big digits, with the seconds, the weekday, the date and the week number. The keyboard reads the time from a connected iPhone over Bluetooth; a Mac does not offer it. Connect the phone for a few seconds and the clock keeps running after it goes.</p>
+        </div>
+      </article>
+
+      <article class="card app" id="timer">
+        <div class="shots">
+          <figure class="screen"><img src="screens/timer.png" alt="A 25-minute countdown at 12:34" width="68" height="160"></figure>
+          <figure class="screen"><img src="screens/timer-done.png" alt="A finished countdown, its digits inverted" width="68" height="160"></figure>
+        </div>
+        <div>
+          <h3>Timer <span class="digit">3</span></h3>
+          <p>A stopwatch, or a countdown. It keeps counting while you type to your computer, and a finished countdown inverts its digits.</p>
+          <table><tbody>
+            <tr><td><kbd>0</kbd>–<kbd>9</kbd></td><td>Type the countdown's minutes.</td></tr>
+            <tr><td><kbd>P</kbd> · <kbd>B</kbd> · <kbd>S</kbd></td><td>A 25-minute pomodoro · a 5-minute break · the stopwatch.</td></tr>
+            <tr><td><kbd>Space</kbd></td><td>Start, pause, and start again after the end.</td></tr>
+            <tr><td><kbd>⌫</kbd></td><td>Back to zero, or delete the last digit typed.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+
+      <article class="card app" id="calc">
+        <figure class="screen"><img src="screens/calc.png" alt="The calculator's stack: 0, 2, 3, and 45.7 being typed" width="68" height="160"></figure>
+        <div>
+          <h3>Calc <span class="digit">4</span></h3>
+          <p>A calculator in reverse Polish notation, with a four-level stack, as on HP's: type a number, push it, type another, and press the operation. 2 <kbd>Return</kbd> 3 <kbd>+</kbd> makes 5.</p>
+          <table><tbody>
+            <tr><td><kbd>Return</kbd>, <kbd>Space</kbd></td><td>Push the number.</td></tr>
+            <tr><td><kbd>+</kbd> <kbd>-</kbd> <kbd>*</kbd> <kbd>/</kbd></td><td>Combine the two lowest numbers; the keypad's keys work too.</td></tr>
+            <tr><td><kbd>N</kbd> · <kbd>S</kbd> · <kbd>R</kbd> · <kbd>C</kbd></td><td>Negate · swap the two lowest · square root · clear everything.</td></tr>
+            <tr><td><kbd>⌫</kbd></td><td>Delete a digit, or clear the lowest number.</td></tr>
+            <tr><td><kbd>⌘</kbd> <kbd>Return</kbd></td><td>Type the lowest number out to your computer.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+
+      <article class="card app" id="dice">
+        <figure class="screen"><img src="screens/dice.png" alt="Dice: 4d6+1 rolled 13, with the single rolls and earlier rolls" width="68" height="160"></figure>
+        <div>
+          <h3>Dice <span class="digit">5</span></h3>
+          <p>For the table: type a roll such as <code>2d6+3</code>, <code>d20</code> or <code>4d6-1</code> and press <kbd>Return</kbd>. The total shows in big digits, the single dice under it, and the three rolls before it at the bottom.</p>
+          <table><tbody>
+            <tr><td><kbd>Return</kbd></td><td>Roll what you typed, or roll the last roll again.</td></tr>
+            <tr><td><kbd>Space</kbd></td><td>Roll a d20.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+
+      <article class="card app" id="kana">
+        <div class="shots">
+          <figure class="screen"><img src="screens/kana-right.png" alt="Kana: し answered right as shi" width="68" height="160"></figure>
+          <figure class="screen"><img src="screens/kana-wrong.png" alt="Kana: フ answered wrong; the answer is fu" width="68" height="160"></figure>
+        </div>
+        <div>
+          <h3>Kana <span class="digit">6</span></h3>
+          <p>A drill of the 46 basic hiragana and katakana: type the romaji for the kana shown. A right answer fills the box; a wrong one shows the answer. Kana you miss come back more often, and the PDA keeps your progress when it restarts.</p>
+          <table><tbody>
+            <tr><td>Letters</td><td>Type the romaji; <i>shi</i> and <i>si</i>, <i>tsu</i> and <i>tu</i> both count.</td></tr>
+            <tr><td>Any key</td><td>On to the next kana; a letter starts its answer.</td></tr>
+            <tr><td><kbd>Tab</kbd></td><td>Hiragana, katakana, or both.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+
+      <article class="card app" id="tetris">
+        <figure class="screen"><img src="screens/tetris.png" alt="A game of Tetris" width="68" height="160"></figure>
+        <div>
+          <h3>Tetris <span class="digit">7</span></h3>
+          <p>The well is ten blocks wide and twenty high, the next piece shows top right, and the level, and the speed, rises every ten lines.</p>
+          <table><tbody>
+            <tr><td><kbd>Space</kbd></td><td>Start; in a game, drop the piece to the bottom.</td></tr>
+            <tr><td><kbd>←</kbd> <kbd>→</kbd> (<kbd>A</kbd> <kbd>D</kbd>)</td><td>Move the piece.</td></tr>
+            <tr><td><kbd>↑</kbd> (<kbd>W</kbd>), <kbd>X</kbd> · <kbd>Z</kbd></td><td>Turn it clockwise · anticlockwise.</td></tr>
+            <tr><td><kbd>↓</kbd> (<kbd>S</kbd>)</td><td>Drop it one row.</td></tr>
+            <tr><td><kbd>P</kbd></td><td>Pause.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+
+      <article class="card app" id="snake">
+        <figure class="screen"><img src="screens/snake.png" alt="A game of Snake" width="68" height="160"></figure>
+        <div>
+          <h3>Snake <span class="digit">8</span></h3>
+          <p>Eat, grow, don't hit the walls or yourself. The snake speeds up as it grows.</p>
+          <table><tbody>
+            <tr><td><kbd>Space</kbd></td><td>Start.</td></tr>
+            <tr><td>Arrows, <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></td><td>Steer.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+
+      <article class="card app" id="bricks">
+        <figure class="screen"><img src="screens/bricks.png" alt="A game of Bricks: a wall of bricks, the ball and the paddle" width="68" height="160"></figure>
+        <div>
+          <h3>Bricks <span class="digit">9</span></h3>
+          <p>Breakout: knock out the wall with three balls. The paddle's edges send the ball off steeper, and every new wall comes faster.</p>
+          <table><tbody>
+            <tr><td><kbd>Space</kbd></td><td>Start, and serve the ball.</td></tr>
+            <tr><td><kbd>←</kbd> <kbd>→</kbd> (<kbd>A</kbd> <kbd>D</kbd>)</td><td>Hold to move the paddle.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+
+      <article class="card app" id="words">
+        <figure class="screen"><img src="screens/words.png" alt="Words: two guesses, SLATE and PRIDE, and CRA being typed" width="68" height="160"></figure>
+        <div>
+          <h3>Words <span class="digit">0</span></h3>
+          <p>Guess the five-letter word in six tries. A filled cell is the right letter in the right place, a framed cell a letter that the word has somewhere else. The letters not ruled out yet show under the grid.</p>
+          <table><tbody>
+            <tr><td>Letters, <kbd>⌫</kbd></td><td>Type the guess.</td></tr>
+            <tr><td><kbd>Return</kbd></td><td>Guess.</td></tr>
+            <tr><td><kbd>Space</kbd></td><td>A new word, after the end.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+
+      <article class="card app" id="rain">
+        <figure class="screen"><img src="screens/rain.png" alt="Rain: three words falling, one being typed" width="68" height="160"></figure>
+        <div>
+          <h3>Rain</h3>
+          <p>Words fall; type them before they land. The first letter picks the lowest word that starts with it. Three misses and the game is over, and the rain gets heavier as you score.</p>
+          <table><tbody>
+            <tr><td><kbd>Space</kbd></td><td>Start.</td></tr>
+            <tr><td>Letters</td><td>Type the words.</td></tr>
+          </tbody></table>
+        </div>
+      </article>
+
+      <article class="card app" id="keys">
+        <figure class="screen"><img src="screens/keys.png" alt="Keys: a grid of key positions, some pressed" width="68" height="160"></figure>
+        <div>
+          <h3>Keys</h3>
+          <p>A key tester for a new build: a cell for every key position, filled while you hold the key and outlined once it has been pressed. The line at the bottom names the last key's row, column and key code. <kbd>⌘</kbd> <kbd>⌫</kbd> starts over.</p>
+        </div>
+      </article>
+
+      <article class="card app" id="info">
+        <figure class="screen"><img src="screens/info.png" alt="Info: each half's key module count, battery and firmware build" width="68" height="160"></figure>
+        <div>
+          <h3>Info</h3>
+          <p>Each half's number of key modules, battery and firmware build, and which Bluetooth connection gave the clock its time.</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section aria-labelledby="more-title">
+    <h2 id="more-title">Good to know</h2>
+    <ul>
+      <li>The games pause while the keys go to your computer, so a game left on the display costs no battery.</li>
+      <li>The best scores, the Words record and your kana progress are kept when the keyboard restarts.</li>
+      <li>The keys reach the PDA as fast as they reach a computer: while it has the keys, the halves talk without their usual power-saving pauses.</li>
+      <li>How it works inside, from the Bluetooth link between the halves to the apps' framebuffer, is in <a href="https://github.com/nevyn/roamyboard/blob/main/docs/pda.md">docs/pda.md</a>.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p><b>Roamyboard</b> is a project by Nevyn Bengtsson &lt;<a href="mailto:hello@nevyn.dev">hello@nevyn.dev</a>&gt;. Source on <a href="https://github.com/nevyn/roamyboard">GitHub</a>.</p>
+  </footer>
+</main>
+</body>
+</html>
