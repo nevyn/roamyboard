@@ -419,6 +419,27 @@ static void set_clock(const uint8_t *data) {
     changed();
 }
 
+static void set_midi(const uint8_t *data) {
+    struct pda_midi_view view = {
+        .shown = data[1],
+        .octave = (int8_t)data[2],
+        .transpose = (int8_t)data[3],
+        .velocity_step = data[4],
+        .channel = data[5],
+        .last_note = data[6] == 0xFF ? -1 : data[6],
+    };
+    for (int i = 0; i < (PDA_LINK_MIDI_LEN - 7) * 8; i++) {
+        if (data[7 + i / 8] & (1 << (i % 8))) {
+            const int note = PDA_LINK_MIDI_FIRST_NOTE + i;
+            view.held[note / 8] |= 1 << (note % 8);
+        }
+    }
+    k_mutex_lock(&lock, K_FOREVER);
+    const enum pda_shell_action action = pda_shell_midi(locked_shell(), &view);
+    k_mutex_unlock(&lock);
+    act(action);
+}
+
 static void update_right_info(void) {
     k_mutex_lock(&lock, K_FOREVER);
     struct pda_half_info *right = &locked_shell()->right;
@@ -480,6 +501,12 @@ static void incoming_handler(struct k_work *work) {
                 continue;
             }
             break;
+        case PDA_LINK_MIDI:
+            if (msg.len == PDA_LINK_MIDI_LEN) {
+                set_midi(msg.data);
+                continue;
+            }
+            break;
         case PDA_LINK_INFO:
             if (msg.len >= 3) {
                 set_left_info(msg.data, msg.len);
@@ -512,7 +539,12 @@ static ssize_t write_to_peripheral(struct bt_conn *conn, const struct bt_gatt_at
 }
 
 /** Without the central, nothing can leave PDA mode, so losing it leaves. */
-static void central_lost_handler(struct k_work *work) { set_mode(ROAMYBOARD_PDA_OFF); }
+static void central_lost_handler(struct k_work *work) {
+    set_mode(ROAMYBOARD_PDA_OFF);
+    k_mutex_lock(&lock, K_FOREVER);
+    locked_shell()->midi.shown = false;
+    k_mutex_unlock(&lock);
+}
 static K_WORK_DEFINE(central_lost_work, central_lost_handler);
 
 /** The PDA shows again: the app that it shows, perhaps restored at startup, ticks again. */

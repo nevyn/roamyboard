@@ -35,6 +35,7 @@
 #include <roamyboard/events/pda_changed.h>
 #include <roamyboard/pda.h>
 
+#include "../midi/view.h"
 #include "central.h"
 #include "keys.h"
 #include "link.h"
@@ -149,13 +150,16 @@ static void typer_cancel(void) {
 /*
  * Split connection latency. ZMK lets the peripheral skip up to
  * CONFIG_ZMK_SPLIT_BLE_PREF_LATENCY connection events, so a message from the central waits up
- * to that many intervals; while the PDA has focus, the peripheral listens at every event.
+ * to that many intervals; while the PDA has focus or something holds the link fast, such as
+ * the MIDI view, the peripheral listens at every event.
  */
+static atomic_t held_fast;
+
 static void latency_handler(struct k_work *work) {
     // The latency that the link has, as far as this half asked for it; a new link starts slow.
     static bool fast;
-    const bool focused = roamyboard_pda_mode() != ROAMYBOARD_PDA_OFF;
-    if (focused == fast) {
+    const bool want_fast = roamyboard_pda_mode() != ROAMYBOARD_PDA_OFF || atomic_get(&held_fast);
+    if (want_fast == fast) {
         return;
     }
     k_mutex_lock(&lock, K_FOREVER);
@@ -167,7 +171,7 @@ static void latency_handler(struct k_work *work) {
     }
     const int err = bt_conn_le_param_update(
         conn, BT_LE_CONN_PARAM(CONFIG_ZMK_SPLIT_BLE_PREF_INT, CONFIG_ZMK_SPLIT_BLE_PREF_INT,
-                               focused ? 0 : CONFIG_ZMK_SPLIT_BLE_PREF_LATENCY,
+                               want_fast ? 0 : CONFIG_ZMK_SPLIT_BLE_PREF_LATENCY,
                                CONFIG_ZMK_SPLIT_BLE_PREF_TIMEOUT));
     bt_conn_unref(conn);
     if (err == -EBUSY || err == -EAGAIN || err == -ENOMEM) {
@@ -176,13 +180,20 @@ static void latency_handler(struct k_work *work) {
         return;
     }
     if (err && err != -EALREADY) {
-        LOG_WRN("Split connection latency update for PDA focus %d failed: %d", focused, err);
+        LOG_WRN("Split connection latency update to fast %d failed: %d", want_fast, err);
         return;
     }
-    fast = focused;
+    fast = want_fast;
 }
 
 static K_WORK_DELAYABLE_DEFINE(latency_work, latency_handler);
+
+void pda_central_hold_fast(bool on) {
+    atomic_set(&held_fast, on);
+    k_work_reschedule(&latency_work, K_NO_WAIT);
+}
+
+void pda_central_send(const uint8_t *data, uint8_t len) { send(data, len); }
 
 /* Mode. Changed on the system work queue only. */
 
@@ -315,6 +326,9 @@ static void state_handler(struct k_work *work) {
     send((const uint8_t[]){PDA_LINK_TIME, clock, profile, seconds & 0xFF, seconds >> 8 & 0xFF,
                            seconds >> 16 & 0xFF, seconds >> 24},
          PDA_LINK_TIME_LEN);
+#if IS_ENABLED(CONFIG_ROAMYBOARD_MIDI_VIEW)
+    roamyboard_midi_view_resend();
+#endif
 }
 
 static K_WORK_DEFINE(state_work, state_handler);

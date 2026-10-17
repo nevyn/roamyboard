@@ -21,21 +21,25 @@ void midi_state_init(struct midi_state *s) {
 
 uint8_t midi_velocity(const struct midi_state *s) { return velocities[s->velocity_step]; }
 
-static void note_on(struct midi_state *s, uint32_t position, int note, uint8_t channel,
+/** Returns whether it played the note. */
+static bool note_on(struct midi_state *s, uint32_t position, int note, uint8_t channel,
                     midi_emit_fn emit, void *ctx) {
     if (position >= MIDI_POSITIONS || note < 0 || note > 127 || s->held_note[position] != NONE) {
-        return;
+        return false;
     }
     s->held_note[position] = (uint8_t)note;
     s->held_channel[position] = channel;
-    s->last_note = (int16_t)note;
     const uint8_t msg[] = {0x90 | channel, (uint8_t)note, midi_velocity(s)};
     emit(msg, sizeof(msg), ctx);
+    return true;
 }
 
 void midi_press_note(struct midi_state *s, uint32_t position, uint8_t base_note,
                      midi_emit_fn emit, void *ctx) {
-    note_on(s, position, base_note + 12 * s->octave + s->transpose, s->channel, emit, ctx);
+    const int note = base_note + 12 * s->octave + s->transpose;
+    if (note_on(s, position, note, s->channel, emit, ctx)) {
+        s->last_note = (int16_t)note;
+    }
 }
 
 void midi_press_drum(struct midi_state *s, uint32_t position, uint8_t note, midi_emit_fn emit,
@@ -50,6 +54,16 @@ void midi_release(struct midi_state *s, uint32_t position, midi_emit_fn emit, vo
     const uint8_t msg[] = {0x80 | s->held_channel[position], s->held_note[position], 0};
     s->held_note[position] = NONE;
     emit(msg, sizeof(msg), ctx);
+}
+
+void midi_held_notes(const struct midi_state *s, uint8_t bits[16]) {
+    memset(bits, 0, 16);
+    for (uint32_t position = 0; position < MIDI_POSITIONS; position++) {
+        const uint8_t note = s->held_note[position];
+        if (note != NONE && s->held_channel[position] != MIDI_DRUM_CHANNEL) {
+            bits[note / 8] |= 1 << (note % 8);
+        }
+    }
 }
 
 void midi_control_change(const struct midi_state *s, uint8_t cc, uint8_t value,

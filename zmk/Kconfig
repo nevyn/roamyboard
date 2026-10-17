@@ -133,3 +133,13 @@ config ROAMYBOARD_BEHAVIOR_MIDI
     bool
     default $(dt_compat_enabled,$(DT_COMPAT_ROAMYBOARD_BEHAVIOR_MIDI_KEY)) || $(dt_compat_enabled,$(DT_COMPAT_ROAMYBOARD_BEHAVIOR_MIDI_CC))
     depends on ROAMYBOARD_MIDI
+
+config ROAMYBOARD_MIDI_VIEW
+    bool "Show the MIDI keys' state on the PDA while a MIDI layer is on"
+    default y
+    depends on ROAMYBOARD_BEHAVIOR_MIDI && ROAMYBOARD_PDA && ZMK_SPLIT_ROLE_CENTRAL
+    help
+      While the highest active layer has MIDI keys, the central sends what
+      they play (octave, transpose, velocity, channel, held notes) to the
+      split peripheral, whose PDA shows it, and holds the split link at
+      latency 0. docs/midi.md describes it.

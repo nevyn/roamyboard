@@ -104,3 +104,4 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **control strip**: Row 1 of both MIDI layers: To0, octave, velocity, transpose, channel, Panic and the swap to the other MIDI layer.
 - **Piano**: The MIDI layer with two octaves of piano keys, General MIDI drums and DAW keys. Not: claviature, keys layer.
 - **Grid**: The isomorphic MIDI layer: a semitone per column, a fourth per row. Not: isomorphic layer, Push layout.
+- **MIDI view**: The right half's display while a MIDI layer is on and the PDA has no focus: the latest note, octave, transpose, velocity, channel and the held notes. Not: MIDI app (it is not on the home screen).

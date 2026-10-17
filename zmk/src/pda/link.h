@@ -35,6 +35,13 @@ enum pda_link_op {
      * 2000-01-01 as uint32 little-endian]; sent with PDA_LINK_INFO.
      */
     PDA_LINK_TIME = 0x05,
+    /**
+     * Central to peripheral: [op, shown, octave as int8, transpose as int8, velocity step,
+     * channel (0 is channel 1), latest note or 0xFF, then bit n - PDA_LINK_MIDI_FIRST_NOTE
+     * for each held note n of 24 to 119 (bit i % 8 of byte 7 + i / 8)]. Sent whenever a MIDI
+     * layer turns on or off, and on every MIDI key while one is on. docs/midi.md.
+     */
+    PDA_LINK_MIDI = 0x06,
     /** Peripheral to central: [op, UTF-8 bytes...]; appends to the text to type out. */
     PDA_LINK_TEXT = 0x81,
     /** Peripheral to central: [op]; leave PDA mode, then type the text out to the host. */
@@ -46,5 +53,8 @@ enum pda_link_op {
 #define PDA_LINK_KEY_LEN 4
 #define PDA_LINK_POSITION_LEN 3
 #define PDA_LINK_TIME_LEN 7
+#define PDA_LINK_MIDI_LEN 19
+/** The lowest note in PDA_LINK_MIDI's held bits: C1. */
+#define PDA_LINK_MIDI_FIRST_NOTE 24
 /** The longest message from the central; writes stay within the smallest ATT MTU (23). */
 #define PDA_LINK_WRITE_MAX 20

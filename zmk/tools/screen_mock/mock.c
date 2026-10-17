@@ -320,6 +320,17 @@ static void render_pda_scenes(const char *dir) {
     pda_note_set_text(&shell.note, text, strlen(text));
     render_shell(dir, "peripheral-pda-note", &shell);
     pda_note_set_text(&shell.note, "", 0);
+
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    struct pda_midi_view midi = {.shown = true, .velocity_step = 3, .last_note = 64};
+    static const int chord[] = {48, 60, 64, 67, 70};
+    for (size_t i = 0; i < sizeof(chord) / sizeof(chord[0]); i++) {
+        midi.held[chord[i] / 8] |= 1 << (chord[i] % 8);
+    }
+    pda_shell_midi(&shell, &midi);
+    render_shell(dir, "peripheral-midi-view", &shell);
+    midi.shown = false;
+    pda_shell_midi(&shell, &midi);
 }
 #endif
 

@@ -17,6 +17,16 @@ A held key remembers the note and channel that it sent, so its note off matches 
 
 The split keymap has two MIDI layers, Piano and Grid, reached with To5 and To6 on the System layer; [Layout](../zmk/Layout.md) shows them.
 
+## MIDI view
+
+While the highest active layer has a MIDI key on it (Piano or Grid, or any layer that ZMK Studio gave one), the PDA on the right half's display shows what the MIDI keys play, in place of its app:
+
+![The MIDI view with C3, C4, E4, G4 and A♯4 held](images/midi-view.png)
+
+The latest note large, then the octave and transpose, the velocity (pp to ff) and the channel. Under them, three octaves of keys from C3 moved by the octave, the highest on top: a held white key fills below the black keys, and a held black key shows hollow. Drums do not show.
+
+`zmk/src/midi/view.c` on the central checks the layer at every layer change, by looking for MIDI keys among the highest layer's bindings, and sends the split data channel's MIDI message ([Micro PDA](pda.md), Split data channel) when the view turns on or off and after every MIDI key while it shows; keys that come faster than the link coalesce into one message. While the view shows, the central holds the split link at peripheral latency 0, as PDA focus does, so that the view follows the keys within a connection event. `zmk/src/pda/midi_view.c` draws it; the shell shows it only while the PDA has no focus, so the PDA key still opens the PDA, and the view returns when focus ends. `zmk/tools/screen_mock/run.sh` renders it as `peripheral-midi-view`.
+
 ## GATT service
 
 `zmk/src/midi/ble_midi.c` defines the service from the BLE-MIDI specification:
@@ -48,4 +58,4 @@ It prints every message from every MIDI source, with the gap since the previous 
 
 - The host plays the notes at their BLE-MIDI timestamps, to the millisecond for keys on the left half. A key on the right half gets its timestamp when it reaches the central (`app/src/split/central.c` in ZMK stamps it with `k_uptime_get()`), so its notes fall on the split link's connection events: the Mac showed them in steps of 15 ms (tried 2026-10-17). The Piano layer has its drums on the left half for this reason.
 - Only the split keymap has the MIDI layers.
-- Nothing shows the octave, transpose, velocity or channel.
+- The MIDI view needs the split build's PDA; the unibody has no display for it.

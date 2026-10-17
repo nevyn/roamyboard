@@ -44,6 +44,7 @@ if(CONFIG_ROAMYBOARD_PDA)
     target_sources(app PRIVATE
       src/pda/peripheral.c
       src/pda/shell.c
+      src/pda/midi_view.c
       src/pda/icons.c
       src/pda/gfx.c
       src/pda/apps.c
@@ -98,4 +99,8 @@ endif()
 
 if(CONFIG_ROAMYBOARD_BEHAVIOR_MIDI)
   target_sources(app PRIVATE src/behaviors/behavior_midi.c)
+endif()
+
+if(CONFIG_ROAMYBOARD_MIDI_VIEW)
+  target_sources(app PRIVATE src/midi/view.c)
 endif()

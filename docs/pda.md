@@ -63,7 +63,7 @@ The games wait while the keys go to the host, under a "paused" banner. Their bes
 
 ## Displays
 
-The left half shows "PDA" or "note" in place of the host name while the PDA has focus. The right half shows the PDA instead of its status screen while the left half is connected; without it, the status screen returns, with the local OTA key's hint. The PDA draws dark on light like the status screen, and inverts while it has focus, so that PDA mode cannot be mistaken for typing to the host. Its title bar shows the app and the right half's battery. `zmk/tools/screen_mock/run.sh` renders the PDA as `peripheral-pda-*`, from the shell's own drawing code.
+The left half shows "PDA" or "note" in place of the host name while the PDA has focus. The right half shows the PDA instead of its status screen while the left half is connected; without it, the status screen returns, with the local OTA key's hint. The PDA draws dark on light like the status screen, and inverts while it has focus, so that PDA mode cannot be mistaken for typing to the host. Its title bar shows the app and the right half's battery. While a MIDI layer is on and the PDA has no focus, the right half shows the MIDI view in place of the app, which keeps running ([MIDI](midi.md)). `zmk/tools/screen_mock/run.sh` renders the PDA as `peripheral-pda-*`, from the shell's own drawing code.
 
 The PDA draws into a 1-bit framebuffer of the whole display, 68 × 160 pixels (`zmk/src/pda/gfx.h`): apps draw shapes in pure C and text through `pda_text_draw()`, one line cut at its width, which `zmk/src/display/pda_text.c` renders with LVGL's fonts on a hidden scratch canvas. `roamyboard_pda_render()` runs the drawing on the display work queue, and `screen_draw_pda()` copies the framebuffer onto the three canvases. The shell and the apps (`zmk/src/pda/shell.c`, `apps.c`, `app_*.c`, `game_*.c`) are pure C; `zmk/tests/pda_shell_test.c` and `pda_apps_test.c` drive them by key and tick, with stubbed text.
 
@@ -88,6 +88,7 @@ ZMK's split link carries a fixed set of messages, so the PDA brings its own GATT
 | | | Position | `03`, pressed, key position; in PDA mode only |
 | | | Info | `04`, key module count (signed), battery percent, build ID; when the link comes up and when either changes |
 | | | Time | `05`, clock status, profile, local seconds since 2000-01-01 (uint32 little-endian); sent with Info and when the clock changes |
+| | | MIDI | `06`, shown, octave, transpose (both int8), velocity step, channel, latest note or `FF`, then 12 bytes of held notes from 24 (C1) to 119, a bit each; on every MIDI key while a MIDI layer is on ([MIDI](midi.md)) |
 | Peripheral to central | notify | Text | `81`, UTF-8 bytes; appends to the text to type out |
 | | | Type out | `82`; leave PDA mode, then type the text |
 | | | Leave | `83`; leave PDA mode |

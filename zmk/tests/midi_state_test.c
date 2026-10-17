@@ -165,6 +165,24 @@ static void test_panic_releases_everything(void) {
     CHECK(sent.count == 0);
 }
 
+static void test_held_notes_leave_out_drums(void) {
+    struct midi_state s;
+    midi_state_init(&s);
+    midi_press_note(&s, 1, 60, collect, &(struct sent){0});
+    midi_press_note(&s, 2, 71, collect, &(struct sent){0});
+    midi_press_drum(&s, 3, 36, collect, &(struct sent){0});
+    uint8_t bits[16];
+    midi_held_notes(&s, bits);
+    CHECK(bits[60 / 8] == 1 << (60 % 8));
+    CHECK(bits[71 / 8] == 1 << (71 % 8));
+    CHECK(bits[36 / 8] == 0);
+    CHECK(s.last_note == 71);
+    midi_release(&s, 2, collect, &(struct sent){0});
+    midi_held_notes(&s, bits);
+    CHECK(bits[71 / 8] == 0);
+    CHECK(s.last_note == 71);
+}
+
 int main(void) {
     test_note_on_and_off();
     test_release_matches_press_after_octave_change();
@@ -174,6 +192,7 @@ int main(void) {
     test_held_position_does_not_retrigger();
     test_control_change_on_current_channel();
     test_panic_releases_everything();
+    test_held_notes_leave_out_drums();
     if (failures) {
         fprintf(stderr, "midi_state_test: %d failures\n", failures);
         return 1;

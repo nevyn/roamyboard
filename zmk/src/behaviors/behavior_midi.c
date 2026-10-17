@@ -14,7 +14,8 @@
 #include <dt-bindings/roamyboard/midi.h>
 #include <roamyboard/midi.h>
 
-#include "../midi/state.h"
+#include "../midi/keys.h"
+#include "../midi/view.h"
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -28,6 +29,14 @@ static struct midi_state *midi(void) {
         state_ready = true;
     }
     return &state;
+}
+
+const struct midi_state *roamyboard_midi_state(void) { return midi(); }
+
+static void changed(void) {
+#if IS_ENABLED(CONFIG_ROAMYBOARD_MIDI_VIEW)
+    roamyboard_midi_view_update();
+#endif
 }
 
 static void emit(const uint8_t *msg, size_t len, void *ctx) {
@@ -69,12 +78,14 @@ static int midi_key_pressed(struct zmk_behavior_binding *binding,
         }
         break;
     }
+    changed();
     return ZMK_BEHAVIOR_OPAQUE;
 }
 
 static int midi_key_released(struct zmk_behavior_binding *binding,
                              struct zmk_behavior_binding_event event) {
     midi_release(midi(), event.position, emit, &event.timestamp);
+    changed();
     return ZMK_BEHAVIOR_OPAQUE;
 }
 
@@ -156,6 +167,11 @@ static const struct behavior_parameter_metadata cc_metadata = {
 API(note, midi_key_pressed, midi_key_released)
 API(ctl, midi_key_pressed, midi_key_released)
 API(cc, midi_cc_pressed, midi_cc_released)
+
+bool roamyboard_midi_is_key(const char *behavior_dev) {
+    const struct device *dev = zmk_behavior_get_binding(behavior_dev);
+    return dev && (dev->api == &note_api || dev->api == &ctl_api || dev->api == &cc_api);
+}
 
 #define DT_DRV_COMPAT roamyboard_behavior_midi_key
 

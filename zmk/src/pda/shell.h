@@ -52,6 +52,22 @@ struct pda_scores {
     uint16_t words_played;
 };
 
+/** What the MIDI keys play, as the central sends it while a MIDI layer is on. */
+struct pda_midi_view {
+    /** The highest active layer has MIDI keys; the shell then shows this instead of the app. */
+    bool shown;
+    int8_t octave;
+    int8_t transpose;
+    /** 0 (pp) to 4 (ff). */
+    uint8_t velocity_step;
+    /** 0 is channel 1. */
+    uint8_t channel;
+    /** The latest note played, or -1. */
+    int16_t last_note;
+    /** Bit n % 8 of byte n / 8: note n is held. */
+    uint8_t held[16];
+};
+
 /** What the platform must do after an event. */
 enum pda_shell_action {
     PDA_SHELL_NONE,
@@ -104,6 +120,7 @@ struct pda_shell {
     struct pda_half_info left;
     struct pda_half_info right;
     struct pda_clock_state clock;
+    struct pda_midi_view midi;
     struct pda_scores scores;
     /** The scores differ from settings. */
     bool scores_changed;
@@ -176,6 +193,12 @@ const char *pda_shell_view_name(const struct pda_shell *shell);
  * keeps the view.
  */
 enum pda_shell_action pda_shell_set_mode(struct pda_shell *shell, enum roamyboard_pda_mode mode);
+
+/**
+ * Takes the MIDI view from the central. While it is shown and the PDA has no focus, the shell
+ * draws it in place of the app, which keeps running; focus shows the app again.
+ */
+enum pda_shell_action pda_shell_midi(struct pda_shell *shell, const struct pda_midi_view *view);
 
 /** A key event from the central; see pda_note_key for the parameters. */
 enum pda_shell_action pda_shell_key(struct pda_shell *shell, uint8_t usage, uint8_t implicit_mods,

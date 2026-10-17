@@ -29,7 +29,7 @@ struct midi_state {
     uint8_t velocity_step;
     /** 0-based: 0 is channel 1. */
     uint8_t channel;
-    /** The MIDI note number of the latest note on, or -1 before any. */
+    /** The latest note that midi_press_note() played, or -1 before any. */
     int16_t last_note;
     /** Per key position: the note that it holds, or 0xFF. */
     uint8_t held_note[MIDI_POSITIONS];
@@ -57,6 +57,9 @@ void midi_press_drum(struct midi_state *s, uint32_t position, uint8_t note, midi
 
 /** Note off for the note that position holds, on the channel that it was played on, if any. */
 void midi_release(struct midi_state *s, uint32_t position, midi_emit_fn emit, void *ctx);
+
+/** Sets bit n of bits (bit n % 8 of byte n / 8) for each note n held by a &midi_note key. */
+void midi_held_notes(const struct midi_state *s, uint8_t bits[16]);
 
 /** Control change cc (0 to 127) to value (0 to 127) on the current channel. */
 void midi_control_change(const struct midi_state *s, uint8_t cc, uint8_t value,

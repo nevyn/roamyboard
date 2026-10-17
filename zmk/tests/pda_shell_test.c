@@ -7,6 +7,10 @@
 
 #include "pda_test_support.h"
 
+#include <string.h>
+
+#include "midi_view.h"
+
 static void test_keys_go_nowhere_without_focus(void) {
     struct pda_shell shell;
     pda_shell_init(&shell, 1);
@@ -218,6 +222,50 @@ static void test_fb_clips(void) {
     CHECK(!pda_fb_get(&fb, 0, PDA_FB_H - 1));
 }
 
+/** The pixel inside note's key in the MIDI view, which a held note fills or hollows. */
+static bool midi_key_lit(const struct pda_fb *fb, const struct pda_midi_view *view, int note) {
+    static const int white_of[12] = {0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6};
+    static const bool black[12] = {0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0};
+    const int offset = note - pda_midi_view_lowest(view);
+    const int y = PDA_MIDI_KEYS_Y + (2 - offset / 12) * PDA_MIDI_OCTAVE_H;
+    const int n = offset % 12;
+    if (black[n]) {
+        return pda_fb_get(fb, PDA_MIDI_KEYS_X + (white_of[n] + 1) * PDA_MIDI_WHITE_W, y + 5);
+    }
+    return pda_fb_get(fb, PDA_MIDI_KEYS_X + white_of[n] * PDA_MIDI_WHITE_W + 4,
+                      y + PDA_MIDI_OCTAVE_H - 5);
+}
+
+static void test_midi_view_shows_held_notes_without_focus(void) {
+    struct pda_shell shell;
+    pda_shell_init(&shell, 1);
+    static struct pda_fb before, fb;
+    pda_shell_draw(&shell, &before);
+
+    struct pda_midi_view view = {.shown = true, .octave = 1, .velocity_step = 2, .last_note = 61};
+    view.held[60 / 8] |= 1 << (60 % 8); // C4: the lowest octave drawn, at octave +1
+    view.held[61 / 8] |= 1 << (61 % 8); // C#4
+    CHECK(pda_shell_midi(&shell, &view) == PDA_SHELL_REDRAW);
+    pda_shell_draw(&shell, &fb);
+    CHECK(midi_key_lit(&fb, &view, 60));
+    CHECK(!midi_key_lit(&fb, &view, 61)); // a held black key is hollow
+    CHECK(!midi_key_lit(&fb, &view, 62));
+    CHECK(midi_key_lit(&fb, &view, 63)); // a black key that is not held is filled
+
+    // Focus shows the PDA as it was; the view comes back when focus ends.
+    CHECK(pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME) == PDA_SHELL_REDRAW);
+    CHECK(pda_shell_midi(&shell, &view) == PDA_SHELL_NONE);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    pda_shell_draw(&shell, &fb);
+    CHECK(midi_key_lit(&fb, &view, 60));
+
+    view.shown = false;
+    CHECK(pda_shell_midi(&shell, &view) == PDA_SHELL_REDRAW);
+    pda_shell_draw(&shell, &fb);
+    CHECK(memcmp(before.bits, fb.bits, sizeof(fb.bits)) == 0);
+    CHECK(pda_shell_midi(&shell, &view) == PDA_SHELL_NONE);
+}
+
 int main(void) {
     test_keys_go_nowhere_without_focus();
     test_home_navigation();
@@ -232,6 +280,7 @@ int main(void) {
     test_clock_runs_from_the_report();
     test_random_stays_below_n();
     test_fb_clips();
+    test_midi_view_shows_held_notes_without_focus();
     if (failures) {
         fprintf(stderr, "pda_shell_test: %d failure(s)\n", failures);
         return 1;

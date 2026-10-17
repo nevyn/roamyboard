@@ -10,6 +10,7 @@
 
 #include "icons.h"
 #include "keys.h"
+#include "midi_view.h"
 
 const struct pda_app *const pda_apps[] = {
     &pda_app_note_def,   &pda_app_clock_def, &pda_app_timer_def,    &pda_app_calc_def,
@@ -70,6 +71,7 @@ void pda_shell_init(struct pda_shell *shell, uint32_t seed) {
     pda_note_init(&shell->note);
     shell->keys.last_position = -1;
     shell->keys.last_usage = -1;
+    shell->midi.last_note = -1;
 }
 
 uint32_t pda_shell_random(struct pda_shell *shell, uint32_t n) {
@@ -363,8 +365,22 @@ bool pda_shell_time(const struct pda_shell *shell, struct pda_date_time *out) {
     return true;
 }
 
+enum pda_shell_action pda_shell_midi(struct pda_shell *shell, const struct pda_midi_view *view) {
+    const bool visible = shell->midi.shown || view->shown;
+    shell->midi = *view;
+    return visible && shell->mode == ROAMYBOARD_PDA_OFF ? PDA_SHELL_REDRAW : PDA_SHELL_NONE;
+}
+
 void pda_shell_draw(const struct pda_shell *shell, struct pda_fb *fb) {
     pda_fb_clear(fb);
+    const struct pda_rect area = {0, PDA_TITLE_H, PDA_FB_W, PDA_FB_H - PDA_TITLE_H};
+    if (shell->midi.shown && shell->mode == ROAMYBOARD_PDA_OFF) {
+        pda_text_draw(fb, 2, 2, PDA_FB_W - 17, "MIDI", PDA_FONT_TITLE, true);
+        draw_battery(fb, shell->right.battery);
+        pda_fb_fill(fb, (struct pda_rect){0, PDA_TITLE_H - 2, PDA_FB_W, 1}, true);
+        pda_midi_view_draw(&shell->midi, fb, area);
+        return;
+    }
     // Home shows the time, once there is one, where apps show their name.
     char clock[8];
     struct pda_date_time now;
@@ -381,7 +397,6 @@ void pda_shell_draw(const struct pda_shell *shell, struct pda_fb *fb) {
     draw_battery(fb, shell->right.battery);
     pda_fb_fill(fb, (struct pda_rect){0, PDA_TITLE_H - 2, PDA_FB_W, 1}, true);
 
-    const struct pda_rect area = {0, PDA_TITLE_H, PDA_FB_W, PDA_FB_H - PDA_TITLE_H};
     if (shell->app == PDA_SHELL_HOME) {
         draw_home(shell, fb, area);
     } else {
