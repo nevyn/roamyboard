@@ -1,4 +1,4 @@
-> 💡 Candidate trackpads and trackballs for a pointing module, compared against the roamyboard's interconnect, module size and battery. Surveyed 2026-10-16; prices and stock are as seen that day. Every figure comes from the linked source; a blank cell means no primary source was found. The earlier sketch is [[Touch module]].
+> 💡 Candidate trackpads and trackballs for a pointing module, compared against the roamyboard's interconnect, module size and battery. Surveyed 2026-10-16; prices and stock are as seen that day. Every figure comes from the linked source; a blank cell means no primary source was found. The decisions are in [[Pointing module]].
 
 ## Constraints
 

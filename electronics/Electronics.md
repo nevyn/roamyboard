@@ -5,7 +5,7 @@
 ## Concepts
 ### Column modules and interconnects
 
-Each column is its own module. There are three kinds of modules: MCU, Key and Terminator. The MCU is the rightmost, terminator the leftmost, and an arbitrary number of key modules in between. A fourth kind, a trackpad column, is sketched in [[Touch module]] for later.
+Each column is its own module. There are three kinds of modules: MCU, Key and Terminator. The MCU is the rightmost, terminator the leftmost, and an arbitrary number of key modules in between. A fourth kind, the pointing module, carries a trackpad; see [[Pointing module]].
 
 The interconnect between each module has 9 signals total:
 - Power: +5V, +3.3V, GND
@@ -31,7 +31,7 @@ v3.0 pinout. J_LEFT*n* are the sockets, J_RIGHT*n* the pin headers; pin 1 is the
 | J_LEFT2 / J_RIGHT2 (middle) | CLK | /PL | DATA |
 | J_LEFT3 / J_RIGHT3 (bottom) | LED | SDA | SCL |
 
-DATA is the one signal that does not pass straight through: J_LEFT2 pin 3 is the 165's serial input and J_RIGHT2 pin 3 its serial output. It sits on the bottom pin because the two pass-through tracks above it would block every other way off the pad. INT was dropped; 9 pins is all three 1×3 connectors carry.
+DATA is the one signal that does not pass straight through: J_LEFT2 pin 3 is the 165's serial input and J_RIGHT2 pin 3 its serial output. It sits on the bottom pin because the two pass-through tracks above it would block every other way off the pad. INT was dropped; 9 pins is all three 1×3 connectors carry. [[Pointing module]] plans to turn pin 1 of J_LEFT1 / J_RIGHT1 from +5V into INT.
 ### MCU module
 The MCU module contains a nice!nano 2.0, battery, USB-C for wired connection and charging, and power switch. Possibly also an OLED display, and maybe a rotary encoder for settings (pairing, switching between profiles, controlling lighting, etc).
 
