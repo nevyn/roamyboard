@@ -5,14 +5,19 @@
 .pda-hero h1 { font-size: clamp(2.6rem, 6vw, 4.4rem); margin: 0; letter-spacing: -.04em; line-height: 1; }
 .pda-hero h1 span { background: linear-gradient(90deg, var(--accent), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .pda-hero .tagline { font-size: clamp(1.25rem, 2.4vw, 1.7rem); font-weight: 750; letter-spacing: -.02em; margin: .3em 0 .6em; }
-/* The photo of the right half; hovering or focusing it fades to the same half playing Tetris. */
-.hero-photo { margin: 0; outline: none; }
+/* The photo of the right half fades to the same half playing Tetris and back, 5 s each. */
+.hero-photo { margin: 0; }
 .hero-photo .frame { position: relative; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
 .hero-photo img { display: block; width: 100%; height: auto; }
-.hero-photo .after { position: absolute; inset: 0; opacity: 0; transition: opacity .35s ease; }
-.hero-photo:hover .after, .hero-photo:focus .after { opacity: 1; }
-.hero-photo:focus-visible .frame { outline: 2px solid var(--accent); outline-offset: 3px; }
-.hero-photo figcaption { font-size: .82rem; color: var(--muted); margin: 8px 4px 0; }
+.hero-photo .after { position: absolute; inset: 0; opacity: 0; animation: swap 11.2s ease-in-out infinite; }
+@keyframes swap {
+  0%, 44.6% { opacity: 0; }
+  50%, 94.6% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-photo .after { animation: none; }
+}
 
 /* A screenshot in the nice!view's dark bezel. The PNGs are the display's own 68 x 160 pixels. */
 .screen { margin: 0; display: inline-flex; flex-direction: column; align-items: center; gap: 6px; }
