@@ -8,10 +8,10 @@
 Each column is its own module. There are three kinds of modules: MCU, Key and Terminator. The MCU is the rightmost, terminator the leftmost, and an arbitrary number of key modules in between. A fourth kind, the pointing module, carries a trackpad; see [[Pointing module]].
 
 The interconnect between each module has 9 signals total:
-- Power: +3.3V, GND
+- Power: +3.3V, GND, and +5V on J_LEFT1 / J_RIGHT1 pin 1 until it becomes INT
 - Key input: /PL, CLK and DATA for the shift register
 - NeoPixel data line, to control RGB LEDs
-- I2C for the [[Pointing module]]: SDA, SCL and INT, the pad's data-ready line
+- I2C for the [[Pointing module]]: SDA and SCL, plus INT, the pad's data-ready line, planned on pin 1
 
 The 9 signals are distributed across **three 1×3 connector pairs** — top, middle, and bottom of the board. This approach was chosen over a single 9-pin connector because:
 - Distributing the connection across three points along the board edge provides better mechanical stability between modules than a single point would
@@ -27,11 +27,11 @@ v3.0 pinout. J_LEFT*n* are the sockets, J_RIGHT*n* the pin headers; pin 1 is the
 
 | Connector | Pin 1 | Pin 2 | Pin 3 |
 | --------- | ----- | ----- | ----- |
-| J_LEFT1 / J_RIGHT1 (top) | INT | +3.3V | GND |
+| J_LEFT1 / J_RIGHT1 (top) | +5V (planned: INT) | +3.3V | GND |
 | J_LEFT2 / J_RIGHT2 (middle) | CLK | /PL | DATA |
 | J_LEFT3 / J_RIGHT3 (bottom) | LED | SDA | SCL |
 
-DATA is the one signal that does not pass straight through: J_LEFT2 pin 3 is the 165's serial input and J_RIGHT2 pin 3 its serial output. It sits on the bottom pin because the two pass-through tracks above it would block every other way off the pad. Pin 1 of J_LEFT1 / J_RIGHT1 was +5V in v3.0 and is INT since the [[Pointing module]]; the key module boards pass it straight through, so only its net name in the PCB file still says +5V.
+DATA is the one signal that does not pass straight through: J_LEFT2 pin 3 is the 165's serial input and J_RIGHT2 pin 3 its serial output. It sits on the bottom pin because the two pass-through tracks above it would block every other way off the pad. The [[Pointing module]] plans to turn pin 1 of J_LEFT1 / J_RIGHT1 from +5V into INT. Nothing drives +5V today, and the key module boards pass pin 1 straight through, so only the MCU module's wiring changes.
 ### MCU module
 The MCU module contains a nice!nano 2.0, battery, USB-C for wired connection and charging, and power switch. Possibly also an OLED display, and maybe a rotary encoder for settings (pairing, switching between profiles, controlling lighting, etc).
 
@@ -107,7 +107,7 @@ MCU module
 
 Key module
 * From MCU-facing interconnect (right side)
-	* Pin 1 (INT, +5V in v3.0) through to terminal-facing (left side) interconnect  pin 1
+	* Pin 1 (+5V, planned INT) through to terminal-facing (left side) interconnect  pin 1
 	* Pin 2 (+3.3V)...
 		* through to left interconnect pin 2, and
 		* to the 165's pin 16 (VCC)

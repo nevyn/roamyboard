@@ -187,11 +187,11 @@ The firmware chooses the pins; the MCU board does not exist yet. Until it does, 
 | CLK | D15 | P1.13, SPIM2 SCK | J_LEFT2 pin 1 |
 | /PL | D18 | P1.15, GPIO | J_LEFT2 pin 2 |
 | DATA | D14 | P1.11, SPIM2 MISO, pull-up | J_LEFT2 pin 3 |
-| SDA | D4 | P0.22, TWIM1 SDA, 2.2 kΩ to VCC | J_LEFT3 pin 2 |
-| SCL | D5 | P0.24, TWIM1 SCL, 2.2 kΩ to VCC | J_LEFT3 pin 3 |
-| INT | D6 | P1.00, GPIO | J_LEFT1 pin 1 |
+| SDA (planned) | D4 | P0.22, TWIM1 SDA, 2.2 kΩ to VCC | J_LEFT3 pin 2 |
+| SCL (planned) | D5 | P0.24, TWIM1 SCL, 2.2 kΩ to VCC | J_LEFT3 pin 3 |
+| INT (planned) | D6 | P1.00, GPIO | J_LEFT1 pin 1 |
 
-LED (J_LEFT3 pin 1) stays unconnected for now. SDA, SCL and INT serve the [pointing module](../electronics/Pointing%20module.md); two 2.2 kΩ pull-ups in the MCU module tie SDA and SCL to VCC, and the firmware also turns on the nRF52840's own pull-ups on both lines.
+SDA, SCL and INT are planned for the [pointing module](../electronics/Pointing%20module.md) and not wired yet. The firmware already runs TWIM1 on D4 and D5, with the nRF52840's own pull-ups on both lines, and does not use D6 yet. Wiring them adds the three wires and two 2.2 kΩ resistors from SDA and SCL to VCC. J_LEFT1 pin 1 (+5V in the v3.0 pinout, INT once wired) and LED (J_LEFT3 pin 1) stay unconnected for now.
 
 Solder the wires to the sockets' solder joints (J_LEFT), not to the empty header pads (J_RIGHT) or U1's pads: those reach the sockets through 0.25 mm tracks, and on the first socket board a wire tugging on a header pad broke the +3.3V and GND connections.
 
@@ -212,7 +212,7 @@ The nice!view, as ZMK's `nice_view_adapter` maps it on the nice!nano:
 Why these pins:
 
 - The chain runs on SPIM2 with SCK on D15 and MISO on D14, the pins of the nice!nano's `pro_micro_spi` (SPIM1); it has no MOSI. SPIM1 shares its peripheral with TWIM1, which the pointing module's I2C needs.
-- SDA, SCL and INT are on D4, D5 and D6, next to the nice!view's wires on the same edge. The free pins on the chain's edge, D19 to D21 (P0.02, P0.29, P0.31), are "low frequency I/O only" in the nRF52840 product specification.
+- SDA, SCL and INT are planned on D4, D5 and D6, next to the nice!view's wires on the same edge. The free pins on the chain's edge, D19 to D21 (P0.02, P0.29, P0.31), are "low frequency I/O only" in the nRF52840 product specification.
 - spi0 belongs to the nice!view (SCK D3/P0.20, MOSI D2/P0.17, CS D1/P0.06) and shares its peripheral with i2c0.
 - D18 sits next to D15 on the header row that also carries VCC and GND, so all five wires leave from one edge of the nice!nano. It is not an NFC pin (D10 and D16 are) and not a UART pin (D0 and D1).
 

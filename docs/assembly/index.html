@@ -435,7 +435,7 @@
       <p>Hover a signal to find it in every table.</p>
       <div class="pinout">
         <div class="conn"><h5>J_LEFT1 (top)</h5>
-          <div class="pin used" data-signal="int"><b>1</b>INT<small>→ D6</small></div>
+          <div class="pin" data-signal="int"><b>1</b>+5V / INT<small>not connected yet</small></div>
           <div class="pin used" data-signal="vcc"><b>2</b>+3.3V<small>→ VCC</small></div>
           <div class="pin used" data-signal="gnd"><b>3</b>GND<small>→ GND</small></div></div>
         <div class="conn"><h5>J_LEFT2 (middle)</h5>
@@ -444,8 +444,8 @@
           <div class="pin used" data-signal="data"><b>3</b>DATA<small>→ D14</small></div></div>
         <div class="conn"><h5>J_LEFT3 (bottom)</h5>
           <div class="pin" data-signal="led"><b>1</b>LED<small>not connected</small></div>
-          <div class="pin used" data-signal="sda"><b>2</b>SDA<small>→ D4</small></div>
-          <div class="pin used" data-signal="scl"><b>3</b>SCL<small>→ D5</small></div></div>
+          <div class="pin" data-signal="sda"><b>2</b>SDA<small>not connected yet</small></div>
+          <div class="pin" data-signal="scl"><b>3</b>SCL<small>not connected yet</small></div></div>
       </div>
       <div class="table-wrap"><table><thead><tr><th>Signal</th><th>nice!nano</th><th>nRF52840</th><th>Socket board</th></tr></thead><tbody>
         <tr data-signal="vcc"><td>+3.3V</td><td>VCC</td><td>switched by P0.13</td><td>J_LEFT1 pin 2</td></tr>
@@ -453,11 +453,8 @@
         <tr data-signal="clk"><td>CLK</td><td>D15</td><td>P1.13, SPIM2 SCK</td><td>J_LEFT2 pin 1</td></tr>
         <tr data-signal="pl"><td>/PL</td><td>D18</td><td>P1.15</td><td>J_LEFT2 pin 2</td></tr>
         <tr data-signal="data"><td>DATA</td><td>D14</td><td>P1.11, SPIM2 MISO</td><td>J_LEFT2 pin 3</td></tr>
-        <tr data-signal="sda"><td>SDA</td><td>D4</td><td>P0.22, TWIM1 SDA</td><td>J_LEFT3 pin 2</td></tr>
-        <tr data-signal="scl"><td>SCL</td><td>D5</td><td>P0.24, TWIM1 SCL</td><td>J_LEFT3 pin 3</td></tr>
-        <tr data-signal="int"><td>INT</td><td>D6</td><td>P1.00</td><td>J_LEFT1 pin 1</td></tr>
       </tbody></table></div>
-      <p>SDA, SCL and INT serve the pointing module. Fit a 2.2 kΩ pull-up from SDA to VCC and another from SCL to VCC.</p>
+      <p>SDA, SCL and INT stay unconnected for now. The planned pointing module will use them on D4, D5 and D6, with a 2.2 kΩ pull-up from SDA and from SCL to VCC.</p>
       <h4>nice!view</h4>
       <div class="table-wrap"><table><thead><tr><th>nice!view</th><th>nice!nano</th><th>nRF52840</th></tr></thead><tbody>
         <tr data-signal="vcc"><td>VCC</td><td>VCC</td><td>switched by P0.13</td></tr>
