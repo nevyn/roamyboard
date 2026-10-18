@@ -9,4 +9,8 @@ config ZMK_KEYBOARD_NAME
 config ZMK_EXT_POWER
     default n
 
+# The pointing module's I2C bus (roamyboard.dtsi).
+config I2C
+    default y
+
 endif
