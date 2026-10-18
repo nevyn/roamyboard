@@ -16,6 +16,7 @@
 </script>
 <script src="assembly/models/data.js"></script>
 <script src="assembly/viewer.js" defer></script>
+<script src="hero.js" defer></script>
 </head>
 <body>
 <header class="topbar">
@@ -41,18 +42,39 @@
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg><span>Easily switch between 5 Bluetooth connections on the fly.</span></li>
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="5" height="14" rx="1.5"/><rect x="9.5" y="5" width="5" height="14" rx="1.5"/><rect x="16" y="5" width="5" height="14" rx="1.5"/></svg><span>Modular: connect any number of columns and other accessory modules.</span></li>
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9h20M2 15h20"/><rect x="8" y="6" width="8" height="12" rx="2"/></svg><span>Straps to your legs!!!</span></li>
-        <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M10 7h4M10 11h4"/></svg><span>A <a href="pda/">micro PDA</a> on the right half: notes, a clock, a calculator and games.</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M10 7h4M10 11h4"/></svg><span>Built in <a href="pda/">PDA</a>! And <a href="https://github.com/nevyn/roamyboard/blob/main/docs/midi.md">MIDI</a>, because why not‽</span></li>
       </ul>
       <p class="actions">
         <a class="btn primary big" href="order/">Order one →</a>
         <a class="btn big" href="assembly/">Build your own</a>
       </p>
     </div>
-    <div>
-      <div class="step hero-viewer">
-        <div class="viewer" data-scene="half" data-no-zoom></div>
+    <div class="hero-gallery" data-gallery>
+      <div class="step hero-stage">
+        <figure class="slide" id="slide-on-legs" role="tabpanel" aria-labelledby="tab-on-legs" data-slide="on-legs" data-caption="Both halves strapped on: their MCU modules meet in the middle, and each half curves around its leg.">
+          <img src="photos/on-legs.jpg" alt="Looking down at both halves of a Roamyboard strapped across two thighs, with pink and purple keycaps" width="1800" height="1200">
+        </figure>
+        <figure class="slide" id="slide-3d" role="tabpanel" aria-labelledby="tab-3d" data-slide="3d" data-swipe="off" hidden data-caption="Drag to orbit and drag the slider to add key modules. The 3D view is generated from the same model that the parts print from.">
+          <div class="viewer" data-scene="half" data-no-zoom></div>
+        </figure>
+        <figure class="slide" id="slide-pda" role="tabpanel" aria-labelledby="tab-pda" data-slide="pda" hidden data-caption="The right half's display runs the built in PDA: here, a game of Tetris.">
+          <img src="photos/pda-tetris.jpg" alt="A hand beside the right half's display, which shows a game of Tetris" width="1800" height="1200" loading="lazy">
+        </figure>
+        <figure class="slide" id="slide-curve" role="tabpanel" aria-labelledby="tab-curve" data-slide="curve" hidden data-caption="Close up: each key module meets the next at an angle, so the half follows the thigh.">
+          <img src="photos/curve.jpg" alt="Close-up of a half's key modules bending over a thigh, the switches visible under the keycaps" width="1800" height="1200" loading="lazy">
+        </figure>
+        <figure class="slide" id="slide-couch" role="tabpanel" aria-labelledby="tab-couch" data-slide="couch" hidden data-caption="Typing from the couch, in a headset.">
+          <img src="photos/couch.jpg" alt="Nevyn lying on a sofa in a headset, typing on the Roamyboard on his legs" width="1280" height="853" loading="lazy">
+        </figure>
       </div>
-      <p class="summary">Drag to orbit and drag the slider to add key modules. The 3D view is generated from the same model that the parts print from.</p>
+      <div class="thumbs" role="tablist" aria-label="Pictures of the Roamyboard">
+        <button type="button" role="tab" id="tab-on-legs" aria-controls="slide-on-legs" aria-selected="true" data-for="on-legs"><img src="photos/on-legs-thumb.jpg" alt="On the legs" width="240" height="160"></button>
+        <button type="button" role="tab" id="tab-3d" aria-controls="slide-3d" aria-selected="false" tabindex="-1" data-for="3d"><span class="thumb-3d" aria-hidden="true">3D</span><span class="sr-only">3D view</span></button>
+        <button type="button" role="tab" id="tab-pda" aria-controls="slide-pda" aria-selected="false" tabindex="-1" data-for="pda"><img src="photos/pda-tetris-thumb.jpg" alt="The PDA" width="240" height="160"></button>
+        <button type="button" role="tab" id="tab-curve" aria-controls="slide-curve" aria-selected="false" tabindex="-1" data-for="curve"><img src="photos/curve-thumb.jpg" alt="Close up" width="240" height="160"></button>
+        <button type="button" role="tab" id="tab-couch" aria-controls="slide-couch" aria-selected="false" tabindex="-1" data-for="couch"><img src="photos/couch-thumb.jpg" alt="On the couch" width="240" height="160"></button>
+      </div>
+      <p class="summary" data-caption aria-live="polite">Both halves strapped on: their MCU modules meet in the middle, and each half curves around its leg.</p>
     </div>
   </section>
 

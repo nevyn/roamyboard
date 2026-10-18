@@ -17,8 +17,24 @@
 .hero .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 14px; }
 a.btn { text-decoration: none; }
 .btn.big { font-size: 1rem; padding: 10px 18px; border-radius: 11px; }
-.hero-viewer { margin: 0; }
-.hero-viewer .viewer { min-height: 460px; }
+.hero-stage { margin: 0; position: relative; aspect-ratio: 3 / 2; overflow: hidden; touch-action: pan-y; }
+.hero-stage .slide { position: absolute; inset: 0; margin: 0; }
+.hero-stage .slide[hidden] { display: none; }
+.hero-stage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-stage .viewer { height: 100%; min-height: 0; }
+.thumbs { display: flex; gap: 8px; margin-top: 10px; }
+.thumbs button {
+  flex: 1 1 0; min-width: 0; aspect-ratio: 3 / 2; padding: 0; overflow: hidden; cursor: pointer;
+  border: 2px solid transparent; border-radius: 9px; background: var(--card); opacity: .7; transition: opacity .15s, border-color .15s;
+}
+.thumbs button:hover, .thumbs button:focus-visible { opacity: 1; }
+.thumbs button[aria-selected="true"] { opacity: 1; border-color: var(--accent); }
+.thumbs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-3d {
+  display: grid; place-items: center; width: 100%; height: 100%;
+  font: 800 1.1rem var(--mono); color: var(--accent); background: var(--accent-soft);
+}
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .band {
   margin-top: 56px; padding: 26px clamp(18px, 3vw, 32px); border-radius: var(--radius);
@@ -48,7 +64,6 @@ a.btn { text-decoration: none; }
 }
 @media (max-width: 860px) {
   .cards.how, .cards.ways { grid-template-columns: minmax(0, 1fr); }
-  .hero-viewer .viewer { min-height: 360px; }
 }
 @media (max-width: 560px) {
   .gallery { grid-template-columns: minmax(0, 1fr); }
