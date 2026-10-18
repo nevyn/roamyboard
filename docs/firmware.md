@@ -30,7 +30,7 @@ Each key module has one 74HC165. Its inputs A to E are SW1 (the bottom key, at t
 Every scan:
 
 1. The driver pulses /PL low for 1 µs. All 165s load their switch states, and QH shows input H of the nearest key module.
-2. The driver reads `max-key-modules + 1` bytes (33 by default) over SPIM1 at 1 MHz, MSB first. Each byte is one key module, nearest first:
+2. The driver reads `max-key-modules + 1` bytes (33 by default) over SPIM2 at 1 MHz, MSB first. Each byte is one key module, nearest first:
 
    | Bit | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
    | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -42,7 +42,7 @@ Every scan:
 
 Row 0 is the top key. The `rows` property (default 5) sets how many inputs each key module uses, so a 7-key module needs only `rows = <7>`.
 
-The SPI bus runs in mode 2 (`spi-cpol`): SCK idles high, SPIM1 samples DATA on each falling edge, and the 165s shift on each rising edge, so every sample lands half a clock period after the last shift. The first falling edge samples input H of the nearest key module, which is on QH straight after /PL. Mode 0 would sample on the same rising edge that shifts, and then depend on the 165's propagation delay, which the datasheet gives no minimum for.
+The SPI bus runs in mode 2 (`spi-cpol`): SCK idles high, SPIM2 samples DATA on each falling edge, and the 165s shift on each rising edge, so every sample lands half a clock period after the last shift. The first falling edge samples input H of the nearest key module, which is on QH straight after /PL. Mode 0 would sample on the same rising edge that shifts, and then depend on the 165's propagation delay, which the datasheet gives no minimum for.
 
 ## Key module count
 
@@ -184,11 +184,14 @@ The firmware chooses the pins; the MCU board does not exist yet. Until it does, 
 | --- | --- | --- | --- |
 | +3.3V | VCC | switched by P0.13 | J_LEFT1 pin 2 |
 | GND | GND | | J_LEFT1 pin 3 |
-| CLK | D15 | P1.13, SPIM1 SCK | J_LEFT2 pin 1 |
+| CLK | D15 | P1.13, SPIM2 SCK | J_LEFT2 pin 1 |
 | /PL | D18 | P1.15, GPIO | J_LEFT2 pin 2 |
-| DATA | D14 | P1.11, SPIM1 MISO, pull-up | J_LEFT2 pin 3 |
+| DATA | D14 | P1.11, SPIM2 MISO, pull-up | J_LEFT2 pin 3 |
+| SDA | D4 | P0.22, TWIM1 SDA, 2.2 kΩ to VCC | J_LEFT3 pin 2 |
+| SCL | D5 | P0.24, TWIM1 SCL, 2.2 kΩ to VCC | J_LEFT3 pin 3 |
+| INT | D6 | P1.00, GPIO | J_LEFT1 pin 1 |
 
-+5V (J_LEFT1 pin 1) and the bottom connector (LED, SDA, SCL) stay unconnected for now.
+LED (J_LEFT3 pin 1) stays unconnected for now. SDA, SCL and INT serve the [pointing module](../electronics/Pointing%20module.md); two 2.2 kΩ pull-ups in the MCU module tie SDA and SCL to VCC, and the firmware also turns on the nRF52840's own pull-ups on both lines.
 
 Solder the wires to the sockets' solder joints (J_LEFT), not to the empty header pads (J_RIGHT) or U1's pads: those reach the sockets through 0.25 mm tracks, and on the first socket board a wire tugging on a header pad broke the +3.3V and GND connections.
 
@@ -208,7 +211,8 @@ The nice!view, as ZMK's `nice_view_adapter` maps it on the nice!nano:
 
 Why these pins:
 
-- SPIM1 is the nice!nano's `pro_micro_spi` instance, with SCK on D15 and MISO on D14 in the board's own pin control. Its MOSI (D16, P0.10) is left unconnected.
+- The chain runs on SPIM2 with SCK on D15 and MISO on D14, the pins of the nice!nano's `pro_micro_spi` (SPIM1); it has no MOSI. SPIM1 shares its peripheral with TWIM1, which the pointing module's I2C needs.
+- SDA, SCL and INT are on D4, D5 and D6, next to the nice!view's wires on the same edge. The free pins on the chain's edge, D19 to D21 (P0.02, P0.29, P0.31), are "low frequency I/O only" in the nRF52840 product specification.
 - spi0 belongs to the nice!view (SCK D3/P0.20, MOSI D2/P0.17, CS D1/P0.06) and shares its peripheral with i2c0.
 - D18 sits next to D15 on the header row that also carries VCC and GND, so all five wires leave from one edge of the nice!nano. It is not an NFC pin (D10 and D16 are) and not a UART pin (D0 and D1).
 
