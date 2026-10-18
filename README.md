@@ -1,65 +1,28 @@
 # roamyboard, aka Pants Keyboard
 
-A pants-mounted keyboard that I can use while walking and sitting. Original idea was to literally sew it into pants, but that’s too impractical; now I’m imagining it as a belt/strap you put on top of your pants to make it wearable.
+A keyboard you wear on your legs, so you can type while you walk. Each half is a row of 3D-printed modules on a strap: key modules that click together at an angle, so the half curves around a thigh, an MCU module with a nice!nano, a battery and a display, and a terminator module at the far end. It runs ZMK over Bluetooth, and the right half's display has a built-in PDA.
+
+**Photos, the build and more: [roamyboard.nevyn.dev](https://roamyboard.nevyn.dev).** There you'll find the [assembly guide](https://roamyboard.nevyn.dev/assembly/), the [layout](https://roamyboard.nevyn.dev/layout/), the [PDA manual](https://roamyboard.nevyn.dev/pda/), and a page to [order one](https://roamyboard.nevyn.dev/order/).
+
+![Both halves strapped across two thighs](docs/photos/on-legs.jpg)
+
+But why‽ Because I think so much better when I'm moving. So I want to code while I move. So I need an input method that works while I'm moving. The original idea was to literally sew it into pants, but that's too impractical; now it's a strap you put on top of your pants.
+
+I will also need a wearable [computer](roamykit/Computer.md) and [head mounted display](roamykit/Head%20mounted%20display.md) to go with this setup, but that's for later.
 
 Made by [Nevyn Bengtsson](mailto:hello@nevyn.dev) 2012-2026 (this is not the first iteration 😅).
 
-My current approach is to make _modular column modules_ that become angled to curve around the leg by having one diagonal side that then clicks into the next module, creating a curve per column. A nice!nano in a rightmost MCU column module, and a terminator in the leftmost column; and then a belt attaches through the side modules to strap around the leg.
+## What's in here
 
-![latest prototype](Images/proto%203.8%20irl.png)
+This repo is also an Obsidian vault, which is why it has wiki syntax here and there.
 
-But why‽ Because I think so much better when I'm moving. So I want to code while I move. So I need an input method that works while I'm moving. 
+- `case/`: the case. `case/roamy-v4` is the current model, in Cadova (Swift): `swift run` there writes the printable 3MF files. Notes in [Case design](case/Case%20design.md) and [Harness design](case/Harness%20design.md). `roamy-v3.py` is the old CadQuery model.
+- `electronics/`: the KiCad project for the key module board, and [Electronics](electronics/Electronics.md) with the bus and the joint.
+- `zmk/`: the firmware, ZMK plus a driver for the key modules' shift register chain. [Firmware](docs/firmware.md) covers building, flashing over USB, and updating over Bluetooth with `roamy-ota` or a phone; [Layout](zmk/Layout.md) covers the keymap.
+- `docs/`: the website at roamyboard.nevyn.dev and the reference docs; [docs/index.md](docs/index.md) lists them.
+- [Build Diary](Build%20Diary.md): what happened when.
+- `firmware/`: the stock Lily58 firmware images from before the roamyboard had its own.
 
-I will also need a wearable [[Computer]] and [[Head mounted display]] to go with this setup for that to be possible, but that's for later.
+## Inspiration
 
-This repo is also an Obsidian project, which is why it has wiki syntax here and there.
-
-To build one, follow the [assembly guide](https://nevyn.github.io/roamyboard/assembly/), or [order one](https://nevyn.github.io/roamyboard/order/). The project's page is https://nevyn.github.io/roamyboard/.
-
-# How to work on this shit
-
-## Case
-
-I'm designing in CadQuery for some reason. I had to run it from source for it to work.
-
-1. Install
-2. Launch from script in repo: `~/cq-editor/run.sh`
-3. Open Case/roamy-v3.py
-4. Press Play????
-
-# Inspiration
-
-The general construction is based on ScottoChoczard, because it’s a straightforward hard-wired PCB-less design and thus doesn’t have to be flat, but can follow the curve of the leg.
-```embed
-title: "ScottoChoczard Handwired Keyboard Project"
-image: "https://scottokeebs.com/cdn/shop/articles/scottochoczard.jpg?v=1730156756"
-description: "The ScottoChoczard is a wireless split 3x6 ortholinear keyboard that uses Choc switches and large 750mah battery."
-url: "https://scottokeebs.com/blogs/keyboards/scottochoczard-handwired-keyboard"
-```
-
-![](https://www.youtube.com/watch?v=LXfdxxXyiFE)
-
-The hardware and layout is based on [![](https://typeractive.xyz/cdn/shop/files/favicon-typeractive_1_32x32.png?v=1640412698)Typeractive.xyzBuild - Wireless Corne and Lily58 Keyboard Kits](https://typeractive.xyz/pages/build/lily58). It’s wireless, based on the nice!nano just like the ScottoChoczard, but has a more conventional 4-row layout so I don’t have to go as deep in layers.
-![Lily58 example](Images/Lily58%20example.png)
-
-# Parts
-## Firmware and layout
-The firmware is ZMK with a custom driver for the key modules' shift register chain; the module and config live in `zmk/`. Read more in [Firmware](docs/firmware.md), and about the layout in [[Layout]].
-
-After the first flash over USB, firmware updates can go over Bluetooth, from a Mac with `roamy-ota` or from a phone: see [Updating over Bluetooth](docs/firmware.md#updating-over-bluetooth).
-
-The stock Lily58 firmware images are still in `firmware/`.
-
-## Wiring
-
-~~It'll probably end up looking something like ScottoChoczard~~:
-![choczard wiring](Images/choczard%20wiring.png)
-
-Actually, screw the handwiring. I'm making PCBs in [[Electronics]]!!!
-## Case
-
-A hard shell 3d print of some sort. Read more in [[Case design]].
-
-## Harness, fabrics etc
-
-This case needs to attach to the user's body somehow. Read more in [[Harness design]].
+The construction started from [ScottoChoczard](https://scottokeebs.com/blogs/keyboards/scottochoczard-handwired-keyboard), a hand-wired, PCB-less split that doesn't have to be flat, and the layout from the [Lily58](https://typeractive.xyz/pages/build/lily58), which is wireless on a nice!nano with a conventional four-row layout. Since then it got its own PCBs and modules. More in [Inspiration](Inspiration.md).
