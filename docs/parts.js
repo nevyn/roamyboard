@@ -55,6 +55,8 @@
     { name: "LiPo battery, 750 mAh, 48 × 30 × 5 mm", source: "electrokit 41016063", per: { mcu: 1 },
       price: { amount: 129, currency: "SEK", each: 1, vendor: "electrokit", url: "https://www.electrokit.com/batteri-lipo-3.7v-750mah",
                note: "Swedish VAT included" } },
+    { name: "2.2 kΩ, 0805 (SDA and SCL pull-ups)", source: lcsc("C17520"), per: { mcu: 2 },
+      price: at("C17520", 0.005, "100+ price tier") },
     { name: "Battery jack, JST S2B-PH-K-S", source: lcsc("C173752"), per: { mcu: 1 },
       price: at("C173752", 0.0399, "20+ price tier") },
     { name: "Slide switch, Alps SSSS811101", source: lcsc("C109335"), per: { mcu: 1 },
