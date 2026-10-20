@@ -12,6 +12,7 @@ enum Revision {
     static let mcuShell = 5     // r2: prop over the nano, view end walls, board-side tabs with wire gaps; r3: chambers for the switch and button; r4: board-side legs down to the floor; r5: seats over the switch and button, wire slots at the button
     static let tunnelFloor = 1  // key module floor r8 with strap tunnels
     static let keeper = 1
+    static let mcuTunnelFloor = 1  // MCU floor r3 with strap tunnels
     static let mcuFloor = 3     // r2: clamp pads and rear stops on the socket bodies; r3: lead-in on the socket stops, tabs at the board-side legs
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }

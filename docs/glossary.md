@@ -18,7 +18,7 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **bay**: The MCU module's space beside its board, holding the battery, the nice!nano, the battery jack, the power switch and the reset button.
 - **lug**: A part on a module's free face that the harness attaches to. Only the MCU and terminator modules have free faces. Not: harness fastener, clip, belt clip, hook.
 - **strap keeper**: A flat printed tube glued under a module, which the harness strap runs through. It only locates the board on the strap. Not: strap loop, belt loop.
-- **tunnel floor**: A key module floor thickened below with a tunnel for the strap at each column end; it does what a strap keeper does without glue.
+- **tunnel floor**: A key module or MCU floor thickened below with a tunnel for the strap at each column end; it does what a strap keeper does without glue.
 - **column**: The line of keys that one key module carries, as a typing concept. The part is a key module.
 - **neighbour**: The module on a module's header side. In a pair, A is the module carrying the guide pins and headers, and B is A's neighbour, carrying the guide holes, flaps and sockets that meet them. Not: next module, left/right module.
 - **header side**, **socket side**: The two long sides of a module, named by the connector each carries. Not: left/right, male/female side.

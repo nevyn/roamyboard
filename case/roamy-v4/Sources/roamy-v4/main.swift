@@ -30,6 +30,10 @@ await Project(packageRelative: "../../build/roamy-v4") {
         let f = KeyModuleFloor(tunnels: true)
         f.transformed(PrintPose.bottomDown(f.bottom))
     }
+    await Model("mcu-tunnel-floor-print") {
+        let f = MCUFloor(tunnels: true)
+        f.transformed(PrintPose.bottomDown(f.bottom))
+    }
     await Model("strap-keeper-print") {   // four: two for the MCU floor, two for the terminator's neighbour
         for i in 0..<4 { StrapKeeper().translated(x: Double(i % 2) * (StrapKeeper.width + 5), y: Double(i / 2) * (StrapKeeper.height + 5)) }
     }
@@ -95,6 +99,13 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
         f.transformed(PrintPose.bottomDown(f.bottom))
     }
     await Model("strap-keeper-print", options: .format3D(.stl)) { StrapKeeper() }
+    await Model("mcu-tunnel-floor", options: .format3D(.stl)) { MCUFloor(tunnels: true) }
+    await Model("right-mcu-tunnel-floor", options: .format3D(.stl)) { MCUFloor(tunnels: true).transformed(Joint.neighbourTransform) }
+    await Model("mcu-tunnel-floor-print", options: .format3D(.stl)) {
+        let f = MCUFloor(tunnels: true)
+        f.transformed(PrintPose.bottomDown(f.bottom))
+    }
+    await Model("mcu-tunnel-drivers", options: .format3D(.stl)) { for frame in MCUFloor.screwFrames { StrapTunnel.driver.transformed(frame) } }
     // what the floor's clamp pads and rear stops touch and keep clear of
     await Model("connector-bodies", options: .format3D(.stl)) {
         for r in P.rowYs { SocketBody(rowY: r); TiltedHeader(rowY: r) }

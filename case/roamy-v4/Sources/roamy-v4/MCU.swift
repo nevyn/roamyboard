@@ -202,9 +202,21 @@ struct MCUChambers: Geometry3D {
 /// button's pegs. Everything that locates the parts sideways hangs from the shell, so they go into the
 /// upturned shell before the floor closes it.
 struct MCUFloor: Geometry3D {
+    /// Thickened below by `StrapTunnel.depth`, with a tunnel for the harness strap at each column end.
+    var tunnels = false
+    var bottom: Double { tunnels ? Joint.bottom - StrapTunnel.depth : Joint.bottom }
+
+    /// Each floor screw's frame: origin on the plain floor's bottom face, z along the screw.
+    static var screwFrames: [Transform3D] {
+        ColumnEnd.allCases.flatMap { end in
+            P.screwXs.map { KeyModuleFloor.frame(x: $0, y: end.y(P.screwY)) }
+                + [Joint.levelFrame(x: MCU.outerScrewX, y: end.y(P.outerScrewInset.y), level: Joint.bottom)]
+        }
+    }
+
     var body: any Geometry3D {
         let c = P.tabClearance, t = P.tabThickness, h = P.tabHeight, rim = Joint.rim
-        alongColumn(MCU.section(from: Joint.bottom, to: rim))
+        alongColumn(MCU.section(from: bottom, to: rim))
             .adding {
                 for x in P.pillarXs {
                     for y in P.pillarYs {
@@ -246,16 +258,17 @@ struct MCUFloor: Geometry3D {
                 }
             }
             .subtracting {
-                for end in ColumnEnd.allCases {
-                    for x in P.screwXs { Counterbore().transformed(KeyModuleFloor.frame(x: x, y: end.y(P.screwY))) }
-                    Counterbore().transformed(Joint.levelFrame(x: MCU.outerScrewX, y: end.y(P.outerScrewInset.y), level: Joint.bottom))
+                for frame in Self.screwFrames {
+                    Counterbore().transformed(frame)
+                    if tunnels { StrapTunnel.headBore.transformed(frame) }
                 }
+                if tunnels { StrapTunnel.slots() }
                 // jack tails, through; switch pegs and button bosses
                 MCU.place(Box(x: 3.4, y: 1.4, z: 20), x: MCU.jackX + P.jackBody.u / 2 - 1.7, d: MCU.jackD + P.jackPins - 0.7, level: rim - 10)
                 MCU.place(Box(x: P.switchBody.u, y: P.switchBody.y, z: 1.0), x: MCU.switchX, d: MCU.switchD - P.switchBody.y / 2, level: rim - 0.7)
                 MCU.place(Box(x: P.resetBody.u, y: P.resetBody.y, z: 1.0), x: MCU.resetX, d: MCU.resetD - P.resetBody.y / 2, level: rim - 0.7)
                 // revision on the inside face
-                MCU.place(engraving("mcu floor \(Revision.label(Revision.mcuFloor))", size: 4.0).rotated(z: 90°).translated(z: -0.6),
+                MCU.place(engraving(tunnels ? "mcu tunnel \(Revision.label(Revision.mcuTunnelFloor))" : "mcu floor \(Revision.label(Revision.mcuFloor))", size: 4.0).rotated(z: 90°).translated(z: -0.6),
                           x: MCU.nanoX + P.nanoWidth + 4, d: 66, level: rim)
             }
     }

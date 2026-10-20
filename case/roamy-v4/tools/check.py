@@ -187,6 +187,14 @@ for move, what in [((0, 0.5, 0), "+y"), ((0, -0.5, 0), "-y")]:
     expect(overlap(P["mcu-shell"], view, move) > 1, f"MCU module: the view is held at its {what} end")
 for move, what in [((0.3, 0, 0), "into the bay"), ((-0.3, 0, 0), "into the socket wall")]:
     expect(overlap(P["mcu-shell"], P["socket-board"], move) > 1e-3, f"MCU module: the socket board is held {what}")
+# MCU tunnel floor: the MCU floor thickened under the strap tunnels, in place of the plain one
+U = {n: man(n) for n in ["mcu-tunnel-floor", "right-mcu-tunnel-floor", "mcu-tunnel-drivers"]}
+worst = max([(overlap(U["mcu-tunnel-floor"], P[n]), n) for n in ["mcu-shell", "mcu-parts", "socket-board"]] +
+            [(overlap(U["right-mcu-tunnel-floor"], P[n]), n) for n in ["shell", "floor", "board"]])
+expect(worst[0] < 1e-3, f"MCU tunnel floor: no overlap with its own module's or its neighbour's parts (largest {worst[0]:.4f} mm³, {worst[1]})")
+expect(max(overlap(U["mcu-tunnel-floor"], s_) for s_ in shanks) < 1e-3, "MCU tunnel floor: 6 M2 shanks clear it")
+expect(overlap(U["mcu-tunnel-floor"], U["mcu-tunnel-drivers"]) < 1e-3, "MCU tunnel floor: a 3.2 mm screwdriver reaches every head")
+expect(overlap(U["mcu-tunnel-floor"], T["tunnel-straps"]) < 1e-3, "MCU tunnel floor: a strap 0.5 mm smaller than the tunnel passes through")
 inward = -np.array([math.cos(math.radians(2.94)), 0, -math.sin(math.radians(2.94))])
 for part in ("switch", "reset"):
     m = man(f"mcu-{part}")

@@ -132,10 +132,7 @@ struct KeyModuleFloor: Geometry3D {
                 for end in ColumnEnd.allCases {
                     for x in P.screwXs {
                         Counterbore().transformed(Self.frame(x: x, y: end.y(P.screwY)))
-                        if tunnels {
-                            Cylinder(diameter: P.screwHeadDiameter, height: StrapTunnel.depth + 1).translated(z: -StrapTunnel.depth - 0.5)
-                                .transformed(Self.frame(x: x, y: end.y(P.screwY)))
-                        }
+                        if tunnels { StrapTunnel.headBore.transformed(Self.frame(x: x, y: end.y(P.screwY))) }
                     }
                 }
                 if tunnels { StrapTunnel.slots() }
