@@ -5,7 +5,7 @@
 ![MCU module rework: three wires and two pull-ups](../docs/images/pointing-rework.svg)
 
 1. Switch the half off, take it off the strap, slide the key modules off, and unscrew the floor.
-2. Solder three wires, stranded or wire-wrap wire, from the nice!nano to the socket joints of J_LEFT3, the connector nearest the SW1 end:
+2. Solder three wires from the nice!nano to the socket joints of J_LEFT3, the connector nearest the SW1 end. Solid-core wire holds its route between the existing wires best; expect about an hour:
    - D6 (silkscreen 100) to J_LEFT3 pin 1, INT. The v3.0 pinout gave this pin to LED, which moves to J_LEFT1 pin 1 once LEDs exist.
    - D4 (022) to J_LEFT3 pin 2, SDA.
    - D5 (024) to J_LEFT3 pin 3, SCL.
