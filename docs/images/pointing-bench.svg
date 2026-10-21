@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 560" width="980" height="560"><rect width="980" height="560" fill="#fff"/>
+<text x="30.0" y="36.0" font-size="16" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">Find the TPS48's pads</text>
+<text x="30.0" y="54.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Ring each solder pad on the module's back out against the IQS572's pins (continuity beep).</text>
+<text x="30.0" y="69.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">The datasheet draws only the GPIO variant (silkscreen IO1..IO5, GND, 3V3); the I2C mapping is not published.</text>
+<rect x="95.0" y="155.0" width="210.0" height="210.0" rx="8" fill="#2b2b2b" stroke="#000"/>
+<circle cx="113.0" cy="173.0" r="6" fill="#777"/>
+<text x="200.0" y="254.0" font-size="16" text-anchor="middle" font-weight="bold" fill="#eee" font-family="Helvetica, Arial, sans-serif">IQS572</text>
+<text x="200.0" y="274.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#ccc" font-family="Helvetica, Arial, sans-serif">QFN28, top view</text>
+<text x="200.0" y="290.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#ccc" font-family="Helvetica, Arial, sans-serif">dot = pin 1</text>
+<rect x="76.0" y="178.5" width="14" height="7" fill="#c9a227"/>
+<text x="69.0" y="186.0" font-size="9" text-anchor="end" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">1</text>
+<rect x="76.0" y="204.5" width="14" height="7" fill="#1f77b4"/>
+<text x="69.0" y="212.0" font-size="11" text-anchor="end" font-weight="bold" fill="#1f77b4" font-family="Helvetica, Arial, sans-serif">2 SDA</text>
+<rect x="76.0" y="230.5" width="14" height="7" fill="#9467bd"/>
+<text x="69.0" y="238.0" font-size="11" text-anchor="end" font-weight="bold" fill="#9467bd" font-family="Helvetica, Arial, sans-serif">3 SCL</text>
+<rect x="76.0" y="256.5" width="14" height="7" fill="#d62728"/>
+<text x="69.0" y="264.0" font-size="11" text-anchor="end" font-weight="bold" fill="#d62728" font-family="Helvetica, Arial, sans-serif">4 VDDHI</text>
+<rect x="76.0" y="282.5" width="14" height="7" fill="#222222"/>
+<text x="69.0" y="290.0" font-size="11" text-anchor="end" font-weight="bold" fill="#222222" font-family="Helvetica, Arial, sans-serif">5 VSS</text>
+<rect x="76.0" y="308.5" width="14" height="7" fill="#c9a227"/>
+<text x="69.0" y="316.0" font-size="9" text-anchor="end" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">6</text>
+<rect x="76.0" y="334.5" width="14" height="7" fill="#7f7f7f"/>
+<text x="69.0" y="342.0" font-size="11" text-anchor="end" font-weight="bold" fill="#7f7f7f" font-family="Helvetica, Arial, sans-serif">7 NRST</text>
+<rect x="118.5" y="370.0" width="7" height="14" fill="#17becf"/>
+<text x="122.0" y="399.0" font-size="11" text-anchor="middle" font-weight="bold" fill="#17becf" font-family="Helvetica, Arial, sans-serif">RDY 8</text>
+<rect x="144.5" y="370.0" width="7" height="14" fill="#c9a227"/>
+<text x="148.0" y="399.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">9</text>
+<rect x="170.5" y="370.0" width="7" height="14" fill="#c9a227"/>
+<text x="174.0" y="399.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">10</text>
+<rect x="196.5" y="370.0" width="7" height="14" fill="#c9a227"/>
+<text x="200.0" y="399.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">11</text>
+<rect x="222.5" y="370.0" width="7" height="14" fill="#c9a227"/>
+<text x="226.0" y="399.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">12</text>
+<rect x="248.5" y="370.0" width="7" height="14" fill="#c9a227"/>
+<text x="252.0" y="399.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">13</text>
+<rect x="274.5" y="370.0" width="7" height="14" fill="#c9a227"/>
+<text x="278.0" y="399.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">14</text>
+<rect x="310.0" y="334.5" width="14" height="7" fill="#c9a227"/>
+<text x="331.0" y="342.0" font-size="9" text-anchor="start" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">15</text>
+<rect x="310.0" y="308.5" width="14" height="7" fill="#c9a227"/>
+<text x="331.0" y="316.0" font-size="9" text-anchor="start" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">16</text>
+<rect x="310.0" y="282.5" width="14" height="7" fill="#c9a227"/>
+<text x="331.0" y="290.0" font-size="9" text-anchor="start" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">17</text>
+<rect x="310.0" y="256.5" width="14" height="7" fill="#c9a227"/>
+<text x="331.0" y="264.0" font-size="9" text-anchor="start" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">18</text>
+<rect x="310.0" y="230.5" width="14" height="7" fill="#c9a227"/>
+<text x="331.0" y="238.0" font-size="9" text-anchor="start" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">19</text>
+<rect x="310.0" y="204.5" width="14" height="7" fill="#c9a227"/>
+<text x="331.0" y="212.0" font-size="9" text-anchor="start" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">20</text>
+<rect x="310.0" y="178.5" width="14" height="7" fill="#c9a227"/>
+<text x="331.0" y="186.0" font-size="9" text-anchor="start" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">21</text>
+<rect x="274.5" y="136.0" width="7" height="14" fill="#c9a227"/>
+<text x="278.0" y="129.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">22</text>
+<rect x="248.5" y="136.0" width="7" height="14" fill="#c9a227"/>
+<text x="252.0" y="129.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">23</text>
+<rect x="222.5" y="136.0" width="7" height="14" fill="#c9a227"/>
+<text x="226.0" y="129.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">24</text>
+<rect x="196.5" y="136.0" width="7" height="14" fill="#c9a227"/>
+<text x="200.0" y="129.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">25</text>
+<rect x="170.5" y="136.0" width="7" height="14" fill="#c9a227"/>
+<text x="174.0" y="129.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">26</text>
+<rect x="144.5" y="136.0" width="7" height="14" fill="#c9a227"/>
+<text x="148.0" y="129.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">27</text>
+<rect x="118.5" y="136.0" width="7" height="14" fill="#c9a227"/>
+<text x="122.0" y="129.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#777" font-family="Helvetica, Arial, sans-serif">28</text>
+<text x="200.0" y="427.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">Pins from the IQS5xx-B000 datasheet, p. 11.</text>
+<text x="600.0" y="120.0" font-size="14" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">Bench: jumpers into the MCU module's sockets</text>
+<text x="600.0" y="136.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">socket face of the rewired MCU module, no key modules attached</text>
+<rect x="470.0" y="160.0" width="40" height="260.0" rx="4" fill="#ddd" stroke="#888"/>
+<text x="490.0" y="154.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">SW5 end (USB-C)</text>
+<text x="490.0" y="434.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">SW1 end</text>
+<rect x="484.0" y="197.45600000000002" width="12" height="6" fill="#111"/>
+<polyline points="496.0,200.5 560.0,200.5 590.0,183.1 640.0,183.1" fill="none" stroke="#17becf" stroke-width="3" stroke-linejoin="round"/>
+<text x="646.0" y="187.1" font-size="11" text-anchor="start" font-weight="bold" fill="#17becf" font-family="Helvetica, Arial, sans-serif">pin 1 INT  to the pad's RDY</text>
+<rect x="484.0" y="204.06" width="12" height="6" fill="#111"/>
+<polyline points="496.0,207.1 560.0,207.1 590.0,207.1 640.0,207.1" fill="none" stroke="#d62728" stroke-width="3" stroke-linejoin="round"/>
+<text x="646.0" y="211.1" font-size="11" text-anchor="start" font-weight="bold" fill="#d62728" font-family="Helvetica, Arial, sans-serif">pin 2 +3.3V  to the pad's VDDHI</text>
+<rect x="484.0" y="210.664" width="12" height="6" fill="#111"/>
+<polyline points="496.0,213.7 560.0,213.7 590.0,231.1 640.0,231.1" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round"/>
+<text x="646.0" y="235.1" font-size="11" text-anchor="start" font-weight="bold" fill="#222222" font-family="Helvetica, Arial, sans-serif">pin 3 GND  to the pad's VSS</text>
+<text x="560.0" y="163.1" font-size="11" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">J_LEFT1</text>
+<text x="520.0" y="260.5" font-size="10" text-anchor="start" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">J_LEFT2: leave empty</text>
+<rect x="484.0" y="246.85599999999997" width="12" height="6" fill="#111"/>
+<rect x="484.0" y="253.45999999999998" width="12" height="6" fill="#111"/>
+<rect x="484.0" y="260.064" width="12" height="6" fill="#111"/>
+<rect x="484.0" y="345.65599999999995" width="12" height="6" fill="#111"/>
+<text x="646.0" y="335.3" font-size="10" text-anchor="start" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">pin 1 LED: leave empty</text>
+<rect x="484.0" y="352.26" width="12" height="6" fill="#111"/>
+<polyline points="496.0,355.3 560.0,355.3 590.0,355.3 640.0,355.3" fill="none" stroke="#1f77b4" stroke-width="3" stroke-linejoin="round"/>
+<text x="646.0" y="359.3" font-size="11" text-anchor="start" font-weight="bold" fill="#1f77b4" font-family="Helvetica, Arial, sans-serif">pin 2 SDA  to the pad's SDA</text>
+<rect x="484.0" y="358.86400000000003" width="12" height="6" fill="#111"/>
+<polyline points="496.0,361.9 560.0,361.9 590.0,379.3 640.0,379.3" fill="none" stroke="#9467bd" stroke-width="3" stroke-linejoin="round"/>
+<text x="646.0" y="383.3" font-size="11" text-anchor="start" font-weight="bold" fill="#9467bd" font-family="Helvetica, Arial, sans-serif">pin 3 SCL  to the pad's SCL</text>
+<text x="560.0" y="311.3" font-size="11" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">J_LEFT3</text>
+<text x="30.0" y="470.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Solder short stranded wires to the pad's VDDHI, VSS, SDA, SCL and RDY pads, with male Dupont pins at the far end.</text>
+<text x="30.0" y="488.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Leave NRST unconnected: the IQS572 pulls it up itself.</text>
+<text x="30.0" y="506.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Switch the half off before you plug the jumpers in. With the pad in the sockets, this half reads 0 key modules.</text>
+<text x="30.0" y="524.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Tape a 1 to 2 mm plastic overlay on the pad's face, without air gaps, and leave solder link S1 open.</text>
+</svg>
