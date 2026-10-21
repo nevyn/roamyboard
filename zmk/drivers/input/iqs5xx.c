@@ -86,8 +86,8 @@ struct iqs5xx_data {
     struct k_work activity_work;
     enum iqs5xx_state state;
     struct iqs5xx_logic logic;
-    /** Product number last reported as not an IQS5xx-B000, so it is logged once. */
-    uint16_t warned_product;
+    /** Product number last reported as not an IQS5xx-B000, so it is logged once; -1 for none. */
+    int32_t warned_product;
     /** ZMK's activity state: 1 while active, 0 while idle. Written by the event listener. */
     atomic_t zmk_active;
     /** The activity state that the trackpad's Idle timeout was last written for. */
@@ -329,7 +329,7 @@ static void iqs5xx_feed(const struct device *dev, enum iqs5xx_input input, uint1
             iqs5xx_logic_release_all(&data->logic, &output);
             iqs5xx_report(dev, &output);
         }
-        if (t.actions & IQS5XX_DO_WARN_PRODUCT && product != data->warned_product) {
+        if ((t.actions & IQS5XX_DO_WARN_PRODUCT) && product != data->warned_product) {
             LOG_WRN("The device at 0x%02x on %s has product number %u, not an IQS5xx-B000 "
                     "(40, 52 or 58); the trackpad driver ignores it",
                     config->bus.addr, config->bus.bus->name, product);
@@ -350,7 +350,7 @@ static void iqs5xx_feed(const struct device *dev, enum iqs5xx_input input, uint1
         if (!(t.actions & IQS5XX_DO_CONFIGURE)) {
             return;
         }
-        data->warned_product = 0;
+        data->warned_product = -1;
         input = iqs5xx_configure(dev) ? IQS5XX_IN_IO_ERROR : IQS5XX_IN_CONFIGURED;
     }
 }
@@ -467,6 +467,7 @@ static int iqs5xx_init(const struct device *dev) {
 
     data->dev = dev;
     data->state = IQS5XX_ABSENT;
+    data->warned_product = -1;
     iqs5xx_logic_init(&data->logic, config->scroll_divisor);
     atomic_set(&data->zmk_active, 1);
 
