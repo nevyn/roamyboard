@@ -1,12 +1,15 @@
 # Firmware
 
-roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `zmk/` holds an out-of-tree ZMK module (a kscan driver, its devicetree binding and the shields) and the user config (`zmk/config`: west manifest, keymaps, settings). ZMK is pinned in `zmk/config/west.yml`; move the pin deliberately, since board names, bindings and Kconfig symbols change on ZMK's main branch.
+roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `zmk/` holds an out-of-tree ZMK module (a kscan driver, a trackpad driver, their devicetree bindings and the shields) and the user config (`zmk/config`: west manifest, keymaps, settings). ZMK is pinned in `zmk/config/west.yml`; move the pin deliberately, since board names, bindings and Kconfig symbols change on ZMK's main branch.
 
 | Path | What |
 | --- | --- |
 | `zmk/drivers/kscan/chain.c`, `chain.h` | Pure logic: sentinel search, key module count stabilizing, column mapping, key event bookkeeping. No Zephyr dependencies. |
 | `zmk/drivers/kscan/kscan_165_chain.c` | Zephyr glue: SPI, /PL, polling, debouncing, the kscan callback. |
 | `zmk/dts/bindings/kscan/roamyboard,kscan-165-chain.yaml` | The driver's devicetree binding; every property is documented there. |
+| `zmk/drivers/input/iqs5xx_logic.c`, `iqs5xx_logic.h` | Pure logic of the trackpad driver: frame decoding, pointer events, the state machine. No Zephyr dependencies. |
+| `zmk/drivers/input/iqs5xx.c` | Zephyr glue of the trackpad driver: I2C, RDY, probing, configuration and the power policy (Trackpad, below). |
+| `zmk/dts/bindings/input/azoteq,iqs5xx.yaml` | The trackpad driver's devicetree binding; every property is documented there. |
 | `zmk/dts/roamyboard.dtsi` | Devicetree shared by all shields: pins, the chain node, the 24 × 5 physical layout and matrix transform. |
 | `zmk/boards/shields/roamyboard/` | The unibody shield. |
 | `zmk/boards/shields/roamyboard_split/` | The `roamyboard_left` and `roamyboard_right` shields. |
@@ -176,6 +179,55 @@ The nice!nano's Adafruit nRF52 bootloader reads the nRF52840's GPREGRET register
 
 Zephyr's boot modes have no OTA mode, so `&ota_boot` writes 0xA8 with `retention_write()` straight to the `zmk,magic-boot-mode` partition. Both keys then call `sys_reboot(SYS_REBOOT_WARM)`. On this ZMK revision nothing writes GPREGRET after that: `sys_reboot()` locks interrupts and stops the RTC1 system timer, and the Cortex-M `sys_arch_reboot()` only sets SYSRESETREQ in the SCB. ZMK's `NRF_STORE_REBOOT_TYPE_GPREGRET` symbol, which once made `sys_reboot()` store its argument in GPREGRET, has had no effect since Zephyr 3.6 removed the code behind it.
 
+## Trackpad
+
+The right half reads the [pointing module](../electronics/Pointing%20module.md)'s trackpad, an Azoteq TPS48-P203-S: an IQS572 controller with Azoteq's IQS5xx-B000 firmware, at I2C address 0x74 on TWIM1 (D4 and D5), with its RDY output on D6. The driver (`zmk/drivers/input/iqs5xx.c`, compatible `azoteq,iqs5xx`) is a Zephyr input device. Its pure logic is in `iqs5xx_logic.c`, with host tests in `zmk/tests/iqs5xx_test.c`. The binding, `zmk/dts/bindings/input/azoteq,iqs5xx.yaml`, documents every property. This follows the IQS5xx-B000 datasheet, revision 2.1; the driver is untested on hardware.
+
+The trackpad accepts I2C transfers only in a **communication window**. It opens a window and raises RDY when it has new data, and it pauses sensing until the driver ends the window by writing one byte to 0xEEEE; an I2C STOP leaves the window open. Register addresses are 16 bits, big-endian. A transfer while RDY is low is a **forced communication**: the trackpad holds SCL low (clock stretching) until its next window opens, which takes up to one report interval. In a low-power mode it NACKs the first addressing, so the driver tries each forced transfer up to 3 times, 200 µs apart.
+
+The driver does all of its I2C on its own work queue thread, so that a stretched transfer never blocks ZMK's system work queue. Zephyr's nRF TWIM driver fails a transfer after `CONFIG_I2C_NRFX_TRANSFER_TIMEOUT` (500 ms), so the build rejects any report interval above half of it.
+
+### States
+
+The trackpad may be missing at boot and may slide on or off at any time, like any module. The driver has three states:
+
+| State | What the driver does | Next state |
+| --- | --- | --- |
+| absent | Reads the Product number every 1 s. The boot never waits for the trackpad. | configuring, when the Product number is 58 (IQS572), 40 (IQS550) or 52 (IQS525) |
+| configuring | In one window: acknowledges the reset (ACK_RESET), turns on event mode with trackpad and gesture events, enables the tap, press-and-hold, two-finger tap and scroll gestures, and writes the axis flips, the report intervals and the Idle timeout. Then it sets SETUP_COMPLETE and the watchdog, logs the product, version and resolution, and ends the window. | running; absent if a transfer fails |
+| running | On each RDY rising edge, reads registers 0x000D to 0x0015 (gestures, system info, finger count, relative X and Y) in one transfer, ends the window and reports the events. After 5 s without a frame, it reads them by forced communication, to find out whether the trackpad is still there. | configuring, when a frame has SHOW_RESET; absent if a transfer fails |
+
+The trackpad sets SHOW_RESET after a power-up, a watchdog reset or a re-plug, and it has then lost the driver's configuration. A device at 0x74 with another Product number gets one warning in the log, and the driver leaves it alone. The RDY interrupt is on only while the driver is running, since RDY floats while no pointing module is attached; the pin has the nRF52840's pull-down. Leaving the running state releases every button that the driver holds, so that a trackpad removed during a drag cannot leave a button stuck on the host.
+
+The driver logs with its own level, `CONFIG_ROAMYBOARD_INPUT_IQS5XX_LOG_LEVEL`: state changes and the configured trackpad at INFO, failed transfers at WRN with the register, and every frame at DEBUG.
+
+### Events
+
+The trackpad recognises the gestures itself, and the driver turns them into Zephyr input events:
+
+| Touch | Input event |
+| --- | --- |
+| One finger moving | `INPUT_REL_X`, `INPUT_REL_Y` |
+| Tap | `INPUT_BTN_0`, pressed, and released 20 ms later |
+| Two-finger tap | `INPUT_BTN_1`, pressed, and released 20 ms later |
+| Press and hold | `INPUT_BTN_0`, held until every finger lifts, so that the finger drags |
+| Two fingers moving in parallel (scroll) | `INPUT_REL_WHEEL` for Y and `INPUT_REL_HWHEEL` for X: one step per `scroll-divisor` (32) relative counts |
+
+The driver keeps the scroll counts that do not make a full step for the next frame, and drops them when the fingers lift. The trackpad's swipe and zoom gestures are disabled. The last event of each frame carries the input sync. The axis flips (`flip-x`, `flip-y`, `switch-xy`) and the scroll direction are untested; the bench decides them.
+
+The right half sends the events to the left half over ZMK's input split: `roamyboard_right.overlay` has a `zmk,input-split` node with reg 0 for the trackpad. The left half's proxy node with the same reg raises them again, and its `zmk,input-listener` reports them to the host (`roamyboard_left.overlay`). `CONFIG_ZMK_POINTING` in `zmk/config/roamyboard.conf` turns on input support on both halves.
+
+### Power
+
+The IQS5xx switches between its modes by itself: Active and Idle-Touch while a finger is on it, Idle between touches, and LP1 and then LP2 after the timeouts of the modes before them. The driver sets the report intervals once and the Idle timeout from ZMK's activity state (`zmk_activity_state_changed`):
+
+| ZMK | Active, Idle-Touch | Idle | Idle timeout | LP1, LP2 |
+| --- | --- | --- | --- | --- |
+| active | `active-report-ms` (10 ms) | `idle-report-ms` (10 ms) | never (255) | not reached |
+| idle or asleep | `active-report-ms` | `idle-report-ms` | 1 s | `lp1-report-ms` (80 ms), `lp2-report-ms` (160 ms) |
+
+While ZMK is active, the trackpad never leaves Idle mode between touches, so the first touch is reported within one Idle interval. The driver never suspends the trackpad, so a touch while ZMK is idle still produces input, and ZMK counts input as activity. The driver writes a new Idle timeout in the next communication window, opened by forced communication if needed, and it reads that window's frame first, so that no touch is lost. The LP1 timeout keeps the trackpad's own setting.
+
 ## Pins
 
 The firmware chooses the pins; the MCU board does not exist yet. Until it does, the MCU module takes the socket board, wired to the nice!nano as below. The interconnect pins are the socket board's J_LEFT sockets (pinout in [Electronics](../electronics/Electronics.md)); pin 1 is the topmost pin of each connector.
@@ -191,7 +243,7 @@ The firmware chooses the pins; the MCU board does not exist yet. Until it does, 
 | SCL (planned) | D5 | P0.24, TWIM1 SCL, 2.2 kΩ to VCC | J_LEFT3 pin 3 |
 | INT (planned) | D6 | P1.00, GPIO | J_LEFT3 pin 1 |
 
-SDA, SCL and INT are planned for the [pointing module](../electronics/Pointing%20module.md) and not wired yet. The firmware already runs TWIM1 on D4 and D5, with the nRF52840's own pull-ups on both lines, and does not use D6 yet. Wiring them adds the three wires and two 2.2 kΩ resistors from SDA and SCL to VCC. INT takes J_LEFT3 pin 1, which the v3.0 pinout gave LED. J_LEFT1 pin 1, +5V in the v3.0 pinout and the LED line once LEDs are wired, stays unconnected.
+SDA, SCL and INT are planned for the [pointing module](../electronics/Pointing%20module.md) and not wired yet. The firmware already runs TWIM1 on D4 and D5, with the nRF52840's own pull-ups on both lines, and the right half's trackpad driver reads RDY on D6 with the nRF52840's pull-down (Trackpad, above). Wiring them adds the three wires and two 2.2 kΩ resistors from SDA and SCL to VCC. INT takes J_LEFT3 pin 1, which the v3.0 pinout gave LED. J_LEFT1 pin 1, +5V in the v3.0 pinout and the LED line once LEDs are wired, stays unconnected.
 
 Solder the wires to the sockets' solder joints (J_LEFT), not to the empty header pads (J_RIGHT) or U1's pads: those reach the sockets through 0.25 mm tracks, and on the first socket board a wire tugging on a header pad broke the +3.3V and GND connections.
 

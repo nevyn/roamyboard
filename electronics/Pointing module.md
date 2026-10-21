@@ -2,7 +2,7 @@
 
 ## Status
 
-The firmware runs the pointing module's I2C bus, TWIM1 on D4 and D5, and the chain on SPIM2 since build ca87098. The MCU modules are not rewired yet, so SDA, SCL, INT and the pull-ups below are the plan, and no pad is built.
+The firmware runs the pointing module's I2C bus, TWIM1 on D4 and D5, and the chain on SPIM2 since build ca87098. The trackpad driver for the right half exists on the pointing-module branch and is untested on hardware; [Firmware](../docs/firmware.md) (Trackpad) describes it. The MCU modules are not rewired yet, so SDA, SCL, INT and the pull-ups below are the plan, and no pad is built.
 
 ## Decisions
 
