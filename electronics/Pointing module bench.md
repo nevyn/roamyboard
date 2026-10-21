@@ -26,19 +26,19 @@
 
 ![IQS572 pins and the bench jumpers](../docs/images/pointing-bench.svg)
 
-The TPS48-P203 has seven solder pads on its back and no connector. Azoteq's datasheet draws only the GPIO variant (silkscreen IO1 to IO5, GND, 3V3), so the I2C variant's pads have to be identified on the board.
+The TPS48-P203 has seven solder pads on its back and no connector. They carry the GPIO variant's silkscreen, from the notch end: IO4, IO5, GND, 3V3, IO1, IO2, IO3. The I2C firmware's use of IO1 to IO5 is not published, so those five have to be rung out on the board. GND and 3V3 need only a check against pins 5 and 4.
 
 1. Find pin 1 of the IQS572: a dot or a bevel on the package. The pins count anticlockwise from it, seen from the top, seven per side.
 2. With the meter on continuity, touch one probe to a solder pad and a needle on the other probe to each of these pins, and fill in the table:
 
    | IQS572 pin | Signal | Solder pad |
    | --- | --- | --- |
-   | 2 | SDA | |
-   | 3 | SCL | |
-   | 4 | VDDHI | |
-   | 5 | VSS (GND) | |
-   | 7 | NRST | |
-   | 8 | RDY | |
+   | 2 | SDA | one of IO1 to IO5 |
+   | 3 | SCL | one of IO1 to IO5 |
+   | 4 | VDDHI | 3V3 |
+   | 5 | VSS (GND) | GND |
+   | 7 | NRST | one of IO1 to IO5, or none |
+   | 8 | RDY | one of IO1 to IO5 |
 
    Pins from the [IQS5xx-B000 datasheet](https://www.azoteq.com/images/stories/pdf/iqs5xx-b000_trackpad_datasheet.pdf), page 11. Pads that match none of them stay unconnected.
 
