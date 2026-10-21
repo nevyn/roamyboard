@@ -3,6 +3,7 @@
 zephyr_include_directories(include)
 
 add_subdirectory(drivers/kscan)
+add_subdirectory(drivers/input)
 
 # The build ID header is regenerated before every build, so an incremental build cannot keep
 # a stale ID; build_id.cmake rewrites it only when the ID changes.

@@ -1,0 +1,91 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Azoteq IQS5xx-B000 trackpad controller (IQS550, IQS572, IQS525) on I2C, such
+  as the TPS48-P203-S on the pointing module. The driver is a Zephyr input
+  device: it reports INPUT_REL_X and INPUT_REL_Y for one finger moving,
+  INPUT_REL_WHEEL and INPUT_REL_HWHEEL for a two-finger scroll, INPUT_BTN_0 for
+  a tap (a click) and for press-and-hold (held until the fingers lift, for
+  dragging), and INPUT_BTN_1 for a two-finger tap.
+
+  The trackpad may be absent at boot and may appear or disappear at any time.
+  The driver probes for it every second while it is absent, configures it when
+  it answers or resets, and never fails the boot without it. While ZMK is
+  active, the trackpad never enters its low-power modes; while ZMK is idle, it
+  enters them after 1 s without a touch, and a touch still produces input.
+  docs/firmware.md describes the states and the power policy.
+
+  The node is a child of the I2C bus, with reg = <0x74>, the IQS5xx's address.
+  Every report interval must stay well below CONFIG_I2C_NRFX_TRANSFER_TIMEOUT
+  (500 ms): a read while RDY is low waits up to one interval for the trackpad,
+  and a longer wait fails the transfer. The build checks that each interval is
+  at most half that timeout.
+
+compatible: "azoteq,iqs5xx"
+
+include: i2c-device.yaml
+
+properties:
+  rdy-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      The trackpad's RDY output, high while its communication window is open.
+      Flag it GPIO_ACTIVE_HIGH. The driver reads a frame on each rising edge,
+      and enables the interrupt only while the trackpad is configured, since
+      RDY floats while no trackpad is attached.
+
+  flip-x:
+    type: boolean
+    description: Inverts the X axis on the trackpad (FLIP_X in XY Config 0).
+
+  flip-y:
+    type: boolean
+    description: Inverts the Y axis on the trackpad (FLIP_Y in XY Config 0).
+
+  switch-xy:
+    type: boolean
+    description: |
+      Swaps the X and Y axes on the trackpad (SWITCH_XY_AXIS in XY Config 0),
+      so that X runs along the Tx electrodes and Y along the Rx electrodes.
+
+  scroll-divisor:
+    type: int
+    default: 32
+    description: |
+      Relative counts of a two-finger scroll per wheel step, 1 or more. The
+      driver keeps the counts below one step and adds them to the next frame's,
+      until the fingers lift. Lower values scroll faster.
+
+  active-report-ms:
+    type: int
+    default: 10
+    description: |
+      Report interval in milliseconds of the trackpad's Active and Idle-Touch
+      modes, which it runs while a finger is on it. 1 to half of
+      CONFIG_I2C_NRFX_TRANSFER_TIMEOUT.
+
+  idle-report-ms:
+    type: int
+    default: 10
+    description: |
+      Report interval in milliseconds of the trackpad's Idle mode, in which it
+      waits for a touch. While ZMK is active, the trackpad stays in Idle mode
+      between touches, so this is the latency of the first touch. 1 to half of
+      CONFIG_I2C_NRFX_TRANSFER_TIMEOUT.
+
+  lp1-report-ms:
+    type: int
+    default: 80
+    description: |
+      Report interval in milliseconds of the trackpad's LP1 mode, which it
+      enters 1 s after the last touch while ZMK is idle. 1 to half of
+      CONFIG_I2C_NRFX_TRANSFER_TIMEOUT.
+
+  lp2-report-ms:
+    type: int
+    default: 160
+    description: |
+      Report interval in milliseconds of the trackpad's LP2 mode, which follows
+      LP1 after the LP1 timeout in the trackpad's own settings. 1 to half of
+      CONFIG_I2C_NRFX_TRANSFER_TIMEOUT.

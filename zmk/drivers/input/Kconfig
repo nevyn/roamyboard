@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: MIT
+
+DT_COMPAT_AZOTEQ_IQS5XX := azoteq,iqs5xx
+
+config ROAMYBOARD_INPUT_IQS5XX
+    bool
+    default $(dt_compat_enabled,$(DT_COMPAT_AZOTEQ_IQS5XX))
+    depends on INPUT
+    select I2C
+    select GPIO
+
+if ROAMYBOARD_INPUT_IQS5XX
+
+config ROAMYBOARD_INPUT_IQS5XX_INIT_PRIORITY
+    int "Init priority of the IQS5xx trackpad driver"
+    default INPUT_INIT_PRIORITY
+    help
+      POST_KERNEL priority. It must come after the I2C bus and GPIO drivers.
+
+config ROAMYBOARD_INPUT_IQS5XX_THREAD_STACK_SIZE
+    int "Stack size of the IQS5xx trackpad driver's work queue thread"
+    default 1024
+
+config ROAMYBOARD_INPUT_IQS5XX_THREAD_PRIORITY
+    int "Preemptible priority of the IQS5xx trackpad driver's work queue thread"
+    default 10
+    help
+      The thread does all of the driver's I2C transfers. A transfer while
+      RDY is low can wait one report interval for the trackpad, so the
+      driver does not use the system work queue.
+
+module = ROAMYBOARD_INPUT_IQS5XX
+module-str = IQS5xx trackpad driver
+source "subsys/logging/Kconfig.template.log_config"
+
+endif

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 
 rsource "drivers/kscan/Kconfig"
+rsource "drivers/input/Kconfig"
 
 config ROAMYBOARD_STATUS_SCREEN
     bool "roamyboard status screen on the nice!view"
