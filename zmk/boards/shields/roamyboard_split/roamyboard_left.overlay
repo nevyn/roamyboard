@@ -11,3 +11,21 @@
     columns = <12>;
     anchor = "mcu";
 };
+
+/ {
+    // Raises the right half's trackpad events here; reg matches the right half's input split.
+    split_inputs {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        trackpad_split: trackpad_split@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+        };
+    };
+
+    trackpad_listener: trackpad_listener {
+        compatible = "zmk,input-listener";
+        device = <&trackpad_split>;
+    };
+};
