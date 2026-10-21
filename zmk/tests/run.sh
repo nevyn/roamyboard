@@ -3,13 +3,15 @@
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 kscan="$here/../drivers/kscan"
+input="$here/../drivers/input"
 display="$here/../src/display"
 pda="$here/../src/pda"
 midi="$here/../src/midi"
 out=$(mktemp -d "${TMPDIR:-/tmp}/roamyboard-tests.XXXXXX")
-trap 'rm -f "$out/chain_test" "$out/cat_test" "$out/pda_test" "$out/pda_shell_test" "$out/pda_clock_test" "$out/pda_apps_test" "$out/midi_state_test" && rmdir "$out"' EXIT
+trap 'rm -f "$out/chain_test" "$out/cat_test" "$out/pda_test" "$out/pda_shell_test" "$out/pda_clock_test" "$out/pda_apps_test" "$out/midi_state_test" "$out/iqs5xx_test" && rmdir "$out"' EXIT
 cflags="-std=c11 -Wall -Wextra -Werror -fsanitize=address,undefined"
 ${CC:-cc} $cflags -I"$kscan" "$here/chain_test.c" "$kscan/chain.c" -o "$out/chain_test"
+${CC:-cc} $cflags -I"$input" "$here/iqs5xx_test.c" "$input/iqs5xx_logic.c" -o "$out/iqs5xx_test"
 ${CC:-cc} $cflags -I"$display" "$here/cat_test.c" "$display/cat.c" -o "$out/cat_test"
 ${CC:-cc} $cflags -I"$pda" "$here/pda_test.c" "$pda/keys.c" "$pda/note.c" -o "$out/pda_test"
 apps="$pda/shell.c $pda/midi_view.c $pda/icons.c $pda/apps.c $pda/app_clock.c $pda/app_timer.c $pda/app_calc.c $pda/app_dice.c $pda/app_kana.c $pda/app_cat.c $pda/cat_sprites.c $pda/game_breakout.c $pda/game_tetris.c $pda/game_snake.c
@@ -23,6 +25,7 @@ ${CC:-cc} $cflags -I"$pda" -I"$here/../include" "$here/pda_apps_test.c" "$here/p
 ${CC:-cc} $cflags -I"$pda" "$here/pda_clock_test.c" "$pda/clock.c" -o "$out/pda_clock_test"
 ${CC:-cc} $cflags -I"$midi" -I"$here/../include" "$here/midi_state_test.c" "$midi/state.c" -o "$out/midi_state_test"
 "$out/chain_test"
+"$out/iqs5xx_test"
 "$out/cat_test"
 "$out/pda_test"
 "$out/pda_shell_test"
