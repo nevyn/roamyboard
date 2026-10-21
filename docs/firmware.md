@@ -189,9 +189,9 @@ The firmware chooses the pins; the MCU board does not exist yet. Until it does, 
 | DATA | D14 | P1.11, SPIM2 MISO, pull-up | J_LEFT2 pin 3 |
 | SDA (planned) | D4 | P0.22, TWIM1 SDA, 2.2 kΩ to VCC | J_LEFT3 pin 2 |
 | SCL (planned) | D5 | P0.24, TWIM1 SCL, 2.2 kΩ to VCC | J_LEFT3 pin 3 |
-| INT (planned) | D6 | P1.00, GPIO | J_LEFT1 pin 1 |
+| INT (planned) | D6 | P1.00, GPIO | J_LEFT3 pin 1 |
 
-SDA, SCL and INT are planned for the [pointing module](../electronics/Pointing%20module.md) and not wired yet. The firmware already runs TWIM1 on D4 and D5, with the nRF52840's own pull-ups on both lines, and does not use D6 yet. Wiring them adds the three wires and two 2.2 kΩ resistors from SDA and SCL to VCC. J_LEFT1 pin 1 (+5V in the v3.0 pinout, INT once wired) and LED (J_LEFT3 pin 1) stay unconnected for now.
+SDA, SCL and INT are planned for the [pointing module](../electronics/Pointing%20module.md) and not wired yet. The firmware already runs TWIM1 on D4 and D5, with the nRF52840's own pull-ups on both lines, and does not use D6 yet. Wiring them adds the three wires and two 2.2 kΩ resistors from SDA and SCL to VCC. INT takes J_LEFT3 pin 1, which the v3.0 pinout gave LED. J_LEFT1 pin 1, +5V in the v3.0 pinout and the LED line once LEDs are wired, stays unconnected.
 
 Solder the wires to the sockets' solder joints (J_LEFT), not to the empty header pads (J_RIGHT) or U1's pads: those reach the sockets through 0.25 mm tracks, and on the first socket board a wire tugging on a header pad broke the +3.3V and GND connections.
 
