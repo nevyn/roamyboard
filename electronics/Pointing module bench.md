@@ -5,10 +5,10 @@
 ![MCU module rework: three wires and two pull-ups](../docs/images/pointing-rework.svg)
 
 1. Switch the half off, take it off the strap, slide the key modules off, and unscrew the floor.
-2. Solder three wires, stranded or wire-wrap wire, from the nice!nano to the socket board's socket joints:
-   - D4 (silkscreen 022) to J_LEFT3 pin 2, SDA.
+2. Solder three wires, stranded or wire-wrap wire, from the nice!nano to the socket joints of J_LEFT3, the connector nearest the SW1 end:
+   - D6 (silkscreen 100) to J_LEFT3 pin 1, INT. The v3.0 pinout gave this pin to LED, which moves to J_LEFT1 pin 1 once LEDs exist.
+   - D4 (022) to J_LEFT3 pin 2, SDA.
    - D5 (024) to J_LEFT3 pin 3, SCL.
-   - D6 (100) to J_LEFT1 pin 1, INT. This pin was +5V; nothing else uses it.
 
    Pin 1 of each connector is the one nearest the SW5 end, which is the USB-C end. Leave the existing wires alone.
 3. Solder two 2.2 kΩ resistors on the socket board's back:
@@ -54,7 +54,7 @@ The TPS48-P203 has seven solder pads on its back and no connector. They carry th
 
    | Socket | Pad |
    | --- | --- |
-   | J_LEFT1 pin 1, INT | RDY |
+   | J_LEFT3 pin 1, INT | RDY |
    | J_LEFT1 pin 2, +3.3V | VDDHI |
    | J_LEFT1 pin 3, GND | VSS |
    | J_LEFT3 pin 2, SDA | SDA |

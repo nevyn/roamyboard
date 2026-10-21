@@ -69,15 +69,12 @@ def rework():
 
     # new wires: from the D4/D5/D6 pads around the nano's far end to the socket joints
     pin = lambda label: (nx1 - 8, ny + right.index(label) * pitch - 4)
-    route = [("022", "J_LEFT3", "2", SDA, "SDA", 0), ("024", "J_LEFT3", "3", SCL, "SCL", 1), ("100", "J_LEFT1", "1", INT, "INT", 2)]
+    route = [("022", "J_LEFT3", "2", SDA, "SDA", 0), ("024", "J_LEFT3", "3", SCL, "SCL", 1), ("100", "J_LEFT3", "1", INT, "INT", 2)]
     for label, ref, n, color, name, k in route:
         px, py = pin(label)
         x, y, _ = fp[ref][n]
-        out = 650 + k * 14
-        if name == "INT":   # under the others, then up the free lane to the top connector
-            b.append(line([(px, py), (out, py), (out, 505), (400, 505), (400, by(y)), (bx(x), by(y))], color, 3))
-        else:
-            b.append(line([(px, py), (out, py), (out, by(y)), (bx(x), by(y))], color, 3))
+        out = {"INT": 636, "SDA": 664, "SCL": 678}[name]   # nested lanes, so no two wires cross
+        b.append(line([(px, py), (out, py), (out, by(y)), (bx(x), by(y))], color, 3))
         b.append(line([(720, 455 + k * 20), (750, 455 + k * 20)], color, 3))
         b.append(text(756, 459 + k * 20, f"{name}: {names[label]} ({label}) to {ref} pin {n}", 11, weight="bold", fill=color))
 
@@ -92,7 +89,7 @@ def rework():
         b.append(text(bx(87.4) - 6, my + 4, f"2.2 kΩ, {name} to +3.3V", 10, "end", "bold", RES))
 
     notes = ["New: three wires from the nano to the socket joints, and two 2.2 kΩ resistors from SDA and SCL to +3.3V.",
-             "Pin 1 of each connector is nearest the SW5 end (the USB-C end). J_LEFT1 pin 1 was +5V; nothing else uses it.",
+             "Pin 1 of each connector is nearest the SW5 end (the USB-C end). J_LEFT3 pin 1 was LED; LED moves to J_LEFT1 pin 1 later.",
              "Lay each resistor flat on the board, its leads leaving the socket joint away from the socket body.",
              "Checked in the case model: a 1/4 W body (2.5 × 6.5 mm) clears the floor by 0.5 mm, a 1/8 W body by 0.8 mm."]
     b += [text(30, 640 + 18 * i, t, 11) for i, t in enumerate(notes)]
@@ -133,7 +130,7 @@ def bench():
     b.append(text(fx0 + 20, fy(40) - 6, "SW5 end (USB-C)", 9, "middle", fill="#555"))
     b.append(text(fx0 + 20, fy(140) + 14, "SW1 end", 9, "middle", fill="#555"))
     fp = footprints()
-    jump = {("J_LEFT1", "1"): ("INT", "RDY", INT), ("J_LEFT1", "2"): ("+3.3V", "VDDHI", VCC), ("J_LEFT1", "3"): ("GND", "VSS", GND),
+    jump = {("J_LEFT3", "1"): ("INT", "RDY", INT), ("J_LEFT1", "2"): ("+3.3V", "VDDHI", VCC), ("J_LEFT1", "3"): ("GND", "VSS", GND),
             ("J_LEFT3", "2"): ("SDA", "SDA", SDA), ("J_LEFT3", "3"): ("SCL", "SCL", SCL)}
     for ref in ("J_LEFT1", "J_LEFT2", "J_LEFT3"):
         mid = fy(fp[ref]["2"][1])
@@ -146,8 +143,8 @@ def bench():
             if j:
                 b.append(line([(fx0 + 26, yy), (560, yy), (590, ly), (640, ly)], j[2], 3))
                 b.append(text(646, ly + 4, f"pin {n} {j[0]}  to the pad's {j[1]}", 11, weight="bold", fill=j[2]))
-            elif ref == "J_LEFT3":
-                b.append(text(646, ly + 4, f"pin {n} LED: leave empty", 10, fill="#999"))
+            elif ref == "J_LEFT1":
+                b.append(text(646, ly + 4, f"pin {n} (+5V, later LED): leave empty", 10, fill="#999"))
         if ref != "J_LEFT2":
             b.append(text(560, mid - 44, ref, 11, "middle", "bold"))
     notes = ["Solder short stranded wires to the pad's VDDHI, VSS, SDA, SCL and RDY pads, with male Dupont pins at the far end.",

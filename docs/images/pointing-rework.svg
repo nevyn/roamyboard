@@ -77,15 +77,15 @@
 <text x="488.0" y="396.0" font-size="11" text-anchor="start" font-weight="normal" fill="#fff" font-family="Helvetica, Arial, sans-serif">009</text>
 <circle cx="612.0" cy="392.0" r="4.5" fill="#c9a227" stroke="#222"/>
 <text x="602.0" y="396.0" font-size="11" text-anchor="end" font-weight="normal" fill="#fff" font-family="Helvetica, Arial, sans-serif">106</text>
-<polyline points="612.0,282.0 650.0,282.0 650.0,455.5 205.4,455.5" fill="none" stroke="#1f77b4" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="612.0,282.0 664.0,282.0 664.0,455.5 205.4,455.5" fill="none" stroke="#1f77b4" stroke-width="3" stroke-linejoin="round"/>
 <polyline points="720.0,455.0 750.0,455.0" fill="none" stroke="#1f77b4" stroke-width="3" stroke-linejoin="round"/>
 <text x="756.0" y="459.0" font-size="11" text-anchor="start" font-weight="bold" fill="#1f77b4" font-family="Helvetica, Arial, sans-serif">SDA: D4 (022) to J_LEFT3 pin 2</text>
-<polyline points="612.0,304.0 664.0,304.0 664.0,467.1 205.4,467.1" fill="none" stroke="#9467bd" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="612.0,304.0 678.0,304.0 678.0,467.1 205.4,467.1" fill="none" stroke="#9467bd" stroke-width="3" stroke-linejoin="round"/>
 <polyline points="720.0,475.0 750.0,475.0" fill="none" stroke="#9467bd" stroke-width="3" stroke-linejoin="round"/>
 <text x="756.0" y="479.0" font-size="11" text-anchor="start" font-weight="bold" fill="#9467bd" font-family="Helvetica, Arial, sans-serif">SCL: D5 (024) to J_LEFT3 pin 3</text>
-<polyline points="612.0,326.0 678.0,326.0 678.0,505.0 400.0,505.0 400.0,181.6 205.4,181.6" fill="none" stroke="#17becf" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="612.0,326.0 636.0,326.0 636.0,443.8 205.4,443.8" fill="none" stroke="#17becf" stroke-width="3" stroke-linejoin="round"/>
 <polyline points="720.0,495.0 750.0,495.0" fill="none" stroke="#17becf" stroke-width="3" stroke-linejoin="round"/>
-<text x="756.0" y="499.0" font-size="11" text-anchor="start" font-weight="bold" fill="#17becf" font-family="Helvetica, Arial, sans-serif">INT: D6 (100) to J_LEFT1 pin 1</text>
+<text x="756.0" y="499.0" font-size="11" text-anchor="start" font-weight="bold" fill="#17becf" font-family="Helvetica, Arial, sans-serif">INT: D6 (100) to J_LEFT3 pin 1</text>
 <polyline points="205.4,455.5 177.5,409.6" fill="none" stroke="#999" stroke-width="1.6" stroke-linejoin="round"/>
 <rect x="176.4" y="427.5" width="30" height="10" rx="3" fill="#e8d2a6" stroke="#8c564b" transform="rotate(-121.4 191.4 432.5)"/>
 <text x="164.0" y="436.5" font-size="10" text-anchor="end" font-weight="bold" fill="#8c564b" font-family="Helvetica, Arial, sans-serif">2.2 kΩ, SDA to +3.3V</text>
@@ -93,7 +93,7 @@
 <rect x="176.4" y="477.2" width="30" height="10" rx="3" fill="#e8d2a6" stroke="#8c564b" transform="rotate(132.8 191.4 482.2)"/>
 <text x="164.0" y="486.2" font-size="10" text-anchor="end" font-weight="bold" fill="#8c564b" font-family="Helvetica, Arial, sans-serif">2.2 kΩ, SCL to +3.3V</text>
 <text x="30.0" y="640.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">New: three wires from the nano to the socket joints, and two 2.2 kΩ resistors from SDA and SCL to +3.3V.</text>
-<text x="30.0" y="658.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Pin 1 of each connector is nearest the SW5 end (the USB-C end). J_LEFT1 pin 1 was +5V; nothing else uses it.</text>
+<text x="30.0" y="658.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Pin 1 of each connector is nearest the SW5 end (the USB-C end). J_LEFT3 pin 1 was LED; LED moves to J_LEFT1 pin 1 later.</text>
 <text x="30.0" y="676.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Lay each resistor flat on the board, its leads leaving the socket joint away from the socket body.</text>
 <text x="30.0" y="694.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Checked in the case model: a 1/4 W body (2.5 × 6.5 mm) clears the floor by 0.5 mm, a 1/8 W body by 0.8 mm.</text>
 </svg>
