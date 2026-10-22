@@ -208,6 +208,66 @@ expect(overlap(tongue, nano, -up * 0.15) > 1e-3 and overlap(tongue, P["mcu-floor
        "MCU module: the floor's tongue holds the port from below")
 expect(overlap(P["mcu-shell"] + P["mcu-floor"], P["mcu-usb-plug"]) < 1e-3, "MCU module: a USB-C plug's overmould clears the end wall")
 
+# Pointing module: key module frame; right-* is its header-side neighbour, and pointing-nb-* places it as the neighbour of
+# the key module at the origin, which is then its socket-side neighbour.
+for n in ["pointing-shell", "pointing-floor", "pointing-board", "pointing-sockets", "pointing-socket-tails", "pointing-pad",
+          "pointing-switch", "pointing-switch-room", "pointing-front-room", "pointing-nb-shell", "pointing-nb-floor",
+          "pointing-nb-sockets", "pointing-nb-pad"]:
+    P[n] = man(n)
+contract("pointing-shell", man("pointing-outline"), ("header", "pointing-socket"))
+own = ["pointing-shell", "pointing-floor", "pointing-board", "pointing-sockets", "pointing-pad", "pointing-switch"]
+worst = max((overlap(P[a], P[b]), a, b) for i, a in enumerate(own) for b in own[i + 1:])
+expect(worst[0] < 1e-3, f"pointing module: largest overlap {worst[0]:.4f} mm³ ({worst[1]} × {worst[2]})")
+for room, what in [("pointing-switch-room", "V's switch pins and their wires"), ("pointing-front-room", "the board's front parts under the pad"),
+                   ("pointing-socket-tails", "the loose sockets' tails and feet")]:
+    worst = max((overlap(P[room], P[n]), n) for n in own if n not in ("pointing-switch", "pointing-sockets"))
+    expect(worst[0] < 1e-3, f"pointing module: room kept for {what} ({worst[0]:.4f} mm³, {worst[1]})")
+pairs = [(a, b) for a in own for b in ("right-shell", "right-floor", "right-board") if (a, b) != ("pointing-board", "right-board")]
+pairs += [(a, b) for a in ("shell", "floor", "board") for b in ("pointing-nb-shell", "pointing-nb-floor", "pointing-nb-sockets", "pointing-nb-pad")
+          if (a, b) != ("board", "pointing-nb-sockets")]
+worst = max((overlap(P[a], P[b]), a, b) for a, b in pairs)
+expect(worst[0] < 1e-3, f"pointing module joined to a key module on each side: largest overlap {worst[0]:.4f} mm³ ({worst[1]} × {worst[2]})")
+pins = overlap(P["pointing-board"], P["right-board"])
+expect(abs(pins - 9 * 0.64 ** 2 * 5.615) < 0.1, f"pointing module: its header pins in the header-side neighbour's sockets: {pins:.2f} mm³ (9 × 0.64² × 5.6)")
+pins = overlap(P["board"], P["pointing-nb-sockets"])
+expect(abs(pins - 9 * 0.64 ** 2 * 5.615) < 0.1, f"pointing module: a key module's header pins in its loose sockets: {pins:.2f} mm³ (9 × 0.64² × 5.6)")
+touch = [d for d in np.arange(0, 9, 0.25) if overlap(P["pointing-shell"], P["right-shell"], along * d) > 1e-3]
+others = max(overlap(P[x], P[y], along * d) for d in np.arange(0.25, 9, 0.25)
+             for x, y in [("pointing-shell", "right-board"), ("pointing-board", "right-shell"), ("pointing-floor", "right-floor")])
+expect(others < 1e-3 and touch and max(touch) <= 3.0,
+       f"pointing module, header side: slide-on touches only within {max(touch, default=0):.2f} mm of home (tooth)")
+touch = [d for d in np.arange(0, 9, 0.25) if overlap(P["shell"], P["pointing-nb-shell"], along * d) > 1e-3]
+others = max(overlap(P[x], P[y], along * d) for d in np.arange(0.25, 9, 0.25)
+             for x, y in [("shell", "pointing-nb-sockets"), ("board", "pointing-nb-shell"), ("floor", "pointing-nb-floor")])
+expect(others < 1e-3 and touch and max(touch) <= 3.0,
+       f"pointing module, socket side: slide-on touches only within {max(touch, default=0):.2f} mm of home (tooth)")
+worst = max(overlap(P["pointing-shell"], P["bare-board"], (0, 0, -d)) for d in np.arange(0, 16, 0.25))
+expect(worst < 1e-3, f"pointing module: the board drops into the shell (largest overlap {worst:.4f} mm³)")
+pu = np.array([float(v) for v in (CHECK / "pointing-up.txt").read_text().split()])
+pup, palong = np.array([pu[0], 0, pu[1]]), np.array([pu[1], 0, -pu[0]])
+worst = max(overlap(P["pointing-shell"], P["pointing-pad"], -pup * d) for d in np.arange(0, 16, 0.25))
+expect(worst < 1e-3, f"pointing module: the pad drops into the upturned shell (largest overlap {worst:.4f} mm³)")
+for part, move, what in [("pointing-shell", pup * 0.05, "against the skin"), ("pointing-floor", -pup * 0.05, "down by the ribs"),
+                         ("pointing-shell", palong * 0.4, "across (+)"), ("pointing-shell", -palong * 0.4, "across (-)"),
+                         ("pointing-shell", (0, 0.4, 0), "along +y"), ("pointing-shell", (0, -0.4, 0), "along -y")]:
+    expect(overlap(P[part], P["pointing-pad"], move) > 1e-3, f"pointing module: the pad is held {what}")
+vup, vx = np.array([-math.sin(a), 0, math.cos(a)]), np.array([math.cos(a), 0, math.sin(a)])
+for part, move, what in [("pointing-shell", vup * 0.05, "up by the socket wall"), ("pointing-floor", -vup * 0.05, "down by the clamp pads"),
+                         ("pointing-floor", vx * 0.05, "into the module by the rear stops"), ("pointing-shell", (0, 0.15, 0), "along +y by the mouth slots"),
+                         ("pointing-shell", (0, -0.15, 0), "along -y by the mouth slots"), ("pointing-floor", (0, 0.15, 0), "along +y by the cheeks"),
+                         ("pointing-floor", (0, -0.15, 0), "along -y by the cheeks")]:
+    expect(overlap(P[part], P["pointing-sockets"], move) > 1e-3, f"pointing module: the loose sockets are held {what}")
+static = P["pointing-shell"] + P["pointing-board"] + P["pointing-pad"] + P["pointing-switch"]
+moving = P["pointing-floor"] + P["pointing-sockets"]
+worst = max((overlap(static, moving, (0, 0, -d)), d) for d in np.arange(0.05, 8, 0.05))
+expect(worst[0] < 1e-3, f"pointing module: the floor with the sockets goes on along the board normal "
+                        f"(largest overlap {worst[0]:.4f} mm³, {worst[1]:.2f} mm out)")
+for move, what in [((0.15, 0, 0), "+x"), ((-0.15, 0, 0), "-x"), ((0, 0.15, 0), "+y"), ((0, -0.15, 0), "-y")]:
+    expect(overlap(P["pointing-shell"], P["pointing-floor"], move) > 1e-3, f"pointing module: tabs locate the floor ({what} 0.15 mm collides)")
+shanks = [man(f"pointing-shank-{i}") for i in range(6)]
+expect(max(overlap(P["pointing-floor"], s_) for s_ in shanks) < 1e-3, "pointing module: 6 M2 shanks clear the floor")
+expect(min(overlap(P["pointing-shell"], s_) for s_ in shanks) > 0.5, "pointing module: every shank bites into the shell")
+
 # Clamp pads and rear stops. The floor goes on along the board normal (+z): its locating tabs and the shell's opening
 # are parallel to z. The top's normal, 2.94° off, is checked too. Each body is checked on its own, in a box around its
 # row and side. overlap() moves its second argument, so a floor d mm short of home is the board moved d mm away.
@@ -218,7 +278,8 @@ up = np.array([math.sin(math.radians(2.94)), 0, math.cos(math.radians(2.94))])
 into = {"socket": np.array([1.0, 0, 0]), "header": np.array([-math.cos(a), 0, math.sin(a)])}   # away from the seam
 approach = [((0, 0, 1), "the board normal"), (tuple(up), "the top's normal")]
 for module, floor, board, sides in [("key module", "floor", "board", ("socket", "header")),
-                                    ("MCU module", "mcu-floor", "socket-board", ("socket",))]:
+                                    ("MCU module", "mcu-floor", "socket-board", ("socket",)),
+                                    ("pointing module", "pointing-floor", "pointing-board", ("header",))]:
     for side in sides:
         for i, r in enumerate(rows):
             y = END_WALL + CLEARANCE + BOARD_Y0 + BOARD_LENGTH - r
