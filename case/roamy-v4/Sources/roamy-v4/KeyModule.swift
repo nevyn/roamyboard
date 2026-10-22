@@ -154,8 +154,12 @@ struct KeyModuleFloor: Geometry3D {
 /// Each stop has a 45° lead-in on its tip, wider than the board's float, so a board that floats toward a stop is cammed
 /// back as the floor closes instead of holding the floor off on it. With the socket's and the header's stops on opposite
 /// sides of the board, the floor centres it.
+///
+/// `headers: false` leaves out the headers' (socket board); `sockets: false` leaves out the sockets' (a board with its
+/// sockets unpopulated).
 struct ClampPadsAndRearStops: Geometry3D {
     var headers = true
+    var sockets = true
 
     /// z of the tilted header's untilted level `w` (below the board's back, as in `TiltedHeader`) at module x.
     static func headerZ(x: Double, w: Double) -> Double {
@@ -180,7 +184,7 @@ struct ClampPadsAndRearStops: Geometry3D {
                                   [far.x, low(far.x)]]
         Union {
             for r in P.rowYs {
-                alongColumn(socket, from: Frame.by(r) - P.socketWidth / 2, length: P.socketWidth)
+                if sockets { alongColumn(socket, from: Frame.by(r) - P.socketWidth / 2, length: P.socketWidth) }
                 if headers { alongColumn(header, from: Frame.by(r) - P.headerWidth / 2, length: P.headerWidth) }
             }
         }
@@ -205,9 +209,9 @@ struct Counterbore: Geometry3D {
 /// Print placements: the shell with its top on the bed, the floor with its bottom on the bed.
 enum PrintPose {
     static var shell: Transform3D { topDown(top: Joint.top) }
-    /// A part with its top at level `top` on the bed.
-    static func topDown(top: Double) -> Transform3D {
-        let u = Joint.up, t = Joint.along, o = Joint.centre
+    /// A part with its top at level `top` on the bed; `up` is the top's outward normal, about the joint centre.
+    static func topDown(top: Double, up u: Vector2D = Joint.up) -> Transform3D {
+        let t = Vector2D(u.y, -u.x), o = Joint.centre
         // x' = (p - o)·t, y' = -y, z' = top - (p - o)·up
         return Transform3D([[t.x, 0, t.y, -(o.x * t.x + o.y * t.y)],
                             [0, -1, 0, P.outerLength],
@@ -215,9 +219,9 @@ enum PrintPose {
                             [0, 0, 0, 1]])
     }
     static var floor: Transform3D { bottomDown(Joint.bottom) }
-    /// A part with its bottom at level `bottom` on the bed.
-    static func bottomDown(_ bottom: Double) -> Transform3D {
-        let u = Joint.up, t = Joint.along, o = Joint.centre
+    /// A part with its bottom at level `bottom` on the bed; `up` is the bottom's inward normal, about the joint centre.
+    static func bottomDown(_ bottom: Double, up u: Vector2D = Joint.up) -> Transform3D {
+        let t = Vector2D(u.y, -u.x), o = Joint.centre
         return Transform3D([[t.x, 0, t.y, -(o.x * t.x + o.y * t.y)],
                             [0, 1, 0, 0],
                             [u.x, 0, u.y, -bottom - (o.x * u.x + o.y * u.y)],

@@ -3,17 +3,20 @@ import Cadova
 
 /// The populated key module board as simple blocks, for checking clearances: board, hotswap sockets, U1,
 /// switch bodies, socket bodies, and the header body and pins as soldered in the 8° jig, and the connectors' tails
-/// (`ConnectorTails`). Without `keyParts`, the socket board: the board and its sockets only.
+/// (`ConnectorTails`). Without `keyParts`, the socket board: the board and its sockets only. `switchYs` are the keys
+/// (board y) that carry a switch; `sockets: false` leaves the sockets unpopulated.
 struct BoardMockup: Geometry3D {
     var switches = true
     var keyParts = true
+    var sockets = true
+    var switchYs = P.keyYs
     var body: any Geometry3D {
         Box(x: P.boardWidth, y: P.boardLength, z: P.boardThickness)
             .translated(x: Frame.bx(P.boardOriginX), y: Frame.by(P.boardOriginY + P.boardLength), z: 0)
             .colored(.green)
         for y in keyParts ? P.keyYs : [] {   // hotswap socket above each key on the back; switch body on the front
             Box(x: 9.0, y: 6.7, z: 1.8).translated(x: Frame.bx(P.keyX - 2.0), y: Frame.by(y - 1.5), z: -1.8).colored(.black)
-            if switches {
+            if switches && switchYs.contains(y) {
                 // legs through the board (footprint: post at the key, pegs at ±5.5), 1.4 below its back, generous
                 for (dx, d) in [(0.0, 3.3), (-5.5, 1.8), (5.5, 1.8)] {
                     Cylinder(diameter: d, height: 1.4).translated(x: Frame.bx(P.keyX + dx), y: Frame.by(y), z: -1.4).colored(.white)
@@ -28,10 +31,10 @@ struct BoardMockup: Geometry3D {
             Box(x: 10.4, y: 7.4, z: 1.75).aligned(at: .centerXY).translated(x: Frame.bx(81.325), y: Frame.by(96.7), z: -1.75).colored(.black)
         }
         for r in P.rowYs {
-            SocketBody(rowY: r).colored(.gray)
+            if sockets { SocketBody(rowY: r).colored(.gray) }
             if keyParts { TiltedHeader(rowY: r).colored(.orange) }
         }
-        ConnectorTails(headers: keyParts, margins: false).colored(.yellow)
+        ConnectorTails(headers: keyParts, sockets: sockets, margins: false).colored(.yellow)
     }
 }
 
@@ -41,9 +44,10 @@ struct BoardMockup: Geometry3D {
 ///
 /// With `margins`, the room that the case keeps free around them: each envelope grown by `P.tailClearance`, and each
 /// foot (the straight end of the tail that lies on the pad) grown by `P.footClearance` for its solder fillet.
-/// `headers` adds the headers' tails, tilted with their bodies.
+/// `headers` adds the headers' tails, tilted with their bodies; `sockets` the sockets'.
 struct ConnectorTails: Geometry3D {
     var headers = true
+    var sockets = true
     var margins = true
     var body: any Geometry3D {
         let t = margins ? P.tailClearance : 0, f = P.footClearance, w = P.pinSquare
@@ -51,9 +55,11 @@ struct ConnectorTails: Geometry3D {
         for r in P.rowYs {
             for k in -1...1 {
                 let y = Frame.by(r) + Double(k) * P.pinPitch
-                Box(x: P.socketTail + 2 * t, y: w + 2 * t, z: socketLow + 2 * t)
-                    .translated(x: P.socketDepth - t, y: y - w / 2 - t, z: -socketLow - t)
-                if margins {
+                if sockets {
+                    Box(x: P.socketTail + 2 * t, y: w + 2 * t, z: socketLow + 2 * t)
+                        .translated(x: P.socketDepth - t, y: y - w / 2 - t, z: -socketLow - t)
+                }
+                if sockets && margins {
                     Box(x: P.socketFoot + 2 * f, y: w + 2 * f, z: P.socketTailThickness + 2 * f)
                         .translated(x: P.socketDepth + P.socketTail - P.socketFoot - f, y: y - w / 2 - f, z: -P.socketTailThickness - f)
                 }
