@@ -117,3 +117,9 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **Piano**: The MIDI layer with two octaves of piano keys, General MIDI drums and DAW keys. Not: claviature, keys layer.
 - **Grid**: The isomorphic MIDI layer: a semitone per column, a fourth per row. Not: isomorphic layer, Push layout.
 - **MIDI view**: The right half's display while a MIDI layer is on and the PDA has no focus: the latest note, octave, transpose, velocity, channel and the held notes. Not: MIDI app (it is not on the home screen).
+- **log record**: One log message as the log service carries it: its half, sequence number, uptime, level, log source and text. Not: log line, log entry, log event.
+- **log source**: A Zephyr log module that a log call belongs to, such as `zmk` or `bt_hci_core`; the unit that a level applies to. `roamy-log --level` calls it MODULE. Not: logger, category.
+- **backlog**: The latest log records that a half keeps in RAM, whether or not a host listens; a log session can begin with it. Not: history, log buffer (Zephyr's own message buffer).
+- **log session**: One host reading one half's log records, from a start command until `stop`, unsubscribing or disconnecting; levels go back to info when it ends. Not: subscription, log stream.
+- **relay**: The split central's part in a log session: it runs the right half's log session over the split link and forwards its log records to the host. Not: proxy, forwarding.
+- **fragment**: One notification of the log service, carrying a piece of one log record. Not: packet, chunk.

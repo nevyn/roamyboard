@@ -21,10 +21,11 @@ roamyboard runs [ZMK](https://zmk.dev) on the nice!nano v2 in the MCU module. `z
 | `zmk/src/behaviors/behavior_boot_screen.c`, `zmk/dts/behaviors/boot_screen.dtsi` | `&boot_screen` and `&ota_boot`, the bootloader keys; their binding is in `zmk/dts/bindings/behaviors/`. |
 | `zmk/src/pda/`, `zmk/src/behaviors/behavior_pda.c`, `zmk/dts/behaviors/pda.dtsi` | The micro PDA: PDA mode and the split data channel on each half, the note editor, and the PDA and Note keys ([Micro PDA](pda.md)). |
 | `zmk/src/midi/`, `zmk/src/behaviors/behavior_midi_note.c`, `zmk/dts/behaviors/midi.dtsi` | The BLE-MIDI service on the central and the MIDI note key ([MIDI](midi.md)). |
+| `zmk/src/log/` | The log backend, the backlog and the log service on every half, and the relay of the right half's records on the split central ([Logging](logging.md)). `ring.c`, `frame.c` and `command.c` are pure logic. |
 | `zmk/src/bootloader.c` | Shows the bootloader view and reboots into the bootloader's UF2 or OTA mode, for the bootloader keys and the local OTA key. |
 | `zmk/src/local_ota.c` | The split peripheral's local OTA key (Updating over Bluetooth, below). |
 | `zmk/tests/` | Host tests for the pure logic: `zmk/tests/run.sh`. |
-| `zmk/tools/` | `cat_frames.py` generates the cat's bitmaps; `screen_mock/run.sh` renders the status screen on the host; `ota/` builds `roamy-ota`, which updates halves over Bluetooth (Updating over Bluetooth, below); `midi/` builds `roamy-midi`, which checks the keyboard's MIDI from a Mac ([MIDI](midi.md)). |
+| `zmk/tools/` | `cat_frames.py` generates the cat's bitmaps; `screen_mock/run.sh` renders the status screen on the host; `ota/` builds `roamy-ota`, which updates halves over Bluetooth (Updating over Bluetooth, below); `midi/` builds `roamy-midi`, which checks the keyboard's MIDI from a Mac ([MIDI](midi.md)); `log/` builds `roamy-log`, which reads both halves' logs over Bluetooth ([Logging](logging.md)). |
 
 ## Reading the chain
 
@@ -287,7 +288,7 @@ docker run --rm -v "$ws:/west" -v "$PWD:/repo:ro" -w /west zmkfirmware/zmk-build
 ls -l "$ws/build/roamyboard/zephyr/zmk.uf2"
 ```
 
-For the split halves use `-d build/roamyboard_left` with `SHIELD="roamyboard_left nice_view_adapter nice_view"` (same snippet and Studio flags), and `-d build/roamyboard_right` with `SHIELD="roamyboard_right nice_view_adapter nice_view"` without `-S studio-rpc-usb-uart` and the Studio flags. For USB logs, add the `zmk-usb-logging` snippet (`-S zmk-usb-logging`) and read the nice!nano's serial port.
+For the split halves use `-d build/roamyboard_left` with `SHIELD="roamyboard_left nice_view_adapter nice_view"` (same snippet and Studio flags), and `-d build/roamyboard_right` with `SHIELD="roamyboard_right nice_view_adapter nice_view"` without `-S studio-rpc-usb-uart` and the Studio flags. For USB logs, add the `zmk-usb-logging` snippet (`-S zmk-usb-logging`) and read the nice!nano's serial port. Every build also keeps its latest logs in RAM and sends them over Bluetooth to a paired Mac, where `roamy-log` reads both halves without a special build or a cable ([Logging](logging.md)); the USB logging build has both.
 
 The host tests need only a C compiler: `zmk/tests/run.sh`.
 
