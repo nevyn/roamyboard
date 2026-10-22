@@ -18,7 +18,7 @@ This repo is also an Obsidian vault, which is why it has wiki syntax here and th
 
 - `case/`: the case. `case/roamy-v4` is the current model, in Cadova (Swift): `swift run` there writes the printable 3MF files. Notes in [Case design](case/Case%20design.md) and [Harness design](case/Harness%20design.md). `roamy-v3.py` is the old CadQuery model.
 - `electronics/`: the KiCad project for the key module board, and [Electronics](electronics/Electronics.md) with the bus and the joint.
-- `zmk/`: the firmware, ZMK plus a driver for the key modules' shift register chain. [Firmware](docs/firmware.md) covers building, flashing over USB, and updating over Bluetooth with `roamy-ota` or a phone; [Layout](zmk/Layout.md) covers the keymap.
+- `zmk/`: the firmware, ZMK plus a driver for the key modules' shift register chain. [Firmware](docs/firmware.md) covers building, flashing over USB, updating over Bluetooth with `roamy-ota` or a phone, and [Logging](docs/logging.md) reading both halves' logs over Bluetooth with `roamy-log`; [Layout](zmk/Layout.md) covers the keymap.
 - `docs/`: the website at roamyboard.nevyn.dev and the reference docs; [docs/index.md](docs/index.md) lists them.
 - [Build Diary](Build%20Diary.md): what happened when.
 - `firmware/`: the stock Lily58 firmware images from before the roamyboard had its own.
