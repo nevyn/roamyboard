@@ -91,6 +91,9 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **DFU zip**: The firmware package for OTA mode: the application image, its init packet and a manifest, made by adafruit-nrfutil from `zmk.hex`. Not: OTA package, DFU package, OTA zip.
 - **cat**: The animated cat in the key module count box of the status screen, on the unibody and the split central.
 - **typing key**: A key whose keycode walks the cat: letters, digits, punctuation, Space, Tab, Enter, and the keypad's digits, operators, dot and Enter. Modifiers, F-keys and layer keys are not typing keys.
+- **Cat app**: The PDA app in which the cat lives on the right half's **playground** while the app is open; the central's box is empty meanwhile. Not: pet game, tamagotchi.
+- **playground**: The Cat app's scene: the cat tree (top shelf with the bed, lower shelf, sisal post), the window, the floor and the bowl. Not: room, cat tree (for the whole scene).
+- **needs**: The cat's food, fun and energy in the Cat app, 0 to 100 each. Not: stats, mood.
 - **pose**: The cat's posture on a layer that has one (Keypad, System, Gaming, Locked), chosen by the highest active layer. Not: stance, mood.
 - **unpaired**: A Bluetooth profile with no host paired to it. The status screen shows a small dot for it and "unpaired" as its host name. Not: open (ZMK's term in its API).
 - **PDA**: The micro PDA on the right half's display, which shows while the halves are connected and takes the keys while PDA mode is on. Its apps ([Micro PDA](pda.md), Apps) show one at a time. Not: organizer, right-display app.

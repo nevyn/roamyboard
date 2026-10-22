@@ -1,6 +1,6 @@
 # Micro PDA
 
-The micro PDA runs on the split peripheral (the right half) and is always on its nice!view while the central (the left half) is connected. While PDA mode is on, the PDA has focus: the central sends its keyboard keys to the PDA instead of the host. Leaving PDA mode keeps the PDA's view on the display, so an app stays visible while the keys go to the host. The PDA's home screen launches its apps: Note, Clock, Timer, Calc, Dice, Kana, the games Tetris, Snake, Bricks, Words and Rain, Keys and Info.
+The micro PDA runs on the split peripheral (the right half) and is always on its nice!view while the central (the left half) is connected. While PDA mode is on, the PDA has focus: the central sends its keyboard keys to the PDA instead of the host. Leaving PDA mode keeps the PDA's view on the display, so an app stays visible while the keys go to the host. The PDA's home screen launches its apps: Note, Clock, Timer, Calc, Dice, Kana, Cat, the games Tetris, Snake, Bricks, Words and Rain, Keys and Info.
 
 ## Keys
 
@@ -44,6 +44,20 @@ Consumer keys, such as volume and media keys, still reach the host in PDA mode.
 **Kana.** A drill of the 46 basic hiragana and katakana: type a kana's romaji (Hepburn; si, ti, tu, hu and o for を also count). The kana fills its box when right; when wrong, its box is framed and the answer shows. Any key goes on to the next kana, and a letter starts its answer. A kana answered wrong comes back more often, one answered right less; the weights, the counts and the longest run are kept in the settings key `roamyboard/pda/kana`, written when PDA mode ends. Tab switches between hiragana, katakana and both.
 
 The kana come from `zmk/src/display/font_kana_40.c`: Noto Sans JP at 40 px, 1 bit per pixel, only the 92 kana, made by `zmk/tools/pda_kana_font.sh`. Noto Sans JP is under the SIL Open Font License 1.1; `font_kana_40.LICENSE` holds its copyright notice and the license.
+
+**Cat.** The status screen's cat comes over to play. Opening the app sends the left half's cat dashing off its right edge, and half a second later she runs in from the left edge of a playground on the right half: a cat tree with a bed on its top shelf and a lower shelf by the window, a sisal post, and a bowl on the floor. She lives there while the app is open, whether the PDA has focus or not, and the left half's box stays empty. Closing the app sends her back.
+
+Three meters along the top show her needs: food, fun and energy, each 0 to 100. Food drops by one every 90 s, fun every 60 s, and energy every 20 s while she is awake; sleep restores 2 energy every 10 s, a loaf 1. Below 25 energy she goes to bed and sleeps until she is full of energy; below 35 food she goes to the bowl, and if it is empty she sits by it asking for food. Otherwise she picks something now and then: roams to a spot on any level, jumping from shelf to shelf, sits and blinks, loafs, watches the window, stretches, runs zoomies along the floor, naps, or plays with a ball that lies around. The needs never kill her. They are kept in the settings key `roamyboard/pda/cat`, written when the tens of a need or the bowl change, and when PDA mode ends; the time she spends on the left half does not count.
+
+| Key | Does |
+|---|---|
+| F | Fills the bowl with three portions; she comes to eat if she is hungry. Each portion gives 35 food. |
+| Space | Throws a ball in from the top right. She chases and bats it along the floor a few times, then loses interest; it stays for later. |
+| Arrows, W A S D, H J K L | Move a laser dot, 4 px a press; the first press puts it on the floor. She stalks a dot on a surface and pounces on it, sits under a dot on the wall and leaps at it if it is within reach, and follows it from level to level. The dot goes out 6 s after the last press. |
+| Return | Pets her: a heart rises, fun goes up by 5, and she purrs with her eyes closed. |
+| Escape | Sends her home: she runs off the left edge, then the app closes. A second Escape closes it at once. |
+
+A sleeping cat ignores the ball below 40 energy and the laser below 30. A quick note does not move her: she is where she was when the note closes. The playground redraws only when something on it changes; while she sits, sleeps or loafs, the app ticks four times a second, and 20 times while she or the ball moves. Her frames come from `zmk/tools/cat_frames.py`, which writes them upright for the PDA's framebuffer to `zmk/src/pda/cat_sprites.c`, with a mask of each frame's outline so that she hides what lies behind her.
 
 **Tetris.** A 10 × 20 well. Left and Right (or A D, H L) move the piece, Up (W, K) or X turns it clockwise, Z anticlockwise, Down (S, J) drops it one row, Space drops it to the bottom, P pauses. The pieces come from shuffled bags of all seven; cleared lines score 100, 300, 500 or 800 times the level plus one; the level starts at 0, rises every 10 lines and speeds the fall.
 
@@ -92,8 +106,11 @@ ZMK's split link carries a fixed set of messages, so the PDA brings its own GATT
 | Peripheral to central | notify | Text | `81`, UTF-8 bytes; appends to the text to type out |
 | | | Type out | `82`; leave PDA mode, then type the text |
 | | | Leave | `83`; leave PDA mode |
+| | | Cat | `84`, here; whether the cat is on the peripheral (the Cat app is the view); when that changes and in answer to Info |
 
-Writes and notifications carry at most 20 bytes, which fits the smallest ATT MTU. A disconnect of the split link leaves PDA mode on both halves.
+Writes and notifications carry at most 20 bytes, which fits the smallest ATT MTU. A disconnect of the split link leaves PDA mode on both halves, and brings the cat back to the central's status screen.
+
+On the central, `roamyboard_pda_cat_away()` returns the latest Cat message, and `roamyboard_pda_changed` follows each change; the status screen then calls `cat_set_away()`, which sends its cat dashing off the right edge or back in from it. The halves' displays sit next to each other at the inner ends, so she seems to cross from one to the other.
 
 ## Clock
 
@@ -107,7 +124,7 @@ The central types the text as `zmk_keycode_state_changed` events, one press or r
 
 ## Storage
 
-The peripheral keeps the note, at most 512 bytes of UTF-8, in the settings key `roamyboard/pda/note`, the games' best scores in `roamyboard/pda/scores`, and the Kana drill's weights in `roamyboard/pda/kana`. It writes both when PDA mode ends, and only when they changed.
+The peripheral keeps the note, at most 512 bytes of UTF-8, in the settings key `roamyboard/pda/note`, the games' best scores in `roamyboard/pda/scores`, the Kana drill's weights in `roamyboard/pda/kana`, and the cat's needs in `roamyboard/pda/cat`. It writes them when PDA mode ends, and only when they changed; the cat's needs also while the app runs (Cat, above).
 
 ## Latency
 
