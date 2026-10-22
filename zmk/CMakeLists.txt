@@ -109,3 +109,17 @@ endif()
 if(CONFIG_ROAMYBOARD_MIDI_VIEW)
   target_sources(app PRIVATE src/midi/view.c)
 endif()
+
+if(CONFIG_ROAMYBOARD_LOG)
+  target_sources(app PRIVATE
+    src/log/backend.c
+    src/log/command.c
+    src/log/frame.c
+    src/log/ring.c
+    src/log/service.c
+  )
+endif()
+
+if(CONFIG_ROAMYBOARD_LOG_RELAY)
+  target_sources(app PRIVATE src/log/relay.c)
+endif()

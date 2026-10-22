@@ -144,3 +144,61 @@ config ROAMYBOARD_MIDI_VIEW
       they play (octave, transpose, velocity, channel, held notes) to the
       split peripheral, whose PDA shows it, and holds the split link at
       latency 0. docs/midi.md describes it.
+
+config ROAMYBOARD_LOG
+    bool "Logs over Bluetooth to a bonded host"
+    default y
+    depends on ZMK_BLE
+    select LOG
+    select LOG_OUTPUT
+    select LOG_RUNTIME_FILTERING
+    help
+      A log backend that keeps the latest records in RAM (the backlog), and
+      the roamyboard log service, which streams them to a bonded host such as
+      roamy-log. The backend's levels start at info for every source; the
+      host raises them per source. docs/logging.md describes it.
+
+config ROAMYBOARD_LOG_RELAY
+    bool
+    default y
+    depends on ROAMYBOARD_LOG && ZMK_SPLIT_BLE && ZMK_SPLIT_ROLE_CENTRAL
+    select BT_GATT_CLIENT
+    select BT_GATT_AUTO_DISCOVER_CCC
+    help
+      The split central subscribes to the peripheral's log service and
+      relays its records to the host.
+
+config ROAMYBOARD_LOG_BACKLOG_SIZE
+    int "Bytes of RAM for the backlog of log records"
+    default 8192
+    range 1024 65536
+    depends on ROAMYBOARD_LOG
+    help
+      The backlog keeps the latest log records, whether or not a host is
+      subscribed, and drops the oldest to make room. Each record takes its
+      text, its source name and 8 bytes.
+
+config ROAMYBOARD_LOG_RELAY_SIZE
+    int "Bytes of RAM for the right half's records on their way to the host"
+    default 2048
+    range 512 16384
+    depends on ROAMYBOARD_LOG_RELAY
+
+config ROAMYBOARD_LOG_THREAD_STACK_SIZE
+    int "Stack size of the log service's work queue"
+    default 1536
+    depends on ROAMYBOARD_LOG
+
+if ROAMYBOARD_LOG
+
+# ZMK's USB logging sets its own larger buffer and shorter sleep; these apply otherwise.
+config LOG_BUFFER_SIZE
+    default 2048
+
+config LOG_PROCESS_THREAD_SLEEP_MS
+    default 100
+
+config LOG_PROCESS_THREAD_STACK_SIZE
+    default 1024
+
+endif
