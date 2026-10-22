@@ -63,3 +63,12 @@ The TPS48-P203 has seven solder pads on its back and no connector. They carry th
 2. Switch on. The pad occupies the sockets, so the right half reads 0 key modules; type on the left half.
 3. Flash the driver build on both halves: the right half runs the pad's driver, and the left half receives its events.
 4. Report what the pad does: whether the pointer moves, which way it moves for each finger direction, and whether a tap clicks and two fingers scroll. The axis flips go in the right half's devicetree.
+
+## Bench results
+
+*2026-10-22*, right half, build b95256e, no overlay:
+
+- The trackpad reports firmware 2.1 and a resolution of 768 × 1024, not the datasheet's 1792 × 1792.
+- With the silkscreen read from the touch side, the pointer moves the way the finger does, with no axis flips.
+- A tap clicks, two fingers scroll, and press-and-hold drags and releases when the finger lifts.
+- A two-finger tap did not right-click. The jumpers and the missing overlay make taps unreliable, so retest it in a module.

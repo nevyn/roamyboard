@@ -345,3 +345,10 @@ The MCU module is wired (all but the battery and the power switch) and reads the
 ![staking header irl](Images/staking%20header%20irl.webp)
 
 Plugging and unplugging key modules pulls on the connectors, and the only thing holding a connector to the board is its solder. The case now takes the slide-on push and the tipping (clamp pads and rear stops in the floor), so the pull is the glue's job. First staking, with Gorilla Epoxy while it was still semi-gooey: slide the header body up its pins, put glue on the board under the tails, then press the body back down into the glue so it bonds to the board as well. Curing; no pull test yet.
+
+### First pointer
+*2026-10-22, evening*
+
+![trackpad bench irl](Images/trackpad%20bench%20irl.webp)
+
+An Azoteq TPS48 trackpad, with Dupont jumpers soldered to its pads, plugged into the right MCU module's sockets; the right MCU module got three new wires (D4, D5, D6 to J_LEFT3) and two pull-ups the night before. Azoteq publishes no I2C pinout for the TPS48's pads, so the pads were found by plugging pairs into the SDA and SCL sockets until the driver's log said "IQS572 (product 58)": SDA is IO2, SCL is IO1, and RDY, found by touch, is IO5. The pointer moved on the first build of our own IQS5xx driver, through the split to the left half and on to the Mac. Directions match the pad's silkscreen read from the touch side, a tap clicks, two fingers scroll, and press-and-hold drags and lets go when the finger lifts. A two-finger tap did not right-click on the loose bench setup. Details in [[Pointing module bench]].
