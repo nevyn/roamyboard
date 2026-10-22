@@ -38,9 +38,9 @@ The TPS48-P203 has seven solder pads on its back and no connector. They carry th
    | 4 | VDDHI | 3V3 |
    | 5 | VSS (GND) | GND |
    | 7 | NRST | none: no pad reads its pull-up's 3.3 V |
-   | 8 | RDY | one of IO1 to IO5 |
+   | 8 | RDY | IO5 |
 
-   Pins from the [IQS5xx-B000 datasheet](https://www.azoteq.com/images/stories/pdf/iqs5xx-b000_trackpad_datasheet.pdf), page 11. Pads that match none of them stay unconnected.
+   IO3 and IO4 connect to none of these; leave them unconnected. Pins from the [IQS5xx-B000 datasheet](https://www.azoteq.com/images/stories/pdf/iqs5xx-b000_trackpad_datasheet.pdf), page 11. Pads that match none of them stay unconnected.
 
 ## 3. Prepare the pad
 
