@@ -7,6 +7,8 @@
  */
 
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <zephyr/bluetooth/conn.h>
@@ -32,7 +34,12 @@
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
-#define SETTINGS_KEY "roamyboard/pda/note"
+/** The single note of builds before the document list; it becomes a document at load. */
+#define LEGACY_NOTE_KEY "roamyboard/pda/note"
+/** Followed by the slot: created and modified stamps (uint32 each, little-endian), then text. */
+#define DOC_KEY "roamyboard/pda/doc/"
+#define DOC_HEADER 8
+#define DOC_SORT_KEY "roamyboard/pda/docsort"
 #define SCORES_KEY "roamyboard/pda/scores"
 #define KANA_KEY "roamyboard/pda/kana"
 #define VIEW_KEY "roamyboard/pda/app"
@@ -76,27 +83,94 @@ void roamyboard_pda_render(uint8_t bits[ROAMYBOARD_PDA_FB_BYTES]) {
     memcpy(bits, fb.bits, sizeof(fb.bits));
 }
 
-/* The note in settings. System work queue only, except settings_set at load. Static buffers:
- * the system work queue's stack is small, and settings writes go deep. */
-static char saved[PDA_NOTE_MAX];
-static size_t saved_len;
+/* The Note app's documents in settings. System work queue only, except at load. Static
+ * buffers: the system work queue's stack is small, and settings writes go deep. */
+static uint8_t doc_value[DOC_HEADER + PDA_NOTE_MAX];
+static char legacy_note[PDA_NOTE_MAX];
+static size_t legacy_len;
+/** Settings still hold LEGACY_NOTE_KEY. */
+static bool legacy_present;
 
-static void save_note(void) {
-    static char text[PDA_NOTE_MAX];
+static void doc_key_for(char *key, size_t size, int slot) { snprintf(key, size, DOC_KEY "%d", slot); }
+
+static void put_u32(uint8_t *p, uint32_t v) {
+    p[0] = (uint8_t)v, p[1] = (uint8_t)(v >> 8), p[2] = (uint8_t)(v >> 16), p[3] = (uint8_t)(v >> 24);
+}
+
+static uint32_t get_u32(const uint8_t *p) {
+    return (uint32_t)p[0] | (uint32_t)p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24;
+}
+
+/** Writes the documents and the sort that differ from settings. */
+static void save_docs(void) {
+    char key[sizeof(DOC_KEY) + 4];
     k_mutex_lock(&lock, K_FOREVER);
-    const size_t len = locked_shell()->note.len;
-    memcpy(text, shell.note.text, len);
+    struct pda_docs *docs = &locked_shell()->docs;
+    uint16_t dirty = docs->dirty, gone = docs->gone;
+    const bool sort_changed = docs->sort_changed;
+    const uint8_t sort = docs->sort;
+    docs->dirty = docs->gone = 0;
+    docs->sort_changed = false;
     k_mutex_unlock(&lock);
-    if (len == saved_len && memcmp(text, saved, len) == 0) {
+
+    uint16_t failed = 0;
+    for (int slot = 0; slot < PDA_DOCS_MAX; slot++) {
+        const uint16_t bit = (uint16_t)(1u << slot);
+        doc_key_for(key, sizeof(key), slot);
+        if (gone & bit) {
+            const int err = settings_delete(key);
+            if (err) {
+                LOG_ERR("Failed to delete setting %s: %d", key, err);
+                failed |= bit;
+            }
+        }
+        if (!(dirty & bit)) {
+            continue;
+        }
+        k_mutex_lock(&lock, K_FOREVER);
+        const struct pda_doc *doc = &shell.docs.docs[slot];
+        const size_t len = doc->note.len;
+        put_u32(doc_value, doc->created);
+        put_u32(doc_value + 4, doc->modified);
+        memcpy(doc_value + DOC_HEADER, doc->note.text, len);
+        k_mutex_unlock(&lock);
+        const int err = settings_save_one(key, doc_value, DOC_HEADER + len);
+        if (err) {
+            LOG_ERR("Failed to save setting %s of %u bytes: %d", key,
+                    (unsigned int)(DOC_HEADER + len), err);
+            failed |= bit;
+        }
+    }
+    bool sort_failed = false;
+    if (sort_changed) {
+        const int err = settings_save_one(DOC_SORT_KEY, &sort, 1);
+        if (err) {
+            LOG_ERR("Failed to save setting " DOC_SORT_KEY ": %d", err);
+            sort_failed = true;
+        }
+    }
+    if (failed || sort_failed) {
+        // Try again at the next save: failed slots count as dirty and gone both, which
+        // rewrites a document that exists and deletes one that does not.
+        k_mutex_lock(&lock, K_FOREVER);
+        for (int slot = 0; slot < PDA_DOCS_MAX; slot++) {
+            const uint16_t bit = (uint16_t)(1u << slot);
+            if (failed & bit) {
+                *(shell.docs.docs[slot].used ? &shell.docs.dirty : &shell.docs.gone) |= bit;
+            }
+        }
+        shell.docs.sort_changed |= sort_failed;
+        k_mutex_unlock(&lock);
         return;
     }
-    const int err = len ? settings_save_one(SETTINGS_KEY, text, len) : settings_delete(SETTINGS_KEY);
-    if (err) {
-        LOG_ERR("Failed to %s setting " SETTINGS_KEY ": %d", len ? "save" : "delete", err);
-        return;
+    if (legacy_present) {
+        const int err = settings_delete(LEGACY_NOTE_KEY);
+        if (err) {
+            LOG_ERR("Failed to delete setting " LEGACY_NOTE_KEY ": %d", err);
+        } else {
+            legacy_present = false;
+        }
     }
-    memcpy(saved, text, len);
-    saved_len = len;
 }
 
 /** Writes the best scores if a game changed them. System work queue only. */
@@ -257,25 +331,69 @@ static int settings_set(const char *name, size_t len, settings_read_cb read_cb, 
         k_mutex_unlock(&lock);
         return 0;
     }
-    if (strcmp(name, "note") != 0 || len > PDA_NOTE_MAX) {
-        LOG_WRN("Ignoring setting roamyboard/pda/%s of %u bytes: expected note or scores, "
-                "a note of at most %d bytes",
-                name, (unsigned int)len, PDA_NOTE_MAX);
+    if (strncmp(name, "doc/", 4) == 0) {
+        const int slot = atoi(name + 4);
+        if (slot < 0 || slot >= PDA_DOCS_MAX || len < DOC_HEADER ||
+            len > DOC_HEADER + PDA_NOTE_MAX) {
+            LOG_WRN("Ignoring setting roamyboard/pda/%s of %u bytes: expected a slot below %d "
+                    "and %d to %d bytes",
+                    name, (unsigned int)len, PDA_DOCS_MAX, DOC_HEADER, DOC_HEADER + PDA_NOTE_MAX);
+            return 0;
+        }
+        const ssize_t got = read_cb(cb_arg, doc_value, len);
+        if (got != (ssize_t)len) {
+            LOG_ERR("Failed to read setting roamyboard/pda/%s: %d", name, (int)got);
+            return got < 0 ? (int)got : -EIO;
+        }
+        k_mutex_lock(&lock, K_FOREVER);
+        pda_docs_load(&locked_shell()->docs, slot, get_u32(doc_value), get_u32(doc_value + 4),
+                      (const char *)doc_value + DOC_HEADER, len - DOC_HEADER);
+        k_mutex_unlock(&lock);
         return 0;
     }
-    const ssize_t got = read_cb(cb_arg, saved, len);
+    if (strcmp(name, "docsort") == 0) {
+        uint8_t sort;
+        if (len != 1 || read_cb(cb_arg, &sort, 1) != 1 || sort >= PDA_DOCS_SORT_COUNT) {
+            LOG_WRN("Ignoring setting " DOC_SORT_KEY " of %u bytes", (unsigned int)len);
+            return 0;
+        }
+        k_mutex_lock(&lock, K_FOREVER);
+        locked_shell()->docs.sort = sort;
+        k_mutex_unlock(&lock);
+        return 0;
+    }
+    if (strcmp(name, "note") != 0 || len > PDA_NOTE_MAX) {
+        LOG_WRN("Ignoring setting roamyboard/pda/%s of %u bytes", name, (unsigned int)len);
+        return 0;
+    }
+    const ssize_t got = read_cb(cb_arg, legacy_note, len);
     if (got < 0) {
-        LOG_ERR("Failed to read setting " SETTINGS_KEY ": %d", (int)got);
+        LOG_ERR("Failed to read setting " LEGACY_NOTE_KEY ": %d", (int)got);
         return (int)got;
     }
-    saved_len = (size_t)got;
+    legacy_len = (size_t)got;
+    legacy_present = true;
+    return 0;
+}
+
+/** After loading: the old single note becomes the first document, unless documents exist. */
+static int settings_commit(void) {
+    if (!legacy_present || legacy_len == 0) {
+        return 0;
+    }
     k_mutex_lock(&lock, K_FOREVER);
-    pda_note_set_text(&locked_shell()->note, saved, saved_len);
+    struct pda_docs *docs = &locked_shell()->docs;
+    if (pda_docs_count(docs) == 0) {
+        const int slot = pda_docs_create(docs);
+        pda_note_set_text(&docs->docs[slot].note, legacy_note, legacy_len);
+        LOG_INF("Moved setting " LEGACY_NOTE_KEY " to document %d", slot);
+    }
     k_mutex_unlock(&lock);
     return 0;
 }
 
-SETTINGS_STATIC_HANDLER_DEFINE(roamyboard_pda, "roamyboard/pda", NULL, settings_set, NULL, NULL);
+SETTINGS_STATIC_HANDLER_DEFINE(roamyboard_pda, "roamyboard/pda", NULL, settings_set,
+                               settings_commit, NULL);
 
 /* Outgoing: one job at a time, text in chunks and then a final message. Runs on the system
  * work queue and retries when the stack is out of buffers. */
@@ -450,7 +568,7 @@ static void set_mode(enum roamyboard_pda_mode new_mode) {
     const enum pda_shell_action action = pda_shell_set_mode(locked_shell(), new_mode);
     k_mutex_unlock(&lock);
     if (new_mode == ROAMYBOARD_PDA_OFF) {
-        save_note();
+        save_docs();
         save_scores();
         save_kana();
         save_cat();

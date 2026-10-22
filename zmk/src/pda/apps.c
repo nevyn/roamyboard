@@ -12,36 +12,188 @@
 #include "keys.h"
 #include "shell.h"
 
-/* Note */
+/* Note: a list of documents, and an editor for one of them. */
 
-static void note_open(struct pda_shell *shell) { pda_note_reset_keys(&shell->note); }
+enum {
+    USAGE_L = 0x0F,
+    USAGE_N = 0x11,
+    USAGE_SPACE = 0x2C,
+};
 
-static enum pda_app_result note_key(struct pda_shell *shell, uint8_t usage, uint8_t implicit_mods,
-                                    bool pressed) {
-    switch (pda_note_key(&shell->note, usage, implicit_mods, pressed)) {
+static const char *const sort_names[PDA_DOCS_SORT_COUNT] = {"new", "edit", "A-Z"};
+
+/** The list position of slot in order, or -1. */
+static int index_of(const int8_t *order, int n, int slot) {
+    for (int i = 0; i < n; i++) {
+        if (order[i] == slot) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/** The highlighted slot, or the list's first when none is: the view can open before settings load. */
+static int highlighted(const struct pda_shell *shell, const int8_t *order, int n) {
+    const int selected = shell->note_app.selected;
+    return selected >= 0 && shell->docs.docs[selected].used ? selected : n > 0 ? order[0] : -1;
+}
+
+static void open_doc(struct pda_shell *shell, int slot) {
+    struct pda_note_app_state *a = &shell->note_app;
+    a->open = (int8_t)slot;
+    a->selected = (int8_t)slot;
+    pda_note_reset_keys(&shell->docs.docs[slot].note);
+    shell->docs.docs[slot].note.held_mods = shell->held_mods;
+}
+
+static void new_doc(struct pda_shell *shell) {
+    const int slot = pda_docs_create(&shell->docs);
+    if (slot < 0) {
+        shell->note_app.open = -1;
+        shell->note_app.full = true;
+        return;
+    }
+    open_doc(shell, slot);
+}
+
+/** Deletes slot, highlighting the document after it in the list, or else the one before. */
+static void delete_doc(struct pda_shell *shell, int slot) {
+    struct pda_note_app_state *a = &shell->note_app;
+    int8_t order[PDA_DOCS_MAX];
+    const int n = pda_docs_order(&shell->docs, order);
+    const int i = index_of(order, n, slot);
+    a->selected = i + 1 < n ? order[i + 1] : i > 0 ? order[i - 1] : -1;
+    if (a->open == slot) {
+        a->open = -1;
+    }
+    pda_docs_delete(&shell->docs, slot);
+}
+
+/** Leaves the open document for the list; an empty one goes away. */
+static void close_doc(struct pda_shell *shell) {
+    const int slot = shell->note_app.open;
+    if (shell->docs.docs[slot].note.len == 0) {
+        delete_doc(shell, slot);
+    }
+    shell->note_app.open = -1;
+}
+
+static void note_open(struct pda_shell *shell) {
+    struct pda_note_app_state *a = &shell->note_app;
+    pda_docs_reset_keys(&shell->docs);
+    a->open = -1;
+    a->confirm = -1;
+    a->full = false;
+    if (shell->quick) {
+        new_doc(shell);
+    }
+    int8_t order[PDA_DOCS_MAX];
+    a->selected = (int8_t)highlighted(shell, order, pda_docs_order(&shell->docs, order));
+}
+
+static enum pda_app_result doc_key(struct pda_shell *shell, uint8_t usage, uint8_t implicit_mods,
+                                   bool cmd) {
+    struct pda_note_app_state *a = &shell->note_app;
+    const int slot = a->open;
+    struct pda_note *note = &shell->docs.docs[slot].note;
+    if (cmd && usage == PDA_USAGE_BACKSPACE) {
+        a->confirm = (int8_t)slot;
+        return PDA_APP_REDRAW;
+    }
+    switch (pda_note_key(note, usage, implicit_mods, true)) {
     case PDA_NOTE_NONE:
         return PDA_APP_NONE;
     case PDA_NOTE_CHANGED:
+        pda_docs_touch(&shell->docs, slot);
         return PDA_APP_REDRAW;
     case PDA_NOTE_TYPE_OUT:
-        memcpy(shell->type_out, shell->note.text, shell->note.len);
-        shell->type_out_len = shell->note.len;
-        pda_note_clear(&shell->note);
+        memcpy(shell->type_out, note->text, note->len);
+        shell->type_out_len = note->len;
         return PDA_APP_TYPE_OUT;
     case PDA_NOTE_LEAVE:
-        return PDA_APP_CLOSE;
+        close_doc(shell);
+        // A quick note leaves PDA mode; otherwise Escape goes back to the list.
+        return shell->quick ? PDA_APP_CLOSE : PDA_APP_REDRAW;
     }
     return PDA_APP_NONE;
+}
+
+static enum pda_app_result list_key(struct pda_shell *shell, uint8_t usage, bool cmd) {
+    struct pda_note_app_state *a = &shell->note_app;
+    int8_t order[PDA_DOCS_MAX];
+    const int n = pda_docs_order(&shell->docs, order);
+    a->selected = (int8_t)highlighted(shell, order, n);
+    const int i = index_of(order, n, a->selected);
+    if (cmd) {
+        if (usage == USAGE_L) {
+            shell->docs.sort = (uint8_t)((shell->docs.sort + 1) % PDA_DOCS_SORT_COUNT);
+            shell->docs.sort_changed = true;
+            return PDA_APP_REDRAW;
+        }
+        if (usage == PDA_USAGE_BACKSPACE && a->selected >= 0) {
+            a->confirm = a->selected;
+            return PDA_APP_REDRAW;
+        }
+        return PDA_APP_NONE;
+    }
+    if (usage == PDA_USAGE_ESCAPE) {
+        return PDA_APP_CLOSE;
+    }
+    if ((usage == PDA_USAGE_RETURN || usage == PDA_USAGE_KP_ENTER || usage == USAGE_SPACE ||
+         pda_key_dir(usage) == PDA_DIR_RIGHT) &&
+        a->selected >= 0) {
+        open_doc(shell, a->selected);
+        return PDA_APP_REDRAW;
+    }
+    const enum pda_dir dir = pda_key_dir(usage);
+    if (n > 0 && (dir == PDA_DIR_UP || dir == PDA_DIR_DOWN)) {
+        const int next = i < 0 ? 0 : dir == PDA_DIR_UP ? (i > 0 ? i - 1 : 0) : (i + 1 < n ? i + 1 : i);
+        a->selected = order[next];
+        return next != i ? PDA_APP_REDRAW : PDA_APP_NONE;
+    }
+    return PDA_APP_NONE;
+}
+
+static enum pda_app_result note_key(struct pda_shell *shell, uint8_t usage, uint8_t implicit_mods,
+                                    bool pressed) {
+    struct pda_note_app_state *a = &shell->note_app;
+    const bool modifier = usage >= PDA_USAGE_LEFT_CONTROL && usage <= PDA_USAGE_RIGHT_GUI;
+    if (modifier || !pressed) {
+        if (a->open >= 0) {
+            pda_note_key(&shell->docs.docs[a->open].note, usage, implicit_mods, pressed);
+        }
+        return PDA_APP_NONE;
+    }
+    if (a->confirm >= 0) {
+        if (usage == PDA_USAGE_RETURN || usage == PDA_USAGE_KP_ENTER) {
+            delete_doc(shell, a->confirm);
+        }
+        a->confirm = -1;
+        return PDA_APP_REDRAW;
+    }
+    const bool was_full = a->full;
+    a->full = false;
+    const bool cmd = (shell->held_mods | implicit_mods) & PDA_MODS_GUI;
+    if (cmd && usage == USAGE_N) {
+        if (a->open >= 0) {
+            close_doc(shell);
+        }
+        new_doc(shell);
+        return PDA_APP_REDRAW;
+    }
+    const enum pda_app_result result =
+        a->open >= 0 ? doc_key(shell, usage, implicit_mods, cmd) : list_key(shell, usage, cmd);
+    return was_full && result == PDA_APP_NONE ? PDA_APP_REDRAW : result;
 }
 
 #define NOTE_MAX_LINES 96
 
 /** The text with a cursor, wrapped; the last lines that fit, as on a receipt. */
-static void note_draw(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area) {
+static void draw_doc(const struct pda_note *note, struct pda_fb *fb, struct pda_rect area) {
     static char buf[PDA_NOTE_MAX + 2];
     static char line[PDA_NOTE_MAX + 2];
     static size_t starts[NOTE_MAX_LINES + 1];
-    snprintf(buf, sizeof(buf), "%s_", shell->note.text);
+    snprintf(buf, sizeof(buf), "%s_", note->text);
     const size_t len = strlen(buf);
     const int x = area.x + 1;
     const int w = area.w - 2;
@@ -64,6 +216,70 @@ static void note_draw(const struct pda_shell *shell, struct pda_fb *fb, struct p
         }
         line[n] = '\0';
         pda_text_draw(fb, x, area.y + 1 + (i - first) * line_h, w, line, PDA_FONT_BODY, true);
+    }
+}
+
+/** A row per document, the highlighted one inverted, scrolled to keep it in view. */
+static void draw_list(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area) {
+    int8_t order[PDA_DOCS_MAX];
+    const int n = pda_docs_order(&shell->docs, order);
+    char text[24];
+    const int small_h = pda_text_line_height(PDA_FONT_SMALL);
+    pda_text_draw(fb, area.x + 1, area.y, 40, sort_names[shell->docs.sort], PDA_FONT_SMALL, true);
+    snprintf(text, sizeof(text), "%d/%d", n, PDA_DOCS_MAX);
+    const int count_w = pda_text_width(text, PDA_FONT_SMALL);
+    pda_text_draw(fb, area.x + area.w - count_w - 1, area.y, count_w + 1, text, PDA_FONT_SMALL,
+                  true);
+    const int top = area.y + small_h + 1;
+    pda_fb_fill(fb, (struct pda_rect){area.x, top - 1, area.w, 1}, true);
+
+    if (n == 0) {
+        pda_text_center(fb, area, top + 30, "No notes", PDA_FONT_BODY, true);
+        pda_text_center(fb, area, top + 50, "cmd-N: new", PDA_FONT_SMALL, true);
+        return;
+    }
+    const int row_h = pda_text_line_height(PDA_FONT_BODY) + 2;
+    const int visible = (area.y + area.h - top) / row_h;
+    const int selected = highlighted(shell, order, n);
+    const int i = index_of(order, n, selected);
+    const int first = i >= visible ? i - visible + 1 : 0;
+    static char title[PDA_NOTE_MAX + 1];
+    for (int row = 0; row < visible && first + row < n; row++) {
+        const int slot = order[first + row];
+        const int y = top + 1 + row * row_h;
+        pda_docs_title(&shell->docs, slot, title, sizeof(title));
+        const size_t fit = pda_text_line_len(title, strlen(title), PDA_FONT_BODY, area.w - 4);
+        title[fit] = '\0';
+        pda_text_draw(fb, area.x + 2, y + 1, area.w - 4, title[0] ? title : "Untitled",
+                      PDA_FONT_BODY, true);
+        if (slot == selected) {
+            pda_fb_invert(fb, (struct pda_rect){area.x, y, area.w, row_h});
+        }
+    }
+    if (first + visible < n) {
+        pda_fb_fill(fb, (struct pda_rect){area.x + area.w - 2, area.y + area.h - 6, 2, 6}, true);
+    }
+}
+
+static void note_draw(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area) {
+    const struct pda_note_app_state *a = &shell->note_app;
+    if (a->open >= 0) {
+        draw_doc(&shell->docs.docs[a->open].note, fb, area);
+    } else {
+        draw_list(shell, fb, area);
+    }
+    if (a->confirm >= 0) {
+        static char title[PDA_NOTE_MAX + 1];
+        pda_docs_title(&shell->docs, a->confirm, title, sizeof(title));
+        const size_t fit = pda_text_line_len(title, strlen(title), PDA_FONT_BODY, area.w - 8);
+        title[fit] = '\0';
+        const char *const lines[3] = {"Delete", title[0] ? title : "Untitled", "ret: yes"};
+        pda_game_banner(fb, area, area.y + 40, lines);
+    } else if (a->full) {
+        char full[16];
+        snprintf(full, sizeof(full), "%d notes:", PDA_DOCS_MAX);
+        const char *const lines[3] = {full, "delete one", "first"};
+        pda_game_banner(fb, area, area.y + 40, lines);
     }
 }
 

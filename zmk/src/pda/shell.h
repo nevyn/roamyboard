@@ -17,6 +17,7 @@
 #include "apps.h"
 #include "clock.h"
 #include "gfx.h"
+#include "docs.h"
 #include "note.h"
 
 /** One half's general state, for the Info app. */
@@ -104,7 +105,8 @@ struct pda_shell {
     uint32_t tick_ms;
     uint32_t random_state;
 
-    struct pda_note note;
+    struct pda_docs docs;
+    struct pda_note_app_state note_app;
     struct pda_keys_state keys;
     struct pda_clock_app_state clock_app;
     struct pda_timer_state timer;

@@ -44,6 +44,7 @@ if(CONFIG_ROAMYBOARD_PDA)
     target_sources(app PRIVATE
       src/pda/peripheral.c
       src/pda/shell.c
+      src/pda/docs.c
       src/pda/midi_view.c
       src/pda/icons.c
       src/pda/gfx.c

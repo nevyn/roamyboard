@@ -817,6 +817,141 @@ static void test_cat_redraws_only_on_change(void) {
     CHECK(redraws >= 9 && redraws <= 12);
 }
 
+/* Note */
+
+enum { USAGE_L = 0x0F };
+
+static int add_doc(struct pda_shell *shell, const char *text) {
+    const int slot = pda_docs_create(&shell->docs);
+    pda_note_set_text(&shell->docs.docs[slot].note, text, strlen(text));
+    pda_docs_touch(&shell->docs, slot);
+    return slot;
+}
+
+static void test_docs_titles_and_order(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    const int b = add_doc(&shell, "  banana bread \nflour");
+    const int a = add_doc(&shell, "Apples");
+    const int u = add_doc(&shell, "\nno title");
+    char title[16];
+    pda_docs_title(&shell.docs, b, title, sizeof(title));
+    CHECK(strcmp(title, "banana bread") == 0);
+    pda_docs_title(&shell.docs, u, title, sizeof(title));
+    CHECK(title[0] == '\0');
+    pda_docs_title(&shell.docs, b, title, 5);
+    CHECK(strcmp(title, "bana") == 0);
+
+    int8_t order[PDA_DOCS_MAX];
+    shell.docs.sort = PDA_DOCS_BY_CREATED; // newest first
+    CHECK(pda_docs_order(&shell.docs, order) == 3 && order[0] == u && order[1] == a && order[2] == b);
+    pda_docs_touch(&shell.docs, b);
+    shell.docs.sort = PDA_DOCS_BY_MODIFIED;
+    pda_docs_order(&shell.docs, order);
+    CHECK(order[0] == b && order[1] == u);
+    shell.docs.sort = PDA_DOCS_BY_TITLE; // case-insensitive, untitled last
+    pda_docs_order(&shell.docs, order);
+    CHECK(order[0] == a && order[1] == b && order[2] == u);
+}
+
+static void test_docs_track_what_settings_lack(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    pda_docs_load(&shell.docs, 3, 40, 41, "kept", 4);
+    CHECK(shell.docs.dirty == 0 && shell.docs.next_stamp == 42);
+    const int slot = pda_docs_create(&shell.docs);
+    CHECK(slot == 0 && shell.docs.docs[0].created == 42);
+    CHECK(shell.docs.dirty == 1);
+    pda_docs_delete(&shell.docs, 3);
+    CHECK(shell.docs.gone == 1 << 3 && !shell.docs.docs[3].used);
+    for (int i = 0; i < PDA_DOCS_MAX - 1; i++) {
+        CHECK(pda_docs_create(&shell.docs) >= 0);
+    }
+    CHECK(pda_docs_create(&shell.docs) == -1);
+    CHECK(shell.docs.gone == 0); // slot 3 was used again, so settings rewrite it
+}
+
+static void test_note_list(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    add_doc(&shell, "first");
+    add_doc(&shell, "second");
+    open_named(&shell, "Note");
+    CHECK(shell.note_app.open == -1);
+    CHECK(strcmp(shell.docs.docs[shell.note_app.selected].note.text, "second") == 0);
+    tap(&shell, USAGE_DOWN);
+    CHECK(strcmp(shell.docs.docs[shell.note_app.selected].note.text, "first") == 0);
+    tap(&shell, PDA_USAGE_RETURN);
+    CHECK(shell.note_app.open == shell.note_app.selected);
+    type(&shell, "s");
+    CHECK(strcmp(shell.docs.docs[shell.note_app.open].note.text, "firsts") == 0);
+    tap(&shell, PDA_USAGE_ESCAPE);
+    CHECK(shell.note_app.open == -1 && strcmp(app_name(&shell), "Note") == 0);
+
+    // Cmd-L: created, modified, title.
+    tap_mods(&shell, LGUI, USAGE_L);
+    CHECK(shell.docs.sort == PDA_DOCS_BY_MODIFIED && shell.docs.sort_changed);
+    int8_t order[PDA_DOCS_MAX];
+    pda_docs_order(&shell.docs, order);
+    CHECK(strcmp(shell.docs.docs[order[0]].note.text, "firsts") == 0);
+    tap_mods(&shell, LGUI, USAGE_L);
+    tap_mods(&shell, LGUI, USAGE_L);
+    CHECK(shell.docs.sort == PDA_DOCS_BY_CREATED);
+
+    // Cmd-N opens a new document; leaving it empty deletes it.
+    tap_mods(&shell, LGUI, USAGE_N);
+    CHECK(shell.note_app.open >= 0 && pda_docs_count(&shell.docs) == 3);
+    tap(&shell, PDA_USAGE_ESCAPE);
+    CHECK(shell.note_app.open == -1 && pda_docs_count(&shell.docs) == 2);
+
+    // Escape from the list closes the app.
+    tap(&shell, PDA_USAGE_ESCAPE);
+    CHECK(shell.app == PDA_SHELL_HOME);
+}
+
+static void test_note_delete_asks_first(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    add_doc(&shell, "keep");
+    const int doomed = add_doc(&shell, "doomed");
+    open_named(&shell, "Note");
+    CHECK(shell.note_app.selected == doomed);
+    tap_mods(&shell, LGUI, PDA_USAGE_BACKSPACE);
+    CHECK(shell.note_app.confirm == doomed);
+    tap(&shell, PDA_USAGE_ESCAPE); // no
+    CHECK(shell.note_app.confirm == -1 && pda_docs_count(&shell.docs) == 2);
+    CHECK(strcmp(app_name(&shell), "Note") == 0);
+    tap_mods(&shell, LGUI, PDA_USAGE_BACKSPACE);
+    tap(&shell, PDA_USAGE_RETURN); // yes
+    CHECK(pda_docs_count(&shell.docs) == 1 && !shell.docs.docs[doomed].used);
+    CHECK(strcmp(shell.docs.docs[shell.note_app.selected].note.text, "keep") == 0);
+
+    // In a document, Cmd-Backspace deletes it too, and returns to the list.
+    tap(&shell, PDA_USAGE_RETURN);
+    CHECK(shell.note_app.open >= 0);
+    tap_mods(&shell, LGUI, PDA_USAGE_BACKSPACE);
+    tap(&shell, PDA_USAGE_RETURN);
+    CHECK(shell.note_app.open == -1 && pda_docs_count(&shell.docs) == 0);
+    CHECK(shell.note_app.selected == -1);
+}
+
+static void test_note_list_full(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    for (int i = 0; i < PDA_DOCS_MAX; i++) {
+        add_doc(&shell, "x");
+    }
+    open_named(&shell, "Note");
+    tap_mods(&shell, LGUI, USAGE_N);
+    CHECK(shell.note_app.full && shell.note_app.open == -1);
+    CHECK(tap(&shell, USAGE_DOWN) == PDA_SHELL_REDRAW && !shell.note_app.full);
+
+    // A quick note with no room shows the list instead.
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_NOTE);
+    CHECK(shell.note_app.full && shell.note_app.open == -1);
+}
+
 int main(void) {
     test_clock_redraws_once_a_second();
     test_countdown_runs_out();
@@ -857,6 +992,11 @@ int main(void) {
     test_cat_purrs_when_petted();
     test_cat_stays_through_quick_note();
     test_cat_redraws_only_on_change();
+    test_docs_titles_and_order();
+    test_docs_track_what_settings_lack();
+    test_note_list();
+    test_note_delete_asks_first();
+    test_note_list_full();
     if (failures) {
         fprintf(stderr, "pda_apps_test: %d failure(s)\n", failures);
         return 1;

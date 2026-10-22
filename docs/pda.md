@@ -7,7 +7,7 @@ The micro PDA runs on the split peripheral (the right half) and is always on its
 Both keys sit on the System layer of `zmk/config/roamyboard_split.keymap`:
 
 - **PDA** (`&pda_sel`, the 6 key) selects the PDA as slot 6, a sixth device beside the five Bluetooth profiles. The PDA keeps the view that it shows.
-- **Note** (`&pda_note`, the 7 key) opens a quick note: the Note app, which Escape or Cmd-Return closes, back to the host and to the view that the note replaced.
+- **Note** (`&pda_note`, the 7 key) opens a quick note: a new note in the Note app, which Escape or Cmd-Return closes, back to the host and to the view that the note replaced. A quick note left empty is not kept.
 
 Pressing the key of the mode that is on returns the keys to the host. Choosing a Bluetooth profile or an output (`&bt BT_SEL`, `BT_NXT`, `BT_PRV`, `&out`) also returns them, as choosing another device would, even the profile or output that is already chosen. ZMK raises no event for that, so the central looks up the binding of every key pressed in PDA mode, once the keymap has handled it (after hold-tap has decided a layer key). A host that connects or disconnects meanwhile does not return the keys.
 
@@ -21,17 +21,29 @@ Consumer keys, such as volume and media keys, still reach the host in PDA mode.
 
 ## Apps
 
-**Note.** A note, kept across restarts, that can be typed out to the host:
+**Note.** Up to 16 notes of up to 512 bytes each, kept across restarts. The app opens on the note list: a row per note, titled by its first line ("Untitled" when that is empty), with the sort order and the count above it.
 
-| Key | Does |
+| Key, in the list | Does |
+|---|---|
+| Up, Down (W S, K J) | Move the highlight. |
+| Return, Space, Right | Open the highlighted note. |
+| Cmd-N | Makes a new note and opens it. With 16 notes, the list says to delete one first. |
+| Cmd-Backspace | Deletes the highlighted note, after Return confirms; any other key keeps it. |
+| Cmd-L | Sorts by creation (newest first), by last edit (latest first), or by title (A to Z, ignoring case, untitled last), in turn. |
+| Escape | Closes the app. |
+
+| Key, in a note | Does |
 |---|---|
 | Letters, digits, punctuation, Space, Tab | Type themselves, with Shift. |
 | Return, keypad Enter | Start a new line. |
 | Backspace | Deletes the last character. |
-| Cmd-Backspace | Deletes the whole note. |
-| Cmd-Return | Returns the keys to the host and types the note out to it, then empties the note. |
-| Escape | Closes the note; it stays for next time. |
+| Cmd-Backspace | Deletes the note, after Return confirms, and goes back to the list. |
+| Cmd-N | Leaves the note for a new one. |
+| Cmd-Return | Returns the keys to the host and types the note out to it; the note stays. |
+| Escape | Back to the list; in a quick note, back to the host. A note left empty is deleted. |
 | å, ä, ö (Keypad layer) | Type themselves: the PDA reads the keymap's Option dead keys back into the letters. |
+
+The keyboard may have no clock, so a note carries stamps from a counter that only grows, instead of dates: one when it is made, and one at every edit. Sorting by creation or by edit compares the stamps. `zmk/src/pda/docs.c` holds the notes and their order; the app in `apps.c` draws the list and the editor.
 
 **Clock.** The time in seven-segment digits, the seconds, the weekday, the date and the ISO week, once a host has given the time (Clock, below).
 
@@ -127,7 +139,9 @@ The central types the text as `zmk_keycode_state_changed` events, one press or r
 
 ## Storage
 
-The peripheral keeps the note, at most 512 bytes of UTF-8, in the settings key `roamyboard/pda/note`, the games' best scores in `roamyboard/pda/scores`, the Kana drill's weights in `roamyboard/pda/kana`, and the cat's needs in `roamyboard/pda/cat`. It writes them when PDA mode ends, and only when they changed; the cat's needs also while the app runs (Cat, above).
+The peripheral keeps each note in the settings key `roamyboard/pda/doc/<slot>`, slot 0 to 15: its two stamps as little-endian uint32s, then at most 512 bytes of UTF-8. The list's sort is in `roamyboard/pda/docsort`. A build before the note list kept one note in `roamyboard/pda/note`; at startup that note becomes the first note of an empty list, and the key goes at the next save. The games' best scores are in in `roamyboard/pda/scores`, the Kana drill's weights in `roamyboard/pda/kana`, and the cat's needs in `roamyboard/pda/cat`. It writes them when PDA mode ends, and only what changed; the cat's needs also while the app runs (Cat, above).
+
+Settings live in a 32 KB flash partition, 8 sectors of 4 KB, of which Zephyr's NVS keeps one free for garbage collection. 16 full notes take about 8.5 KB of it, and the same in RAM, since the PDA holds every note in memory.
 
 ## Latency
 

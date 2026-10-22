@@ -345,12 +345,25 @@ static void render_pda_scenes(const char *dir) {
     }
     render_shell(dir, "peripheral-pda-rain", &shell);
 
+    static const char *const notes[] = {
+        "Packing list\nstrap, chargers, the left half",
+        "Ideas\nA cat that walks between the halves",
+        "Köp mjölk\nÅÄÖ åäö\nRing Theo",
+    };
+    for (size_t i = 0; i < sizeof(notes) / sizeof(notes[0]); i++) {
+        const int slot = pda_docs_create(&shell.docs);
+        pda_note_set_text(&shell.docs.docs[slot].note, notes[i], strlen(notes[i]));
+    }
+    open_named(&shell, "Note");
     pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
-    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_NOTE);
-    const char *text = "Köp mjölk\nÅÄÖ åäö\nRing Theo";
-    pda_note_set_text(&shell.note, text, strlen(text));
+    render_shell(dir, "peripheral-pda-notes", &shell);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    tap(&shell, 0x28); // Return: the newest note
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
     render_shell(dir, "peripheral-pda-note", &shell);
-    pda_note_set_text(&shell.note, "", 0);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    tap(&shell, 0x29); // Escape twice: home
+    tap(&shell, 0x29);
 
     pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
     struct pda_midi_view midi = {.shown = true, .velocity_step = 3, .last_note = 64};

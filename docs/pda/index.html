@@ -68,7 +68,7 @@
       <thead><tr><th>Keys</th><th>Does</th></tr></thead>
       <tbody>
         <tr><td><kbd>fn⌫</kbd> <kbd>6</kbd></td><td>Selects the PDA as a sixth device beside the five Bluetooth connections, and gives it the keys. Press it again to give the keys back.</td></tr>
-        <tr><td><kbd>fn⌫</kbd> <kbd>7</kbd></td><td>Opens a quick note right away. <kbd>Esc</kbd> gives the keys back, and the PDA returns to whatever it showed before.</td></tr>
+        <tr><td><kbd>fn⌫</kbd> <kbd>7</kbd></td><td>Opens a new quick note right away. <kbd>Esc</kbd> gives the keys back, and the PDA returns to whatever it showed before.</td></tr>
         <tr><td><kbd>Esc</kbd></td><td>In an app: back to the home screen. On the home screen: gives the keys back to your computer.</td></tr>
         <tr><td><kbd>fn⌫</kbd> <kbd>1</kbd>–<kbd>5</kbd></td><td>Choosing a Bluetooth connection, even the one you are on, also gives the keys back, to that connection.</td></tr>
       </tbody>
@@ -99,15 +99,21 @@
     <div class="apps">
 
       <article class="card app" id="note">
-        <figure class="screen"><img src="screens/note.png" alt="A note: Köp mjölk, ÅÄÖ åäö, Ring Theo" width="68" height="160"></figure>
+        <div class="shots">
+          <figure class="screen"><img src="screens/notes.png" alt="The note list: Köp mjölk, Ideas, Packing" width="68" height="160"></figure>
+          <figure class="screen"><img src="screens/note.png" alt="A note: Köp mjölk, ÅÄÖ åäö, Ring Theo" width="68" height="160"></figure>
+        </div>
         <div>
           <h3>Note <span class="digit">1</span></h3>
-          <p>A note to type into while you think, kept when the keyboard restarts. Swedish letters work, through the Keypad layer's å, ä and ö.</p>
+          <p>Up to 16 notes to type into while you think, kept when the keyboard restarts. The app opens on a list of them, each titled by its first line. Swedish letters work, through the Keypad layer's å, ä and ö.</p>
           <table><tbody>
-            <tr><td><kbd>Return</kbd></td><td>A new line.</td></tr>
-            <tr><td><kbd>⌫</kbd> · <kbd>⌘</kbd> <kbd>⌫</kbd></td><td>Delete the last character · the whole note.</td></tr>
-            <tr><td><kbd>⌘</kbd> <kbd>Return</kbd></td><td>Type the note out to your computer, then empty it.</td></tr>
-            <tr><td><kbd>Esc</kbd></td><td>Close the note; it stays for next time.</td></tr>
+            <tr><td><kbd>↑</kbd> <kbd>↓</kbd> · <kbd>Return</kbd></td><td>In the list: pick a note · open it.</td></tr>
+            <tr><td><kbd>⌘</kbd> <kbd>N</kbd></td><td>A new note.</td></tr>
+            <tr><td><kbd>⌘</kbd> <kbd>L</kbd></td><td>Sort the list by newest, last edited, or title.</td></tr>
+            <tr><td><kbd>⌘</kbd> <kbd>⌫</kbd></td><td>Delete the note, after <kbd>Return</kbd> confirms.</td></tr>
+            <tr><td><kbd>Return</kbd> · <kbd>⌫</kbd></td><td>In a note: a new line · delete the last character.</td></tr>
+            <tr><td><kbd>⌘</kbd> <kbd>Return</kbd></td><td>Type the note out to your computer.</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Back to the list; a note left empty goes away.</td></tr>
           </tbody></table>
         </div>
       </article>

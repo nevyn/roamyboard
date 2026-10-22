@@ -121,15 +121,23 @@ static void test_quick_note_returns_to_the_view_it_replaced(void) {
     CHECK(tap(&shell, PDA_USAGE_ESCAPE) == PDA_SHELL_LEAVE);
     CHECK(strcmp(app_name(&shell), "Timer") == 0);
     CHECK(shell.tick_ms != 0); // the timer ticks again
-    CHECK(strcmp(shell.note.text, "hi") == 0);
+    CHECK(pda_docs_count(&shell.docs) == 1 && strcmp(shell.docs.docs[0].note.text, "hi") == 0);
 
-    // Cmd-Return types the note out and also returns.
+    // Each quick note is a new document. Cmd-Return types it out, keeps it, and also returns.
     pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
     pda_shell_set_mode(&shell, ROAMYBOARD_PDA_NOTE);
+    type(&shell, "yo");
     CHECK(tap_mods(&shell, LGUI, PDA_USAGE_RETURN) == PDA_SHELL_TYPE_OUT);
-    CHECK(shell.type_out_len == 2 && memcmp(shell.type_out, "hi", 2) == 0);
-    CHECK(shell.note.len == 0);
+    CHECK(shell.type_out_len == 2 && memcmp(shell.type_out, "yo", 2) == 0);
+    CHECK(pda_docs_count(&shell.docs) == 2);
     CHECK(strcmp(app_name(&shell), "Timer") == 0);
+
+    // A quick note left empty leaves no document.
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF); // the central leaves PDA mode to type out
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_NOTE);
+    CHECK(pda_docs_count(&shell.docs) == 3);
+    CHECK(tap(&shell, PDA_USAGE_ESCAPE) == PDA_SHELL_LEAVE);
+    CHECK(pda_docs_count(&shell.docs) == 2);
 }
 
 static void test_slot_6_during_quick_note_keeps_note_open(void) {
@@ -145,9 +153,12 @@ static void test_note_opened_from_home_stays_after_type_out(void) {
     struct pda_shell shell;
     pda_shell_init(&shell, 1);
     open_named(&shell, "Note");
+    tap_mods(&shell, LGUI, USAGE_N);
     tap(&shell, USAGE_H);
     CHECK(tap_mods(&shell, LGUI, PDA_USAGE_RETURN) == PDA_SHELL_TYPE_OUT);
     CHECK(strcmp(app_name(&shell), "Note") == 0);
+    CHECK(tap(&shell, PDA_USAGE_ESCAPE) == PDA_SHELL_REDRAW); // to the list
+    CHECK(shell.note_app.open == -1 && strcmp(app_name(&shell), "Note") == 0);
     CHECK(tap(&shell, PDA_USAGE_ESCAPE) == PDA_SHELL_REDRAW);
     CHECK(shell.app == PDA_SHELL_HOME);
 }

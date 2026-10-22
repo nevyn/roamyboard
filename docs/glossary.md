@@ -100,9 +100,11 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **PDA mode**: The state in which the central sends its keyboard keys to the PDA instead of the host; the PDA then has **focus**. Its two modes are slot 6 and quick note. Outside PDA mode the PDA stays on the right display. Not: PDA layer (it is not a keymap layer).
 - **home screen**: The PDA's list of apps, which launches them. Not: launcher menu, desktop.
 - **slot 6**: PDA mode entered with the PDA key (`&pda_sel`), as if the PDA were a sixth device beside the five Bluetooth profiles. Not: profile 6 (ZMK has no sixth profile).
-- **quick note**: PDA mode entered with the Note key (`&pda_note`), straight into the note editor; Escape returns to the host.
+- **note**: One text in the PDA's Note app, up to 512 bytes, titled by its first line. Not: document, file.
+- **note list**: The Note app's first view: a row per note, in the chosen sort. Not: index, library.
+- **quick note**: PDA mode entered with the Note key (`&pda_note`), straight into a new note; Escape returns to the host.
 - **split data channel**: The PDA's own GATT service on the split peripheral, which the central writes to and subscribes to over the split connection. Not: split transport (ZMK's own messages).
-- **type out**: Sending the note to the host as key presses, with Cmd-Return in the note.
+- **type out**: Sending the open note to the host as key presses, with Cmd-Return in the note.
 - **tick**: The PDA shell's periodic call to the open app, at the interval in `tick_ms` that the app asks for; timers and games run on it. Not: frame, timer interrupt.
 - **BLE-MIDI**: MIDI over Bluetooth LE: the GATT service that the central offers each host beside HID, which carries the MIDI keys' messages ([MIDI](midi.md)). Not: Bluetooth MIDI, MIDI over GATT.
 - **MIDI key**: A key bound to a MIDI behavior, such as `&midi_note`, that sends MIDI messages over BLE-MIDI instead of a HID key code. Not: note key, MIDI button.

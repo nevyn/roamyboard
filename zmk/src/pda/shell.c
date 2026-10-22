@@ -68,7 +68,8 @@ void pda_shell_init(struct pda_shell *shell, uint32_t seed) {
     shell->before_quick = PDA_SHELL_HOME;
     // xorshift32 never leaves 0, so 0 is not a seed.
     shell->random_state = seed ? seed : 0x9E3779B9u;
-    pda_note_init(&shell->note);
+    pda_docs_init(&shell->docs);
+    shell->note_app = (struct pda_note_app_state){.open = -1, .selected = -1, .confirm = -1};
     shell->keys.last_position = -1;
     shell->keys.last_usage = -1;
     shell->midi.last_note = -1;
@@ -136,7 +137,7 @@ static void end_quick(struct pda_shell *shell) {
 }
 
 enum pda_shell_action pda_shell_set_mode(struct pda_shell *shell, enum roamyboard_pda_mode mode) {
-    pda_note_reset_keys(&shell->note);
+    pda_docs_reset_keys(&shell->docs);
     shell->held_mods = 0;
     if (mode == shell->mode) {
         return PDA_SHELL_NONE;

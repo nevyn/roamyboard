@@ -20,6 +20,18 @@ struct pda_keys_state {
     int last_usage;
 };
 
+/** Note: the document list, or the document open in the editor. */
+struct pda_note_app_state {
+    /** The open document's slot, or -1 while the list shows. */
+    int8_t open;
+    /** The highlighted document's slot in the list, or -1. */
+    int8_t selected;
+    /** The document that the delete confirmation asks about, or -1. */
+    int8_t confirm;
+    /** Cmd-N found every slot in use; the list says so until the next key. */
+    bool full;
+};
+
 /** Clock: the second that the view shows, to redraw only when it changes. */
 struct pda_clock_app_state {
     uint32_t shown_s;
