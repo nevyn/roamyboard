@@ -181,7 +181,7 @@ Zephyr's boot modes have no OTA mode, so `&ota_boot` writes 0xA8 with `retention
 
 ## Trackpad
 
-The right half reads the [pointing module](../electronics/Pointing%20module.md)'s trackpad, an Azoteq TPS48-P203-S: an IQS572 controller with Azoteq's IQS5xx-B000 firmware, at I2C address 0x74 on TWIM1 (D4 and D5), with its RDY output on D6. The driver (`zmk/drivers/input/iqs5xx.c`, compatible `azoteq,iqs5xx`) is a Zephyr input device. Its pure logic is in `iqs5xx_logic.c`, with host tests in `zmk/tests/iqs5xx_test.c`. The binding, `zmk/dts/bindings/input/azoteq,iqs5xx.yaml`, documents every property. This follows the IQS5xx-B000 datasheet, revision 2.1; the driver is untested on hardware.
+The right half reads the [pointing module](../electronics/Pointing%20module.md)'s trackpad, an Azoteq TPS48-P203-S: an IQS572 controller with Azoteq's IQS5xx-B000 firmware, at I2C address 0x74 on TWIM1 (D4 and D5), with its RDY output on D6. The driver (`zmk/drivers/input/iqs5xx.c`, compatible `azoteq,iqs5xx`) is a Zephyr input device. Its pure logic is in `iqs5xx_logic.c`, with host tests in `zmk/tests/iqs5xx_test.c`. The binding, `zmk/dts/bindings/input/azoteq,iqs5xx.yaml`, documents every property. This follows the IQS5xx-B000 datasheet, revision 2.1. On the bench (2026-10-22), the TPS48 reported firmware 2.1 and a resolution of 768 × 1024, and moved, tapped, scrolled and dragged as described below.
 
 The trackpad accepts I2C transfers only in a **communication window**. It opens a window and raises RDY when it has new data, and it pauses sensing until the driver ends the window by writing one byte to 0xEEEE; an I2C STOP leaves the window open. Register addresses are 16 bits, big-endian. A transfer while RDY is low is a **forced communication**: the trackpad holds SCL low (clock stretching) until its next window opens, which takes up to one report interval. In a low-power mode it NACKs the first addressing, so the driver tries each forced transfer up to 3 times, 200 µs apart.
 
@@ -239,11 +239,11 @@ The firmware chooses the pins; the MCU board does not exist yet. Until it does, 
 | CLK | D15 | P1.13, SPIM2 SCK | J_LEFT2 pin 1 |
 | /PL | D18 | P1.15, GPIO | J_LEFT2 pin 2 |
 | DATA | D14 | P1.11, SPIM2 MISO, pull-up | J_LEFT2 pin 3 |
-| SDA (planned) | D4 | P0.22, TWIM1 SDA, 2.2 kΩ to VCC | J_LEFT3 pin 2 |
-| SCL (planned) | D5 | P0.24, TWIM1 SCL, 2.2 kΩ to VCC | J_LEFT3 pin 3 |
-| INT (planned) | D6 | P1.00, GPIO | J_LEFT3 pin 1 |
+| SDA | D4 | P0.22, TWIM1 SDA, 2.2 kΩ to VCC | J_LEFT3 pin 2 |
+| SCL | D5 | P0.24, TWIM1 SCL, 2.2 kΩ to VCC | J_LEFT3 pin 3 |
+| INT | D6 | P1.00, GPIO | J_LEFT3 pin 1 |
 
-SDA, SCL and INT are planned for the [pointing module](../electronics/Pointing%20module.md) and not wired yet. The firmware already runs TWIM1 on D4 and D5, with the nRF52840's own pull-ups on both lines, and the right half's trackpad driver reads RDY on D6 with the nRF52840's pull-down (Trackpad, above). Wiring them adds the three wires and two 2.2 kΩ resistors from SDA and SCL to VCC. INT takes J_LEFT3 pin 1, which the v3.0 pinout gave LED. J_LEFT1 pin 1, +5V in the v3.0 pinout and the LED line once LEDs are wired, stays unconnected.
+SDA, SCL and INT serve the [pointing module](../electronics/Pointing%20module.md), and only the right half's MCU module wires them: three wires and two 2.2 kΩ resistors from SDA and SCL to VCC, as in [Pointing module bench](../electronics/Pointing%20module%20bench.md). The firmware runs TWIM1 on D4 and D5 on both halves, with the nRF52840's own pull-ups, so a left MCU module without the wires reads as no trackpad. INT takes J_LEFT3 pin 1, which the v3.0 pinout gave LED. J_LEFT1 pin 1, +5V in the v3.0 pinout and the LED line once LEDs are wired, stays unconnected.
 
 Solder the wires to the sockets' solder joints (J_LEFT), not to the empty header pads (J_RIGHT) or U1's pads: those reach the sockets through 0.25 mm tracks, and on the first socket board a wire tugging on a header pad broke the +3.3V and GND connections.
 
@@ -264,7 +264,7 @@ The nice!view, as ZMK's `nice_view_adapter` maps it on the nice!nano:
 Why these pins:
 
 - The chain runs on SPIM2 with SCK on D15 and MISO on D14, the pins of the nice!nano's `pro_micro_spi` (SPIM1); it has no MOSI. SPIM1 shares its peripheral with TWIM1, which the pointing module's I2C needs.
-- SDA, SCL and INT are planned on D4, D5 and D6, next to the nice!view's wires on the same edge. The free pins on the chain's edge, D19 to D21 (P0.02, P0.29, P0.31), are "low frequency I/O only" in the nRF52840 product specification.
+- SDA, SCL and INT are on D4, D5 and D6, next to the nice!view's wires on the same edge. The free pins on the chain's edge, D19 to D21 (P0.02, P0.29, P0.31), are "low frequency I/O only" in the nRF52840 product specification.
 - spi0 belongs to the nice!view (SCK D3/P0.20, MOSI D2/P0.17, CS D1/P0.06) and shares its peripheral with i2c0.
 - D18 sits next to D15 on the header row that also carries VCC and GND, so all five wires leave from one edge of the nice!nano. It is not an NFC pin (D10 and D16 are) and not a UART pin (D0 and D1).
 
