@@ -14,6 +14,8 @@ enum Revision {
     static let keeper = 1
     static let mcuTunnelFloor = 1  // MCU floor r3 with strap tunnels
     static let mcuFloor = 3     // r2: clamp pads and rear stops on the socket bodies; r3: lead-in on the socket stops, tabs at the board-side legs
+    static let pointShell = 1
+    static let pointFloor = 1
     static let coupon = 3       // r1: 13.7–14.2; r2: from 13.5; r3: larger text
     static func label(_ n: Int) -> String { "r\(n)" }
 }
@@ -184,7 +186,19 @@ enum P {
     /// and the board's pads cross the edge between them, clear of the connector rows.
     static let boardSideTabYs: [(Double, Double)] = [(12, 16), (42, 46), (55, 59), (98, 102)]
 
-    // Derived
+    // Pointing module: Azoteq TPS48-P203-S trackpad under the plateau's skin (electronics/Pointing module.md)
+    static let padLength = 48.0               // along the column
+    static let padWidth = 38.0
+    static let padThickness = 2.03            // with its adhesive
+    static let padSkin = 1.2                  // the pad's overlay; S1 open tunes the pad for 1 to 2 mm
+    static let padClearance = 0.3             // pocket past the pad, all round
+    static let padOverParts = 1.0             // pad's back over the board's front; its 0805s stand about 0.7
+    static let padPastSW5 = 3.0               // pad's edge past the SW5 switch pockets, toward the SW1 end
+    static let padRibYs = [40.0, 52.0, 80.5]  // module y of the floor's ribs under the pad, clear of the socket cradles
+    static let padRibXs = (4.0, 15.0)         // V frame: clear of the cradles' mouths and the seam's wire channel
+    static let keycapWell = 18.5              // around each SW5 switch, through the plateau; Choc keycaps are 17.5 x 16.5
+    static let cheekLength = 4.5              // socket cradle cheeks, from the socket wall; short of the switch's legs
+
     static var pocketWidth: Double { boardWidth + 2 * boardClearance }
     static var pocketLength: Double { boardLength + 2 * boardClearance }
     static var outerLength: Double { pocketLength + 2 * endWall }

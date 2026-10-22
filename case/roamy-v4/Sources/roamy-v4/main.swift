@@ -7,6 +7,12 @@ print(String(format: "joint centre (%.2f, %.2f), skew %.2f°, height %.2f, top %
              Joint.corner(Joint.socketFace, Joint.rim).y, Joint.corner(Joint.headerFace, Joint.rim).y))
 print(String(format: "MCU module: top %.2f above the key modules' (view), %.2f thick; free face at x %.2f",
              MCU.top - Joint.top, MCU.top - Joint.bottom, MCU.freeFaceX))
+do {
+    let seam = Pointing.level(Joint.corner(Joint.socketFace, Joint.top)), faces = Pointing.level(Joint.corner(Joint.headerFace, Joint.top))
+    print(String(format: "pointing module: plateau %.2f over the key tops at the seam, %.2f at the faces; pad at board y %.2f..%.2f",
+                 Pointing.plateau - seam, Pointing.plateau - faces, P.boardOriginY + P.boardLength - (Pointing.padY1 - P.endWall - P.boardClearance),
+                 P.boardOriginY + P.boardLength - (Pointing.padY0 - P.endWall - P.boardClearance)))
+}
 print(String(format: "terminator: pause at %.2f mm print height, %.2f mm printed over the pockets",
              TerminatorModule.pauseHeight, TerminatorModule.pauseLevel - Joint.bottom))
 
@@ -62,6 +68,18 @@ await Project(packageRelative: "../../build/roamy-v4") {
     await Model("mcu-module-print") {
         MCUShell().transformed(PrintPose.topDown(top: MCU.top)).inPart(name: "Shell")
         MCUFloor().transformed(PrintPose.floor).translated(x: 70).inPart(name: "Floor")
+    }
+    await Model("pointing-module") {
+        PointingShell().inPart(name: "Shell")
+        PointingFloor().inPart(name: "Floor", color: .blue)
+        PointingParts.board.inPart(name: "Board")
+        PointingParts.sockets.inPart(name: "Sockets", color: .gray)
+        PointingParts.vSwitch.inPart(name: "Switch", color: .white)
+        PointingParts.pad.inPart(name: "Trackpad", color: .black)
+    }
+    await Model("pointing-module-print") {
+        PointingShell().transformed(PrintPose.topDown(top: Pointing.plateau, up: Pointing.up)).inPart(name: "Shell")
+        PointingFloor().transformed(PrintPose.bottomDown(Pointing.bottom, up: Pointing.up)).translated(x: 55).inPart(name: "Floor")
     }
     await Model("three-modules") {
         KeyModuleShell().inPart(name: "Left shell")
@@ -140,6 +158,35 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
     await Model("mcu-wire-paths", options: .format3D(.stl)) { MCUFixtures.wirePaths }
     await Model("mcu-tongue", options: .format3D(.stl)) { MCUParts.usbTongue }
     await Model("mcu-usb-plug", options: .format3D(.stl)) { MCUFixtures.plug }
+    // pointing module, in the key module frame: right-* is its header-side neighbour; pointing-nb-* places it as the
+    // neighbour of the key module at the origin, which is then its socket-side neighbour
+    let nn = Joint.neighbourTransform.concatenated(with: Joint.neighbourTransform)
+    await Model("pointing-shell", options: .format3D(.stl)) { PointingShell() }
+    await Model("pointing-floor", options: .format3D(.stl)) { PointingFloor() }
+    await Model("pointing-board", options: .format3D(.stl)) { PointingParts.board }
+    await Model("pointing-sockets", options: .format3D(.stl)) { PointingParts.sockets }
+    await Model("pointing-socket-tails", options: .format3D(.stl)) { PointingParts.socketTails }
+    await Model("pointing-pad", options: .format3D(.stl)) { PointingParts.pad }
+    await Model("pointing-switch", options: .format3D(.stl)) { PointingParts.vSwitch }
+    await Model("pointing-switch-room", options: .format3D(.stl)) { PointingParts.vSwitchRoom }
+    await Model("pointing-front-room", options: .format3D(.stl)) { PointingParts.frontRoom }
+    await Model("pointing-outline", options: .format3D(.stl)) { alongColumn(Pointing.shellSection) }
+    await Model("pointing-nb-shell", options: .format3D(.stl)) { PointingShell().transformed(nn) }
+    await Model("pointing-nb-floor", options: .format3D(.stl)) { PointingFloor().transformed(nn) }
+    await Model("pointing-nb-sockets", options: .format3D(.stl)) { PointingParts.sockets.transformed(nn) }
+    await Model("pointing-nb-pad", options: .format3D(.stl)) { PointingParts.pad.transformed(nn) }
+    await Model("pointing-shell-print", options: .format3D(.stl)) { PointingShell().transformed(PrintPose.topDown(top: Pointing.plateau, up: Pointing.up)) }
+    await Model("pointing-shell-print-painted-support", options: .format3D(.stl)) {
+        Pointing.headerJoint.added.transformed(PrintPose.topDown(top: Pointing.plateau, up: Pointing.up))
+    }
+    await Model("pointing-floor-print", options: .format3D(.stl)) { PointingFloor().transformed(PrintPose.bottomDown(Pointing.bottom, up: Pointing.up)) }
+    for (i, shank) in PointingParts.shanks.enumerated() {
+        await Model("pointing-shank-\(i)", options: .format3D(.stl)) { shank }
+    }
+    await Model("pointing-socket-joint-reserved", options: .format3D(.stl)) { Pointing.socketJoint.reserved.transformed(Pointing.v) }
+    await Model("pointing-socket-joint-removed", options: .format3D(.stl)) { Pointing.socketJoint.removed.transformed(Pointing.v) }
+    await Model("pointing-socket-joint-added", options: .format3D(.stl)) { Pointing.socketJoint.added.transformed(Pointing.v) }
+    await Model("pointing-socket-joint-keep-out", options: .format3D(.stl)) { Pointing.socketJoint.keepOut.transformed(Pointing.v) }
     // the JointSide contract: what each side owns, cuts, adds and keeps clear
     await Model("shell-outline", options: .format3D(.stl)) { alongColumn(keystone(from: Joint.rim, to: Joint.top)) }
     for (name, joint) in [("header", HeaderSideJoint() as any JointSide), ("socket", SocketSideJoint())] {
@@ -151,4 +198,7 @@ await Project(packageRelative: "../../build/roamy-v4/check") {
 }
 try String(format: "%.2f\n", TerminatorModule.pauseHeight)
     .write(to: URL(fileURLWithPath: #filePath).appending(path: "../../../../../build/roamy-v4/check/terminator-pause.txt").standardized,
+           atomically: true, encoding: .utf8)
+try String(format: "%.6f %.6f\n", Pointing.up.x, Pointing.up.y)
+    .write(to: URL(fileURLWithPath: #filePath).appending(path: "../../../../../build/roamy-v4/check/pointing-up.txt").standardized,
            atomically: true, encoding: .utf8)
