@@ -30,7 +30,7 @@
 #define DASH_SPEED 150
 #define STALK_SPEED 8
 
-#define FAST_TICK_MS 50
+#define FAST_TICK_MS 40
 #define SLOW_TICK_MS 250
 /** A longer gap between ticks (quick note, a busy queue) counts as this much. */
 #define MAX_STEP_MS 250
@@ -41,7 +41,16 @@
 #define LEAP_MS 700
 #define LASER_MS 6000
 #define HEART_MS 1500
-#define LASER_STEP_PX 4
+/* The laser dot: a press starts it at LASER_START_SPEED, holding speeds it up by LASER_ACCEL
+ * px/s^2 to LASER_MAX_SPEED, and on release it glides to a stop, its speed falling by e every
+ * LASER_GLIDE_MS. A tap moves it about 4 px. */
+#define LASER_START_SPEED 30
+#define LASER_ACCEL 200
+#define LASER_MAX_SPEED 90
+#define LASER_GLIDE_MS 80
+#define LASER_TOP 12
+/** In toy mode, food and fun never fall below this: above every threshold that makes her beg. */
+#define TOY_FLOOR 60
 /** Highest above her surface that she leaps at the laser dot. */
 #define LEAP_REACH_PX 40
 
@@ -130,10 +139,15 @@ static bool due(const struct pda_shell *shell) {
 }
 
 /** Adds to a need, up to full, and flags a save when its tens change. */
+/** The needs that lead her now: the kept ones, or in toy mode the transient ones. */
+static struct pda_cat_saved *needs(struct pda_cat_state *c) {
+    return c->needs.toy ? &c->toy_needs : &c->needs;
+}
+
 static void add_need(struct pda_shell *shell, uint8_t *need, int delta) {
     const int before = *need;
     *need = (uint8_t)clamp(before + delta, 0, PDA_CAT_FULL);
-    if (before / 10 != *need / 10) {
+    if (before / 10 != *need / 10 && !shell->cat.needs.toy) {
         shell->cat_changed = true;
     }
 }
@@ -225,7 +239,7 @@ static void arrive(struct pda_shell *shell) {
 /** Picks what she does next, from her needs and a little chance. */
 static void decide(struct pda_shell *shell) {
     struct pda_cat_state *c = &shell->cat;
-    const struct pda_cat_saved *n = &c->needs;
+    const struct pda_cat_saved *n = needs(c);
     if (n->energy < 25) {
         head_for(shell, GOAL_BED, TOP, BED_X, WALK_SPEED);
         return;
@@ -340,6 +354,53 @@ static void move_ball(struct pda_cat_state *c, uint32_t dt) {
     }
 }
 
+static bool laser_moving(const struct pda_cat_state *c) {
+    return c->laser && (c->laser_held || c->laser_vx16 || c->laser_vy16);
+}
+
+/** -1, 0 or 1: the way that the held keys push along one axis. */
+static int laser_push(uint8_t held, enum pda_dir minus, enum pda_dir plus) {
+    return ((held >> plus) & 1) - ((held >> minus) & 1);
+}
+
+/** Moves one axis of the dot by dt: speeds up while pushed, glides to a stop when not. */
+static void laser_axis(int32_t *pos16, int32_t *v16, int push, int lo, int hi, uint32_t dt) {
+    if (push != 0) {
+        const int32_t start = push * LASER_START_SPEED * 16;
+        if (*v16 * push < LASER_START_SPEED * 16) {
+            *v16 = start;
+        } else {
+            *v16 += push * LASER_ACCEL * 16 * (int32_t)dt / 1000;
+            if (*v16 * push > LASER_MAX_SPEED * 16) {
+                *v16 = push * LASER_MAX_SPEED * 16;
+            }
+        }
+    } else if (*v16 != 0) {
+        *v16 = dt >= LASER_GLIDE_MS ? 0 : *v16 - *v16 * (int32_t)dt / LASER_GLIDE_MS;
+        if (*v16 > -4 * 16 && *v16 < 4 * 16) {
+            *v16 = 0;
+        }
+    }
+    *pos16 += *v16 * (int32_t)dt / 1000;
+    if (*pos16 < lo * 16 || *pos16 > hi * 16) {
+        *pos16 = clamp(*pos16, lo * 16, hi * 16);
+        *v16 = 0;
+    }
+}
+
+static void move_laser(struct pda_cat_state *c, uint32_t now, uint32_t dt) {
+    if (!laser_moving(c)) {
+        return;
+    }
+    laser_axis(&c->laser_x16, &c->laser_vx16, laser_push(c->laser_held, PDA_DIR_LEFT, PDA_DIR_RIGHT),
+               1, PDA_FB_W - 2, dt);
+    laser_axis(&c->laser_y16, &c->laser_vy16, laser_push(c->laser_held, PDA_DIR_UP, PDA_DIR_DOWN),
+               LASER_TOP, PLAY_H - 2, dt);
+    c->laser_x = (int16_t)((c->laser_x16 + 8) / 16);
+    c->laser_y = (int16_t)((c->laser_y16 + 8) / 16);
+    c->laser_ms = now;
+}
+
 /** The surface under the laser dot: the nearest at or below it. */
 static enum level level_under(int x, int y) {
     enum level best = FLOOR;
@@ -421,9 +482,9 @@ static void bat_ball(struct pda_shell *shell) {
         c->ball_vx16 = (c->left ? -speed : speed) * 16;
         c->ball_vh16 = 40 * 16;
         c->ball_h16 = 1;
-        add_need(shell, &c->needs.fun, 6);
+        add_need(shell, &needs(c)->fun, 6);
     }
-    if (c->kicks >= c->kick_limit || c->needs.fun >= PDA_CAT_FULL) {
+    if (c->kicks >= c->kick_limit || needs(c)->fun >= PDA_CAT_FULL) {
         sit(shell, 3000);
     } else {
         begin(shell, DOING_STAND, 0);
@@ -480,18 +541,23 @@ static void live(struct pda_shell *shell, uint32_t dt) {
     while (c->life_ms >= LIFE_STEP_MS) {
         c->life_ms -= LIFE_STEP_MS;
         c->life_steps++;
+        struct pda_cat_saved *n = needs(c);
         if (c->life_steps % 9 == 0) {
-            add_need(shell, &c->needs.food, -1);
+            add_need(shell, &n->food, -1);
         }
         if (c->life_steps % 6 == 0) {
-            add_need(shell, &c->needs.fun, -1);
+            add_need(shell, &n->fun, -1);
         }
         if (c->doing == DOING_SLEEP) {
-            add_need(shell, &c->needs.energy, 2);
+            add_need(shell, &n->energy, 2);
         } else if (c->doing == DOING_LOAF) {
-            add_need(shell, &c->needs.energy, 1);
+            add_need(shell, &n->energy, 1);
         } else if (c->life_steps % 2 == 0) {
-            add_need(shell, &c->needs.energy, -1);
+            add_need(shell, &n->energy, -1);
+        }
+        if (c->needs.toy) {
+            n->food = n->food < TOY_FLOOR ? TOY_FLOOR : n->food;
+            n->fun = n->fun < TOY_FLOOR ? TOY_FLOOR : n->fun;
         }
     }
 }
@@ -501,7 +567,7 @@ static void eat(struct pda_shell *shell) {
     struct pda_cat_state *c = &shell->cat;
     if (shell->now_ms - c->since_ms >= 1000) {
         c->since_ms += 1000;
-        add_need(shell, &c->needs.food, 4);
+        add_need(shell, &needs(c)->food, 4);
         c->eaten += 4;
         if (c->eaten >= PORTION) {
             c->eaten = 0;
@@ -509,7 +575,7 @@ static void eat(struct pda_shell *shell) {
             shell->cat_changed = true;
         }
     }
-    if (c->needs.food >= PDA_CAT_FULL || c->needs.bowl == 0) {
+    if (needs(c)->food >= PDA_CAT_FULL || c->needs.bowl == 0) {
         sit(shell, 3000);
     }
 }
@@ -551,7 +617,7 @@ static void behave(struct pda_shell *shell, uint32_t dt) {
         if (c->goal == GOAL_BALL) {
             bat_ball(shell);
         } else if (c->goal == GOAL_LASER) {
-            add_need(shell, &c->needs.fun, 3);
+            add_need(shell, &needs(c)->fun, 3);
             begin(shell, DOING_STARE, 1200);
         } else {
             resume(shell);
@@ -559,7 +625,7 @@ static void behave(struct pda_shell *shell, uint32_t dt) {
         break;
     case DOING_LEAP:
         if (due(shell)) {
-            add_need(shell, &c->needs.fun, 3);
+            add_need(shell, &needs(c)->fun, 3);
             if (c->goal == GOAL_LASER) {
                 begin(shell, DOING_STARE, 900);
             } else {
@@ -571,7 +637,7 @@ static void behave(struct pda_shell *shell, uint32_t dt) {
         eat(shell);
         break;
     case DOING_SLEEP:
-        if (c->needs.energy >= PDA_CAT_FULL) {
+        if (needs(c)->energy >= PDA_CAT_FULL) {
             begin(shell, DOING_STRETCH, 900);
         }
         break;
@@ -618,6 +684,8 @@ struct scene {
     bool laser;
     int16_t laser_x, laser_y;
     int16_t heart_x[PDA_CAT_HEARTS], heart_y[PDA_CAT_HEARTS];
+    /** Toy mode: no meters. */
+    bool toy;
     uint8_t meters[3];
     uint8_t bowl;
     /** 0 a plain window, 1 the sun, 2 the moon. */
@@ -752,9 +820,12 @@ static void scene_of(const struct pda_shell *shell, struct scene *s) {
         s->heart_x[i] = shown ? c->heart_x[i] : NO_HEART;
         s->heart_y[i] = shown ? (int16_t)(c->heart_y[i] - (int)age * 20 / HEART_MS) : NO_HEART;
     }
-    s->meters[0] = (uint8_t)(c->needs.food * METER_PX / PDA_CAT_FULL);
-    s->meters[1] = (uint8_t)(c->needs.fun * METER_PX / PDA_CAT_FULL);
-    s->meters[2] = (uint8_t)(c->needs.energy * METER_PX / PDA_CAT_FULL);
+    s->toy = c->needs.toy;
+    if (!s->toy) {
+        s->meters[0] = (uint8_t)(c->needs.food * METER_PX / PDA_CAT_FULL);
+        s->meters[1] = (uint8_t)(c->needs.fun * METER_PX / PDA_CAT_FULL);
+        s->meters[2] = (uint8_t)(c->needs.energy * METER_PX / PDA_CAT_FULL);
+    }
     s->bowl = c->needs.bowl;
     struct pda_date_time now;
     if (pda_shell_time(shell, &now)) {
@@ -799,7 +870,7 @@ static void pace(struct pda_shell *shell) {
     default:
         break;
     }
-    if (ball_moving(c) || hearts_shown(shell)) {
+    if (ball_moving(c) || laser_moving(c) || hearts_shown(shell)) {
         calm = false;
     }
     shell->tick_ms = calm ? SLOW_TICK_MS : FAST_TICK_MS;
@@ -824,9 +895,14 @@ static enum pda_app_result cat_tick(struct pda_shell *shell) {
     if (c->doing != DOING_WAIT) {
         live(shell, dt);
     }
+    if (shell->mode == ROAMYBOARD_PDA_OFF) {
+        c->laser_held = 0; // the releases go to the host
+    }
     move_ball(c, dt);
+    move_laser(c, shell->now_ms, dt);
     if (c->laser && shell->now_ms - c->laser_ms >= LASER_MS) {
         c->laser = false;
+        c->laser_held = 0;
     }
     behave(shell, dt);
     if (!c->here) {
@@ -845,6 +921,8 @@ static void cat_open(struct pda_shell *shell) {
         c->left = false;
         c->ball = false;
         c->laser = false;
+        c->laser_held = 0;
+        c->toy_needs = (struct pda_cat_saved){.food = 90, .fun = 90, .energy = 80};
         memset(c->heart_ms, 0, sizeof(c->heart_ms));
         c->goal = GOAL_ROAM;
         c->goal_level = FLOOR;
@@ -867,7 +945,7 @@ static void pet(struct pda_shell *shell) {
     c->heart_x[i] = (int16_t)(x_px(c) + (c->left ? 1 : CAT_WIDTH - 8) +
                               (int)pda_shell_random(shell, 5) - 2);
     c->heart_y[i] = (int16_t)(levels[c->level].surface - CAT_HEIGHT - 6);
-    add_need(shell, &c->needs.fun, 5);
+    add_need(shell, &needs(c)->fun, 5);
     if (c->doing != DOING_SLEEP && !committed(c) && c->goal != GOAL_HOME) {
         sit(shell, 0);
         begin(shell, DOING_PURR, 2500);
@@ -881,7 +959,7 @@ static void throw_ball(struct pda_shell *shell) {
     c->ball_h16 = 70 * 16;
     c->ball_vx16 = -(int32_t)between(shell, 30, 80) * 16;
     c->ball_vh16 = 20 * 16;
-    if (c->doing == DOING_SLEEP && c->needs.energy < 40) {
+    if (c->doing == DOING_SLEEP && needs(c)->energy < 40) {
         return;
     }
     c->kicks = 0;
@@ -889,20 +967,31 @@ static void throw_ball(struct pda_shell *shell) {
     heed(shell, GOAL_BALL);
 }
 
-static void move_laser(struct pda_shell *shell, enum pda_dir dir) {
+/** A direction key: pressing it shows the dot if needed and pushes it; releasing lets it glide. */
+static void laser_key(struct pda_shell *shell, enum pda_dir dir, bool pressed) {
     struct pda_cat_state *c = &shell->cat;
+    if (!pressed) {
+        c->laser_held &= (uint8_t)~(1u << dir);
+        return;
+    }
     if (!c->laser) {
         c->laser = true;
+        c->laser_x16 = (PDA_FB_W / 2) * 16;
+        c->laser_y16 = (levels[FLOOR].surface - 2) * 16;
+        c->laser_vx16 = c->laser_vy16 = 0;
         c->laser_x = PDA_FB_W / 2;
         c->laser_y = levels[FLOOR].surface - 2;
-    } else {
-        const int dx = dir == PDA_DIR_LEFT ? -1 : dir == PDA_DIR_RIGHT ? 1 : 0;
-        const int dy = dir == PDA_DIR_UP ? -1 : dir == PDA_DIR_DOWN ? 1 : 0;
-        c->laser_x = (int16_t)clamp(c->laser_x + dx * LASER_STEP_PX, 1, PDA_FB_W - 2);
-        c->laser_y = (int16_t)clamp(c->laser_y + dy * LASER_STEP_PX, 12, PLAY_H - 2);
     }
+    c->laser_held |= (uint8_t)(1u << dir);
     c->laser_ms = shell->now_ms;
-    if (c->doing == DOING_SLEEP && c->needs.energy < 30) {
+    // The push starts at once, so that a tap shorter than a tick still nudges the dot.
+    const int32_t start = LASER_START_SPEED * 16;
+    int32_t *v16 = dir == PDA_DIR_LEFT || dir == PDA_DIR_RIGHT ? &c->laser_vx16 : &c->laser_vy16;
+    const int sign = dir == PDA_DIR_LEFT || dir == PDA_DIR_UP ? -1 : 1;
+    if (*v16 * sign < start) {
+        *v16 = sign * start;
+    }
+    if (c->doing == DOING_SLEEP && needs(c)->energy < 30) {
         return;
     }
     heed(shell, GOAL_LASER);
@@ -914,11 +1003,21 @@ static void feed(struct pda_shell *shell) {
         c->needs.bowl = PDA_CAT_BOWL_MAX;
         shell->cat_changed = true;
     }
-    if (c->needs.food < 80 && c->doing != DOING_SLEEP && c->doing != DOING_EAT &&
+    if (needs(c)->food < 80 && c->doing != DOING_SLEEP && c->doing != DOING_EAT &&
         c->goal != GOAL_BALL && c->goal != GOAL_LASER && heed(shell, GOAL_EAT)) {
         c->goal_level = FLOOR;
         c->goal_x = EAT_X;
         c->speed = RUN_SPEED;
+    }
+}
+
+/** Shows or hides the meters: with them, her kept needs count; without, she is a toy. */
+static void toggle_toy(struct pda_shell *shell) {
+    struct pda_cat_state *c = &shell->cat;
+    c->needs.toy = !c->needs.toy;
+    shell->cat_changed = true;
+    if (c->needs.toy) {
+        c->toy_needs = (struct pda_cat_saved){.food = 90, .fun = 90, .energy = c->needs.energy};
     }
 }
 
@@ -942,12 +1041,17 @@ static void go_home(struct pda_shell *shell) {
 static enum pda_app_result cat_key(struct pda_shell *shell, uint8_t usage, uint8_t implicit_mods,
                                    bool pressed) {
     (void)implicit_mods;
+    const enum pda_dir dir = pda_key_dir(usage);
+    if (dir != PDA_DIR_NONE) {
+        laser_key(shell, dir, pressed);
+        pace(shell);
+        return redraw_if_changed(shell);
+    }
     if (!pressed) {
         return PDA_APP_NONE;
     }
-    const enum pda_dir dir = pda_key_dir(usage);
-    if (dir != PDA_DIR_NONE) {
-        move_laser(shell, dir);
+    if (usage == PDA_USAGE_TAB) {
+        toggle_toy(shell);
     } else if (usage == PDA_USAGE_ESCAPE) {
         go_home(shell);
         if (!shell->cat.here) {
@@ -1098,7 +1202,9 @@ static void draw_bubble(struct pda_fb *fb, struct pda_rect area, const struct sc
 static void cat_draw(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area) {
     struct scene s;
     scene_of(shell, &s);
-    draw_meters(fb, area, &s);
+    if (!s.toy) {
+        draw_meters(fb, area, &s);
+    }
     draw_room(fb, area, &s);
     if (s.ball) {
         const int x = area.x + s.ball_x, y = area.y + s.ball_y;

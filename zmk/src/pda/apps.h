@@ -225,11 +225,18 @@ struct pda_cat_saved {
     uint8_t fun;
     uint8_t energy;
     uint8_t bowl;
+    /**
+     * Toy mode: the meters are hidden and these needs rest, while the transient toy_needs lead
+     * her; those never fall low enough for her to beg.
+     */
+    uint8_t toy;
 };
 
 /** Cat: the status screen's cat, on the right half's playground while the app is open. */
 struct pda_cat_state {
     struct pda_cat_saved needs;
+    /** Her food, fun and energy in toy mode. */
+    struct pda_cat_saved toy_needs;
     /** She has come over and not yet run back; reopening after quick note keeps her where she is. */
     bool here;
     /** enum doing and enum goal in app_cat.c. */
@@ -255,7 +262,13 @@ struct pda_cat_state {
     int32_t ball_x16, ball_h16, ball_vx16, ball_vh16;
 
     bool laser;
+    /** The dot's pixel, rounded from its position in 1/16 pixels. */
     int16_t laser_x, laser_y;
+    int32_t laser_x16, laser_y16;
+    /** Its velocity in 1/16 pixels per second. */
+    int32_t laser_vx16, laser_vy16;
+    /** Bit (1 << enum pda_dir) for each direction key held. */
+    uint8_t laser_held;
     uint32_t laser_ms;
 
     uint32_t heart_ms[PDA_CAT_HEARTS];

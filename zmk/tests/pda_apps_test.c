@@ -657,17 +657,58 @@ static void test_cat_plays_with_the_ball(void) {
     CHECK(shell.cat.ball);
 }
 
+/** Holds a key for ms of the app's ticks. */
+static void hold(struct pda_shell *shell, uint8_t usage, uint32_t ms) {
+    pda_shell_key(shell, usage, 0, true);
+    run_ms(shell, ms);
+    pda_shell_key(shell, usage, 0, false);
+}
+
+static void test_cat_laser_accelerates_and_glides(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_cat(&shell);
+    run_ms(&shell, 2000);
+    tap(&shell, USAGE_RIGHT); // the dot appears mid-floor
+    CHECK(shell.cat.laser && shell.cat.laser_x == PDA_FB_W / 2);
+    run_ms(&shell, 1000);
+    const int tapped = shell.cat.laser_x - PDA_FB_W / 2;
+    CHECK(tapped >= 1 && tapped <= 6); // a tap nudges it a few pixels
+    CHECK(shell.cat.laser_vx16 == 0);
+
+    shell.cat.laser_x16 = 64 * 16; // room to speed up before the left wall
+    shell.cat.laser_x = 64;
+    pda_shell_key(&shell, USAGE_LEFT, 0, true);
+    CHECK(shell.tick_ms == 40);
+    int x = shell.cat.laser_x;
+    run_ms(&shell, 120);
+    const int early = x - shell.cat.laser_x;
+    run_ms(&shell, 240);
+    x = shell.cat.laser_x;
+    run_ms(&shell, 120);
+    const int late = x - shell.cat.laser_x;
+    CHECK(early > 0 && late > early); // it speeds up while held
+    pda_shell_key(&shell, USAGE_LEFT, 0, false);
+    x = shell.cat.laser_x;
+    run_ms(&shell, 1000);
+    CHECK(shell.cat.laser_x < x && x - shell.cat.laser_x < 15); // and glides to a stop
+    CHECK(shell.cat.laser_vx16 == 0);
+
+    // Leaving PDA mode drops a held key, whose release goes to the host.
+    pda_shell_key(&shell, USAGE_UP, 0, true);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    run_ms(&shell, 1000);
+    CHECK(shell.cat.laser_vy16 == 0 && shell.cat.laser_held == 0);
+}
+
 static void test_cat_chases_the_laser(void) {
     static struct pda_shell shell;
     new_shell(&shell);
     shell.cat.needs.fun = 30;
     open_cat(&shell);
     run_ms(&shell, 2000);
-    tap(&shell, USAGE_RIGHT); // the dot appears mid-floor
+    hold(&shell, USAGE_RIGHT, 300);
     CHECK(shell.cat.laser);
-    for (int i = 0; i < 6; i++) {
-        tap(&shell, USAGE_RIGHT);
-    }
     run_ms(&shell, 4000);
     const int paw = shell.cat.left ? cat_x(&shell) + 1 : cat_x(&shell) + CAT_WIDTH - 2;
     CHECK(abs(paw - shell.cat.laser_x) <= 3);
@@ -681,20 +722,39 @@ static void test_cat_follows_the_laser_up_the_tree(void) {
     new_shell(&shell);
     open_cat(&shell);
     run_ms(&shell, 2000);
-    tap(&shell, USAGE_UP);
-    for (int i = 0; i < 20; i++) { // up onto the top shelf, on the left
-        tap(&shell, USAGE_UP);
-        if (i < 6) {
-            tap(&shell, USAGE_LEFT);
-        }
-    }
-    CHECK(shell.cat.laser_y < 54);
+    hold(&shell, USAGE_UP, 1400); // up onto the top shelf, on the left
+    hold(&shell, USAGE_LEFT, 500);
+    CHECK(shell.cat.laser_y < 54 && shell.cat.laser_x < 30);
     for (int i = 0; i < 6 && shell.cat.level != 2; i++) {
         run_ms(&shell, 1000);
         tap(&shell, USAGE_LEFT); // keeps the dot alive
-        tap(&shell, USAGE_RIGHT);
     }
     CHECK(shell.cat.level == 2);
+}
+
+static void test_cat_toy_mode(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    shell.cat.needs = (struct pda_cat_saved){.food = 40, .fun = 40, .energy = 60};
+    open_cat(&shell);
+    shell.cat_changed = false;
+    tap(&shell, PDA_USAGE_TAB);
+    CHECK(shell.cat.needs.toy && shell.cat_changed);
+    shell.cat_changed = false;
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    bool slept = false;
+    for (int minute = 0; minute < 180; minute++) {
+        run_ms(&shell, 60000);
+        CHECK(shell.cat.toy_needs.food >= 60 && shell.cat.toy_needs.fun >= 60);
+        slept |= shell.cat.level == 2 && shell.cat.toy_needs.energy < 100;
+    }
+    CHECK(slept); // she still gets tired and goes to bed
+    // Her kept needs wait for toy mode to end.
+    CHECK(shell.cat.needs.food == 40 && shell.cat.needs.fun == 40 && shell.cat.needs.energy == 60);
+    CHECK(!shell.cat_changed);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    tap(&shell, PDA_USAGE_TAB);
+    CHECK(!shell.cat.needs.toy && shell.cat_changed);
 }
 
 static void test_cat_purrs_when_petted(void) {
@@ -705,7 +765,7 @@ static void test_cat_purrs_when_petted(void) {
     const uint8_t fun = shell.cat.needs.fun;
     CHECK(tap(&shell, PDA_USAGE_RETURN) == PDA_SHELL_REDRAW);
     CHECK(shell.cat.needs.fun == fun + 5);
-    CHECK(shell.tick_ms == 50); // the heart rises
+    CHECK(shell.tick_ms == 40); // the heart rises
 }
 
 static void test_cat_stays_through_quick_note(void) {
@@ -768,8 +828,10 @@ int main(void) {
     test_cat_eats_from_the_bowl();
     test_cat_sleeps_in_bed();
     test_cat_plays_with_the_ball();
+    test_cat_laser_accelerates_and_glides();
     test_cat_chases_the_laser();
     test_cat_follows_the_laser_up_the_tree();
+    test_cat_toy_mode();
     test_cat_purrs_when_petted();
     test_cat_stays_through_quick_note();
     test_cat_redraws_only_on_change();

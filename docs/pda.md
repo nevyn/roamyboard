@@ -53,11 +53,14 @@ Three meters along the top show her needs: food, fun and energy, each 0 to 100. 
 |---|---|
 | F | Fills the bowl with three portions; she comes to eat if she is hungry. Each portion gives 35 food. |
 | Space | Throws a ball in from the top right. She chases and bats it along the floor a few times, then loses interest; it stays for later. |
-| Arrows, W A S D, H J K L | Move a laser dot, 4 px a press; the first press puts it on the floor. She stalks a dot on a surface and pounces on it, sits under a dot on the wall and leaps at it if it is within reach, and follows it from level to level. The dot goes out 6 s after the last press. |
+| Arrows, W A S D, H J K L | Move a laser dot; the first press puts it on the floor. A held key starts it at 30 px/s and speeds it up by 200 px/s² to 90 px/s, two keys move it diagonally, and on release it glides to a stop, so a tap nudges it a few pixels. She stalks a dot on a surface and pounces on it, sits under a dot on the wall and leaps at it if it is within reach, and follows it from level to level. The dot goes out 6 s after it stops. |
 | Return | Pets her: a heart rises, fun goes up by 5, and she purrs with her eyes closed. |
+| Tab | Toy mode on or off (below). |
 | Escape | Sends her home: she runs off the left edge, then the app closes. A second Escape closes it at once. |
 
-A sleeping cat ignores the ball below 40 energy and the laser below 30. A quick note does not move her: she is where she was when the note closes. The playground redraws only when something on it changes; while she sits, sleeps or loafs, the app ticks four times a second, and 20 times while she or the ball moves. Her frames come from `zmk/tools/cat_frames.py`, which writes them upright for the PDA's framebuffer to `zmk/src/pda/cat_sprites.c`, with a mask of each frame's outline so that she hides what lies behind her.
+In toy mode the meters are hidden and nothing is at stake, like a screensaver: her kept needs wait unchanged, and a separate set leads her, in which food and fun never fall below 60, so she never begs, while energy runs as usual, so she still naps and goes to bed. Toy mode lasts until Tab again, and is kept in `roamyboard/pda/cat` with the needs; the toy needs start afresh each time.
+
+A sleeping cat ignores the ball below 40 energy and the laser below 30. A quick note does not move her: she is where she was when the note closes. The playground redraws only when something on it changes; while she sits, sleeps or loafs, the app ticks four times a second, and 25 times while she, the ball or the laser dot moves. Her frames come from `zmk/tools/cat_frames.py`, which writes them upright for the PDA's framebuffer to `zmk/src/pda/cat_sprites.c`, with a mask of each frame's outline so that she hides what lies behind her.
 
 **Tetris.** A 10 × 20 well. Left and Right (or A D, H L) move the piece, Up (W, K) or X turns it clockwise, Z anticlockwise, Down (S, J) drops it one row, Space drops it to the bottom, P pauses. The pieces come from shuffled bags of all seven; cleared lines score 100, 300, 500 or 800 times the level plus one; the level starts at 0, rises every 10 lines and speeds the fall.
 
