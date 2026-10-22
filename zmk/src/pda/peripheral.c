@@ -377,7 +377,7 @@ static int settings_set(const char *name, size_t len, settings_read_cb read_cb, 
 }
 
 /** After loading: the old single note becomes the first document, unless documents exist. */
-static int settings_commit(void) {
+static int settings_loaded(void) {
     if (!legacy_present || legacy_len == 0) {
         return 0;
     }
@@ -393,7 +393,7 @@ static int settings_commit(void) {
 }
 
 SETTINGS_STATIC_HANDLER_DEFINE(roamyboard_pda, "roamyboard/pda", NULL, settings_set,
-                               settings_commit, NULL);
+                               settings_loaded, NULL);
 
 /* Outgoing: one job at a time, text in chunks and then a final message. Runs on the system
  * work queue and retries when the stack is out of buffers. */
