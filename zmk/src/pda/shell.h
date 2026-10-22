@@ -92,6 +92,13 @@ struct pda_shell {
     int selected;
     /** The app was opened by quick note, so Escape leaves PDA mode instead of going home. */
     bool quick;
+    /**
+     * ? shows the help of the app or home over it; Escape closes it. Games wait meanwhile, and
+     * leaving PDA mode or changing the view closes it.
+     */
+    bool help;
+    /** Pixels that the help is scrolled up by. */
+    int16_t help_scroll;
     /** The app that quick note replaced, PDA_SHELL_HOME included; it returns afterwards. */
     int before_quick;
     /** PDA_MOD_* bits of the modifier keys held now. */
@@ -168,7 +175,17 @@ struct pda_app {
     bool focused_ticks;
     /** Draws the app into area, which lies below the title bar. */
     void (*draw)(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area);
+    /** The help that ? shows, in pda_help_draw()'s format; NULL for none of its own. */
+    const char *help;
+    /**
+     * Whether ? goes to the app as text instead of showing help now, as in the Note editor; NULL
+     * for never.
+     */
+    bool (*types_question_mark)(const struct pda_shell *shell);
 };
+
+/** The home screen's help. */
+extern const char pda_home_help[];
 
 /** The apps, in home screen order; the digit keys open the first ten, 1 first and 0 last. */
 extern const struct pda_app *const pda_apps[];

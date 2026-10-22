@@ -1238,10 +1238,19 @@ static void cat_draw(const struct pda_shell *shell, struct pda_fb *fb, struct pd
     }
 }
 
+static const char cat_help[] =
+    "F\tFill the bowl.\n"
+    "Space\tThrow a ball; with the laser on, it lands at the dot.\n"
+    "Arrows, WASD, HJKL\tMove the laser dot; hold to speed it up.\n"
+    "Return\tPet her.\n"
+    "Tab\tToy mode: no meters, nothing to look after.\n"
+    "Esc\tSend her home; the app closes when she has gone.";
+
 const struct pda_app pda_app_cat_def = {
     .name = "Cat",
     .open = cat_open,
     .key = cat_key,
     .tick = cat_tick,
     .draw = cat_draw,
+    .help = cat_help,
 };

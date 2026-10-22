@@ -103,6 +103,7 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **PDA mode**: The state in which the central sends its keyboard keys to the PDA instead of the host; the PDA then has **focus**. Its two modes are slot 6 and quick note. Outside PDA mode the PDA stays on the right display. Not: PDA layer (it is not a keymap layer).
 - **home screen**: The PDA's list of apps, which launches them. Not: launcher menu, desktop.
 - **slot 6**: PDA mode entered with the PDA key (`&pda_sel`), as if the PDA were a sixth device beside the five Bluetooth profiles. Not: profile 6 (ZMK has no sixth profile).
+- **help**: The screen that ? shows over the PDA's home screen or an app: its keys and what each does. Not: legend, cheat sheet, manual (the manual is the web page).
 - **note**: One text in the PDA's Note app, up to 512 bytes, titled by its first line. Not: document, file.
 - **note list**: The Note app's first view: a row per note, in the chosen sort. Not: index, library.
 - **quick note**: PDA mode entered with the Note key (`&pda_note`), straight into a new note; Escape returns to the host.

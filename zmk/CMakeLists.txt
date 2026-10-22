@@ -46,6 +46,7 @@ if(CONFIG_ROAMYBOARD_PDA)
       src/pda/peripheral.c
       src/pda/shell.c
       src/pda/docs.c
+      src/pda/help.c
       src/pda/midi_view.c
       src/pda/icons.c
       src/pda/gfx.c

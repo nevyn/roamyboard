@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "help.h"
 #include "icons.h"
 #include "keys.h"
 #include "midi_view.h"
@@ -86,6 +87,7 @@ uint32_t pda_shell_random(struct pda_shell *shell, uint32_t n) {
 }
 
 static void open_app(struct pda_shell *shell, int app) {
+    shell->help = false;
     shell->app = app;
     shell->selected = app;
     shell->tick_ms = 0;
@@ -95,6 +97,7 @@ static void open_app(struct pda_shell *shell, int app) {
 }
 
 static void go_home(struct pda_shell *shell) {
+    shell->help = false;
     shell->app = PDA_SHELL_HOME;
     shell->tick_ms = 0;
 }
@@ -143,6 +146,7 @@ enum pda_shell_action pda_shell_set_mode(struct pda_shell *shell, enum roamyboar
         return PDA_SHELL_NONE;
     }
     shell->mode = mode;
+    shell->help = false;
     switch (mode) {
     case ROAMYBOARD_PDA_NOTE:
         if (!shell->quick) {
@@ -207,6 +211,59 @@ static enum pda_shell_action home_key(struct pda_shell *shell, uint8_t usage) {
     return shell->selected != selected ? PDA_SHELL_REDRAW : PDA_SHELL_NONE;
 }
 
+/* Help */
+
+const char pda_home_help[] =
+    "Arrows, WASD, HJKL\tMove the highlight.\n"
+    "Return, Space\tOpen the app.\n"
+    "1 to 9, 0\tOpen the first ten apps.\n"
+    "Esc\tGive the keys back to the computer; the PDA stays on the display.\n"
+    "System 6\tThe PDA, from anywhere; again gives the keys back.\n"
+    "System 7\tA quick note, from anywhere.\n"
+    "?\tIn any app: its keys.";
+
+static const struct pda_rect help_area = {0, PDA_TITLE_H, PDA_FB_W, PDA_FB_H - PDA_TITLE_H};
+
+static const char *help_text(const struct pda_shell *shell) {
+    if (shell->app == PDA_SHELL_HOME) {
+        return pda_home_help;
+    }
+    const char *help = pda_apps[shell->app]->help;
+    return help ? help : "Esc\tBack to the home screen.";
+}
+
+/** ? with no modifier but Shift, unless the app takes it as text. */
+static bool asks_for_help(const struct pda_shell *shell, uint8_t usage, uint8_t implicit_mods) {
+    const uint8_t mods = shell->held_mods | implicit_mods;
+    if ((mods & (PDA_MODS_GUI | PDA_MODS_CTRL | PDA_MODS_ALT)) ||
+        pda_keys_char(usage, mods & PDA_MODS_SHIFT) != '?') {
+        return false;
+    }
+    const struct pda_app *app = shell->app == PDA_SHELL_HOME ? NULL : pda_apps[shell->app];
+    return app == NULL || app->types_question_mark == NULL || !app->types_question_mark(shell);
+}
+
+static enum pda_shell_action help_key(struct pda_shell *shell, uint8_t usage) {
+    if (usage == PDA_USAGE_ESCAPE) {
+        shell->help = false;
+        return PDA_SHELL_REDRAW;
+    }
+    const int step = pda_text_line_height(PDA_FONT_BODY);
+    const enum pda_dir dir = pda_key_dir(usage);
+    if (dir != PDA_DIR_UP && dir != PDA_DIR_DOWN) {
+        return PDA_SHELL_NONE;
+    }
+    const int height = pda_help_draw(NULL, help_area, help_text(shell), 0);
+    const int max = height > help_area.h ? height - help_area.h : 0;
+    int scroll = shell->help_scroll + (dir == PDA_DIR_DOWN ? step : -step);
+    scroll = scroll < 0 ? 0 : scroll > max ? max : scroll;
+    if (scroll == shell->help_scroll) {
+        return PDA_SHELL_NONE;
+    }
+    shell->help_scroll = (int16_t)scroll;
+    return PDA_SHELL_REDRAW;
+}
+
 static enum pda_shell_action app_result(struct pda_shell *shell, enum pda_app_result result) {
     switch (result) {
     case PDA_APP_NONE:
@@ -236,10 +293,23 @@ enum pda_shell_action pda_shell_key(struct pda_shell *shell, uint8_t usage, uint
         const uint8_t bit = (uint8_t)(1u << (usage - PDA_USAGE_LEFT_CONTROL));
         shell->held_mods = pressed ? (shell->held_mods | bit) : (shell->held_mods & ~bit);
     }
-    if (shell->app != PDA_SHELL_HOME) {
-        return app_result(shell, pda_apps[shell->app]->key(shell, usage, implicit_mods, pressed));
+    const bool modifier = usage >= PDA_USAGE_LEFT_CONTROL && usage <= PDA_USAGE_RIGHT_GUI;
+    if (shell->help && !modifier && pressed) {
+        return help_key(shell, usage);
     }
-    return pressed ? home_key(shell, usage) : PDA_SHELL_NONE;
+    if (!shell->help && pressed && asks_for_help(shell, usage, implicit_mods)) {
+        shell->help = true;
+        shell->help_scroll = 0;
+        return PDA_SHELL_REDRAW;
+    }
+    // Under the help, the app still learns of modifiers and releases, to keep its held keys right.
+    enum pda_shell_action action = PDA_SHELL_NONE;
+    if (shell->app != PDA_SHELL_HOME) {
+        action = app_result(shell, pda_apps[shell->app]->key(shell, usage, implicit_mods, pressed));
+    } else if (pressed) {
+        action = home_key(shell, usage);
+    }
+    return shell->help && action == PDA_SHELL_REDRAW ? PDA_SHELL_NONE : action;
 }
 
 enum pda_shell_action pda_shell_position(struct pda_shell *shell, uint8_t position, bool pressed) {
@@ -252,7 +322,8 @@ enum pda_shell_action pda_shell_position(struct pda_shell *shell, uint8_t positi
 
 uint32_t pda_shell_tick_ms(const struct pda_shell *shell) {
     if (shell->app == PDA_SHELL_HOME || pda_apps[shell->app]->tick == NULL ||
-        (pda_apps[shell->app]->focused_ticks && shell->mode == ROAMYBOARD_PDA_OFF)) {
+        (pda_apps[shell->app]->focused_ticks &&
+         (shell->mode == ROAMYBOARD_PDA_OFF || shell->help))) {
         return 0;
     }
     return shell->tick_ms;
@@ -262,7 +333,8 @@ enum pda_shell_action pda_shell_tick(struct pda_shell *shell) {
     if (pda_shell_tick_ms(shell) == 0) {
         return PDA_SHELL_NONE;
     }
-    return app_result(shell, pda_apps[shell->app]->tick(shell));
+    const enum pda_shell_action action = app_result(shell, pda_apps[shell->app]->tick(shell));
+    return shell->help && action == PDA_SHELL_REDRAW ? PDA_SHELL_NONE : action;
 }
 
 void pda_text_center(struct pda_fb *fb, struct pda_rect area, int y, const char *text,
@@ -393,7 +465,9 @@ void pda_shell_draw(const struct pda_shell *shell, struct pda_fb *fb) {
     char clock[8];
     struct pda_date_time now;
     const char *title;
-    if (shell->app != PDA_SHELL_HOME) {
+    if (shell->help) {
+        title = "Help";
+    } else if (shell->app != PDA_SHELL_HOME) {
         title = pda_apps[shell->app]->name;
     } else if (pda_shell_time(shell, &now)) {
         snprintf(clock, sizeof(clock), "%02d:%02d", now.hour, now.minute);
@@ -405,7 +479,9 @@ void pda_shell_draw(const struct pda_shell *shell, struct pda_fb *fb) {
     draw_battery(fb, shell->right.battery);
     pda_fb_fill(fb, (struct pda_rect){0, PDA_TITLE_H - 2, PDA_FB_W, 1}, true);
 
-    if (shell->app == PDA_SHELL_HOME) {
+    if (shell->help) {
+        pda_help_draw(fb, area, help_text(shell), shell->help_scroll);
+    } else if (shell->app == PDA_SHELL_HOME) {
         draw_home(shell, fb, area);
     } else {
         pda_apps[shell->app]->draw(shell, fb, area);

@@ -178,15 +178,24 @@ static void words_draw(const struct pda_shell *shell, struct pda_fb *fb, struct 
             snprintf(first, sizeof(first), "%s %u/%u", answer, shell->scores.words_won,
                      shell->scores.words_played);
         }
-        const char *const banner[3] = {first, "spc: again", NULL};
+        const char *const banner[3] = {first, "? help", NULL};
         const int banner_h = 2 * pda_text_line_height(PDA_FONT_BODY) + 6;
         pda_game_banner(fb, area, area.y + area.h - banner_h - 1, banner);
     }
 }
+
+static const char words_help[] =
+    "Guess the five-letter word in six tries. Filled: right letter, right place. Framed: in the word elsewhere.\n"
+    "Letters\tType a guess.\n"
+    "Return\tTry it.\n"
+    "Backspace\tDelete a letter.\n"
+    "Space, Return\tA new word after the end.\n"
+    "Esc\tBack to the home screen.";
 
 const struct pda_app pda_app_words_def = {
     .name = "Words",
     .open = words_open,
     .key = words_key,
     .draw = words_draw,
+    .help = words_help,
 };

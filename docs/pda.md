@@ -15,6 +15,8 @@ The home screen shows the apps as a grid of icons, three to a row, with the high
 
 The PDA remembers what it shows: as soon as the view changes, the peripheral writes the app's name to the settings key `roamyboard/pda/app` (empty for the home screen), and shows that view again when it starts. A quick note counts as the view that it replaced. The icons are 16 × 16 pixel art in `zmk/tools/pda_icons.py`, which generates `zmk/src/pda/icons.c`; the shell finds an app's icon by its name in lowercase.
 
+? (Shift-/) shows help over the home screen or any app: its keys, each with what it does, as an inverted key label and an explanation under it. The apps show no key legends of their own; a screen that would need one says "? help". Up and Down (W S, K J) scroll the help, and Escape closes it. Games wait while it shows; other apps, such as the Cat and the Timer, go on. Leaving PDA mode or changing the view closes it. In a note, ? is a question mark: an app's `types_question_mark` keeps ? for itself. Each app's help is the `help` string of its `struct pda_app`; the home screen's is `pda_home_help` in `shell.c`, and `zmk/src/pda/help.c` draws it.
+
 The games start, and start again after a game over, with Space or Return.
 
 Consumer keys, such as volume and media keys, still reach the host in PDA mode.

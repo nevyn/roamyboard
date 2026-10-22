@@ -235,7 +235,7 @@ static void draw_list(const struct pda_shell *shell, struct pda_fb *fb, struct p
 
     if (n == 0) {
         pda_text_center(fb, area, top + 30, "No notes", PDA_FONT_BODY, true);
-        pda_text_center(fb, area, top + 50, "cmd-N: new", PDA_FONT_SMALL, true);
+        pda_text_center(fb, area, top + 50, "? help", PDA_FONT_SMALL, true);
         return;
     }
     const int row_h = pda_text_line_height(PDA_FONT_BODY) + 2;
@@ -283,11 +283,35 @@ static void note_draw(const struct pda_shell *shell, struct pda_fb *fb, struct p
     }
 }
 
+static const char note_help[] =
+    "In the list\n"
+    "Up, Down (W S, K J)\tPick a note.\n"
+    "Return, Space, Right\tOpen it.\n"
+    "Cmd-N\tA new note.\n"
+    "Cmd-L\tSort by newest, last edited, or title.\n"
+    "Cmd-Backspace\tDelete the note; Return confirms.\n"
+    "Esc\tBack to the home screen.\n"
+    "In a note\n"
+    "Return\tA new line.\n"
+    "Backspace\tDelete the last character.\n"
+    "Cmd-Return\tType the note out to the computer.\n"
+    "Cmd-N\tA new note.\n"
+    "Cmd-Backspace\tDelete the note; Return confirms.\n"
+    "Esc\tBack to the list; an empty note goes away.\n"
+    "å ä ö\tOn the Keypad layer.";
+
+/** In a note, ? is text; in the list, it shows the help. */
+static bool note_types_question_mark(const struct pda_shell *shell) {
+    return shell->note_app.open >= 0;
+}
+
 const struct pda_app pda_app_note_def = {
     .name = "Note",
     .open = note_open,
     .key = note_key,
     .draw = note_draw,
+    .help = note_help,
+    .types_question_mark = note_types_question_mark,
 };
 
 /* Keys: a cell per key position, keymap columns top to bottom and rows left to right. */
@@ -374,11 +398,17 @@ static void keys_draw(const struct pda_shell *shell, struct pda_fb *fb, struct p
     pda_text_draw(fb, area.x + 1, text_y, area.w - 2, text, PDA_FONT_SMALL, true);
 }
 
+static const char keys_help[] =
+    "Press keys to see them: filled while held, outlined once pressed.\n"
+    "Cmd-Backspace\tStart over.\n"
+    "Esc\tBack to the home screen.";
+
 const struct pda_app pda_app_keys_def = {
     .name = "Keys",
     .key = keys_key,
     .position = keys_position,
     .draw = keys_draw,
+    .help = keys_help,
 };
 
 /* Info */
@@ -454,8 +484,13 @@ static void info_draw(const struct pda_shell *shell, struct pda_fb *fb, struct p
     pda_text_draw(fb, 1, y + 4, area.w - 2, text, PDA_FONT_SMALL, true);
 }
 
+static const char info_help[] =
+    "Each half's key module count, battery and build ID, and where the clock comes from.\n"
+    "Esc\tBack to the home screen.";
+
 const struct pda_app pda_app_info_def = {
     .name = "Info",
     .key = info_key,
     .draw = info_draw,
+    .help = info_help,
 };

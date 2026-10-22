@@ -276,18 +276,23 @@ static void breakout_draw(const struct pda_shell *shell, struct pda_fb *fb, stru
     char best[24];
     snprintf(best, sizeof(best), "best %lu", (unsigned long)shell->scores.breakout);
     if (!b->started) {
-        const char *const lines[3] = {"Bricks", best, "spc: play"};
+        const char *const lines[3] = {"Bricks", best, "? help"};
         pda_game_banner(fb, area, area.y + 50, lines);
     } else if (b->over) {
-        const char *const lines[3] = {"game over", best, "spc: again"};
+        const char *const lines[3] = {"game over", best, "? help"};
         pda_game_banner(fb, area, area.y + 50, lines);
     } else if (shell->mode == ROAMYBOARD_PDA_OFF) {
         const char *const lines[3] = {"paused", NULL, NULL};
         pda_game_banner(fb, area, area.y + 60, lines);
-    } else if (b->serving) {
-        pda_text_center(fb, area, top + 60, "spc: serve", PDA_FONT_SMALL, true);
     }
 }
+
+static const char breakout_help[] =
+    "Space, Return\tStart.\n"
+    "Left, Right (A D, H L)\tMove the paddle while held.\n"
+    "Space\tServe the ball.\n"
+    "The paddle's edges send the ball off steeper. Three balls.\n"
+    "Esc\tBack to the home screen; the game waits.";
 
 const struct pda_app pda_app_breakout_def = {
     .name = "Bricks",
@@ -296,4 +301,5 @@ const struct pda_app pda_app_breakout_def = {
     .tick = breakout_tick,
     .focused_ticks = true,
     .draw = breakout_draw,
+    .help = breakout_help,
 };

@@ -219,18 +219,23 @@ static void calc_draw(const struct pda_shell *shell, struct pda_fb *fb, struct p
         format(c->X, text, sizeof(text), area.w - 3, PDA_FONT_TITLE);
     }
     draw_right(fb, area, rule_y + 4, text, PDA_FONT_TITLE);
-
-    static const char *const hints[] = {"ret push", "n neg", "s swap", "r sqrt", "c clear",
-                                        "cmd-ret", " types x"};
-    const int count = sizeof(hints) / sizeof(hints[0]);
-    for (int i = 0; i < count; i++) {
-        const int y = area.y + area.h - (count - i) * small_h - 1;
-        pda_text_draw(fb, area.x + 1, y, area.w - 2, hints[i], PDA_FONT_SMALL, true);
-    }
 }
+
+static const char calc_help[] =
+    "RPN, as on HP's: type a number, push it, then the operation.\n"
+    "Return, Space\tPush X.\n"
+    "+ - * /\tCombine Y and X.\n"
+    "N\tNegate X.\n"
+    "S\tSwap X and Y.\n"
+    "R\tSquare root.\n"
+    "C\tClear all.\n"
+    "Backspace\tDelete a digit, or clear X.\n"
+    "Cmd-Return\tType X out to the computer.\n"
+    "Esc\tBack to the home screen.";
 
 const struct pda_app pda_app_calc_def = {
     .name = "Calc",
     .key = calc_key,
     .draw = calc_draw,
+    .help = calc_help,
 };

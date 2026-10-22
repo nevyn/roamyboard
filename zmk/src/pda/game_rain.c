@@ -224,16 +224,22 @@ static void rain_draw(const struct pda_shell *shell, struct pda_fb *fb, struct p
     char best[24];
     snprintf(best, sizeof(best), "best %lu", (unsigned long)shell->scores.rain);
     if (!r->started) {
-        const char *const lines[3] = {"Rain", best, "spc: play"};
+        const char *const lines[3] = {"Rain", best, "? help"};
         pda_game_banner(fb, area, area.y + 40, lines);
     } else if (r->over) {
-        const char *const lines[3] = {"game over", best, "spc: again"};
+        const char *const lines[3] = {"game over", best, "? help"};
         pda_game_banner(fb, area, area.y + 40, lines);
     } else if (shell->mode == ROAMYBOARD_PDA_OFF) {
         const char *const lines[3] = {"paused", NULL, NULL};
         pda_game_banner(fb, area, area.y + 50, lines);
     }
 }
+
+static const char rain_help[] =
+    "Space, Return\tStart.\n"
+    "Letters\tType a falling word to clear it; the first letter picks the lowest.\n"
+    "A word that reaches the bottom costs one of three lives.\n"
+    "Esc\tBack to the home screen; the game waits.";
 
 const struct pda_app pda_app_rain_def = {
     .name = "Rain",
@@ -242,4 +248,5 @@ const struct pda_app pda_app_rain_def = {
     .tick = rain_tick,
     .focused_ticks = true,
     .draw = rain_draw,
+    .help = rain_help,
 };

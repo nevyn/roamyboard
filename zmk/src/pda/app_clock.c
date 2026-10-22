@@ -73,10 +73,15 @@ static void clock_draw(const struct pda_shell *shell, struct pda_fb *fb, struct 
     pda_text_center(fb, area, y, text, PDA_FONT_BODY, true);
 }
 
+static const char clock_help[] =
+    "The time comes from a connected iPhone; a Mac does not offer it.\n"
+    "Esc\tBack to the home screen.";
+
 const struct pda_app pda_app_clock_def = {
     .name = "Clock",
     .open = clock_open,
     .key = clock_key,
     .tick = clock_tick,
     .draw = clock_draw,
+    .help = clock_help,
 };

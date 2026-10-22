@@ -215,9 +215,17 @@ static void kana_draw(const struct pda_shell *shell, struct pda_fb *fb, struct p
                   true);
 }
 
+static const char kana_help[] =
+    "Letters\tType the kana's romaji; shi and si, tsu and tu both count.\n"
+    "Any key\tOn to the next kana; a letter starts its answer.\n"
+    "Backspace\tDelete a letter.\n"
+    "Tab\tHiragana, katakana, or both.\n"
+    "Esc\tBack to the home screen.";
+
 const struct pda_app pda_app_kana_def = {
     .name = "Kana",
     .open = kana_open,
     .key = kana_key,
     .draw = kana_draw,
+    .help = kana_help,
 };

@@ -292,6 +292,68 @@ static void test_midi_view_shows_held_notes_without_focus(void) {
     CHECK(pda_shell_midi(&shell, &view) == PDA_SHELL_NONE);
 }
 
+static enum pda_shell_action question_mark(struct pda_shell *shell) {
+    return tap_mods(shell, LSHIFT, USAGE_SLASH);
+}
+
+static void test_help_over_home_and_apps(void) {
+    static struct pda_shell shell;
+    pda_shell_init(&shell, 1);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    CHECK(question_mark(&shell) == PDA_SHELL_REDRAW && shell.help);
+    CHECK(tap(&shell, USAGE_DOWN) == PDA_SHELL_REDRAW && shell.help_scroll > 0); // it scrolls
+    CHECK(shell.selected == 0); // the keys go to the help, not home
+    for (int i = 0; i < 50; i++) {
+        tap(&shell, USAGE_DOWN);
+    }
+    const int16_t bottom = shell.help_scroll;
+    CHECK(tap(&shell, USAGE_DOWN) == PDA_SHELL_NONE && shell.help_scroll == bottom);
+    CHECK(tap(&shell, PDA_USAGE_ESCAPE) == PDA_SHELL_REDRAW && !shell.help);
+    CHECK(shell.mode == ROAMYBOARD_PDA_HOME); // Escape closed the help, not PDA mode
+
+    // Cmd-? is not help.
+    pda_shell_key(&shell, LGUI, 0, true);
+    question_mark(&shell);
+    pda_shell_key(&shell, LGUI, 0, false);
+    CHECK(!shell.help);
+
+    // Every app has help of its own.
+    for (int i = 0; i < pda_app_count; i++) {
+        CHECK(pda_apps[i]->help != NULL);
+    }
+}
+
+static void test_help_pauses_games(void) {
+    static struct pda_shell shell;
+    pda_shell_init(&shell, 1);
+    shell.now_ms = 1000;
+    open_named(&shell, "Tetris");
+    tap(&shell, USAGE_SPACE);
+    CHECK(pda_shell_tick_ms(&shell) != 0);
+    question_mark(&shell);
+    CHECK(shell.help && pda_shell_tick_ms(&shell) == 0);
+    tap(&shell, PDA_USAGE_ESCAPE);
+    CHECK(strcmp(app_name(&shell), "Tetris") == 0 && pda_shell_tick_ms(&shell) != 0);
+
+    // Leaving PDA mode closes the help.
+    question_mark(&shell);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    CHECK(!shell.help);
+}
+
+static void test_help_in_notes(void) {
+    static struct pda_shell shell;
+    pda_shell_init(&shell, 1);
+    open_named(&shell, "Note");
+    CHECK(question_mark(&shell) == PDA_SHELL_REDRAW && shell.help); // in the list
+    tap(&shell, PDA_USAGE_ESCAPE);
+    CHECK(!shell.help && strcmp(app_name(&shell), "Note") == 0);
+    tap_mods(&shell, LGUI, USAGE_N);
+    question_mark(&shell); // in a note, ? is text
+    CHECK(!shell.help);
+    CHECK(strcmp(shell.docs.docs[shell.note_app.open].note.text, "?") == 0);
+}
+
 int main(void) {
     test_keys_go_nowhere_without_focus();
     test_home_navigation();
@@ -308,6 +370,9 @@ int main(void) {
     test_random_stays_below_n();
     test_fb_clips();
     test_midi_view_shows_held_notes_without_focus();
+    test_help_over_home_and_apps();
+    test_help_pauses_games();
+    test_help_in_notes();
     if (failures) {
         fprintf(stderr, "pda_shell_test: %d failure(s)\n", failures);
         return 1;

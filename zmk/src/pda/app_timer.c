@@ -174,23 +174,23 @@ static void timer_draw(const struct pda_shell *shell, struct pda_fb *fb, struct 
     if (t->running) {
         snprintf(status, sizeof(status), "running");
     } else if (t->done) {
-        snprintf(status, sizeof(status), "spc: again");
+        snprintf(status, sizeof(status), "done");
     } else if (t->elapsed_ms) {
         snprintf(status, sizeof(status), "paused");
     } else {
         snprintf(status, sizeof(status), "%s", hours ? "h : min" : "ready");
     }
     pda_text_center(fb, area, clock_y + PDA_SEGMENT_H + 8, status, PDA_FONT_BODY, true);
-
-    static const char *const hints[] = {"spc go", "del zero", "0-9 min", "p pomo", "b break",
-                                        "s watch"};
-    const int count = sizeof(hints) / sizeof(hints[0]);
-    const int small_h = pda_text_line_height(PDA_FONT_SMALL);
-    for (int i = 0; i < count; i++) {
-        const int y = area.y + area.h - (count - i) * small_h - 1;
-        pda_text_draw(fb, area.x + 1, y, area.w - 2, hints[i], PDA_FONT_SMALL, true);
-    }
 }
+
+static const char timer_help[] =
+    "0 to 9\tType the countdown's minutes.\n"
+    "P\t25 minutes: a pomodoro.\n"
+    "B\t5 minutes: a break.\n"
+    "S\tThe stopwatch.\n"
+    "Space, Return\tStart or pause; again after it ends.\n"
+    "Backspace\tBack to zero, or delete the last digit.\n"
+    "Esc\tBack to the home screen; it keeps counting.";
 
 const struct pda_app pda_app_timer_def = {
     .name = "Timer",
@@ -198,4 +198,5 @@ const struct pda_app pda_app_timer_def = {
     .key = timer_key,
     .tick = timer_tick,
     .draw = timer_draw,
+    .help = timer_help,
 };

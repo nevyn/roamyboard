@@ -301,16 +301,26 @@ static void tetris_draw(const struct pda_shell *shell, struct pda_fb *fb, struct
     char best[24];
     snprintf(best, sizeof(best), "best %lu", (unsigned long)shell->scores.tetris);
     if (!t->started) {
-        const char *const lines[3] = {"Tetris", best, "spc: play"};
+        const char *const lines[3] = {"Tetris", best, "? help"};
         pda_game_banner(fb, area, area.y + 40, lines);
     } else if (t->over) {
-        const char *const lines[3] = {"game over", best, "spc: again"};
+        const char *const lines[3] = {"game over", best, "? help"};
         pda_game_banner(fb, area, area.y + 40, lines);
     } else if (t->paused || shell->mode == ROAMYBOARD_PDA_OFF) {
         const char *const lines[3] = {"paused", NULL, NULL};
         pda_game_banner(fb, area, area.y + 50, lines);
     }
 }
+
+static const char tetris_help[] =
+    "Space, Return\tStart.\n"
+    "Left, Right (A D, H L)\tMove the piece.\n"
+    "Up (W, K), X\tTurn it clockwise.\n"
+    "Z\tTurn it anticlockwise.\n"
+    "Down (S, J)\tDrop it one row.\n"
+    "Space\tDrop it to the bottom.\n"
+    "P\tPause.\n"
+    "Esc\tBack to the home screen; the game waits.";
 
 const struct pda_app pda_app_tetris_def = {
     .name = "Tetris",
@@ -319,4 +329,5 @@ const struct pda_app pda_app_tetris_def = {
     .tick = tetris_tick,
     .focused_ticks = true,
     .draw = tetris_draw,
+    .help = tetris_help,
 };

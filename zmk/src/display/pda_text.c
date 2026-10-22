@@ -42,7 +42,7 @@ size_t pda_text_line_len(const char *text, size_t len, enum pda_font font, int m
     const uint32_t n = lv_text_get_next_line(text, len, lv_font(font), 0, max_w, NULL,
                                              LV_TEXT_FLAG_NONE);
     if (n > 0) {
-        return n;
+        return n < len ? n : len; // LVGL can count past len, into the text that follows
     }
     // Nothing fits: take one whole UTF-8 character anyway.
     size_t one = 1;

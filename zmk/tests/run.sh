@@ -15,7 +15,7 @@ ${CC:-cc} $cflags -I"$input" "$here/iqs5xx_test.c" "$input/iqs5xx_logic.c" -o "$
 ${CC:-cc} $cflags -I"$display" "$here/cat_test.c" "$display/cat.c" -o "$out/cat_test"
 ${CC:-cc} $cflags -I"$pda" "$here/pda_test.c" "$pda/keys.c" "$pda/note.c" -o "$out/pda_test"
 apps="$pda/shell.c $pda/midi_view.c $pda/icons.c $pda/apps.c $pda/app_clock.c $pda/app_timer.c $pda/app_calc.c $pda/app_dice.c $pda/app_kana.c $pda/app_cat.c $pda/cat_sprites.c $pda/game_breakout.c $pda/game_tetris.c $pda/game_snake.c
-    $pda/game_words.c $pda/game_rain.c $pda/words.c $pda/gfx.c $pda/note.c $pda/docs.c $pda/keys.c $pda/clock.c"
+    $pda/game_words.c $pda/game_rain.c $pda/words.c $pda/gfx.c $pda/note.c $pda/docs.c $pda/help.c $pda/keys.c $pda/clock.c"
 # shellcheck disable=SC2086
 ${CC:-cc} $cflags -I"$pda" -I"$here/../include" "$here/pda_shell_test.c" "$here/pda_text_stub.c" \
     $apps -lm -o "$out/pda_shell_test"

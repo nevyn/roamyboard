@@ -137,11 +137,7 @@ static void dice_draw(const struct pda_shell *shell, struct pda_fb *fb, struct p
     pda_fb_fill(fb, (struct pda_rect){area.x, area.y + 20, area.w, 1}, true);
 
     if (!d->rolled) {
-        static const char *const hints[] = {"2d6+3 ret", "spc d20", "ret again"};
-        for (int i = 0; i < 3; i++) {
-            pda_text_draw(fb, area.x + 2, area.y + 30 + i * (small_h + 4), area.w - 4, hints[i],
-                          PDA_FONT_SMALL, true);
-        }
+        pda_text_center(fb, area, area.y + 40, "? help", PDA_FONT_SMALL, true);
         return;
     }
     if (d->invalid) {
@@ -181,8 +177,16 @@ static void dice_draw(const struct pda_shell *shell, struct pda_fb *fb, struct p
     }
 }
 
+static const char dice_help[] =
+    "2d6+3 Return\tRoll: up to 20 dice of 2 to 1000 sides, plus or minus up to 999.\n"
+    "Space\tRoll a d20.\n"
+    "Return\tOn an empty line: the last roll again.\n"
+    "Backspace\tDelete a character.\n"
+    "Esc\tBack to the home screen.";
+
 const struct pda_app pda_app_dice_def = {
     .name = "Dice",
     .key = dice_key,
     .draw = dice_draw,
+    .help = dice_help,
 };

@@ -161,6 +161,12 @@ static void open_named(struct pda_shell *shell, const char *name) {
     }
 }
 
+static void question_mark(struct pda_shell *shell) {
+    pda_shell_key(shell, 0xE1, 0, true); // Shift
+    tap(shell, 0x38);                    // /
+    pda_shell_key(shell, 0xE1, 0, false);
+}
+
 static void type_letters(struct pda_shell *shell, const char *letters) {
     for (const char *c = letters; *c; c++) {
         tap(shell, (uint8_t)(0x04 + (*c - 'a')));
@@ -193,6 +199,9 @@ static void render_pda_scenes(const char *dir) {
         tap(&shell, 0x51);
     }
     render_shell(dir, "peripheral-pda-home-scrolled", &shell);
+    question_mark(&shell);
+    render_shell(dir, "peripheral-pda-help", &shell);
+    tap(&shell, 0x29); // Escape
 
     open_named(&shell, "Keys");
     for (int position = 5; position < 120; position += 13) {
@@ -268,6 +277,9 @@ static void render_pda_scenes(const char *dir) {
     tap(&shell, 0x28);
     run_ms(&shell, 400);
     render_shell(dir, "peripheral-pda-cat-pet", &shell);
+    question_mark(&shell);
+    render_shell(dir, "peripheral-pda-cat-help", &shell);
+    tap(&shell, 0x29);
     shell.cat.needs.fun = 20;
     tap(&shell, 0x2C); // Space: the ball
     run_ms(&shell, 2600);
