@@ -15,10 +15,9 @@ The right MCU module is wired for the pointing module, and a TPS48 on Dupont jum
 - **I2C peripheral.** The chain runs on SPIM2 instead of SPIM1, so that TWIM1 is free; TWIM0 shares its hardware with SPIM0, which drives the nice!view. The bus runs at 400 kHz, TWIM's maximum.
 - **Hot-plug.** The firmware probes 0x74 while the pad is absent and configures the pad whenever it appears, so a pointing module can slide on after power-up. The pad calibrates when it starts, so a finger on it during slide-on gives a bad baseline until the next start.
 - **Latency and power.** The pad keeps a short report interval while ZMK is active and drops to its low-power mode only while ZMK is idle, so the first touch while typing is reported within one interval. The IQS572 draws 1.85 mA at a 15 ms interval and 35 µA in low power.
-- **Chain.** The pointing module has no 74HC165: CLK, /PL and DATA pass straight through, so the chain reads one key module fewer.
+- **Chain.** The pointing module carries a key module board, whose 74HC165 reads its two buttons. Input G of that 165 is tied high instead of to GND, so bit 6 of its byte marks a pointing module. The firmware leaves marked columns out of the column mapping, so the key modules beyond it keep their keymap columns, and reports the marked column's keys as mouse buttons. A key module therefore has at most 6 keys: bit 6 is no longer SW7. Not implemented yet; until then the module counts as an ordinary key module.
 
 ## Open questions
 
-- How the keymap copes with the pointing module next to the MCU module, where its buttons' 74HC165 becomes physical column 0 and moves every key module one keymap column outward. One answer: mark the pointing module in the chain, for example with input G of its 74HC165 tied high instead of to GND, and let the firmware leave marked columns out of the column mapping.
 - Clicking: the pad's tap gesture, thumb keys bound to mouse buttons, or buttons on the module, read by a 74HC165 like a key module's keys.
 - The overlay. The TPS48 takes a 1 to 2 mm or 2 to 3 mm overlay, chosen by solder link S1, so the printed shell top may serve as the overlay.
