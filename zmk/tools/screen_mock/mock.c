@@ -357,6 +357,27 @@ static void render_pda_scenes(const char *dir) {
     }
     render_shell(dir, "peripheral-pda-rain", &shell);
 
+    open_named(&shell, "Anarch");
+    run_ms(&shell, 1000);
+    render_shell(dir, "peripheral-pda-anarch-menu", &shell);
+    for (int i = 0; i < 2; i++) { // Play, then past the story
+        pda_shell_key(&shell, 0x2C, 0, true);
+        run_ms(&shell, 100);
+        pda_shell_key(&shell, 0x2C, 0, false);
+        run_ms(&shell, 1500);
+    }
+    pda_shell_key(&shell, 0x1A, 0, true); // W
+    run_ms(&shell, 1200);
+    pda_shell_key(&shell, 0x1A, 0, false);
+    pda_shell_key(&shell, 0x4F, 0, true); // Right
+    run_ms(&shell, 300);
+    pda_shell_key(&shell, 0x4F, 0, false);
+    run_ms(&shell, 100);
+    render_shell(dir, "peripheral-pda-anarch", &shell);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    render_shell(dir, "peripheral-pda-anarch-paused", &shell);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+
     static const char *const notes[] = {
         "Packing list\nstrap, chargers, the left half",
         "Ideas\nA cat that walks between the halves",

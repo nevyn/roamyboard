@@ -17,7 +17,7 @@ const struct pda_app *const pda_apps[] = {
     &pda_app_note_def,   &pda_app_clock_def, &pda_app_timer_def,    &pda_app_calc_def,
     &pda_app_dice_def,   &pda_app_kana_def,  &pda_app_cat_def,      &pda_app_tetris_def,
     &pda_app_snake_def,  &pda_app_breakout_def, &pda_app_words_def, &pda_app_rain_def,
-    &pda_app_keys_def,   &pda_app_info_def,
+    &pda_app_anarch_def, &pda_app_keys_def,     &pda_app_info_def,
 };
 const int pda_app_count = sizeof(pda_apps) / sizeof(pda_apps[0]);
 const int pda_app_note = 0;
@@ -459,6 +459,10 @@ void pda_shell_draw(const struct pda_shell *shell, struct pda_fb *fb) {
         draw_battery(fb, shell->right.battery);
         pda_fb_fill(fb, (struct pda_rect){0, PDA_TITLE_H - 2, PDA_FB_W, 1}, true);
         pda_midi_view_draw(&shell->midi, fb, area);
+        return;
+    }
+    if (!shell->help && shell->app != PDA_SHELL_HOME && pda_apps[shell->app]->fullscreen) {
+        pda_apps[shell->app]->draw(shell, fb, (struct pda_rect){0, 0, PDA_FB_W, PDA_FB_H});
         return;
     }
     // Home shows the time, once there is one, where apps show their name.

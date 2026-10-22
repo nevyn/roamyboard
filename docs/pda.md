@@ -1,6 +1,6 @@
 # Micro PDA
 
-The micro PDA runs on the split peripheral (the right half) and is always on its nice!view while the central (the left half) is connected. While PDA mode is on, the PDA has focus: the central sends its keyboard keys to the PDA instead of the host. Leaving PDA mode keeps the PDA's view on the display, so an app stays visible while the keys go to the host. The PDA's home screen launches its apps: Note, Clock, Timer, Calc, Dice, Kana, Cat, the games Tetris, Snake, Bricks, Words and Rain, Keys and Info.
+The micro PDA runs on the split peripheral (the right half) and is always on its nice!view while the central (the left half) is connected. While PDA mode is on, the PDA has focus: the central sends its keyboard keys to the PDA instead of the host. Leaving PDA mode keeps the PDA's view on the display, so an app stays visible while the keys go to the host. The PDA's home screen launches its apps: Note, Clock, Timer, Calc, Dice, Kana, Cat, the games Tetris, Snake, Bricks, Words, Rain and Anarch, Keys and Info.
 
 ## Keys
 
@@ -86,6 +86,25 @@ A sleeping cat ignores the ball below 40 energy and the laser below 30. A quick 
 
 **Rain.** Words fall; typing one clears it. The first letter picks the lowest word that starts with it, and a wrong letter lets the word go. A word that reaches the bottom costs one of three lives. The words fall faster and come more often as the score grows.
 
+**Anarch.** A Doom-like shooter: drummyfish's [Anarch](https://gitlab.com/drummyfish/anarch), with its ten levels. It fills the whole display without the title bar, sideways: the game's top is the display's right edge, so it reads upright with the head tilted to the right. The game draws 160 × 68 pixels in its 256 colours, and `zmk/src/pda/anarch.c` dithers each pixel to 1 bit by its colour's brightness, with a 4 × 4 Bayer matrix. It has no sound, since the keyboard has no speaker.
+
+| Key | Does |
+|---|---|
+| Up, Down, W S | Walk. |
+| Left, Right | Turn. |
+| A D | Strafe. |
+| Space, Return | Fire; in the menu, choose. |
+| Shift, Backspace | In the menu, back. Held, Left and Right strafe, and Up and Down look if free look is on in the game's settings. |
+| Q E | Previous and next weapon. |
+| Tab | The map, while held. |
+| J | Jump. |
+| M | The game's menu. |
+| Escape | Closes the app; the game waits where it is. |
+
+The game runs on a thread of its own at the lowest priority (`zmk/src/pda/anarch_runner.c`), 25 frames a second, so that a frame never holds up ZMK's work queues; the app feeds it the held keys every 20 ms and takes its newest frame. The game runs only while the feeds come, and pauses 100 ms after the last one: that is how it waits while the keys go to the host, the help shows or another app opens, and it resumes without catching up on the pause. A key released while the PDA had no focus never reaches the app, so after a pause the app forgets every held key. On the host, `zmk/src/pda/anarch_inline.c` runs the game inside the app's tick instead, so that the tests and the screen mock drive it by key and tick, as they do the other games.
+
+The game keeps the levels reached and its settings in 12 bytes, which the peripheral writes to `roamyboard/pda/anarch` when PDA mode ends. `zmk/src/pda/anarch/` holds Anarch's game headers unchanged, from commit 6f905621 (2023-09-08) of its repository; its code and art are under CC0 1.0 (`anarch/LICENSE`). They take about 100 KB of flash, 20 KB of code and 80 KB of levels and art, and the app with its thread about 11 KB of RAM.
+
 **Keys.** The Keys app shows a cell per key position, with keymap columns from top to bottom and rows from left to right, and a gap between the halves: filled while held, outlined once pressed, a dot before that. The line at the bottom names the latest position (`r2c13`: row 2, keymap column 13) and its HID usage in hex. It helps to check a new build's key modules. Cmd-Backspace starts over.
 
 **Info.** The Info app shows each half's key module count, battery and build ID, and where the clock comes from: `time BT2` for the host on Bluetooth profile 2, `no CTS` when no connected host offers the time, `time err` when a read failed, `time ...` before any host was asked.
@@ -94,7 +113,7 @@ The games wait while the keys go to the host, under a "paused" banner. Their bes
 
 ## Displays
 
-The left half shows "PDA" or "note" in place of the host name while the PDA has focus. The right half shows the PDA instead of its status screen while the left half is connected; without it, the status screen returns, with the local OTA key's hint. The PDA draws dark on light like the status screen, and inverts while it has focus, so that PDA mode cannot be mistaken for typing to the host. Its title bar shows the app and the right half's battery. While a MIDI layer is on and the PDA has no focus, the right half shows the MIDI view in place of the app, which keeps running ([MIDI](midi.md)). `zmk/tools/screen_mock/run.sh` renders the PDA as `peripheral-pda-*`, from the shell's own drawing code.
+The left half shows "PDA" or "note" in place of the host name while the PDA has focus. The right half shows the PDA instead of its status screen while the left half is connected; without it, the status screen returns, with the local OTA key's hint. The PDA draws dark on light like the status screen, and inverts while it has focus, so that PDA mode cannot be mistaken for typing to the host. Its title bar shows the app and the right half's battery; an app with `fullscreen` set, such as Anarch, draws on the whole display instead. While a MIDI layer is on and the PDA has no focus, the right half shows the MIDI view in place of the app, which keeps running ([MIDI](midi.md)). `zmk/tools/screen_mock/run.sh` renders the PDA as `peripheral-pda-*`, from the shell's own drawing code.
 
 The PDA draws into a 1-bit framebuffer of the whole display, 68 × 160 pixels (`zmk/src/pda/gfx.h`): apps draw shapes in pure C and text through `pda_text_draw()`, one line cut at its width, which `zmk/src/display/pda_text.c` renders with LVGL's fonts on a hidden scratch canvas. `roamyboard_pda_render()` runs the drawing on the display work queue, and `screen_draw_pda()` copies the framebuffer onto the three canvases. The shell and the apps (`zmk/src/pda/shell.c`, `apps.c`, `app_*.c`, `game_*.c`) are pure C; `zmk/tests/pda_shell_test.c` and `pda_apps_test.c` drive them by key and tick, with stubbed text.
 
@@ -141,7 +160,7 @@ The central types the text as `zmk_keycode_state_changed` events, one press or r
 
 ## Storage
 
-The peripheral keeps each note in the settings key `roamyboard/pda/doc/<slot>`, slot 0 to 15: its two stamps as little-endian uint32s, then at most 512 bytes of UTF-8. The list's sort is in `roamyboard/pda/docsort`. A build before the note list kept one note in `roamyboard/pda/note`; at startup that note becomes the first note of an empty list, and the key goes at the next save. The games' best scores are in in `roamyboard/pda/scores`, the Kana drill's weights in `roamyboard/pda/kana`, and the cat's needs in `roamyboard/pda/cat`. It writes them when PDA mode ends, and only what changed; the cat's needs also while the app runs (Cat, above).
+The peripheral keeps each note in the settings key `roamyboard/pda/doc/<slot>`, slot 0 to 15: its two stamps as little-endian uint32s, then at most 512 bytes of UTF-8. The list's sort is in `roamyboard/pda/docsort`. A build before the note list kept one note in `roamyboard/pda/note`; at startup that note becomes the first note of an empty list, and the key goes at the next save. The games' best scores are in in `roamyboard/pda/scores`, the Kana drill's weights in `roamyboard/pda/kana`, the cat's needs in `roamyboard/pda/cat`, and Anarch's save in `roamyboard/pda/anarch`. It writes them when PDA mode ends, and only what changed; the cat's needs also while the app runs (Cat, above).
 
 Settings live in a 32 KB flash partition, 8 sectors of 4 KB, of which Zephyr's NVS keeps one free for garbage collection. 16 full notes take about 8.5 KB of it, and the same in RAM, since the PDA holds every note in memory.
 

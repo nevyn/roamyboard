@@ -952,6 +952,112 @@ static void test_note_list_full(void) {
     CHECK(shell.note_app.full && shell.note_app.open == -1);
 }
 
+/* Anarch. The game is one per process: these tests share it, in the order that main runs them. */
+
+enum {
+    USAGE_W = 0x1A,
+};
+
+static bool anarch_light(const struct pda_anarch_state *a, int gx, int gy) {
+    return a->frame[gy * PDA_ANARCH_STRIDE + gx / 8] & (0x80 >> (gx % 8));
+}
+
+static void open_anarch_with_frame(struct pda_shell *shell) {
+    new_shell(shell);
+    open_named(shell, "Anarch");
+    run_ms(shell, 1000);
+    CHECK(shell->anarch.has_frame);
+}
+
+static void test_anarch_runs_only_while_focused(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_named(&shell, "Anarch");
+    CHECK(shell.tick_ms != 0 && !shell.anarch.has_frame);
+    run_ms(&shell, 1000);
+    CHECK(shell.anarch.has_frame); // the game's menu
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    CHECK(pda_shell_tick_ms(&shell) == 0);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    CHECK(pda_shell_tick_ms(&shell) != 0);
+    tap(&shell, PDA_USAGE_ESCAPE);
+    CHECK(shell.app == PDA_SHELL_HOME);
+}
+
+static void test_anarch_key_held_by_two_usages(void) {
+    static struct pda_shell shell;
+    open_anarch_with_frame(&shell);
+    pda_shell_key(&shell, USAGE_W, 0, true);
+    pda_shell_key(&shell, USAGE_UP, 0, true);
+    pda_shell_key(&shell, USAGE_W, 0, false);
+    CHECK(shell.anarch.held[PDA_ANARCH_KEY_UP] == 1);
+    pda_shell_key(&shell, USAGE_UP, 0, false);
+    CHECK(shell.anarch.held[PDA_ANARCH_KEY_UP] == 0);
+    pda_shell_key(&shell, USAGE_UP, 0, false); // a release whose press went to the host
+    CHECK(shell.anarch.held[PDA_ANARCH_KEY_UP] == 0);
+}
+
+static void test_anarch_forgets_keys_held_across_a_pause(void) {
+    static struct pda_shell shell;
+    open_anarch_with_frame(&shell);
+    pda_shell_key(&shell, USAGE_W, 0, true);
+    run_ms(&shell, 100);
+    CHECK(shell.anarch.held[PDA_ANARCH_KEY_UP] == 1);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF); // W's release goes to the host
+    shell.now_ms += 1000;
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_HOME);
+    run_ms(&shell, 40);
+    CHECK(shell.anarch.held[PDA_ANARCH_KEY_UP] == 0);
+}
+
+static void test_anarch_draws_sideways_on_the_whole_display(void) {
+    static struct pda_shell shell;
+    static struct pda_fb fb;
+    open_anarch_with_frame(&shell);
+    pda_shell_draw(&shell, &fb);
+    int wrong = 0;
+    for (int gy = 0; gy < PDA_ANARCH_H; gy++) {
+        for (int gx = 0; gx < PDA_ANARCH_W; gx++) {
+            wrong += pda_fb_get(&fb, PDA_FB_W - 1 - gy, gx) != anarch_light(&shell.anarch, gx, gy);
+        }
+    }
+    CHECK(wrong == 0);
+    // Unfocused, the display shows lit pixels dark, so the picture inverts to stay the same.
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    pda_shell_draw(&shell, &fb);
+    CHECK(pda_fb_get(&fb, PDA_FB_W - 1, 0) != anarch_light(&shell.anarch, 0, 0));
+    CHECK(pda_fb_get(&fb, 0, PDA_FB_H - 1) !=
+          anarch_light(&shell.anarch, PDA_ANARCH_W - 1, PDA_ANARCH_H - 1));
+}
+
+/** Percent of rows 10 to 49 lit: the menu and the story are mostly dark, a level is not. */
+static int anarch_lit_percent(const struct pda_anarch_state *a) {
+    int lit = 0;
+    for (int gy = 10; gy < 50; gy++) {
+        for (int gx = 0; gx < PDA_ANARCH_W; gx++) {
+            lit += anarch_light(a, gx, gy);
+        }
+    }
+    return lit * 100 / (40 * PDA_ANARCH_W);
+}
+
+static void fire(struct pda_shell *shell) {
+    pda_shell_key(shell, USAGE_SPACE, 0, true);
+    run_ms(shell, 100);
+    pda_shell_key(shell, USAGE_SPACE, 0, false);
+}
+
+static void test_anarch_fire_plays_the_first_level(void) {
+    static struct pda_shell shell;
+    open_anarch_with_frame(&shell);
+    CHECK(anarch_lit_percent(&shell.anarch) < 15);
+    fire(&shell); // Play
+    run_ms(&shell, 1000);
+    fire(&shell); // past the story
+    run_ms(&shell, 2000);
+    CHECK(anarch_lit_percent(&shell.anarch) > 20);
+}
+
 int main(void) {
     test_clock_redraws_once_a_second();
     test_countdown_runs_out();
@@ -997,6 +1103,11 @@ int main(void) {
     test_note_list();
     test_note_delete_asks_first();
     test_note_list_full();
+    test_anarch_runs_only_while_focused();
+    test_anarch_key_held_by_two_usages();
+    test_anarch_forgets_keys_held_across_a_pause();
+    test_anarch_draws_sideways_on_the_whole_display();
+    test_anarch_fire_plays_the_first_level();
     if (failures) {
         fprintf(stderr, "pda_apps_test: %d failure(s)\n", failures);
         return 1;

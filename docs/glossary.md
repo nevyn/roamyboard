@@ -113,6 +113,7 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **quick note**: PDA mode entered with the Note key (`&pda_note`), straight into a new note; Escape returns to the host.
 - **split data channel**: The PDA's own GATT service on the split peripheral, which the central writes to and subscribes to over the split connection. Not: split transport (ZMK's own messages).
 - **type out**: Sending the open note to the host as key presses, with Cmd-Return in the note.
+- **Anarch**: The PDA's Doom-like shooter, drummyfish's Anarch, which runs on its own thread and shows sideways on the whole display. Not: Doom (it is not Doom's engine or data).
 - **tick**: The PDA shell's periodic call to the open app, at the interval in `tick_ms` that the app asks for; timers and games run on it. Not: frame, timer interrupt.
 - **BLE-MIDI**: MIDI over Bluetooth LE: the GATT service that the central offers each host beside HID, which carries the MIDI keys' messages ([MIDI](midi.md)). Not: Bluetooth MIDI, MIDI over GATT.
 - **MIDI key**: A key bound to a MIDI behavior, such as `&midi_note`, that sends MIDI messages over BLE-MIDI instead of a HID key code. Not: note key, MIDI button.

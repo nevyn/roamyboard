@@ -11,6 +11,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "anarch.h"
+
 /** Keys: which key positions are held now and which have been pressed. */
 struct pda_keys_state {
     uint8_t held[16];
@@ -295,6 +297,16 @@ struct pda_cat_state {
     uint32_t drawn;
 };
 
+/** Anarch: the keys held and the newest frame; the game's own state lives in anarch.c. */
+struct pda_anarch_state {
+    /** How many held usages hold each key, by enum pda_anarch_key. */
+    uint8_t held[PDA_ANARCH_KEY_COUNT];
+    /** When the app last ticked, to tell that it paused. */
+    uint32_t last_tick_ms;
+    bool has_frame;
+    uint8_t frame[PDA_ANARCH_BYTES];
+};
+
 struct pda_app;
 extern const struct pda_app pda_app_note_def;
 extern const struct pda_app pda_app_clock_def;
@@ -308,6 +320,7 @@ extern const struct pda_app pda_app_snake_def;
 extern const struct pda_app pda_app_words_def;
 extern const struct pda_app pda_app_rain_def;
 extern const struct pda_app pda_app_breakout_def;
+extern const struct pda_app pda_app_anarch_def;
 extern const struct pda_app pda_app_keys_def;
 extern const struct pda_app pda_app_info_def;
 

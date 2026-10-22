@@ -125,6 +125,7 @@ struct pda_shell {
     struct pda_words_state words;
     struct pda_rain_state rain;
     struct pda_breakout_state breakout;
+    struct pda_anarch_state anarch;
     struct pda_cat_state cat;
 
     struct pda_half_info left;
@@ -173,6 +174,8 @@ struct pda_app {
      * Without focus, pda_shell_tick_ms() is 0, so the platform does not wake for it.
      */
     bool focused_ticks;
+    /** Draws on the whole display, without the title bar: draw's area is the whole display. */
+    bool fullscreen;
     /** Draws the app into area, which lies below the title bar. */
     void (*draw)(const struct pda_shell *shell, struct pda_fb *fb, struct pda_rect area);
     /** The help that ? shows, in pda_help_draw()'s format; NULL for none of its own. */

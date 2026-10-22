@@ -29,6 +29,7 @@
 #include <roamyboard/events/pda_changed.h>
 #include <roamyboard/pda.h>
 
+#include "anarch.h"
 #include "link.h"
 #include "shell.h"
 
@@ -44,6 +45,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define KANA_KEY "roamyboard/pda/kana"
 #define VIEW_KEY "roamyboard/pda/app"
 #define CAT_KEY "roamyboard/pda/cat"
+#define ANARCH_KEY "roamyboard/pda/anarch"
 #define VIEW_NAME_MAX 16
 
 /** Notifications stay within the smallest ATT MTU (23), whatever the link negotiated. */
@@ -253,6 +255,22 @@ static void save_kana(void) {
     }
 }
 
+/** Writes Anarch's save if the game saved since the last write. System work queue only. */
+static void save_anarch(void) {
+    static uint8_t blob[PDA_ANARCH_SAVE_SIZE];
+    static bool pending;
+    pending |= pda_anarch_take_save(blob);
+    if (!pending) {
+        return;
+    }
+    const int err = settings_save_one(ANARCH_KEY, blob, sizeof(blob));
+    if (err) {
+        LOG_ERR("Failed to save setting " ANARCH_KEY ": %d", err);
+        return;
+    }
+    pending = false;
+}
+
 static int settings_set(const char *name, size_t len, settings_read_cb read_cb, void *cb_arg) {
     if (strcmp(name, "app") == 0) {
         if (len >= sizeof(saved_view)) {
@@ -311,6 +329,21 @@ static int settings_set(const char *name, size_t len, settings_read_cb read_cb, 
         k_mutex_lock(&lock, K_FOREVER);
         shell.cat.needs = needs;
         k_mutex_unlock(&lock);
+        return 0;
+    }
+    if (strcmp(name, "anarch") == 0) {
+        uint8_t blob[PDA_ANARCH_SAVE_SIZE];
+        if (len != sizeof(blob)) {
+            LOG_WRN("Ignoring setting " ANARCH_KEY " of %u bytes: expected %u", (unsigned int)len,
+                    (unsigned int)sizeof(blob));
+            return 0;
+        }
+        const ssize_t got = read_cb(cb_arg, blob, len);
+        if (got != (ssize_t)len) {
+            LOG_ERR("Failed to read setting " ANARCH_KEY ": %d", (int)got);
+            return got < 0 ? (int)got : -EIO;
+        }
+        pda_anarch_load(blob);
         return 0;
     }
     if (strcmp(name, "scores") == 0) {
@@ -572,6 +605,7 @@ static void set_mode(enum roamyboard_pda_mode new_mode) {
         save_scores();
         save_kana();
         save_cat();
+        save_anarch();
     }
     save_view();
     act(action);

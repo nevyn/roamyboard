@@ -63,6 +63,9 @@ if(CONFIG_ROAMYBOARD_PDA)
       src/pda/game_snake.c
       src/pda/game_words.c
       src/pda/game_rain.c
+      src/pda/game_anarch.c
+      src/pda/anarch.c
+      src/pda/anarch_runner.c
       src/pda/words.c
     )
   endif()
