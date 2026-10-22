@@ -11,7 +11,7 @@ The interconnect between each module has 9 signals total:
 - Power: +3.3V, GND, and +5V on J_LEFT1 / J_RIGHT1 pin 1, which nothing drives and which becomes the LED line
 - Key input: /PL, CLK and DATA for the shift register
 - NeoPixel data line, to control RGB LEDs: J_LEFT3 / J_RIGHT3 pin 1 in v3.0, moving to J_LEFT1 / J_RIGHT1 pin 1 once LEDs exist
-- I2C for the [[Pointing module]]: SDA and SCL, plus INT, the pad's data-ready line, on J_LEFT3 / J_RIGHT3 pin 1
+- I2C for modules that need it, such as the [[Pointing module]]: SDA and SCL, plus INT, a data-ready line, on J_LEFT3 / J_RIGHT3 pin 1
 
 The 9 signals are distributed across **three 1×3 connector pairs** — top, middle, and bottom of the board. This approach was chosen over a single 9-pin connector because:
 - Distributing the connection across three points along the board edge provides better mechanical stability between modules than a single point would

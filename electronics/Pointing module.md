@@ -2,7 +2,7 @@
 
 ## Status
 
-The right MCU module is wired for the pointing module, and a TPS48 on Dupont jumpers in its sockets moves the pointer through the right half's trackpad driver ([Firmware](../docs/firmware.md), Trackpad); [[Pointing module bench]] has the pad's pinout and the bench results. The left MCU module is not wired for it. No pointing module case is built.
+The right MCU module is wired for the pointing module, and a TPS48 on Dupont jumpers in its sockets moves the pointer through the right half's trackpad driver ([Firmware](../docs/firmware.md), Trackpad); [[Pointing module bench]] has the pad's pinout and the bench results. The left MCU module's I2C lines are not wired yet; the assembly guide wires them on every MCU module. No pointing module case is built.
 
 ## Decisions
 

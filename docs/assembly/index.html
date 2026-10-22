@@ -443,9 +443,9 @@
           <div class="pin used" data-signal="pl"><b>2</b>/PL<small>→ D18</small></div>
           <div class="pin used" data-signal="data"><b>3</b>DATA<small>→ D14</small></div></div>
         <div class="conn"><h5>J_LEFT3 (bottom)</h5>
-          <div class="pin used" data-signal="int"><b>1</b>INT<small>→ D6, right half only</small></div>
-          <div class="pin used" data-signal="sda"><b>2</b>SDA<small>→ D4, right half only</small></div>
-          <div class="pin used" data-signal="scl"><b>3</b>SCL<small>→ D5, right half only</small></div></div>
+          <div class="pin used" data-signal="int"><b>1</b>INT<small>→ D6</small></div>
+          <div class="pin used" data-signal="sda"><b>2</b>SDA<small>→ D4</small></div>
+          <div class="pin used" data-signal="scl"><b>3</b>SCL<small>→ D5</small></div></div>
       </div>
       <div class="table-wrap"><table><thead><tr><th>Signal</th><th>nice!nano</th><th>nRF52840</th><th>Socket board</th></tr></thead><tbody>
         <tr data-signal="vcc"><td>+3.3V</td><td>VCC</td><td>switched by P0.13</td><td>J_LEFT1 pin 2</td></tr>
@@ -454,7 +454,7 @@
         <tr data-signal="pl"><td>/PL</td><td>D18</td><td>P1.15</td><td>J_LEFT2 pin 2</td></tr>
         <tr data-signal="data"><td>DATA</td><td>D14</td><td>P1.11, SPIM2 MISO</td><td>J_LEFT2 pin 3</td></tr>
       </tbody></table></div>
-      <p>J_LEFT3 carries the trackpad's lines. Only the right half's MCU module wires them, in the <a href="#trackpad-wiring">next step</a>.</p>
+      <p>J_LEFT3 carries the I2C bus; the <a href="#i2c-wiring">next step</a> wires it.</p>
       <h4>nice!view</h4>
       <div class="table-wrap"><table><thead><tr><th>nice!view</th><th>nice!nano</th><th>nRF52840</th></tr></thead><tbody>
         <tr data-signal="vcc"><td>VCC</td><td>VCC</td><td>switched by P0.13</td></tr>
@@ -471,10 +471,10 @@
       <figure class="photo"><img src="photos/mcu-module-wired-open.jpg" alt="An open MCU module: battery, power switch, reset button, nice!nano and the socket board, with wires crossing the board edge to the sockets" loading="lazy"><figcaption>A wired MCU module, open: the battery at the SW1 end, the power switch and reset button in their chambers, the nice!nano at the SW5 end, and the wires crossing the socket board's edge to the socket joints (2026-10-05).</figcaption></figure></div></div>
   </article>
 
-  <article class="step" id="trackpad-wiring" data-title="Right half: the trackpad's lines">
-    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder · right half</span><h3>Right half: wire the trackpad's lines</h3><a class="anchor" href="#trackpad-wiring">#</a></div>
+  <article class="step" id="i2c-wiring" data-title="Wire the I2C bus">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder</span><h3>Wire the I2C bus</h3><a class="anchor" href="#i2c-wiring">#</a></div>
     <div class="step-body"><div class="step-text">
-      <p>The pointing module's trackpad sits on the right half and talks I2C through J_LEFT3. Skip this step on the left half's MCU module.</p>
+      <p>J_LEFT3 carries an I2C bus to the modules that need one, such as the pointing module's trackpad. Wire it on every MCU module, so that either half takes such a module.</p>
       <div class="table-wrap"><table><thead><tr><th>Signal</th><th>nice!nano</th><th>nRF52840</th><th>Socket board</th></tr></thead><tbody>
         <tr data-signal="int"><td>INT</td><td>D6 (silkscreen 100)</td><td>P1.00</td><td>J_LEFT3 pin 1</td></tr>
         <tr data-signal="sda"><td>SDA</td><td>D4 (022)</td><td>P0.22, TWIM1 SDA</td><td>J_LEFT3 pin 2</td></tr>

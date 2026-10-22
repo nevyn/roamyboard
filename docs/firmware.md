@@ -243,7 +243,7 @@ The firmware chooses the pins; the MCU board does not exist yet. Until it does, 
 | SCL | D5 | P0.24, TWIM1 SCL, 2.2 kΩ to VCC | J_LEFT3 pin 3 |
 | INT | D6 | P1.00, GPIO | J_LEFT3 pin 1 |
 
-SDA, SCL and INT serve the [pointing module](../electronics/Pointing%20module.md), and only the right half's MCU module wires them: three wires and two 2.2 kΩ resistors from SDA and SCL to VCC, as in [Pointing module bench](../electronics/Pointing%20module%20bench.md). The firmware runs TWIM1 on D4 and D5 on both halves, with the nRF52840's own pull-ups, so a left MCU module without the wires reads as no trackpad. INT takes J_LEFT3 pin 1, which the v3.0 pinout gave LED. J_LEFT1 pin 1, +5V in the v3.0 pinout and the LED line once LEDs are wired, stays unconnected.
+SDA, SCL and INT are an I2C bus for modules that need one, such as the [pointing module](../electronics/Pointing%20module.md). Every MCU module wires them: three wires and two 2.2 kΩ resistors from SDA and SCL to VCC, as in [Pointing module bench](../electronics/Pointing%20module%20bench.md). The firmware runs TWIM1 on D4 and D5 on both halves, with the nRF52840's own pull-ups; only the right half has a trackpad driver. On the first build, only the right MCU module is wired so far. INT takes J_LEFT3 pin 1, which the v3.0 pinout gave LED. J_LEFT1 pin 1, +5V in the v3.0 pinout and the LED line once LEDs are wired, stays unconnected.
 
 Solder the wires to the sockets' solder joints (J_LEFT), not to the empty header pads (J_RIGHT) or U1's pads: those reach the sockets through 0.25 mm tracks, and on the first socket board a wire tugging on a header pad broke the +3.3V and GND connections.
 
