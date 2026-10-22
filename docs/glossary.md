@@ -7,10 +7,11 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 ## Modules
 
 - **half**: One row of modules, from a terminator module through the key modules to an MCU module. A unibody keyboard is one half, a split keyboard two. Not: side, hand.
-- **module**: One printed unit of the keyboard that couples to its neighbours side by side. Kinds: key module, MCU module, terminator module, and the planned pointing module. Not: block, piece.
+- **module**: One printed unit of the keyboard that couples to its neighbours side by side. Kinds: key module, MCU module, terminator module, and pointing module. Not: block, piece.
 - **key module**: A module carrying one column of five keys: shell, floor and board. `KeyModule*` in `case/roamy-v4`. Not: column module, column (for the part).
 - **MCU module**: The module at the header-side end of a half, carrying the nice!nano, battery and display. It has a socket side only, so no header pins stand exposed. Not: brain module, controller module.
 - **pointing module**: A module carrying a trackpad or trackball instead of keys; see `electronics/Pointing module.md`. Not: touch module, trackpad column, mouse module.
+- **K**, **V**: The pointing module's two columns: K holds a key module board and the header side, V holds the loose sockets and the socket side. K is V's neighbour.
 - **terminator module**: The module at the socket-side end of a half. It has a header side only: two headers, embedded in the print, tie DATA to +3.3V so the chain reads the end-of-chain sentinel. Not: end cap, terminator plug.
 - **MCU board**: The MCU module's planned PCB: sockets at the key module board's positions, the nice!nano and the power parts.
 - **socket board**: A spare key module board with only its sockets populated, wired to the nice!nano; it stands in for the MCU board. The MCU module takes either.
@@ -35,6 +36,8 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **end wall**: The 6.6 mm wall at each column end. It holds the guide hole and flap on the socket side, the guide pin's root on the header side, and two corner screws. Its outer face is the **end face**.
 - **top**, **rim**, **bottom**: The three planes of a module's outline: the shell's upper surface, where shell meets floor, and the floor's underside. Each lies perpendicular to the bisector of the header and socket faces.
 - **keystone**: The module's outline in section. The header and socket faces run radially to the joint centre, so neighbours' tops and rims meet.
+- **plateau**: The pointing module's flat top over both its columns, perpendicular to their seam. Its **skin** over the trackpad is the pad's overlay. Not: top plate, overlay (for the part).
+- **keycap well**: The opening through the plateau around a pointing module's switch, so a pressed keycap clears it.
 - **corner screw**: One of four M2 screws holding the floor, in the end walls' corners.
 - **ledge**: A strip on the shell's underside that stops the board from rising. **Ledge tab**: a short ledge between switch housings on the socket side.
 - **locating tab**: A 1.0 mm rib on the floor that locates it in the shell's opening.
@@ -49,6 +52,7 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 - **tail**: The part of a header pin or socket contact behind the body: it leaves the body's **rear face** (opposite the mouth or the exposed pins) at the pin axis and jogs to the board. Its **foot** is the straight end that lies on the pad. Not: leg, lead.
 - **clamp pad**: The part of the floor that rests on a connector body's face away from the board, with zero interference, so the body can't tip toward the floor. The header's follows its 8° tilt. Not: hold-down, clamp.
 - **rear stop**: The rib on the floor against a connector body's rear face, below the tails; slide-on pushes the body against it instead of against its solder joints. Not: backstop, end stop.
+- **loose socket**: A socket with no board, in the pointing module's V, glued into a **cradle** on the floor: a clamp pad, a rear stop and cheeks beside the body. Its tails are wired to K's board.
 - **staking**: Glue (two-component epoxy; superglue as a fallback) between a connector body's long sides and the board, which carries separation. Not: potting, underfill.
 
 ## Joint
