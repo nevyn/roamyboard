@@ -8,6 +8,7 @@ The right MCU module is wired for the pointing module, and a TPS48 on Dupont jum
 
 - **Trackpad first.** The pad is the Azoteq TPS48-P203-S: an IQS572 on a 48 × 38 mm board, 2 mm thick, I2C at 0x74, up to five fingers with scroll and tap gestures on the chip. The TPS43-201A-S is the bench reference, since the community ZMK drivers were tested on it. A PMW3610 trackball stays the alternative. A pointing stick is out: it controls the pointer's speed, not its position, so long moves are slow.
 - **Right half.** The pad sits on the right half, the split peripheral, for right-handed pointing. Its events cross the split to the left half through ZMK's input split, which costs one split connection interval.
+- **Position.** Next to the MCU module on the right half, so the pad sits beside J and Space, where the index finger and the thumb rest.
 - **Width.** At most two columns, about 42 mm, with side faces 16° apart, so the half's curve is kept. The TPS48's 38 mm side runs across the column.
 - **Interconnect.** INT, the pad's data-ready output (RDY on the IQS5xx), active high, takes J_LEFT3 / J_RIGHT3 pin 1, so the bottom connector carries the whole I2C bus. LED moves to J_LEFT1 / J_RIGHT1 pin 1, +5V in the v3.0 pinout, beside the power that LEDs need. The pointing module uses SDA, SCL and INT only, and pulls the pad's NRST up on its own board. Key module boards need no change, since they pass every pin straight through on its own track.
 - **MCU module.** SDA on D4 (P0.22), SCL on D5 (P0.24), INT on D6 (P1.00), next to the nice!view's wires on the same edge of the nice!nano. 2.2 kΩ through-hole pull-ups from SDA and SCL to VCC. The free pins on the chain's edge, D19 to D21 (P0.02, P0.29, P0.31), are "low frequency I/O only" in the nRF52840 product specification, so they are not used for I2C.
@@ -18,6 +19,6 @@ The right MCU module is wired for the pointing module, and a TPS48 on Dupont jum
 
 ## Open questions
 
-- Where in the right half the pointing module sits, and which finger reaches the pad.
+- How the keymap copes with the pointing module next to the MCU module, where its buttons' 74HC165 becomes physical column 0 and moves every key module one keymap column outward. One answer: mark the pointing module in the chain, for example with input G of its 74HC165 tied high instead of to GND, and let the firmware leave marked columns out of the column mapping.
 - Clicking: the pad's tap gesture, thumb keys bound to mouse buttons, or buttons on the module, read by a 74HC165 like a key module's keys.
 - The overlay. The TPS48 takes a 1 to 2 mm or 2 to 3 mm overlay, chosen by solder link S1, so the printed shell top may serve as the overlay.
