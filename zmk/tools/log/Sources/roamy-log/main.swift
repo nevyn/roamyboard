@@ -26,4 +26,5 @@ for number in [SIGINT, SIGTERM] {
     signalSources.append(source)
 }
 
-dispatchMain()
+// dispatchMain() would drain the main queue on another thread, which @MainActor delegate callbacks reject.
+RunLoop.main.run()

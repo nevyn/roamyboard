@@ -214,4 +214,5 @@ setvbuf(stdout, nil, _IOLBF, 0)
 let listener = Listener()
 let activator: Activator? = listenOnly ? nil : Activator()
 print("Play some notes; Ctrl-C quits.")
-dispatchMain()
+// dispatchMain() would drain the main queue on another thread, which @MainActor delegate callbacks reject.
+RunLoop.main.run()
