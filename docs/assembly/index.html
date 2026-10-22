@@ -443,9 +443,9 @@
           <div class="pin used" data-signal="pl"><b>2</b>/PL<small>→ D18</small></div>
           <div class="pin used" data-signal="data"><b>3</b>DATA<small>→ D14</small></div></div>
         <div class="conn"><h5>J_LEFT3 (bottom)</h5>
-          <div class="pin used" data-signal="int"><b>1</b>INT<small>→ D6, right half</small></div>
-          <div class="pin used" data-signal="sda"><b>2</b>SDA<small>→ D4, right half</small></div>
-          <div class="pin used" data-signal="scl"><b>3</b>SCL<small>→ D5, right half</small></div></div>
+          <div class="pin used" data-signal="int"><b>1</b>INT<small>→ D6, right half only</small></div>
+          <div class="pin used" data-signal="sda"><b>2</b>SDA<small>→ D4, right half only</small></div>
+          <div class="pin used" data-signal="scl"><b>3</b>SCL<small>→ D5, right half only</small></div></div>
       </div>
       <div class="table-wrap"><table><thead><tr><th>Signal</th><th>nice!nano</th><th>nRF52840</th><th>Socket board</th></tr></thead><tbody>
         <tr data-signal="vcc"><td>+3.3V</td><td>VCC</td><td>switched by P0.13</td><td>J_LEFT1 pin 2</td></tr>
@@ -453,11 +453,8 @@
         <tr data-signal="clk"><td>CLK</td><td>D15</td><td>P1.13, SPIM2 SCK</td><td>J_LEFT2 pin 1</td></tr>
         <tr data-signal="pl"><td>/PL</td><td>D18</td><td>P1.15</td><td>J_LEFT2 pin 2</td></tr>
         <tr data-signal="data"><td>DATA</td><td>D14</td><td>P1.11, SPIM2 MISO</td><td>J_LEFT2 pin 3</td></tr>
-        <tr data-signal="int"><td>INT</td><td>D6</td><td>P1.00</td><td>J_LEFT3 pin 1</td></tr>
-        <tr data-signal="sda"><td>SDA</td><td>D4</td><td>P0.22, TWIM1 SDA</td><td>J_LEFT3 pin 2</td></tr>
-        <tr data-signal="scl"><td>SCL</td><td>D5</td><td>P0.24, TWIM1 SCL</td><td>J_LEFT3 pin 3</td></tr>
       </tbody></table></div>
-      <p>INT, SDA and SCL carry the trackpad of a pointing module, which sits on the right half. Wire them on the right half's MCU module only, and fit a 2.2 kΩ resistor from SDA to VCC and another from SCL to VCC. A +3.3V hotswap pad on the socket board's back makes a handy landing for each: SW2's pad 1 for SDA, SW1's pad 1 for SCL. The left half's MCU module leaves all three unconnected.</p>
+      <p>J_LEFT3 carries the trackpad's lines. Only the right half's MCU module wires them, in the <a href="#trackpad-wiring">next step</a>.</p>
       <h4>nice!view</h4>
       <div class="table-wrap"><table><thead><tr><th>nice!view</th><th>nice!nano</th><th>nRF52840</th></tr></thead><tbody>
         <tr data-signal="vcc"><td>VCC</td><td>VCC</td><td>switched by P0.13</td></tr>
@@ -472,6 +469,25 @@
     </div>
     <div class="step-media"><figure><img class="diagram" src="../images/bench-wiring.svg" alt="Wiring of the nice!nano, socket board, nice!view, battery, power switch and reset button"><figcaption>From docs/firmware.md. Click to enlarge.</figcaption></figure>
       <figure class="photo"><img src="photos/mcu-module-wired-open.jpg" alt="An open MCU module: battery, power switch, reset button, nice!nano and the socket board, with wires crossing the board edge to the sockets" loading="lazy"><figcaption>A wired MCU module, open: the battery at the SW1 end, the power switch and reset button in their chambers, the nice!nano at the SW5 end, and the wires crossing the socket board's edge to the socket joints (2026-10-05).</figcaption></figure></div></div>
+  </article>
+
+  <article class="step" id="trackpad-wiring" data-title="Right half: the trackpad's lines">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder · right half</span><h3>Right half: wire the trackpad's lines</h3><a class="anchor" href="#trackpad-wiring">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>The pointing module's trackpad sits on the right half and talks I2C through J_LEFT3. Skip this step on the left half's MCU module.</p>
+      <div class="table-wrap"><table><thead><tr><th>Signal</th><th>nice!nano</th><th>nRF52840</th><th>Socket board</th></tr></thead><tbody>
+        <tr data-signal="int"><td>INT</td><td>D6 (silkscreen 100)</td><td>P1.00</td><td>J_LEFT3 pin 1</td></tr>
+        <tr data-signal="sda"><td>SDA</td><td>D4 (022)</td><td>P0.22, TWIM1 SDA</td><td>J_LEFT3 pin 2</td></tr>
+        <tr data-signal="scl"><td>SCL</td><td>D5 (024)</td><td>P0.24, TWIM1 SCL</td><td>J_LEFT3 pin 3</td></tr>
+      </tbody></table></div>
+      <ol>
+        <li>Solder the three wires to J_LEFT3's socket joints. Solid-core wire holds its route between the other wires best.</li>
+        <li>Fit a 2.2 kΩ through-hole resistor from SDA to VCC and another from SCL to VCC. The socket board's +3.3V hotswap pads make the landings: SDA's resistor from the J_LEFT3 pin 2 joint to SW2's pad 1, SCL's from the pin 3 joint to SW1's pad 1.</li>
+        <li>Lay each resistor flat on the board, its leads leaving the joint away from the socket body: the floor's rear stop sits beside the socket body, and a 1/4 W body clears the floor by only 0.5 mm.</li>
+        <li>Check with a meter: about 2.2 kΩ from J_LEFT3 pin 2 and from pin 3 to J_LEFT1 pin 2 (+3.3V), and no short between INT, SDA, SCL, +3.3V and GND.</li>
+      </ol>
+    </div>
+    <div class="step-media"><figure><img class="diagram" src="../images/pointing-rework.svg" alt="Three wires from the nice!nano's D4, D5 and D6 to J_LEFT3, and two pull-up resistors to the hotswap pads"><figcaption>From electronics/Pointing module bench.md. Click to enlarge.</figcaption></figure></div></div>
   </article>
 
   <article class="step" id="polarity" data-title="Power: battery, jack and switch">
