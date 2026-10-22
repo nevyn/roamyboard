@@ -43,11 +43,11 @@
 #define HEART_MS 1500
 /* The laser dot: a press starts it at LASER_START_SPEED, holding speeds it up by LASER_ACCEL
  * px/s^2 to LASER_MAX_SPEED, and on release it glides to a stop, its speed falling by e every
- * LASER_GLIDE_MS. A tap moves it about 4 px. */
-#define LASER_START_SPEED 30
-#define LASER_ACCEL 200
-#define LASER_MAX_SPEED 90
-#define LASER_GLIDE_MS 80
+ * LASER_GLIDE_MS. A tap moves it about 5 px. */
+#define LASER_START_SPEED 20
+#define LASER_ACCEL 260
+#define LASER_MAX_SPEED 130
+#define LASER_GLIDE_MS 250
 #define LASER_TOP 12
 /** In toy mode, food and fun never fall below this: above every threshold that makes her beg. */
 #define TOY_FLOOR 60
@@ -952,13 +952,22 @@ static void pet(struct pda_shell *shell) {
     }
 }
 
+/** Throws the ball in from the top right, or with the laser dot on, drops it at the dot. */
 static void throw_ball(struct pda_shell *shell) {
     struct pda_cat_state *c = &shell->cat;
     c->ball = true;
-    c->ball_x16 = (PDA_FB_W - BALL_SIZE - 2) * 16;
-    c->ball_h16 = 70 * 16;
-    c->ball_vx16 = -(int32_t)between(shell, 30, 80) * 16;
-    c->ball_vh16 = 20 * 16;
+    if (c->laser) {
+        const int floor_y = levels[FLOOR].surface;
+        c->ball_x16 = clamp(c->laser_x - BALL_SIZE / 2, 0, PDA_FB_W - BALL_SIZE) * 16;
+        c->ball_h16 = clamp(floor_y - c->laser_y, 24, floor_y - LASER_TOP) * 16;
+        c->ball_vx16 = ((int32_t)pda_shell_random(shell, 21) - 10) * 16;
+        c->ball_vh16 = 0;
+    } else {
+        c->ball_x16 = (PDA_FB_W - BALL_SIZE - 2) * 16;
+        c->ball_h16 = 70 * 16;
+        c->ball_vx16 = -(int32_t)between(shell, 30, 80) * 16;
+        c->ball_vh16 = 20 * 16;
+    }
     if (c->doing == DOING_SLEEP && needs(c)->energy < 40) {
         return;
     }

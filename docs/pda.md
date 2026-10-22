@@ -52,8 +52,8 @@ Three meters along the top show her needs: food, fun and energy, each 0 to 100. 
 | Key | Does |
 |---|---|
 | F | Fills the bowl with three portions; she comes to eat if she is hungry. Each portion gives 35 food. |
-| Space | Throws a ball in from the top right. She chases and bats it along the floor a few times, then loses interest; it stays for later. |
-| Arrows, W A S D, H J K L | Move a laser dot; the first press puts it on the floor. A held key starts it at 30 px/s and speeds it up by 200 px/s² to 90 px/s, two keys move it diagonally, and on release it glides to a stop, so a tap nudges it a few pixels. She stalks a dot on a surface and pounces on it, sits under a dot on the wall and leaps at it if it is within reach, and follows it from level to level. The dot goes out 6 s after it stops. |
+| Space | Throws a ball in from the top right, or, while the laser dot is on, drops it at the dot, so the dot aims it. She chases and bats it along the floor a few times, then loses interest; it stays for later. |
+| Arrows, W A S D, H J K L | Move a laser dot; the first press puts it on the floor. A held key starts it at 20 px/s and speeds it up by 260 px/s² to 130 px/s, two keys move it diagonally, and on release it glides to a stop over about a second, losing speed by a factor e every 250 ms, so a tap nudges it a few pixels. She stalks a dot on a surface and pounces on it, sits under a dot on the wall and leaps at it if it is within reach, and follows it from level to level. The dot goes out 6 s after it stops. |
 | Return | Pets her: a heart rises, fun goes up by 5, and she purrs with her eyes closed. |
 | Tab | Toy mode on or off (below). |
 | Escape | Sends her home: she runs off the left edge, then the app closes. A second Escape closes it at once. |

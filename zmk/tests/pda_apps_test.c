@@ -689,9 +689,14 @@ static void test_cat_laser_accelerates_and_glides(void) {
     const int late = x - shell.cat.laser_x;
     CHECK(early > 0 && late > early); // it speeds up while held
     pda_shell_key(&shell, USAGE_LEFT, 0, false);
-    x = shell.cat.laser_x;
-    run_ms(&shell, 1000);
-    CHECK(shell.cat.laser_x < x && x - shell.cat.laser_x < 15); // and glides to a stop
+
+    // Let go at full speed, it glides on a while before it stops.
+    shell.cat.laser_x16 = 64 * 16;
+    shell.cat.laser_vx16 = -130 * 16;
+    run_ms(&shell, 200);
+    CHECK(shell.cat.laser_vx16 != 0);
+    run_ms(&shell, 1800);
+    CHECK(shell.cat.laser_x > 1 && 64 - shell.cat.laser_x > 20 && 64 - shell.cat.laser_x < 45);
     CHECK(shell.cat.laser_vx16 == 0);
 
     // Leaving PDA mode drops a held key, whose release goes to the host.
@@ -699,6 +704,22 @@ static void test_cat_laser_accelerates_and_glides(void) {
     pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
     run_ms(&shell, 1000);
     CHECK(shell.cat.laser_vy16 == 0 && shell.cat.laser_held == 0);
+}
+
+static void test_cat_ball_drops_at_the_laser(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_cat(&shell);
+    run_ms(&shell, 2000);
+    tap(&shell, USAGE_RIGHT);
+    shell.cat.laser_x16 = 12 * 16;
+    shell.cat.laser_x = 12;
+    shell.cat.laser_vx16 = 0;
+    run_ms(&shell, 100);
+    tap(&shell, USAGE_SPACE);
+    CHECK(abs(shell.cat.ball_x16 / 16 + 2 - 12) <= 1);
+    run_ms(&shell, 400);
+    CHECK(abs(shell.cat.ball_x16 / 16 + 2 - 12) <= 6); // it falls near the dot
 }
 
 static void test_cat_chases_the_laser(void) {
@@ -829,6 +850,7 @@ int main(void) {
     test_cat_sleeps_in_bed();
     test_cat_plays_with_the_ball();
     test_cat_laser_accelerates_and_glides();
+    test_cat_ball_drops_at_the_laser();
     test_cat_chases_the_laser();
     test_cat_follows_the_laser_up_the_tree();
     test_cat_toy_mode();
