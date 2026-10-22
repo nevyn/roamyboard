@@ -260,6 +260,37 @@ static void render_pda_scenes(const char *dir) {
     type_letters(&shell, "ho");
     render_shell(dir, "peripheral-pda-kana-wrong", &shell);
 
+    open_named(&shell, "Cat");
+    run_ms(&shell, 1800);
+    render_shell(dir, "peripheral-pda-cat", &shell);
+    tap(&shell, 0x28); // Return: pet
+    run_ms(&shell, 300);
+    tap(&shell, 0x28);
+    run_ms(&shell, 400);
+    render_shell(dir, "peripheral-pda-cat-pet", &shell);
+    shell.cat.needs.fun = 20;
+    tap(&shell, 0x2C); // Space: the ball
+    run_ms(&shell, 2600);
+    render_shell(dir, "peripheral-pda-cat-ball", &shell);
+    tap(&shell, 0x4F); // Right: the laser dot
+    tap(&shell, 0x52);
+    tap(&shell, 0x52);
+    run_ms(&shell, 2500);
+    render_shell(dir, "peripheral-pda-cat-laser", &shell);
+    shell.cat.ball = false;
+    shell.cat.laser = false;
+    shell.cat.needs.food = 25;
+    tap(&shell, 0x09); // F: fill the bowl
+    run_ms(&shell, 6000);
+    render_shell(dir, "peripheral-pda-cat-eat", &shell);
+    tap(&shell, 0x29); // Escape twice: home at once
+    tap(&shell, 0x29);
+    shell.cat.needs = (struct pda_cat_saved){.food = 90, .fun = 70, .energy = 15, .bowl = 2};
+    open_named(&shell, "Cat");
+    run_ms(&shell, 25000);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    render_shell(dir, "peripheral-pda-cat-sleep", &shell);
+
     open_named(&shell, "Bricks");
     render_shell(dir, "peripheral-pda-bricks-start", &shell);
     tap(&shell, 0x28);

@@ -346,12 +346,13 @@ enum cat_event_kind {
     CAT_EVENT_MOUSE_RELEASED,
     CAT_EVENT_POSE,
     CAT_EVENT_PROFILE,
+    CAT_EVENT_AWAY,
 };
 
 struct cat_event {
     uint32_t ms;
     uint8_t kind;
-    /** enum cat_key, enum cat_mouse or enum cat_pose, by kind. */
+    /** enum cat_key, enum cat_mouse, enum cat_pose or whether the cat is away, by kind. */
     uint8_t arg;
 };
 
@@ -408,6 +409,9 @@ static void cat_feed(const struct cat_event *ev) {
         break;
     case CAT_EVENT_PROFILE:
         cat_profile_changed(&cat, ev->ms);
+        break;
+    case CAT_EVENT_AWAY:
+        cat_set_away(&cat, ev->arg, ev->ms);
         break;
     default:
         LOG_ERR("Unknown cat event kind %d", ev->kind);
@@ -511,6 +515,12 @@ static int cat_listener(const zmk_event_t *eh) {
         cat_post(CAT_EVENT_POSE, cat_current_pose());
         return ZMK_EV_EVENT_BUBBLE;
     }
+#if IS_ENABLED(CONFIG_ROAMYBOARD_PDA)
+    if (as_roamyboard_pda_changed(eh) != NULL) {
+        cat_post(CAT_EVENT_AWAY, roamyboard_pda_cat_away());
+        return ZMK_EV_EVENT_BUBBLE;
+    }
+#endif
 #if defined(CONFIG_ZMK_BLE)
     if (as_zmk_ble_active_profile_changed(eh) != NULL) {
         cat_post(CAT_EVENT_PROFILE, 0);
@@ -526,11 +536,17 @@ ZMK_SUBSCRIPTION(roamyboard_cat, zmk_layer_state_changed);
 #if defined(CONFIG_ZMK_BLE)
 ZMK_SUBSCRIPTION(roamyboard_cat, zmk_ble_active_profile_changed);
 #endif
+#if IS_ENABLED(CONFIG_ROAMYBOARD_PDA)
+ZMK_SUBSCRIPTION(roamyboard_cat, roamyboard_pda_changed);
+#endif
 
 static void cat_start(void) {
     const uint32_t now = k_uptime_get_32();
     cat_init(&cat, CAT_START_X, now);
     cat_set_pose(&cat, cat_current_pose(), now);
+#if IS_ENABLED(CONFIG_ROAMYBOARD_PDA)
+    cat_set_away(&cat, roamyboard_pda_cat_away(), now);
+#endif
     atomic_set(&cat_started, true);
     k_work_schedule_for_queue(zmk_display_work_q(), &cat_work, K_NO_WAIT);
 }

@@ -36,6 +36,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define SCORES_KEY "roamyboard/pda/scores"
 #define KANA_KEY "roamyboard/pda/kana"
 #define VIEW_KEY "roamyboard/pda/app"
+#define CAT_KEY "roamyboard/pda/cat"
 #define VIEW_NAME_MAX 16
 
 /** Notifications stay within the smallest ATT MTU (23), whatever the link negotiated. */
@@ -139,6 +140,25 @@ static void save_view(void) {
     strcpy(saved_view, view);
 }
 
+/** Writes the cat's needs if they changed by enough. System work queue only. */
+static void save_cat(void) {
+    k_mutex_lock(&lock, K_FOREVER);
+    const bool changed_cat = locked_shell()->cat_changed;
+    const struct pda_cat_saved needs = shell.cat.needs;
+    shell.cat_changed = false;
+    k_mutex_unlock(&lock);
+    if (!changed_cat) {
+        return;
+    }
+    const int err = settings_save_one(CAT_KEY, &needs, sizeof(needs));
+    if (err) {
+        LOG_ERR("Failed to save setting " CAT_KEY ": %d", err);
+        k_mutex_lock(&lock, K_FOREVER);
+        shell.cat_changed = true;
+        k_mutex_unlock(&lock);
+    }
+}
+
 /** Writes the Kana drill's weights and counts if they changed. System work queue only. */
 static void save_kana(void) {
     static uint8_t blob[PDA_KANA_SAVED];
@@ -195,6 +215,27 @@ static int settings_set(const char *name, size_t len, settings_read_cb read_cb, 
         }
         k_mutex_lock(&lock, K_FOREVER);
         memcpy(&locked_shell()->kana, blob, sizeof(blob));
+        k_mutex_unlock(&lock);
+        return 0;
+    }
+    if (strcmp(name, "cat") == 0) {
+        // Like the scores, the needs only gain fields at the end.
+        struct pda_cat_saved needs;
+        k_mutex_lock(&lock, K_FOREVER);
+        needs = locked_shell()->cat.needs;
+        k_mutex_unlock(&lock);
+        if (len > sizeof(needs)) {
+            LOG_WRN("Ignoring setting " CAT_KEY " of %u bytes: expected at most %u",
+                    (unsigned int)len, (unsigned int)sizeof(needs));
+            return 0;
+        }
+        const ssize_t got = read_cb(cb_arg, &needs, len);
+        if (got != (ssize_t)len) {
+            LOG_ERR("Failed to read setting " CAT_KEY ": %d", (int)got);
+            return got < 0 ? (int)got : -EIO;
+        }
+        k_mutex_lock(&lock, K_FOREVER);
+        shell.cat.needs = needs;
         k_mutex_unlock(&lock);
         return 0;
     }
@@ -315,6 +356,43 @@ static void send_job(const char *text, size_t len, uint8_t final) {
     k_work_schedule(&out_work, K_NO_WAIT);
 }
 
+/* The cat's whereabouts for the central's status screen: only the latest state matters. */
+static bool cat_sent_valid;
+static bool cat_sent_here;
+
+static void cat_out_handler(struct k_work *work);
+static K_WORK_DELAYABLE_DEFINE(cat_out_work, cat_out_handler);
+
+static void cat_out_handler(struct k_work *work) {
+    k_mutex_lock(&lock, K_FOREVER);
+    const bool here = pda_shell_cat_here(locked_shell());
+    k_mutex_unlock(&lock);
+    const uint8_t msg[] = {PDA_LINK_CAT, here};
+    const int err = notify(msg, sizeof(msg));
+    if (err == -ENOMEM) {
+        k_work_schedule(&cat_out_work, K_MSEC(10));
+        return;
+    }
+    if (err) {
+        // The central asks again with PDA_LINK_INFO when the link comes up.
+        LOG_DBG("PDA link notify of the cat failed: %d", err);
+        cat_sent_valid = false;
+        return;
+    }
+    cat_sent_valid = true;
+    cat_sent_here = here;
+}
+
+/** Tells the central where the cat is if that changed, or always if force. System work queue. */
+static void sync_cat(bool force) {
+    k_mutex_lock(&lock, K_FOREVER);
+    const bool here = pda_shell_cat_here(locked_shell());
+    k_mutex_unlock(&lock);
+    if (force || !cat_sent_valid || here != cat_sent_here) {
+        k_work_reschedule(&cat_out_work, K_NO_WAIT);
+    }
+}
+
 static void app_tick_handler(struct k_work *work);
 static K_WORK_DELAYABLE_DEFINE(app_tick_work, app_tick_handler);
 
@@ -335,6 +413,7 @@ static void follow_tick(void) {
 /** Carries out what the shell asked for, then follows its tick. System work queue only. */
 static void act(enum pda_shell_action action) {
     follow_tick();
+    sync_cat(false);
     switch (action) {
     case PDA_SHELL_NONE:
         return;
@@ -360,6 +439,8 @@ static void app_tick_handler(struct k_work *work) {
     k_mutex_lock(&lock, K_FOREVER);
     const enum pda_shell_action action = pda_shell_tick(locked_shell());
     k_mutex_unlock(&lock);
+    save_cat();
+    save_view();
     act(action);
 }
 
@@ -372,6 +453,7 @@ static void set_mode(enum roamyboard_pda_mode new_mode) {
         save_note();
         save_scores();
         save_kana();
+        save_cat();
     }
     save_view();
     act(action);
@@ -512,6 +594,7 @@ static void incoming_handler(struct k_work *work) {
         case PDA_LINK_INFO:
             if (msg.len >= 3) {
                 set_left_info(msg.data, msg.len);
+                sync_cat(true);
                 continue;
             }
             break;

@@ -116,6 +116,7 @@ struct pda_shell {
     struct pda_words_state words;
     struct pda_rain_state rain;
     struct pda_breakout_state breakout;
+    struct pda_cat_state cat;
 
     struct pda_half_info left;
     struct pda_half_info right;
@@ -126,6 +127,8 @@ struct pda_shell {
     bool scores_changed;
     /** Kana's weights and counts differ from settings. */
     bool kana_changed;
+    /** The cat's needs differ from settings by enough to save them. */
+    bool cat_changed;
 
     /** The text of the latest PDA_SHELL_TYPE_OUT, which the app fills in. */
     char type_out[PDA_NOTE_MAX];
@@ -173,6 +176,12 @@ extern const int pda_app_note;
 
 /** Resets the shell; seed starts the random numbers that games use. */
 void pda_shell_init(struct pda_shell *shell, uint32_t seed);
+
+/**
+ * The cat is on this half: the Cat app is the view, or the view that quick note replaced. The
+ * left half's status screen shows her only while this is false.
+ */
+bool pda_shell_cat_here(const struct pda_shell *shell);
 
 /** Columns of app icons on the home screen. */
 #define PDA_HOME_COLUMNS 3

@@ -49,6 +49,24 @@ enum roamyboard_pda_mode roamyboard_pda_mode(void) {
     return (enum roamyboard_pda_mode)atomic_get(&mode);
 }
 
+/* The cat's whereabouts, as the peripheral reports them. */
+static atomic_t cat_away;
+
+bool roamyboard_pda_cat_away(void) { return atomic_get(&cat_away); }
+
+static void cat_moved_handler(struct k_work *work) {
+    raise_roamyboard_pda_changed((struct roamyboard_pda_changed){});
+}
+
+static K_WORK_DEFINE(cat_moved_work, cat_moved_handler);
+
+static void set_cat_away(bool away) {
+    if (atomic_set(&cat_away, away) != away) {
+        LOG_INF("Cat %s", away ? "on the peripheral" : "back");
+        k_work_submit(&cat_moved_work);
+    }
+}
+
 /* Link state. The GATT callbacks run on the Bluetooth receive thread; the rest on the system
  * work queue. lock guards link_conn and to_peripheral_handle. */
 static K_MUTEX_DEFINE(lock);
@@ -409,6 +427,13 @@ static uint8_t notify_func(struct bt_conn *conn, struct bt_gatt_subscribe_params
     case PDA_LINK_LEAVE:
         k_work_submit(&leave_work);
         break;
+    case PDA_LINK_CAT:
+        if (length == 2) {
+            set_cat_away(bytes[1] != 0);
+            break;
+        }
+        LOG_WRN("PDA link: bad message 0x%02x of %u bytes", bytes[0], length);
+        break;
     default:
         LOG_WRN("PDA link: unknown message 0x%02x of %u bytes", bytes[0], length);
         break;
@@ -530,6 +555,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason) {
     k_mutex_unlock(&lock);
     atomic_clear(&link_ready);
     LOG_INF("PDA link down (reason 0x%02x)", reason);
+    set_cat_away(false);
     k_work_submit(&leave_work);
     k_work_reschedule(&latency_work, K_NO_WAIT);
 }

@@ -48,6 +48,11 @@ enum pda_link_op {
     PDA_LINK_TYPE_OUT = 0x82,
     /** Peripheral to central: [op]; leave PDA mode. */
     PDA_LINK_LEAVE = 0x83,
+    /**
+     * Peripheral to central: [op, here]; whether the cat is on the peripheral, in the Cat app.
+     * Sent when that changes and in answer to PDA_LINK_INFO.
+     */
+    PDA_LINK_CAT = 0x84,
 };
 
 #define PDA_LINK_KEY_LEN 4

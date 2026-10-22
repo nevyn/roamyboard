@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include "pda_test_support.h"
+#include "cat_sprites.h"
 #include "words.h"
 
 static int active_drop_index(const struct pda_rain_state *r) {
@@ -550,6 +551,191 @@ static void test_rain_ends_after_three_misses(void) {
     CHECK(shell.tick_ms == 0);
 }
 
+/* Cat */
+
+enum { USAGE_F = 0x09 };
+
+static int cat_x(const struct pda_shell *shell) { return shell->cat.x16 / 16; }
+
+static void open_cat(struct pda_shell *shell) {
+    open_named(shell, "Cat");
+    CHECK(strcmp(app_name(shell), "Cat") == 0);
+}
+
+static void test_cat_comes_over_and_goes_home(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    CHECK(!pda_shell_cat_here(&shell));
+    open_cat(&shell);
+    CHECK(pda_shell_cat_here(&shell));
+    CHECK(cat_x(&shell) < 0); // still on the left half
+    run_ms(&shell, 400);
+    CHECK(cat_x(&shell) < 0);
+    run_ms(&shell, 2000);
+    CHECK(cat_x(&shell) >= 0 && shell.cat.level == 0);
+
+    // Escape sends her running off the left edge; then the app closes.
+    CHECK(tap(&shell, PDA_USAGE_ESCAPE) != PDA_SHELL_LEAVE);
+    CHECK(strcmp(app_name(&shell), "Cat") == 0);
+    run_ms(&shell, 3000);
+    CHECK(strcmp(app_name(&shell), "home") == 0);
+    CHECK(!shell.cat.here && !pda_shell_cat_here(&shell));
+}
+
+static void test_cat_second_escape_closes_at_once(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_cat(&shell);
+    run_ms(&shell, 2000);
+    tap(&shell, PDA_USAGE_ESCAPE);
+    CHECK(strcmp(app_name(&shell), "Cat") == 0);
+    tap(&shell, PDA_USAGE_ESCAPE);
+    CHECK(strcmp(app_name(&shell), "home") == 0 && !shell.cat.here);
+}
+
+static void test_cat_lives_unfocused(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_cat(&shell);
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    CHECK(pda_shell_tick_ms(&shell) != 0);
+    int moves = 0, last_x = cat_x(&shell), levels_seen = 0;
+    for (int minute = 0; minute < 60; minute++) {
+        run_ms(&shell, 60000);
+        moves += cat_x(&shell) != last_x;
+        last_x = cat_x(&shell);
+        levels_seen |= 1 << shell.cat.level;
+        CHECK(cat_x(&shell) >= 0 && cat_x(&shell) <= PDA_FB_W - CAT_WIDTH);
+    }
+    CHECK(moves > 10);
+    CHECK(levels_seen == 7);
+    CHECK(shell.cat.needs.food < 80 && shell.cat.needs.fun < 80);
+    CHECK(strcmp(app_name(&shell), "Cat") == 0 && shell.cat.here);
+}
+
+static void test_cat_eats_from_the_bowl(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    shell.cat.needs.food = 20;
+    open_cat(&shell);
+    run_ms(&shell, 20000); // she waits at the empty bowl
+    CHECK(shell.cat.level == 0 && shell.cat.needs.bowl == 0);
+    shell.cat_changed = false;
+    tap(&shell, USAGE_F);
+    CHECK(shell.cat.needs.bowl == PDA_CAT_BOWL_MAX && shell.cat_changed);
+    run_ms(&shell, 40000);
+    CHECK(shell.cat.needs.food > 50);
+    CHECK(shell.cat.needs.bowl < PDA_CAT_BOWL_MAX);
+}
+
+static void test_cat_sleeps_in_bed(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    shell.cat.needs.energy = 10;
+    open_cat(&shell);
+    run_ms(&shell, 20000);
+    CHECK(shell.cat.level == 2 && cat_x(&shell) == 3);
+    const uint8_t energy = shell.cat.needs.energy;
+    // Asleep, she wakes the platform only a few times a second.
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    CHECK(pda_shell_tick_ms(&shell) >= 250);
+    run_ms(&shell, 120000);
+    CHECK(shell.cat.needs.energy > energy + 10);
+    CHECK(shell.cat.level == 2);
+}
+
+static void test_cat_plays_with_the_ball(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    shell.cat.needs.fun = 30;
+    open_cat(&shell);
+    run_ms(&shell, 2000);
+    tap(&shell, USAGE_SPACE);
+    CHECK(shell.cat.ball);
+    run_ms(&shell, 20000);
+    CHECK(shell.cat.needs.fun > 30);
+    CHECK(shell.cat.ball);
+}
+
+static void test_cat_chases_the_laser(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    shell.cat.needs.fun = 30;
+    open_cat(&shell);
+    run_ms(&shell, 2000);
+    tap(&shell, USAGE_RIGHT); // the dot appears mid-floor
+    CHECK(shell.cat.laser);
+    for (int i = 0; i < 6; i++) {
+        tap(&shell, USAGE_RIGHT);
+    }
+    run_ms(&shell, 4000);
+    const int paw = shell.cat.left ? cat_x(&shell) + 1 : cat_x(&shell) + CAT_WIDTH - 2;
+    CHECK(abs(paw - shell.cat.laser_x) <= 3);
+    CHECK(shell.cat.needs.fun > 30);
+    run_ms(&shell, 7000);
+    CHECK(!shell.cat.laser);
+}
+
+static void test_cat_follows_the_laser_up_the_tree(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_cat(&shell);
+    run_ms(&shell, 2000);
+    tap(&shell, USAGE_UP);
+    for (int i = 0; i < 20; i++) { // up onto the top shelf, on the left
+        tap(&shell, USAGE_UP);
+        if (i < 6) {
+            tap(&shell, USAGE_LEFT);
+        }
+    }
+    CHECK(shell.cat.laser_y < 54);
+    for (int i = 0; i < 6 && shell.cat.level != 2; i++) {
+        run_ms(&shell, 1000);
+        tap(&shell, USAGE_LEFT); // keeps the dot alive
+        tap(&shell, USAGE_RIGHT);
+    }
+    CHECK(shell.cat.level == 2);
+}
+
+static void test_cat_purrs_when_petted(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_cat(&shell);
+    run_ms(&shell, 2000);
+    const uint8_t fun = shell.cat.needs.fun;
+    CHECK(tap(&shell, PDA_USAGE_RETURN) == PDA_SHELL_REDRAW);
+    CHECK(shell.cat.needs.fun == fun + 5);
+    CHECK(shell.tick_ms == 50); // the heart rises
+}
+
+static void test_cat_stays_through_quick_note(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    open_cat(&shell);
+    run_ms(&shell, 5000);
+    const int32_t x = shell.cat.x16;
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_NOTE);
+    CHECK(pda_shell_cat_here(&shell));
+    pda_shell_set_mode(&shell, ROAMYBOARD_PDA_OFF);
+    CHECK(strcmp(app_name(&shell), "Cat") == 0);
+    CHECK(shell.cat.here && shell.cat.x16 == x);
+}
+
+static void test_cat_redraws_only_on_change(void) {
+    static struct pda_shell shell;
+    new_shell(&shell);
+    shell.cat.needs.energy = 10;
+    open_cat(&shell);
+    run_ms(&shell, 20000); // asleep in bed
+    int redraws = 0;
+    for (int i = 0; i < 40; i++) {
+        shell.now_ms += pda_shell_tick_ms(&shell);
+        redraws += pda_shell_tick(&shell) == PDA_SHELL_REDRAW;
+    }
+    // Ten seconds of 250 ms ticks: a snore frame a second, and perhaps a meter.
+    CHECK(redraws >= 9 && redraws <= 12);
+}
+
 int main(void) {
     test_clock_redraws_once_a_second();
     test_countdown_runs_out();
@@ -576,6 +762,17 @@ int main(void) {
     test_words_answers_are_five_letters();
     test_rain_typing_clears_a_word();
     test_rain_ends_after_three_misses();
+    test_cat_comes_over_and_goes_home();
+    test_cat_second_escape_closes_at_once();
+    test_cat_lives_unfocused();
+    test_cat_eats_from_the_bowl();
+    test_cat_sleeps_in_bed();
+    test_cat_plays_with_the_ball();
+    test_cat_chases_the_laser();
+    test_cat_follows_the_laser_up_the_tree();
+    test_cat_purrs_when_petted();
+    test_cat_stays_through_quick_note();
+    test_cat_redraws_only_on_change();
     if (failures) {
         fprintf(stderr, "pda_apps_test: %d failure(s)\n", failures);
         return 1;

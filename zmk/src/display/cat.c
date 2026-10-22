@@ -249,6 +249,9 @@ static struct cat_view rest_view(const struct cat *cat, uint32_t now) {
 }
 
 struct cat_view cat_view_at(const struct cat *cat, uint32_t now_ms) {
+    if (cat->away && !action_running(cat, now_ms)) {
+        return (struct cat_view){.frame = NO_FRAME, .x = cat->x, .valid_ms = FOREVER_MS};
+    }
     if (cat->stalking) {
         return stalk_view(cat, now_ms);
     }
@@ -319,6 +322,9 @@ void cat_init(struct cat *cat, int x, uint32_t now_ms) {
 }
 
 void cat_key_pressed(struct cat *cat, enum cat_key key, uint32_t now_ms) {
+    if (cat->away) {
+        return;
+    }
     switch (cat->pose) {
     case CAT_POSE_LOCKED:
         return;
@@ -373,7 +379,7 @@ void cat_key_pressed(struct cat *cat, enum cat_key key, uint32_t now_ms) {
 }
 
 void cat_mouse_pressed(struct cat *cat, enum cat_mouse mouse, uint32_t now_ms) {
-    if (cat->pose == CAT_POSE_LOCKED) {
+    if (cat->away || cat->pose == CAT_POSE_LOCKED) {
         return;
     }
     if (mouse == CAT_MOUSE_CLICK) {
@@ -404,6 +410,9 @@ void cat_set_pose(struct cat *cat, enum cat_pose pose, uint32_t now_ms) {
     const enum cat_pose old = cat->pose;
     cat->pose = pose;
     cat->pose_ms = now_ms;
+    if (cat->away) {
+        return;
+    }
     if (pose == CAT_POSE_LOCKED) {
         stop(cat, now_ms);
         const int run_px = MIDDLE_X - cat->x;
@@ -418,5 +427,22 @@ void cat_set_pose(struct cat *cat, enum cat_pose pose, uint32_t now_ms) {
 }
 
 void cat_profile_changed(struct cat *cat, uint32_t now_ms) {
-    act(cat, now_ms, CAT_LAP_PX, false, NULL, 0);
+    if (!cat->away) {
+        act(cat, now_ms, CAT_LAP_PX, false, NULL, 0);
+    }
+}
+
+void cat_set_away(struct cat *cat, bool away, uint32_t now_ms) {
+    if (away == cat->away) {
+        return;
+    }
+    cat->away = away;
+    if (away) {
+        stop(cat, now_ms);
+        act(cat, now_ms, CAT_BOX_WIDTH - cat->x, false, NULL, 0);
+    } else {
+        // Off the right edge wraps to off the left edge, so run left from there.
+        cat->x = wrap(CAT_BOX_WIDTH);
+        act(cat, now_ms, CAT_RETURN_X - CAT_BOX_WIDTH, true, NULL, 0);
+    }
 }

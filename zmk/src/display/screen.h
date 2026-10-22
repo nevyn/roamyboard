@@ -68,7 +68,8 @@ void screen_draw_bottom(struct screen *screen, const struct status_state *state)
  * Shows the cat in the key module count box, cropped to the box's interior. The split
  * peripheral has no cat.
  *
- * @param frame The frame to show, CAT_FACING_LEFT + frame for a left-facing one.
+ * @param frame The frame to show, CAT_FACING_LEFT + frame for a left-facing one, or
+ *              CAT_FRAME_COUNT for an empty box.
  * @param x Left edge of the frame from the left edge of the interior, in pixels; any value,
  *          but only -CAT_WIDTH + 1 to CAT_BOX_WIDTH - 1 show part of the cat.
  * @param y Height of the frame above the cat's floor, 0 to CAT_MAX_RISE_PX.

@@ -53,6 +53,8 @@ if(CONFIG_ROAMYBOARD_PDA)
       src/pda/app_calc.c
       src/pda/app_dice.c
       src/pda/app_kana.c
+      src/pda/app_cat.c
+      src/pda/cat_sprites.c
       src/pda/game_breakout.c
       src/pda/game_tetris.c
       src/pda/game_snake.c

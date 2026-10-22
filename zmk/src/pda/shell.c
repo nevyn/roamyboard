@@ -14,9 +14,9 @@
 
 const struct pda_app *const pda_apps[] = {
     &pda_app_note_def,   &pda_app_clock_def, &pda_app_timer_def,    &pda_app_calc_def,
-    &pda_app_dice_def,   &pda_app_kana_def,  &pda_app_tetris_def,   &pda_app_snake_def,
-    &pda_app_breakout_def,
-    &pda_app_words_def,  &pda_app_rain_def,  &pda_app_keys_def,     &pda_app_info_def,
+    &pda_app_dice_def,   &pda_app_kana_def,  &pda_app_cat_def,      &pda_app_tetris_def,
+    &pda_app_snake_def,  &pda_app_breakout_def, &pda_app_words_def, &pda_app_rain_def,
+    &pda_app_keys_def,   &pda_app_info_def,
 };
 const int pda_app_count = sizeof(pda_apps) / sizeof(pda_apps[0]);
 const int pda_app_note = 0;
@@ -72,6 +72,7 @@ void pda_shell_init(struct pda_shell *shell, uint32_t seed) {
     shell->keys.last_position = -1;
     shell->keys.last_usage = -1;
     shell->midi.last_note = -1;
+    shell->cat.needs = (struct pda_cat_saved){.food = 80, .fun = 80, .energy = 80};
 }
 
 uint32_t pda_shell_random(struct pda_shell *shell, uint32_t n) {
@@ -114,6 +115,11 @@ bool pda_shell_show(struct pda_shell *shell, const char *name) {
 const char *pda_shell_view_name(const struct pda_shell *shell) {
     const int app = shell->quick ? shell->before_quick : shell->app;
     return app == PDA_SHELL_HOME ? "" : pda_apps[app]->name;
+}
+
+bool pda_shell_cat_here(const struct pda_shell *shell) {
+    const int app = shell->quick ? shell->before_quick : shell->app;
+    return app != PDA_SHELL_HOME && pda_apps[app] == &pda_app_cat_def;
 }
 
 /** Ends quick note: back to the app that it replaced, which opens again. */

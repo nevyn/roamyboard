@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -27,6 +28,13 @@ enum roamyboard_pda_mode {
 
 /** The current mode, on either half. Callable from any thread. */
 enum roamyboard_pda_mode roamyboard_pda_mode(void);
+
+/**
+ * On the central: whether the cat is over on the peripheral's PDA, in the Cat app, so that the
+ * status screen shows none. False while the peripheral is not connected. Callable from any
+ * thread; roamyboard_pda_changed follows every change.
+ */
+bool roamyboard_pda_cat_away(void);
 
 /**
  * Central only. Enters a PDA mode, or leaves PDA mode if mode is the current one, so that the

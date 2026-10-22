@@ -158,6 +158,9 @@ struct cat {
     enum cat_mouse stalk;
     uint32_t stalk_ms;
     int stalk_x;
+
+    /** The cat is on the other half, in the PDA's Cat app, once its dash off the edge ends. */
+    bool away;
 };
 
 /**
@@ -194,5 +197,19 @@ void cat_set_pose(struct cat *cat, enum cat_pose pose, uint32_t now_ms);
 /** Makes the cat dash off the right edge and come back in from the left to where it was. */
 void cat_profile_changed(struct cat *cat, uint32_t now_ms);
 
-/** Returns what the screen shows of the cat at now_ms, which must not precede the last event. */
+/**
+ * Sends the cat to the other half's PDA or brings it back. Going, it dashes off the right
+ * edge and stays away: keys and mouse keys do nothing until it returns, and cat_view_at()
+ * shows no frame. Returning, it runs in from the right edge to CAT_RETURN_X and faces left.
+ * Setting the current state again does nothing.
+ */
+void cat_set_away(struct cat *cat, bool away, uint32_t now_ms);
+
+/** Where the cat stops after returning from the other half. */
+#define CAT_RETURN_X (CAT_BOX_WIDTH - CAT_WIDTH - 8)
+
+/**
+ * Returns what the screen shows of the cat at now_ms, which must not precede the last event;
+ * the frame is CAT_FRAME_COUNT while the cat is away.
+ */
 struct cat_view cat_view_at(const struct cat *cat, uint32_t now_ms);

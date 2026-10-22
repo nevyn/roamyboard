@@ -291,11 +291,16 @@ void screen_draw_bottom(struct screen *screen, const struct status_state *state)
 #if STATUS_SCREEN_CENTRAL
 
 void screen_show_cat(struct screen *screen, enum cat_frame frame, int x, int y) {
+    lv_obj_remove_flag(screen->cat_box, LV_OBJ_FLAG_HIDDEN);
+    if (frame >= CAT_FRAME_COUNT) {
+        lv_obj_add_flag(screen->cat, LV_OBJ_FLAG_HIDDEN);
+        return;
+    }
+    lv_obj_remove_flag(screen->cat, LV_OBJ_FLAG_HIDDEN);
     lv_image_set_src(screen->cat, cat_frames[frame]);
     // Upright (ux, uy) in the interior lands at (INTERIOR_H - 1 - uy, ux) in the rotated box.
     const int top = CAT_Y - INTERIOR_Y - y;
     lv_obj_set_pos(screen->cat, INTERIOR_H - top - CAT_HEIGHT, x);
-    lv_obj_remove_flag(screen->cat_box, LV_OBJ_FLAG_HIDDEN);
 }
 
 #endif

@@ -422,6 +422,44 @@ static void test_profile_dash(void) {
     CHECK(times[n - 1] - t < 1000);
 }
 
+static void test_away(void) {
+    struct cat cat;
+    cat_init(&cat, 10, T0);
+    uint32_t t = T0 + 100;
+    cat_set_away(&cat, true, t);
+    struct cat_view views[64];
+    uint32_t times[64];
+    int n = timeline(&cat, t, t + 2000, views, times, 64);
+    for (int i = 0; i < n - 1; i++) {
+        CHECK(!faces_left(views[i]));
+        CHECK(views[i].x >= 10 || views[i].x == -CAT_WIDTH);
+    }
+    CHECK_EQ(views[n - 1].frame, CAT_FRAME_COUNT);
+    CHECK(times[n - 1] - t < 1000);
+
+    /* Away, keys, mouse keys, poses and profile changes leave the cat away. */
+    t += 2000;
+    cat_key_pressed(&cat, CAT_KEY_SPACE, t);
+    cat_mouse_pressed(&cat, CAT_MOUSE_LEFT, t);
+    cat_set_pose(&cat, CAT_POSE_KEYPAD, t);
+    cat_profile_changed(&cat, t);
+    CHECK_EQ(cat_view_at(&cat, t + 10).frame, CAT_FRAME_COUNT);
+    cat_set_away(&cat, true, t);
+    CHECK_EQ(cat_view_at(&cat, t + 10).frame, CAT_FRAME_COUNT);
+
+    /* Back, it runs in from the right edge facing left, then takes the pose. */
+    cat_mouse_released(&cat, CAT_MOUSE_LEFT, t += 100);
+    cat_set_away(&cat, false, t += 100);
+    n = timeline(&cat, t, t + 2000, views, times, 64);
+    CHECK(views[0].x > CAT_RETURN_X);
+    for (int i = 0; i < n; i++) {
+        CHECK(faces_left(views[i]));
+        CHECK(views[i].x >= CAT_RETURN_X);
+    }
+    CHECK_EQ(views[n - 1].x, CAT_RETURN_X);
+    CHECK_EQ(upright(cat_view_at(&cat, t + 1500)), CAT_SIT_UP);
+}
+
 static void test_idle(void) {
     struct cat cat;
     cat_init(&cat, 0, T0);
@@ -475,6 +513,7 @@ int main(void) {
     test_gaming_pose();
     test_locked_pose();
     test_profile_dash();
+    test_away();
     test_idle();
     test_steps_last_a_frame();
 

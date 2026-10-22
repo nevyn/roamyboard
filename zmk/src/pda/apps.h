@@ -214,6 +214,62 @@ struct pda_rain_state {
     bool started, over;
 };
 
+/** Cat: needs run from 0 to PDA_CAT_FULL; the bowl holds up to PDA_CAT_BOWL_MAX portions. */
+#define PDA_CAT_FULL 100
+#define PDA_CAT_BOWL_MAX 3
+#define PDA_CAT_HEARTS 4
+
+/** What settings keep of the cat, as it is stored; only fields at the end may be added. */
+struct pda_cat_saved {
+    uint8_t food;
+    uint8_t fun;
+    uint8_t energy;
+    uint8_t bowl;
+};
+
+/** Cat: the status screen's cat, on the right half's playground while the app is open. */
+struct pda_cat_state {
+    struct pda_cat_saved needs;
+    /** She has come over and not yet run back; reopening after quick note keeps her where she is. */
+    bool here;
+    /** enum doing and enum goal in app_cat.c. */
+    uint8_t doing, goal;
+    /** The surface that she stands on, the one that she heads for, and a jump's target. */
+    uint8_t level, goal_level, to_level;
+    bool left;
+    /** Left edge of her sprite in the playground, in 1/16 pixels. */
+    int32_t x16;
+    int16_t goal_x, from_x, to_x;
+    /** Pixels per second of the walk under way. */
+    uint16_t speed;
+    uint32_t since_ms, until_ms;
+    /** Bats at the ball so far, and how many she makes before she tires of it. */
+    uint8_t kicks, kick_limit;
+    /** Pixels that a leap at the laser dot rises. */
+    uint8_t leap_px;
+    /** Food eaten from the current portion. */
+    uint8_t eaten;
+
+    bool ball;
+    /** The ball's left edge, height above the floor and their speeds, in 1/16 pixels (per second). */
+    int32_t ball_x16, ball_h16, ball_vx16, ball_vh16;
+
+    bool laser;
+    int16_t laser_x, laser_y;
+    uint32_t laser_ms;
+
+    uint32_t heart_ms[PDA_CAT_HEARTS];
+    int16_t heart_x[PDA_CAT_HEARTS], heart_y[PDA_CAT_HEARTS];
+    uint8_t next_heart;
+
+    uint32_t last_ms;
+    /** Time lived towards the next change of needs. */
+    uint32_t life_ms;
+    uint32_t life_steps;
+    /** A hash of the last scene drawn, to redraw only on change. */
+    uint32_t drawn;
+};
+
 struct pda_app;
 extern const struct pda_app pda_app_note_def;
 extern const struct pda_app pda_app_clock_def;
@@ -221,6 +277,7 @@ extern const struct pda_app pda_app_timer_def;
 extern const struct pda_app pda_app_calc_def;
 extern const struct pda_app pda_app_dice_def;
 extern const struct pda_app pda_app_kana_def;
+extern const struct pda_app pda_app_cat_def;
 extern const struct pda_app pda_app_tetris_def;
 extern const struct pda_app pda_app_snake_def;
 extern const struct pda_app pda_app_words_def;

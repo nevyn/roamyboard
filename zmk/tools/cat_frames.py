@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Generates the status screen's cat frames from the pixel art below.
 
-Writes zmk/src/display/cat_frames.c, cat_frames.h and cat_frame_images.h, and
+Writes zmk/src/display/cat_frames.c, cat_frames.h and cat_frame_images.h for the
+status screen, zmk/src/pda/cat_sprites.c and cat_sprites.h for the PDA's Cat app, and
 renders every frame, scaled up, to a PNG (default /tmp/roamy-screen/frames.png):
 the right-facing frames on the first row, their mirror images on the second.
 Run it after editing the art:
@@ -608,6 +609,53 @@ def write_c(path_c, path_h, path_images_h):
             f.write("\n".join(lines) + "\n")
 
 
+def solid(frame):
+    """The ink and every background pixel that the ink encloses: what hides whatever lies behind the cat."""
+    outside = set()
+    todo = [(x, y) for y in range(HEIGHT) for x in range(WIDTH)
+            if (x in (0, WIDTH - 1) or y in (0, HEIGHT - 1)) and frame[y][x] != "#"]
+    while todo:
+        x, y = todo.pop()
+        if (x, y) in outside or not (0 <= x < WIDTH and 0 <= y < HEIGHT) or frame[y][x] == "#":
+            continue
+        outside.add((x, y))
+        todo += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+    return ["".join("." if (x, y) in outside else "#" for x in range(WIDTH)) for y in range(HEIGHT)]
+
+
+def write_sprites(path_c, path_h):
+    """The frames upright for the PDA's 1-bit framebuffer: a uint32_t per row, bit WIDTH - 1 leftmost."""
+    right = right_frames()
+    frames = right + left_frames()
+    h = [C_HEADER, "#pragma once\n", "#include <stdint.h>\n", '#include "../display/cat_frames.h"\n']
+    h.append("/**")
+    h.append(" * Every frame and its mirror image, indexed by enum cat_frame, upright: a row per element,")
+    h.append(" * bit CAT_WIDTH - 1 the leftmost pixel, a set bit the cat's ink.")
+    h.append(" */")
+    h.append("extern const uint32_t pda_cat_sprites[CAT_FRAME_COUNT][CAT_HEIGHT];\n")
+    h.append("/** Like pda_cat_sprites, but a set bit is the ink or background inside the cat's outline. */")
+    h.append("extern const uint32_t pda_cat_masks[CAT_FRAME_COUNT][CAT_HEIGHT];")
+    c = [C_HEADER, '#include "cat_sprites.h"\n']
+    for array, shape in (("pda_cat_sprites", lambda f: f), ("pda_cat_masks", solid)):
+        if array != "pda_cat_sprites":
+            c.append("")
+        c.append(f"const uint32_t {array}[CAT_FRAME_COUNT][CAT_HEIGHT] = {{")
+        for i, (name, frame) in enumerate(frames):
+            index = name if i < len(right) else f"CAT_FACING_LEFT + {name[:-len('_LEFT')]}"
+            values = [sum(1 << (WIDTH - 1 - x) for x, ch in enumerate(row) if ch == "#")
+                      for row in shape(frame)]
+            c.append(f"    [{index}] =")
+            for j in range(0, HEIGHT, 6):
+                chunk = ", ".join(f"0x{v:06x}" for v in values[j:j + 6])
+                opener = "        {" if j == 0 else "         "
+                closer = "}," if j + 6 >= HEIGHT else ","
+                c.append(f"{opener}{chunk}{closer}")
+        c.append("};")
+    for path, lines in ((path_h, h), (path_c, c)):
+        with open(path, "w") as f:
+            f.write("\n".join(lines) + "\n")
+
+
 def write_png(path, pixels, width, height):
     """Writes 8-bit grayscale rows (bytes, one per pixel) as a PNG."""
     raw = b"".join(b"\x00" + bytes(pixels[y * width:(y + 1) * width]) for y in range(height))
@@ -655,10 +703,13 @@ def main():
     display = os.path.join(here, "..", "src", "display")
     write_c(os.path.join(display, "cat_frames.c"), os.path.join(display, "cat_frames.h"),
             os.path.join(display, "cat_frame_images.h"))
+    pda = os.path.join(here, "..", "src", "pda")
+    write_sprites(os.path.join(pda, "cat_sprites.c"), os.path.join(pda, "cat_sprites.h"))
     png = sys.argv[1] if len(sys.argv) > 1 else "/tmp/roamy-screen/frames.png"
     os.makedirs(os.path.dirname(png), exist_ok=True)
     render_frames(png)
-    print(f"wrote {os.path.normpath(display)}/cat_frames.[ch], cat_frame_images.h and {png}")
+    print(f"wrote {os.path.normpath(display)}/cat_frames.[ch], cat_frame_images.h, "
+          f"{os.path.normpath(pda)}/cat_sprites.[ch] and {png}")
 
 
 if __name__ == "__main__":

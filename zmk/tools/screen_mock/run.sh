@@ -45,7 +45,7 @@ for role in central peripheral; do
         "$here/mock.c" "$display/screen.c" "$display/util.c" "$display/bolt.c" \
         "$display/cat.c" "$display/cat_frames.c" "$display/font_pda_12.c" "$display/font_kana_40.c" \
         "$display/pda_text.c" "$pda/shell.c" "$pda/midi_view.c" "$pda/icons.c" "$pda/apps.c" "$pda/app_clock.c" "$pda/app_timer.c" \
-        "$pda/app_calc.c" "$pda/app_dice.c" "$pda/app_kana.c" "$pda/game_breakout.c" "$pda/game_tetris.c" "$pda/game_snake.c" "$pda/game_words.c" \
+        "$pda/app_calc.c" "$pda/app_dice.c" "$pda/app_kana.c" "$pda/app_cat.c" "$pda/cat_sprites.c" "$pda/game_breakout.c" "$pda/game_tetris.c" "$pda/game_snake.c" "$pda/game_words.c" \
         "$pda/game_rain.c" "$pda/words.c" "$pda/gfx.c" "$pda/note.c" "$pda/keys.c" "$pda/clock.c" "$build/liblvgl.a" -lm -o "$build/mock-$role"
     "$build/mock-$role" "$out"
 done
