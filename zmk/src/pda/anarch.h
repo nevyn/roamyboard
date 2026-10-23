@@ -48,10 +48,11 @@ enum pda_anarch_key {
 /* The game. Not thread-safe: the runner calls these, from one thread at a time. */
 
 /**
- * Advances the game by elapsed_ms of game time with the keys in the mask held, then draws a
- * frame into frame if at least one game step passed. The game clock only moves in these
- * calls, so the game waits between them; a long elapsed_ms runs every step it covers. The
- * first call starts the game with the save from pda_anarch_game_load(), if any.
+ * Advances the game by elapsed_ms of real time with the keys in the mask held, then draws a
+ * frame into frame if at least one game step passed. The game plays at half speed: 40 ms of
+ * real time make one 20 ms step. The game clock only moves in these calls, so the game waits
+ * between them; a long elapsed_ms runs every step it covers. The first call starts the game
+ * with the save from pda_anarch_game_load(), if any.
  * @return Whether it drew a frame; the first calls, before the menu shows, draw none.
  */
 bool pda_anarch_game_run(uint32_t elapsed_ms, uint16_t keys, uint8_t frame[PDA_ANARCH_BYTES]);

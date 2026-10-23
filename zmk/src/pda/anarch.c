@@ -11,7 +11,10 @@
 
 #define SFG_SCREEN_RESOLUTION_X PDA_ANARCH_W
 #define SFG_SCREEN_RESOLUTION_Y PDA_ANARCH_H
-#define SFG_FPS 25
+/** Game time per real time: half speed, so that a person can follow the game on the display. */
+#define GAME_SPEED_PERCENT 50
+/** Game steps a second: a step, and with it a frame, every 40 ms of real time. */
+#define SFG_FPS (25 * 100 / GAME_SPEED_PERCENT)
 #define SFG_CAN_EXIT 0
 #define SFG_DIMINISH_SPRITES 1
 #define SFG_RAYCASTING_MAX_HITS 7
@@ -42,6 +45,8 @@ static uint8_t level[256];
 
 static bool started;
 static uint32_t game_ms;
+/** Real time not yet turned into game time, in hundredths of a millisecond of game time. */
+static uint32_t game_carry;
 static uint16_t held;
 static uint8_t *target;
 static bool drew;
@@ -102,7 +107,9 @@ bool pda_anarch_game_run(uint32_t elapsed_ms, uint16_t keys, uint8_t frame[PDA_A
         SFG_init();
         started = true;
     }
-    game_ms += elapsed_ms;
+    const uint32_t scaled = elapsed_ms * GAME_SPEED_PERCENT + game_carry;
+    game_ms += scaled / 100;
+    game_carry = scaled % 100;
     held = keys;
     drew = false;
     SFG_mainLoopBody();

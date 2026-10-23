@@ -964,7 +964,7 @@ static bool anarch_light(const struct pda_anarch_state *a, int gx, int gy) {
 
 static void open_anarch_with_frame(struct pda_shell *shell) {
     new_shell(shell);
-    open_named(shell, "Anarch");
+    open_named(shell, "Doom");
     run_ms(shell, 1000);
     CHECK(shell->anarch.has_frame);
 }
@@ -972,7 +972,7 @@ static void open_anarch_with_frame(struct pda_shell *shell) {
 static void test_anarch_runs_only_while_focused(void) {
     static struct pda_shell shell;
     new_shell(&shell);
-    open_named(&shell, "Anarch");
+    open_named(&shell, "Doom");
     CHECK(shell.tick_ms != 0 && !shell.anarch.has_frame);
     run_ms(&shell, 1000);
     CHECK(shell.anarch.has_frame); // the game's menu
@@ -1052,9 +1052,9 @@ static void test_anarch_fire_plays_the_first_level(void) {
     open_anarch_with_frame(&shell);
     CHECK(anarch_lit_percent(&shell.anarch) < 15);
     fire(&shell); // Play
-    run_ms(&shell, 1000);
-    fire(&shell); // past the story
     run_ms(&shell, 2000);
+    fire(&shell); // past the story
+    run_ms(&shell, 4000);
     CHECK(anarch_lit_percent(&shell.anarch) > 20);
 }
 
