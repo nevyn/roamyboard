@@ -160,7 +160,7 @@
       gltf.scene.updateMatrixWorld(true);
       gltf.scene.traverse(o => {
         if (!o.isMesh) return;
-        const raw = (o.name || o.parent?.name || "").replace(/_/g, " ");
+        const raw = (o.userData.name || o.name || o.parent?.name || "").replace(/_/g, " ");   // the loader strips "/" from o.name
         let g = o.geometry.clone().applyMatrix4(o.matrixWorld);
         g.deleteAttribute("normal");
         g = BGU.toCreasedNormals(g, THREE.MathUtils.degToRad(32));
