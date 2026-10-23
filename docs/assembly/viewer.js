@@ -37,6 +37,8 @@
     mcuShell: ["MCU shell", PLA], mcuFloor: ["MCU floor", FLOOR], socketBoard: ["Socket board", "#6a43a0"],
     view: ["nice!view", "#17161c"], nano: ["nice!nano", "#2f2d5c"], battery: ["Battery", "#b9bec5"],
     switch: ["Power switch", "#55545c"], reset: ["Reset button", "#55545c"], jack: ["Battery jack", "#efece2"],
+    pad: ["Trackpad", "#17161c"], vSwitch: ["V's switch", "#f4f1ea", 0.72],
+    looseSockets: ["Loose sockets", "#77727f"], looseTails: ["Loose socket tails", "#c9a227"],
     print: ["Print", PLA],
   };
 
@@ -57,7 +59,11 @@
       case "Jig": case "solder-jig-print": return "jig";
       case "Terminator": case "terminator-print": return "terminator";
       case "Headers": return "termHeaders";
-            default:
+      case "Trackpad": return "pad";
+      case "Switch": return "vSwitch";
+      case "Sockets": return "looseSockets";
+      case "Socket tails": return "looseTails";
+      default:
         if (part.startsWith("MCU ")) return part.slice(4);
         return "print";
     }
@@ -83,6 +89,11 @@
       note: "Red: the guide pins, the only parts that get painted support.",
     },
     mcuPrint: { badge: "PRINT POSE", model: "mcu-module-print", view: [0.8, -1.1, 1.1], bed: true },
+    pointPrint: {
+      badge: "PRINT POSE", model: "pointing-module-print", view: [0.8, -1.1, 1.1], bed: true,
+      legend: ["shell", "floor", "support"],
+      note: "Red: the guide pins, the only parts that get painted support. The shell lies on its plateau.",
+    },
     termPrint: {
       badge: "PRINT POSE", model: "terminator-print", view: [1.1, -0.9, 1.2], bed: true,
       clip: { label: "Print height", group: ["terminator", "support"], marker: DATA.terminatorPause },
@@ -136,6 +147,21 @@
       ],
       legend: ["mcuShell", "mcuFloor", "socketBoard", "view", "nano", "battery", "switch", "reset", "jack", "ghost"],
       hidden: ["ghost", "ghostBoard", "legs", "switches", "pcb", "ics", "headers", "headerTails", "shell", "floor"],
+    },
+    pointing: {
+      badge: "POINTING MODULE · UPTURNED", model: "pointing-module", flip: true, view: [0.4, -0.9, -1.2],
+      explode: { pad: [0, 0, -14], pcb: [0, 0, -24], ics: [0, 0, -24], headers: [0, 0, -24], headerTails: [0, 0, -24],
+                 switches: [0, 0, 16], legs: [0, 0, 16], vSwitch: [0, 0, 16],
+                 floor: [0, 0, -40], looseSockets: [0, 0, -40], looseTails: [0, 0, -40] },
+      sequence: [
+        { caption: "The shell, upturned: the plateau is underneath, and everything goes in from what will be the bottom.", add: ["shell"] },
+        { caption: "The trackpad presses into its pocket by its own adhesive, solder pads over V's half.", add: ["pad"] },
+        { caption: "K's board drops in along its normal, back toward you, over the pad's other half.", add: ["pcb", "ics", "headers", "headerTails"] },
+        { caption: "V's switch presses into V's plate from the plateau side; its pins are wired to SW4's pads on K's board.", add: ["vSwitch"], view: [0.4, -0.9, 1.2] },
+        { caption: "The floor, with the three loose sockets glued into its cradles, closes it. Six M2 screws.", add: ["floor", "looseSockets", "looseTails"] },
+        { caption: "Turned over: K's switch clicks into its pocket, legs into SW5's hotswap socket.", add: ["switches", "legs"], view: [0.4, -0.9, 1.2] },
+      ],
+      legend: ["shell", "floor", "pad", "pcb", "headers", "switches", "vSwitch", "looseSockets"],
     },
   };
 

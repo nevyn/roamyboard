@@ -191,6 +191,8 @@
         <tr><td>MCU shell</td><td><code>mcu-module-print.3mf</code></td><td class="n" data-rev="mcuShell"></td></tr>
         <tr><td>MCU floor</td><td><code>mcu-module-print.3mf</code></td><td class="n" data-rev="mcuFloor"></td></tr>
         <tr><td>Terminator module</td><td><code>terminator-print.3mf</code></td><td class="n" data-rev="terminator"></td></tr>
+        <tr><td>Pointing module shell</td><td><code>pointing-module-print.3mf</code></td><td class="n" data-rev="pointShell"></td></tr>
+        <tr><td>Pointing module floor</td><td><code>pointing-module-print.3mf</code></td><td class="n" data-rev="pointFloor"></td></tr>
         <tr><td>Solder jig</td><td><code>solder-jig-print.3mf</code></td><td class="n" data-rev="jig"></td></tr>
       </tbody></table></div>
       <p class="summary">Read from <code>Parameters.swift</code> when the guide's models were generated.</p>
@@ -204,7 +206,7 @@
         <div class="card"><h4>Layers</h4><p><b>0.2 mm.</b> The overhang check slices at 0.2 mm, and the MCU module's 1.4 mm plate is a whole number of layers at that height.</p></div>
         <div class="card"><h4>Supports</h4><p><b>None, except where painted.</b> Paint tree support, from the build plate only, under the two guide pins of each shell and of the terminator module. Top Z distance about 0.275 mm makes it come off cleanly.</p></div>
         <div class="card"><h4>Print poses</h4><p>The 3MF files already lie the right way: <b>shells top-down</b> on the bed, <b>floors bottom-down</b>, the jig base down.</p></div>
-        <div class="card"><h4>Several objects per file</h4><p><code>key-module-print.3mf</code> and <code>mcu-module-print.3mf</code> hold the shell and its floor side by side. To reprint one of them, delete the other object in the slicer.</p></div>
+        <div class="card"><h4>Several objects per file</h4><p><code>key-module-print.3mf</code>, <code>mcu-module-print.3mf</code> and <code>pointing-module-print.3mf</code> hold the shell and its floor side by side. To reprint one of them, delete the other object in the slicer.</p></div>
       </div>
     </div></div>
   </article>
@@ -254,7 +256,7 @@
 <section class="chapter" id="solder" data-title="Solder the key module boards">
   <div class="chapter-head"><div class="chapter-no">4</div><div>
     <h2>Solder the key module boards</h2>
-    <p>Repeat for each key module board, and once more for the MCU module's socket board, which takes the sockets only (<a href="#socket-board">chapter 7</a>). The board's front carries the passives and the switches; its back carries U1, the hotswap sockets and the connectors.</p>
+    <p>Repeat for each key module board, and once more for the MCU module's socket board, which takes the sockets only (<a href="#socket-board">chapter 7</a>). The pointing module's board differs in a few parts (<a href="#point-board">chapter 8</a>). The board's front carries the passives and the switches; its back carries U1, the hotswap sockets and the connectors.</p>
   </div></div>
 
   <article class="step" id="front" data-title="Front: resistors and capacitor">
@@ -325,7 +327,7 @@
         <tr><td>GPIO0</td><td>J_RIGHT2 pin 2</td><td>/PL</td></tr>
         <tr><td>GPIO26</td><td>J_RIGHT2 pin 3</td><td>DATA (QH)</td></tr>
       </tbody></table></div>
-      <p>Tie J_LEFT2 pin 3 (DATA in) to GND for the test, so the bits shifted in behind the module read 0. Details in the sketch's <a href="https://github.com/nevyn/roamyboard/blob/main/firmware/shiftregister-test/README.md">README</a>. Without an M5Stick, test the boards in the finished half instead (<a href="#first-test">chapter 9</a>).</p>
+      <p>Tie J_LEFT2 pin 3 (DATA in) to GND for the test, so the bits shifted in behind the module read 0. Details in the sketch's <a href="https://github.com/nevyn/roamyboard/blob/main/firmware/shiftregister-test/README.md">README</a>. Without an M5Stick, test the boards in the finished half instead (<a href="#first-test">chapter 10</a>).</p>
     </div></div>
   </article>
 </section>
@@ -524,10 +526,184 @@
 </section>
 
 <!-- ============================================================ 8 -->
-<section class="chapter" id="join" data-title="Join a half">
+<section class="chapter" id="pointing" data-title="Build the pointing module">
   <div class="chapter-head"><div class="chapter-no">8</div><div>
+    <h2>Build the pointing module</h2>
+    <p>Optional, and for the right half only. The <b>pointing module</b> sits next to the MCU module, so its trackpad lies beside J and Space, where the index finger and the thumb rest. It spans two key module columns in one case: <b>K</b> carries a key module board and the header side, and <b>V</b> carries the socket side, with three <b>loose sockets</b> wired to K's board. An Azoteq TPS48 trackpad lies under the 1.2 mm <b>skin</b> of the flat <b>plateau</b> over both columns, and two buttons sit in the SW5 row.</p>
+    <p><b>Status:</b> revision r1 of its case is modelled and passes the mesh checks, but it has not been printed yet. Nobody has built one, so every step below is untested.</p>
+  </div></div>
+
+  <article class="step" id="point-parts" data-title="Parts for the pointing module">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Plan</span><h3>Parts</h3><a class="anchor" href="#point-parts">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <ul class="check">
+        <li>A key module board, with U1, C1, R1 to R5, the three headers and one Choc hotswap socket</li>
+        <li>Three sockets (hanxia HX PM2.54-1x3P WT), which become the loose sockets</li>
+        <li>Two Kailh Choc v1 switches and two Choc keycaps</li>
+        <li>An Azoteq TPS48-P203-S trackpad</li>
+        <li>Thin stranded wire for sixteen wires, and a short piece for U1's pin 5</li>
+        <li>Four M2 × 5 mm and two M2 × 6 mm self-tapping screws</li>
+        <li>Two-component epoxy, for the headers and the loose sockets</li>
+      </ul>
+      <div class="warn"><p>The trackpad needs the I2C bus on the right MCU module's J_LEFT3. <a href="#i2c-wiring">Wire the I2C bus</a> first.</p></div>
+    </div></div>
+  </article>
+
+  <article class="step" id="point-print" data-title="Print the pointing module">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Print</span><h3>Print the pointing module</h3><a class="anchor" href="#point-print">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <ol class="do">
+        <li>Open <code>pointing-module-print.3mf</code>: the shell on its plateau, the floor beside it on its bottom.</li>
+        <li>The shell prints plateau-down, so the skin over the trackpad is the first layers on the bed.</li>
+        <li>Paint support under the two guide pins only (red in the view), as on a key module shell.</li>
+        <li>Print one of each. Remove the support and clean the guide pins' ridges, as on a key module.</li>
+      </ol>
+      <p><code>python3 tools/overhang.py pointing-shell-print pointing-floor-print</code> finds nothing that droops outside the painted support.</p>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="pointPrint"></div></div></div>
+  </article>
+
+  <article class="step" id="point-board" data-title="The board for K">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder · jig</span><h3>The board for K</h3><a class="anchor" href="#point-board">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>K's board is a key module board with fewer parts, and with one pin of U1 moved to +3.3V.</p>
+      <ol class="do">
+        <li>Solder the <a href="#front">front</a> (R1 to R5, C1) and U1, as on a key module board.</li>
+        <li>Lift U1's pin 5 (input G) off its pad: heat the joint and lift the pin clear with tweezers. Jumper it to +3.3V with a short piece of thin wire to U1's pin 16, across the package. Keep the wire clear of pins 4 and 6, which are GND.</li>
+        <li>Fit SW5's hotswap socket only. SW4's pads take V's button later.</li>
+        <li>Solder the three headers in the jig at 8° (<a href="#headers">Headers at 8°</a>), and <a href="#stake">glue them</a> to the board.</li>
+        <li>Leave J_LEFT1 to J_LEFT3 empty: their pads take the wires from the loose sockets and the trackpad.</li>
+      </ol>
+      <div class="note"><p>With pin 5 tied high, bit 6 of the module's byte in the chain is set, which will mark it as a pointing module. Today's firmware reads only bits 0 to 4 of each byte for the keys and bit 7 for the sentinel, so it ignores bit 6: tie it high now.</p>
+        <p>The firmware that knows the marker does not exist yet. Until it does, the module's 74HC165 counts as a key module, so the right half's key modules each move one keymap column outward while the pointing module is attached.</p></div>
+    </div>
+    <div class="step-media"><div class="photo-slot"><b>Photo wanted</b>U1 with pin 5 lifted and jumpered to pin 16.</div></div></div>
+  </article>
+
+  <article class="step" id="point-pad" data-title="The trackpad">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder</span><h3>The trackpad</h3><a class="anchor" href="#point-pad">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <p>The TPS48-P203 has seven solder pads on its back and no connector. From the notch end, their silkscreen reads IO4, IO5, GND, 3V3, IO1, IO2, IO3. <a href="https://github.com/nevyn/roamyboard/blob/main/electronics/Pointing%20module%20bench.md">Pointing module bench</a> rang them out:</p>
+      <div class="table-wrap"><table><thead><tr><th>Solder pad</th><th>Signal</th><th class="n">IQS572 pin</th></tr></thead><tbody>
+        <tr data-signal="sda"><td>IO2</td><td>SDA</td><td class="n">2</td></tr>
+        <tr data-signal="scl"><td>IO1</td><td>SCL</td><td class="n">3</td></tr>
+        <tr data-signal="int"><td>IO5</td><td>RDY</td><td class="n">8</td></tr>
+        <tr data-signal="vcc"><td>3V3</td><td>VDDHI</td><td class="n">4</td></tr>
+        <tr data-signal="gnd"><td>GND</td><td>VSS</td><td class="n">5</td></tr>
+        <tr><td>IO3, IO4</td><td>unused</td><td class="n"></td></tr>
+        <tr><td>none</td><td>NRST</td><td class="n">7</td></tr>
+      </tbody></table></div>
+      <ol class="do">
+        <li>Leave solder link S1 open. Open selects the tuning for a 1 to 2 mm overlay, and the skin is 1.2 mm.</li>
+        <li>Solder short stranded wires to 3V3, GND, IO1, IO2 and IO5. Leave IO3 and IO4 unconnected. NRST needs no wire: the IQS572 pulls it up itself.</li>
+      </ol>
+      <p>In the <a href="#point-assembly">assembly</a>, the trackpad goes into the upturned shell first: pressed into its pocket by its own adhesive, with its solder pads over V's half. Its wires drop into V's open bay and reach K's board round its socket-side edge.</p>
+    </div>
+    <div class="step-media"><figure><img class="diagram" src="../images/pointing-bench.svg" alt="The IQS572's pins and the trackpad's solder pads"><figcaption>From electronics/Pointing module bench.md. Click to enlarge.</figcaption></figure>
+      <div class="photo-slot"><b>Photo wanted</b>The trackpad's back with its five wires.</div></div></div>
+  </article>
+
+  <article class="step" id="point-sockets" data-title="Loose sockets">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Glue · solder</span><h3>Loose sockets</h3><a class="anchor" href="#point-sockets">#</a></div>
+    <div class="step-body single stack"><div class="step-text">
+      <p>V has no board. Its three sockets sit where a key module's would, each glued into a <b>cradle</b> on the floor, and their tails are wired to K's board, where K's own sockets would be.</p>
+      <ol class="do">
+        <li>Glue each socket into its cradle with epoxy: mouth toward V's socket face, pin 1 toward the SW5 end. The cradle is a key module's clamp pad and rear stop, with cheeks beside the body. Keep the glue off the tails.</li>
+        <li>Wire each tail to the J_LEFT pad on K's board with the same connector and pin number: J_LEFT1 pin 1 to J_LEFT1 pin 1, and so on, nine wires. The socket nearest the SW5 end stands in for J_LEFT1, the middle one for J_LEFT2, and the one nearest the SW1 end for J_LEFT3.</li>
+        <li>Route the wires through the slots that K's socket wall keeps open toward the floor.</li>
+      </ol>
+      <p>J_LEFT2 pin 3 is DATA_IN, the chain's data from the key modules beyond; the same rule holds for it. K's board passes every other pin straight through to its header.</p>
+      <div class="pinout">
+        <div class="conn"><h5>J_LEFT1 on K's board</h5>
+          <div class="pin used" data-signal="led"><b>1</b>+5V / LED<small>socket</small></div>
+          <div class="pin used" data-signal="vcc"><b>2</b>+3.3V<small>socket, trackpad 3V3</small></div>
+          <div class="pin used" data-signal="gnd"><b>3</b>GND<small>socket, trackpad GND</small></div></div>
+        <div class="conn"><h5>J_LEFT2</h5>
+          <div class="pin used" data-signal="clk"><b>1</b>CLK<small>socket</small></div>
+          <div class="pin used" data-signal="pl"><b>2</b>/PL<small>socket</small></div>
+          <div class="pin used" data-signal="datain"><b>3</b>DATA_IN<small>socket</small></div></div>
+        <div class="conn"><h5>J_LEFT3</h5>
+          <div class="pin used" data-signal="int"><b>1</b>INT<small>socket, trackpad IO5</small></div>
+          <div class="pin used" data-signal="sda"><b>2</b>SDA<small>socket, trackpad IO2</small></div>
+          <div class="pin used" data-signal="scl"><b>3</b>SCL<small>socket, trackpad IO1</small></div></div>
+      </div>
+      <div class="warn"><p>Leave slack in every wire. On the first socket board, a wire tugging on a pad broke its connection.</p></div>
+      <div class="gap"><p>Only the glue holds the loose sockets when modules are pulled apart. How well it holds is untested.</p></div>
+    </div>
+    <div class="step-media"><div class="photo-slot"><b>Photo wanted</b>The floor with the three loose sockets glued into their cradles and wired.</div></div></div>
+  </article>
+
+  <article class="step" id="point-pad-wiring" data-title="Wire the trackpad to K's board">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder</span><h3>Wire the trackpad to K's board</h3><a class="anchor" href="#point-pad-wiring">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <p>The trackpad's wires land on the same J_LEFT pads as the loose sockets' wires. K's board carries them to its headers, and on to the MCU module's J_LEFT3, where the pull-ups are. Hover a signal to find it in every table.</p>
+      <div class="table-wrap"><table><thead><tr><th>Signal</th><th>Trackpad</th><th>K's board</th></tr></thead><tbody>
+        <tr data-signal="vcc"><td>+3.3V</td><td>3V3</td><td>J_LEFT1 pin 2</td></tr>
+        <tr data-signal="gnd"><td>GND</td><td>GND</td><td>J_LEFT1 pin 3</td></tr>
+        <tr data-signal="int"><td>INT</td><td>IO5 (RDY)</td><td>J_LEFT3 pin 1</td></tr>
+        <tr data-signal="sda"><td>SDA</td><td>IO2</td><td>J_LEFT3 pin 2</td></tr>
+        <tr data-signal="scl"><td>SCL</td><td>IO1</td><td>J_LEFT3 pin 3</td></tr>
+      </tbody></table></div>
+      <ol class="do">
+        <li>Solder the five wires to their pads, beside the loose sockets' wires.</li>
+        <li>Check with a meter: continuity from each trackpad pad to the matching pin of K's headers (J_RIGHT1 and J_RIGHT3), and no short between +3.3V, GND, INT, SDA and SCL.</li>
+      </ol>
+    </div></div>
+  </article>
+
+  <article class="step" id="point-button" data-title="V's button">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder</span><h3>V's button</h3><a class="anchor" href="#point-button">#</a></div>
+    <div class="step-body single"><div class="step-text">
+      <p>V has no board, so its switch is wired to the hotswap pads of SW4 on K's board, whose socket stays empty.</p>
+      <ol class="do">
+        <li>Solder a wire to each of SW4's two hotswap pads on K's board: pad 1 is +3.3V, pad 2 is SW4's key net.</li>
+        <li>Once the switch is in V's plate (<a href="#point-assembly">assembly</a>), solder the wires' other ends to its two pins. The space under V's switch reaches 4 mm below the plate, for the pins and the wires.</li>
+      </ol>
+      <p>The two buttons read as SW5 and SW4 of the board's key module column: K's switch, in SW5's hotswap socket, as SW5, and V's switch as SW4.</p>
+    </div></div>
+  </article>
+
+  <article class="step" id="point-assembly" data-title="Assemble the pointing module">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Assemble</span><h3>Assemble the pointing module</h3><a class="anchor" href="#point-assembly">#</a></div>
+    <div class="step-body wide-media"><div class="step-text">
+      <p>As in the MCU module, the parts go into the <b>upturned shell</b>, and the floor closes it:</p>
+      <ol class="do">
+        <li><b>Shell</b>: turn it upside down, plateau on the table.</li>
+        <li><b>Trackpad</b>: press it into its pocket by its own adhesive, sensing face on the skin and solder pads over V's half. Press it flat, without air gaps: the skin is its overlay.</li>
+        <li><b>K's board</b>: drop it in along its normal, back up, SW1 at the SW1 end. It lies over the trackpad's other half, and the wires come round its socket-side edge.</li>
+        <li><b>V's switch</b>: press it into V's plate from the plateau side until its clips catch. Solder the wires from SW4's pads to its pins.</li>
+        <li><b>Floor</b>, with the loose sockets glued in: fold the wires in and put it on along K's board normal. The sockets rise into the mouth slots in V's socket wall, which hold each socket at its mouth.</li>
+        <li><b>Screws</b>: four M2 × 5 mm at K's header side and V's socket side, and two M2 × 6 mm at the seam between K and V, where the floor is thicker.</li>
+        <li><b>K's switch</b>: turn the module over and press a switch into K's pocket, legs into SW5's hotswap socket. Put both keycaps on.</li>
+      </ol>
+      <p>Step through it with the numbered buttons under the view.</p>
+      <div class="gap"><p>The wire lengths and how the wires fold under the floor are untested. With an M2 × 5 mm screw at the seam, the model has it reach about 1 mm less far into its pilot than the others.</p></div>
+    </div>
+    <div class="step-media"><div class="viewer" data-scene="pointing"></div>
+      <div class="photo-slot"><b>Photo wanted</b>An open pointing module: the trackpad, K's board and the wires.</div></div></div>
+  </article>
+
+  <article class="step" id="point-test" data-title="Test the pointing module">
+    <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Test</span><h3>Test the pointing module</h3><a class="anchor" href="#point-test">#</a></div>
+    <div class="step-body"><div class="step-text">
+      <ol class="do">
+        <li>Switch the right half off. Join the pointing module between the right half's key modules and its MCU module, with the usual <a href="#slide-on">slide-on</a>: the key modules' headers go into V's loose sockets, and K's headers into the MCU module's sockets. Keep your fingers off the trackpad: it calibrates when it starts, and a finger on it gives a bad baseline until the next start.</li>
+        <li>Switch on. On the Mac that the keyboard is connected to, build <code>roamy-log</code> with <code>swift build -c release --package-path zmk/tools/log</code> and run <code>zmk/tools/log/.build/release/roamy-log --half R</code> (<a href="https://github.com/nevyn/roamyboard/blob/main/docs/logging.md">docs/logging.md</a>).</li>
+        <li>The log shows <code>Trackpad absent -&gt; configuring</code>, then <code>Trackpad IQS572 (product 58), version 2.1, resolution 768 x 1024</code> and <code>Trackpad configuring -&gt; running</code>: the right half found the trackpad.</li>
+        <li>Move a finger on the plateau: the pointer follows. A tap clicks, and two fingers scroll.</li>
+      </ol>
+      <p>Until the firmware knows the pointing module's marker, the log counts it as a key module (<code>Chain has 8 key modules</code> with seven key modules), and its buttons type as the keys of the right half's innermost keymap column: K's button as its SW5 key, Backspace on QWERTY, and V's button as its SW4 key, N. Each key module types the keys of the next column outward.</p>
+      <div class="gap"><p>On the bench, the pointer moved the way the finger did with no axis flips, with the silkscreen read from the touch side. If it moves the wrong way in the module, the axis flips go in the right half's devicetree (<a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md#trackpad">docs/firmware.md</a>, Trackpad).</p></div>
+    </div>
+    <div class="step-media"><div class="photo-slot"><b>Photo wanted</b>The pointing module between the right MCU module and its key modules.</div></div></div>
+  </article>
+</section>
+
+<!-- ============================================================ 9 -->
+<section class="chapter" id="join" data-title="Join a half">
+  <div class="chapter-head"><div class="chapter-no">9</div><div>
     <h2>Join a half</h2>
-    <p>Start at the terminator module and work toward the MCU module: each module slides onto the headers of the one to its left.</p>
+    <p>Start at the terminator module and work toward the MCU module: each module slides onto the headers of the one to its left. On the right half, a pointing module goes on last before the MCU module.</p>
   </div></div>
 
   <article class="step" id="slide-on" data-title="Slide-on">
@@ -569,9 +745,9 @@
   </article>
 </section>
 
-<!-- ============================================================ 9 -->
+<!-- ============================================================ 10 -->
 <section class="chapter" id="firmware" data-title="Flash and test">
-  <div class="chapter-head"><div class="chapter-no">9</div><div>
+  <div class="chapter-head"><div class="chapter-no">10</div><div>
     <h2>Flash and test</h2>
     <p>The Roamyboard runs <a href="https://zmk.dev">ZMK</a> with its own driver for the key modules' chain. Details in <a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md">docs/firmware.md</a>; the keys and layers are on <a href="../layout/">the keyboard layout page</a>.</p>
   </div></div>
@@ -617,9 +793,9 @@
   </article>
 </section>
 
-<!-- ============================================================ 10 -->
+<!-- ============================================================ 11 -->
 <section class="chapter" id="trouble" data-title="Troubleshooting">
-  <div class="chapter-head"><div class="chapter-no">10</div><div>
+  <div class="chapter-head"><div class="chapter-no">11</div><div>
     <h2>Troubleshooting</h2>
     <p>What went wrong on the first builds, and what the firmware's symptoms mean.</p>
   </div></div>
@@ -638,6 +814,7 @@
         <li>Whether the 0.57 mm seat overhang prints clean, and how well the 0.25 mm seat holds a switch.</li>
         <li>Flap stiffness and tooth hold in PLA versus PETG; the 0.1 mm guide clearance on other printers.</li>
         <li>The MCU module r3 as a whole on the printer; charging with the power switch off.</li>
+        <li>The pointing module r1: printing, assembly, and the trackpad through the printed skin.</li>
         <li>One key module showed no GND continuity between its socket and header yet worked in either position, which a 74HC165 can also do on leaked ground. If a module acts up only in some positions, check its GND.</li>
       </ul>
     </div></div>
