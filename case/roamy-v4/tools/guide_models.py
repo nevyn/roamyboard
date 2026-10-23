@@ -3,8 +3,9 @@
 Converts the 3MF files in build/roamy-v4 into GLB models in docs/assembly/models, one node per part and colour
 (`<part>#<rrggbb[aa]>`), so the guide's viewer can colour, hide and explode them. The GLBs are in Git LFS.
 `data.js` carries the joint's neighbour pose, the terminator's pause height and the part revisions. The MCU module's parts are one object
-in the 3MF; they are split into bodies and named by matching the check STLs. Print models get the painted-support
-zones and the terminator's embedded headers from the check STLs. Needs trimesh and numpy.
+in the 3MF; they are split into bodies and named by matching the check STLs. Some models get parts from the check STLs
+(EXTRAS): the painted-support zones, the terminator's embedded headers and the pointing module's loose socket tails.
+Arguments limit the run to those models; data.js is always rewritten. Needs trimesh and numpy.
 """
 import json, pathlib, re, sys, zipfile
 import xml.etree.ElementTree as ET
@@ -20,9 +21,11 @@ EXTRAS = {
     "key-module-print": {"Painted support": ("shell-print-painted-support", "ff3b30")},
     "terminator-print": {"Painted support": ("terminator-print-painted-support", "ff3b30"),
                          "Headers": ("terminator-embedded-print", "ffa500")},
+    "pointing-module": {"Socket tails": ("pointing-socket-tails", "ffff00")},
+    "pointing-module-print": {"Painted support": ("pointing-shell-print-painted-support", "ff3b30")},
 }
 MODELS = ["key-module", "key-module-print", "mcu-module", "mcu-module-print", "terminator", "terminator-print",
-          "solder-jig", "solder-jig-print"]
+          "solder-jig", "solder-jig-print", "pointing-module", "pointing-module-print"]
 MCU_PARTS = ["nano", "view", "switch", "reset"]   # check STLs mcu-<name>; the rest of "Parts" is the battery and jack
 
 
@@ -92,7 +95,9 @@ TAILS, SOCKETS, HEADERS = "ffff00", "808080", "ffa500"   # BoardMockup's colours
 
 def split_tails(tails, sockets, headers):
     """Splits the connector tails by the nearer connector body, so the socket and header steps show only their own."""
-    bodies = {"socket": sockets.split(only_watertight=False)}
+    bodies = {}
+    if sockets is not None:
+        bodies["socket"] = sockets.split(only_watertight=False)
     if headers is not None:
         bodies["header"] = headers.split(only_watertight=False)
     centres = {side: np.array([b.bounds.mean(axis=0) for b in bs]) for side, bs in bodies.items()}
@@ -120,8 +125,8 @@ def convert(model):
             if name == "Parts" and model == "mcu-module":
                 for part, mesh in split_mcu_parts(sub).items():
                     add(part, mesh, colour)
-            elif colour == TAILS and SOCKETS in subs:
-                for side, mesh in split_tails(sub, subs[SOCKETS], subs.get(HEADERS)).items():
+            elif colour == TAILS and (SOCKETS in subs or HEADERS in subs):
+                for side, mesh in split_tails(sub, subs.get(SOCKETS), subs.get(HEADERS)).items():
                     add(f"{name}/{side} tails", mesh, colour)
             else:
                 add(name, sub, colour)
