@@ -105,6 +105,8 @@ The game runs on a thread of its own at the lowest priority (`zmk/src/pda/anarch
 
 The game keeps the levels reached and its settings in 12 bytes, which the peripheral writes to `roamyboard/pda/anarch` when PDA mode ends. `zmk/src/pda/anarch/` holds Anarch's game headers unchanged, from commit 6f905621 (2023-09-08) of its repository; its code and art are under CC0 1.0 (`anarch/LICENSE`). They take about 100 KB of flash, 20 KB of code and 80 KB of levels and art, and the app with its thread about 11 KB of RAM.
 
+id's Doom engine does not fit instead. A Doom port such as next-hack's nRF52840 port takes about 250 KB of code, and the data of one map runs to megabytes: Freedoom's E1M1 is about 2 MiB of map, textures, flats and sprites without sounds, and still about 300 KiB with its art pre-composited at half resolution in 16 greys. The other ports keep the WAD in external flash; without Doom, the right half has about 300 KiB of flash free beside ZMK.
+
 **Keys.** The Keys app shows a cell per key position, with keymap columns from top to bottom and rows from left to right, and a gap between the halves: filled while held, outlined once pressed, a dot before that. The line at the bottom names the latest position (`r2c13`: row 2, keymap column 13) and its HID usage in hex. It helps to check a new build's key modules. Cmd-Backspace starts over.
 
 **Info.** The Info app shows each half's key module count, battery and build ID, and where the clock comes from: `time BT2` for the host on Bluetooth profile 2, `no CTS` when no connected host offers the time, `time err` when a read failed, `time ...` before any host was asked.
