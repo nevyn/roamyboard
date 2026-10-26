@@ -157,6 +157,10 @@ void iqs5xx_logic_release_all(struct iqs5xx_logic *logic, struct iqs5xx_output *
     finish(output);
 }
 
+bool iqs5xx_should_retune(const struct iqs5xx_frame *frame) {
+    return (frame->system_info0 & IQS5XX_ATI_ERROR) && frame->fingers == 0;
+}
+
 bool iqs5xx_product_known(uint16_t product) {
     return product == 40 || product == 52 || product == 58;
 }

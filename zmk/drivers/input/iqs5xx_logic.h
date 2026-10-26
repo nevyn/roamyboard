@@ -33,6 +33,10 @@
 
 /** System Info 0 (0x000F). */
 #define IQS5XX_SHOW_RESET 0x80
+/** The trackpad ran ATI again by itself since the last frame. */
+#define IQS5XX_REATI_OCCURRED 0x10
+/** The latest ATI did not reach its targets, so the trackpad tracks badly until the next one. */
+#define IQS5XX_ATI_ERROR 0x08
 #define IQS5XX_CHARGING_MODE_MASK 0x07
 
 /** System Info 1 (0x0010). */
@@ -132,6 +136,12 @@ void iqs5xx_logic_release_taps(struct iqs5xx_logic *logic, struct iqs5xx_output 
  * away or reset. output is overwritten.
  */
 void iqs5xx_logic_release_all(struct iqs5xx_logic *logic, struct iqs5xx_output *output);
+
+/**
+ * Whether the driver should make the trackpad run ATI (its calibration) again: the latest ATI
+ * failed, and no finger is down, so a new one tunes to the untouched trackpad.
+ */
+bool iqs5xx_should_retune(const struct iqs5xx_frame *frame);
 
 /** Whether a Product number (0x0000) names an IQS5xx-B000: IQS550 (40), IQS572 (58) or IQS525 (52). */
 bool iqs5xx_product_known(uint16_t product);

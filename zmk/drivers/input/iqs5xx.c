@@ -40,8 +40,10 @@ LOG_MODULE_REGISTER(iqs5xx, CONFIG_ROAMYBOARD_INPUT_IQS5XX_LOG_LEVEL);
 #define REG_END_WINDOW 0xEEEE
 
 #define ACK_RESET BIT(7)
+#define AUTO_ATI BIT(5)
 #define SETUP_COMPLETE BIT(6)
 #define WDT BIT(5)
+#define REATI BIT(2)
 #define TP_EVENT BIT(2)
 #define GESTURE_EVENT BIT(1)
 #define EVENT_MODE BIT(0)
@@ -58,6 +60,10 @@ LOG_MODULE_REGISTER(iqs5xx, CONFIG_ROAMYBOARD_INPUT_IQS5XX_LOG_LEVEL);
 #define FORCED_RETRY_US 200
 #define IDLE_TIMEOUT_NEVER 255
 #define IDLE_TIMEOUT_WHILE_ZMK_IDLE_S 1
+/** ATI takes a few cycles, and frames keep the error until it is done. */
+#define RETUNE_INTERVAL_MS 2000
+/** A trackpad that is still starting answers the probe with product number 0 or 256. */
+#define STARTUP_MS 3000
 
 #if defined(CONFIG_I2C_NRFX_TRANSFER_TIMEOUT) && CONFIG_I2C_NRFX_TRANSFER_TIMEOUT > 0
 #define MAX_REPORT_MS (CONFIG_I2C_NRFX_TRANSFER_TIMEOUT / 2)
@@ -92,6 +98,10 @@ struct iqs5xx_data {
     atomic_t zmk_active;
     /** The activity state that the trackpad's Idle timeout was last written for. */
     bool configured_active;
+    /** Uptime of the latest ATI that the driver asked for; INT64_MIN for none. */
+    int64_t retuned_at;
+    /** Whether the latest frame had ATI_ERROR, so that the change is logged once. */
+    bool ati_error;
 };
 
 static K_THREAD_STACK_DEFINE(iqs5xx_stack, CONFIG_ROAMYBOARD_INPUT_IQS5XX_THREAD_STACK_SIZE);
@@ -272,12 +282,13 @@ static int iqs5xx_configure(const struct device *dev) {
         return err;
     }
 
-    // Read-modify-write keeps the Re-ATI and switch input settings.
+    // Read-modify-write keeps the ALP Re-ATI and switch input settings. Re-ATI goes off: without
+    // a good ground, a touch looks like drift, and a Re-ATI under the finger fails.
     err = iqs5xx_read(dev, REG_SYSTEM_CONFIG_0, &reg, 1);
     if (iqs5xx_step(err, "reading System Config 0", REG_SYSTEM_CONFIG_0)) {
         return err;
     }
-    err = iqs5xx_write_u8(dev, REG_SYSTEM_CONFIG_0, reg | SETUP_COMPLETE | WDT);
+    err = iqs5xx_write_u8(dev, REG_SYSTEM_CONFIG_0, (reg & ~REATI) | SETUP_COMPLETE | WDT);
     if (iqs5xx_step(err, "writing System Config 0", REG_SYSTEM_CONFIG_0)) {
         return err;
     }
@@ -329,7 +340,11 @@ static void iqs5xx_feed(const struct device *dev, enum iqs5xx_input input, uint1
             iqs5xx_logic_release_all(&data->logic, &output);
             iqs5xx_report(dev, &output);
         }
-        if ((t.actions & IQS5XX_DO_WARN_PRODUCT) && product != data->warned_product) {
+        if ((t.actions & IQS5XX_DO_WARN_PRODUCT) && product != data->warned_product &&
+            k_uptime_get() < STARTUP_MS) {
+            LOG_DBG("The trackpad at 0x%02x is still starting (product number %u)",
+                    config->bus.addr, product);
+        } else if ((t.actions & IQS5XX_DO_WARN_PRODUCT) && product != data->warned_product) {
             LOG_WRN("The device at 0x%02x on %s has product number %u, not an IQS5xx-B000 "
                     "(40, 52 or 58); the trackpad driver ignores it",
                     config->bus.addr, config->bus.bus->name, product);
@@ -380,8 +395,26 @@ static void iqs5xx_service_window(const struct device *dev) {
     }
     iqs5xx_logic_frame(&data->logic, &frame, &output);
 
+    const bool ati_error = frame.system_info0 & IQS5XX_ATI_ERROR;
+    if (ati_error != data->ati_error) {
+        data->ati_error = ati_error;
+        if (ati_error) {
+            LOG_WRN("Trackpad calibration (ATI) failed%s",
+                    (frame.system_info0 & IQS5XX_REATI_OCCURRED) ? " in a Re-ATI" : "");
+        } else {
+            LOG_INF("Trackpad calibration (ATI) is good again");
+        }
+    }
+    if (iqs5xx_should_retune(&frame) && k_uptime_get() - data->retuned_at >= RETUNE_INTERVAL_MS) {
+        err = iqs5xx_write_u8(dev, REG_SYSTEM_CONTROL_0, AUTO_ATI);
+        if (!iqs5xx_step(err, "writing AUTO_ATI to System Control 0", REG_SYSTEM_CONTROL_0)) {
+            data->retuned_at = k_uptime_get();
+            LOG_INF("Trackpad recalibrating (ATI) with no finger down");
+        }
+    }
+
     const bool zmk_active = atomic_get(&data->zmk_active);
-    if (zmk_active != data->configured_active) {
+    if (!err && zmk_active != data->configured_active) {
         err = iqs5xx_write_u8(dev, REG_IDLE_TIMEOUT, iqs5xx_idle_timeout(zmk_active));
         if (!iqs5xx_step(err, "writing the Idle timeout", REG_IDLE_TIMEOUT)) {
             data->configured_active = zmk_active;
@@ -468,6 +501,7 @@ static int iqs5xx_init(const struct device *dev) {
     data->dev = dev;
     data->state = IQS5XX_ABSENT;
     data->warned_product = -1;
+    data->retuned_at = INT64_MIN / 2;
     iqs5xx_logic_init(&data->logic, config->scroll_divisor);
     atomic_set(&data->zmk_active, 1);
 

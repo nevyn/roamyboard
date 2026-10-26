@@ -224,6 +224,12 @@ Every time the halves connect, the left half discovers the right half's GATT ser
 
 So both of ours wait `CONFIG_ROAMYBOARD_SPLIT_CLIENT_DELAY_MS` (2 s) after the split link is encrypted before they discover anything, and the log relay waits 0.5 s longer than the PDA link. Each tries again `CONFIG_ROAMYBOARD_SPLIT_CLIENT_RETRY_MS` (1 s) after a discovery or subscription that failed or found nothing, up to 5 times per connection. The left half also raises `CONFIG_BT_ATT_TX_COUNT` from 10 to 16 (`roamyboard_left.conf`). Host traffic can still starve ZMK's discovery; reconnecting the halves gets a fresh one.
 
+### Calibration
+
+The IQS5xx calibrates itself with ATI (Automatic Tuning Implementation): it tunes each channel's compensation so that the untouched trackpad reads a target count, and a touch is a deviation from that. It runs ATI when it starts, and with Re-ATI on, again whenever counts drift out of a band. Without a good ground, as on battery with nothing else touching the module, a touch can look like drift: a Re-ATI then runs under the finger, misses its targets, and sets ATI_ERROR in System Info 0, and the trackpad tracks badly, with phantom second fingers, until the next good ATI. So the driver turns Re-ATI off in System Config 0, keeping the ALP channel's. When a frame reports ATI_ERROR with no finger down, the driver writes AUTO_ATI to System Control 0 for a fresh ATI, at most every 2 s, and logs when the calibration fails and when it is good again. During the first 3 s after boot, a trackpad that is still starting answers the probe with product number 0 or 256; the driver logs that at debug level only.
+
+Grounding is the cause, not the cure: on USB the trackpad tracks cleanly, and on battery it tracks better while a hand also touches the module. How well it tracks when worn is not tested yet.
+
 ### Power
 
 The IQS5xx switches between its modes by itself: Active and Idle-Touch while a finger is on it, Idle between touches, and LP1 and then LP2 after the timeouts of the modes before them. The driver sets the report intervals once and the Idle timeout from ZMK's activity state (`zmk_activity_state_changed`):

@@ -335,6 +335,18 @@ static void test_release_all(void) {
     CHECK_EQ(out.count, 0);
 }
 
+static void test_retune_after_a_failed_ati_once_lifted(void) {
+    struct iqs5xx_frame f = frame(0, 0, 1, 0, 0);
+    f.system_info0 = IQS5XX_ATI_ERROR;
+    CHECK(!iqs5xx_should_retune(&f));
+    f.fingers = 0;
+    CHECK(iqs5xx_should_retune(&f));
+    f.system_info0 = IQS5XX_REATI_OCCURRED;
+    CHECK(!iqs5xx_should_retune(&f));
+    f.system_info0 = IQS5XX_ATI_ERROR | IQS5XX_REATI_OCCURRED | 2;
+    CHECK(iqs5xx_should_retune(&f));
+}
+
 static void test_products(void) {
     CHECK(iqs5xx_product_known(58));
     CHECK(iqs5xx_product_known(40));
@@ -413,6 +425,7 @@ int main(void) {
     test_scroll_emits_no_movement();
     test_lift_drops_the_scroll_remainder();
     test_release_all();
+    test_retune_after_a_failed_ati_once_lifted();
     test_products();
     test_transitions_absent();
     test_transitions_configuring();
