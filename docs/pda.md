@@ -131,7 +131,7 @@ ZMK calls listeners in the order of the `.event_subscription` section, which is 
 
 ## Split data channel
 
-ZMK's split link carries a fixed set of messages, so the PDA brings its own GATT service on the peripheral (`zmk/src/pda/peripheral.c`, UUIDs in `zmk/src/pda/link.h`). The central, which is already the GATT client on the split connection, discovers it once the link is encrypted, and subscribes. Both characteristics require encryption; the split link is bonded.
+ZMK's split link carries a fixed set of messages, so the PDA brings its own GATT service on the peripheral (`zmk/src/pda/peripheral.c`, UUIDs in `zmk/src/pda/link.h`). The central, which is already the GATT client on the split connection, discovers it 2 s after the link is encrypted, so that ZMK's own discovery runs alone ([Firmware](firmware.md), Split clients), and subscribes. Both characteristics require encryption; the split link is bonded.
 
 | Direction | Characteristic | Message | Bytes |
 |---|---|---|---|

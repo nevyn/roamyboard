@@ -77,6 +77,23 @@ static struct bt_gatt_discover_params discover_params;
 static struct bt_gatt_discover_params ccc_discover_params;
 static struct bt_gatt_subscribe_params subscribe_params;
 static uint16_t service_end_handle;
+/** Discovery attempts on the current split link; the receive thread and the work queue count. */
+static atomic_t discovery_attempts;
+#define DISCOVERY_ATTEMPTS_MAX 5
+
+static void discover_handler(struct k_work *work);
+static K_WORK_DELAYABLE_DEFINE(discover_work, discover_handler);
+
+/** Schedules another discovery after a failure, or gives up after DISCOVERY_ATTEMPTS_MAX. */
+static void retry_discovery(const char *what, int err) {
+    if (atomic_inc(&discovery_attempts) + 1 >= DISCOVERY_ATTEMPTS_MAX) {
+        LOG_ERR("PDA link gave up after %d attempts: %s (%d); is the peripheral's firmware older?",
+                DISCOVERY_ATTEMPTS_MAX, what, err);
+        return;
+    }
+    LOG_WRN("PDA link: %s (%d); trying again", what, err);
+    k_work_reschedule(&discover_work, K_MSEC(CONFIG_ROAMYBOARD_SPLIT_CLIENT_RETRY_MS));
+}
 
 /* Messages to the peripheral, sent in order from the system work queue. */
 struct outgoing {
@@ -443,7 +460,7 @@ static uint8_t notify_func(struct bt_conn *conn, struct bt_gatt_subscribe_params
 
 static void subscribed(struct bt_conn *conn, uint8_t err, struct bt_gatt_subscribe_params *params) {
     if (err) {
-        LOG_ERR("PDA link subscribe failed: ATT error 0x%02x", err);
+        retry_discovery("subscribing failed with ATT error", err);
         return;
     }
     LOG_INF("PDA link ready");
@@ -458,8 +475,7 @@ static uint8_t chrc_discovered(struct bt_conn *conn, const struct bt_gatt_attr *
         const bool found = to_peripheral_handle != 0 && subscribe_params.value_handle != 0;
         k_mutex_unlock(&lock);
         if (!found) {
-            LOG_ERR("PDA service lacks a characteristic: to-peripheral %u, to-central %u",
-                    to_peripheral_handle, subscribe_params.value_handle);
+            retry_discovery("the PDA service's characteristics were not found", -ENOENT);
             return BT_GATT_ITER_STOP;
         }
         subscribe_params.notify = notify_func;
@@ -471,7 +487,7 @@ static uint8_t chrc_discovered(struct bt_conn *conn, const struct bt_gatt_attr *
         atomic_set_bit(subscribe_params.flags, BT_GATT_SUBSCRIBE_FLAG_VOLATILE);
         const int err = bt_gatt_subscribe(conn, &subscribe_params);
         if (err && err != -EALREADY) {
-            LOG_ERR("PDA link subscribe failed: %d", err);
+            retry_discovery("subscribing failed", err);
         }
         return BT_GATT_ITER_STOP;
     }
@@ -490,7 +506,7 @@ static uint8_t chrc_discovered(struct bt_conn *conn, const struct bt_gatt_attr *
 static uint8_t service_discovered(struct bt_conn *conn, const struct bt_gatt_attr *attr,
                                   struct bt_gatt_discover_params *params) {
     if (attr == NULL) {
-        LOG_WRN("The split peripheral has no PDA service; is its firmware older?");
+        retry_discovery("the PDA service was not found", -ENOENT);
         return BT_GATT_ITER_STOP;
     }
     const struct bt_gatt_service_val *service = attr->user_data;
@@ -502,7 +518,7 @@ static uint8_t service_discovered(struct bt_conn *conn, const struct bt_gatt_att
     discover_params.type = BT_GATT_DISCOVER_CHARACTERISTIC;
     const int err = bt_gatt_discover(conn, &discover_params);
     if (err) {
-        LOG_ERR("PDA characteristic discovery failed to start: %d", err);
+        retry_discovery("characteristic discovery failed to start", err);
     }
     return BT_GATT_ITER_STOP;
 }
@@ -512,7 +528,34 @@ static bool is_split_link(struct bt_conn *conn) {
     return bt_conn_get_info(conn, &info) == 0 && info.role == BT_CONN_ROLE_CENTRAL;
 }
 
-/** Discovery starts once the split link is encrypted, since the service requires it. */
+static void discover_handler(struct k_work *work) {
+    k_mutex_lock(&lock, K_FOREVER);
+    struct bt_conn *conn = link_conn ? bt_conn_ref(link_conn) : NULL;
+    to_peripheral_handle = 0;
+    k_mutex_unlock(&lock);
+    if (conn == NULL) {
+        return;
+    }
+    memset(&subscribe_params, 0, sizeof(subscribe_params));
+    static const struct bt_uuid_128 service_uuid = BT_UUID_INIT_128(PDA_LINK_SERVICE_UUID);
+    discover_params = (struct bt_gatt_discover_params){
+        .uuid = &service_uuid.uuid,
+        .func = service_discovered,
+        .start_handle = BT_ATT_FIRST_ATTRIBUTE_HANDLE,
+        .end_handle = BT_ATT_LAST_ATTRIBUTE_HANDLE,
+        .type = BT_GATT_DISCOVER_PRIMARY,
+    };
+    const int err = bt_gatt_discover(conn, &discover_params);
+    bt_conn_unref(conn);
+    if (err) {
+        retry_discovery("service discovery failed to start", err);
+    }
+}
+
+/**
+ * Discovery starts once the split link is encrypted, since the service requires it, and after
+ * ZMK's own split discovery has had CONFIG_ROAMYBOARD_SPLIT_CLIENT_DELAY_MS to run alone.
+ */
 static void security_changed(struct bt_conn *conn, bt_security_t level,
                              enum bt_security_err err) {
     if (err || level < BT_SECURITY_L2 || !is_split_link(conn)) {
@@ -527,19 +570,8 @@ static void security_changed(struct bt_conn *conn, bt_security_t level,
     to_peripheral_handle = 0;
     k_mutex_unlock(&lock);
 
-    memset(&subscribe_params, 0, sizeof(subscribe_params));
-    static const struct bt_uuid_128 service_uuid = BT_UUID_INIT_128(PDA_LINK_SERVICE_UUID);
-    discover_params = (struct bt_gatt_discover_params){
-        .uuid = &service_uuid.uuid,
-        .func = service_discovered,
-        .start_handle = BT_ATT_FIRST_ATTRIBUTE_HANDLE,
-        .end_handle = BT_ATT_LAST_ATTRIBUTE_HANDLE,
-        .type = BT_GATT_DISCOVER_PRIMARY,
-    };
-    const int disc_err = bt_gatt_discover(conn, &discover_params);
-    if (disc_err) {
-        LOG_ERR("PDA service discovery failed to start: %d", disc_err);
-    }
+    atomic_set(&discovery_attempts, 0);
+    k_work_reschedule(&discover_work, K_MSEC(CONFIG_ROAMYBOARD_SPLIT_CLIENT_DELAY_MS));
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason) {
@@ -553,6 +585,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason) {
     to_peripheral_handle = 0;
     text_rx_len = 0;
     k_mutex_unlock(&lock);
+    k_work_cancel_delayable(&discover_work);
     atomic_clear(&link_ready);
     LOG_INF("PDA link down (reason 0x%02x)", reason);
     set_cat_away(false);

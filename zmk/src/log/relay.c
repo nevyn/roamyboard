@@ -150,7 +150,21 @@ static void ready_handler(struct k_work *work) {
 
 static K_WORK_DEFINE(ready_work, ready_handler);
 
+/** Discovery attempts on the current split link; the receive thread and the work queue count. */
+static atomic_t discovery_attempts;
+#define DISCOVERY_ATTEMPTS_MAX 5
+/** Starts after the PDA link's discovery, so that the two don't contend for ATT requests. */
+#define DISCOVERY_STAGGER_MS 500
+
+static void discover_handler(struct k_work *work);
+static K_WORK_DELAYABLE_DEFINE(discover_work, discover_handler);
+
+/** Tries the discovery again after a failure, and reports it once it gives up. */
 static void link_failed(int err) {
+    if (atomic_inc(&discovery_attempts) + 1 < DISCOVERY_ATTEMPTS_MAX) {
+        k_work_reschedule(&discover_work, K_MSEC(CONFIG_ROAMYBOARD_SPLIT_CLIENT_RETRY_MS));
+        return;
+    }
     atomic_set(&link_failure, err);
     roamy_log_submit(&problems_work);
 }
@@ -254,7 +268,43 @@ static bool is_split_link(struct bt_conn *conn) {
     return bt_conn_get_info(conn, &info) == 0 && info.role == BT_CONN_ROLE_CENTRAL;
 }
 
-/** Discovery starts once the split link is encrypted, since the service requires it. */
+static void discover_handler(struct k_work *work) {
+    struct bt_conn *conn = NULL;
+    K_SPINLOCK(&lock) {
+        if (link_conn) {
+            conn = bt_conn_ref(link_conn);
+        }
+        command_handle = 0;
+    }
+    if (conn == NULL) {
+        return;
+    }
+    memset(&subscribe_params, 0, sizeof(subscribe_params));
+    if (atomic_get(&discovery_attempts) == 0) {
+        // A larger ATT MTU carries a record in fewer notifications; ZMK leaves it at 23.
+        mtu_params.func = mtu_exchanged;
+        (void)bt_gatt_exchange_mtu(conn, &mtu_params);
+    }
+
+    static const struct bt_uuid_128 service_uuid = BT_UUID_INIT_128(ROAMY_LOG_SERVICE_UUID);
+    discover_params = (struct bt_gatt_discover_params){
+        .uuid = &service_uuid.uuid,
+        .func = service_discovered,
+        .start_handle = BT_ATT_FIRST_ATTRIBUTE_HANDLE,
+        .end_handle = BT_ATT_LAST_ATTRIBUTE_HANDLE,
+        .type = BT_GATT_DISCOVER_PRIMARY,
+    };
+    const int err = bt_gatt_discover(conn, &discover_params);
+    bt_conn_unref(conn);
+    if (err) {
+        link_failed(err);
+    }
+}
+
+/**
+ * Discovery starts once the split link is encrypted, since the service requires it, and after
+ * ZMK's own split discovery and the PDA link's have had time to run alone.
+ */
 static void security_changed(struct bt_conn *conn, bt_security_t level,
                              enum bt_security_err err) {
     if (err || level < BT_SECURITY_L2 || !is_split_link(conn)) {
@@ -272,24 +322,9 @@ static void security_changed(struct bt_conn *conn, bt_security_t level,
         return;
     }
     log_frame_reassembler_init(&reassembler);
-    memset(&subscribe_params, 0, sizeof(subscribe_params));
-
-    // A larger ATT MTU carries a record in fewer notifications; ZMK leaves it at 23.
-    mtu_params.func = mtu_exchanged;
-    (void)bt_gatt_exchange_mtu(conn, &mtu_params);
-
-    static const struct bt_uuid_128 service_uuid = BT_UUID_INIT_128(ROAMY_LOG_SERVICE_UUID);
-    discover_params = (struct bt_gatt_discover_params){
-        .uuid = &service_uuid.uuid,
-        .func = service_discovered,
-        .start_handle = BT_ATT_FIRST_ATTRIBUTE_HANDLE,
-        .end_handle = BT_ATT_LAST_ATTRIBUTE_HANDLE,
-        .type = BT_GATT_DISCOVER_PRIMARY,
-    };
-    const int disc_err = bt_gatt_discover(conn, &discover_params);
-    if (disc_err) {
-        link_failed(disc_err);
-    }
+    atomic_set(&discovery_attempts, 0);
+    k_work_reschedule(&discover_work,
+                      K_MSEC(CONFIG_ROAMYBOARD_SPLIT_CLIENT_DELAY_MS + DISCOVERY_STAGGER_MS));
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason) {
@@ -304,6 +339,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason) {
     }
     if (ours) {
         atomic_clear(&link_ready);
+        k_work_cancel_delayable(&discover_work);
     }
 }
 

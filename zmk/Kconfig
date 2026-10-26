@@ -105,6 +105,29 @@ config ROAMYBOARD_PDA_TYPE_OUT_STEP_MS
       The central types a note out to the host as one press or release per
       step. Raise it if the host drops characters.
 
+config ROAMYBOARD_SPLIT_CLIENT_DELAY_MS
+    int "Milliseconds that the split central's own GATT clients wait after encryption"
+    default 2000
+    range 0 10000
+    depends on ZMK_SPLIT_BLE && ZMK_SPLIT_ROLE_CENTRAL
+    help
+      The PDA link and the log relay start discovering the peripheral's
+      services this long after the split link is encrypted, so that ZMK's
+      own split discovery runs alone. ZMK's discovery ends silently when it
+      cannot send an ATT request, and then never subscribes to the
+      peripheral's input events. docs/firmware.md (Split clients)
+      describes it.
+
+config ROAMYBOARD_SPLIT_CLIENT_RETRY_MS
+    int "Milliseconds before the split central's own GATT clients try again"
+    default 1000
+    range 100 10000
+    depends on ZMK_SPLIT_BLE && ZMK_SPLIT_ROLE_CENTRAL
+    help
+      After a discovery or subscription that failed or ended without what
+      it looked for, the PDA link and the log relay try again this much
+      later, up to 5 times per connection.
+
 DT_COMPAT_ROAMYBOARD_BEHAVIOR_PDA := roamyboard,behavior-pda
 
 config ROAMYBOARD_BEHAVIOR_PDA

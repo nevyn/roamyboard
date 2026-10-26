@@ -218,6 +218,12 @@ The driver keeps the scroll counts that do not make a full step for the next fra
 
 The right half sends the events to the left half over ZMK's input split: `roamyboard_right.overlay` has a `zmk,input-split` node with reg 0 for the trackpad. The left half's proxy node with the same reg raises them again, and its `zmk,input-listener` reports them to the host (`roamyboard_left.overlay`). `CONFIG_ZMK_POINTING` in `zmk/config/roamyboard.conf` turns on input support on both halves.
 
+### Split clients
+
+Every time the halves connect, the left half discovers the right half's GATT services. ZMK's own discovery finds the input split's characteristic, then its CCC and CPF descriptors, and only then subscribes, with each step sent from the callback of the step before. When Zephyr cannot send a step, because no ATT request or buffer is free, it ends the discovery as if it were complete (`gatt_discover_next` in Zephyr's `gatt.c`). ZMK then never subscribes to the trackpad's events, without a warning, and the pointer stays still until the halves reconnect. The left half's ATT buffers are shared by the hosts and the split link, and two more GATT clients of ours use the split link: the PDA link ([Micro PDA](pda.md)) and the log relay ([Logging](logging.md)).
+
+So both of ours wait `CONFIG_ROAMYBOARD_SPLIT_CLIENT_DELAY_MS` (2 s) after the split link is encrypted before they discover anything, and the log relay waits 0.5 s longer than the PDA link. Each tries again `CONFIG_ROAMYBOARD_SPLIT_CLIENT_RETRY_MS` (1 s) after a discovery or subscription that failed or found nothing, up to 5 times per connection. The left half also raises `CONFIG_BT_ATT_TX_COUNT` from 10 to 16 (`roamyboard_left.conf`). Host traffic can still starve ZMK's discovery; reconnecting the halves gets a fresh one.
+
 ### Power
 
 The IQS5xx switches between its modes by itself: Active and Idle-Touch while a finger is on it, Idle between touches, and LP1 and then LP2 after the timeouts of the modes before them. The driver sets the report intervals once and the Idle timeout from ZMK's activity state (`zmk_activity_state_changed`):
