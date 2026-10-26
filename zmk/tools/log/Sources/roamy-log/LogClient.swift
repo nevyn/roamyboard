@@ -40,6 +40,14 @@ func fail(_ message: String) -> Never {
         Swift.print(line)
         file?.write(Data((line + "\n").utf8))
     }
+
+    /// Flushes stdout and the save file, then ends the process without running exit()'s teardown.
+    func quit(_ code: Int32) -> Never {
+        fflush(stdout)
+        try? file?.synchronize()
+        // exit() runs atexit handlers, which can stall on CoreBluetooth's threads while notifications still arrive.
+        _exit(code)
+    }
 }
 
 /// Finds the keyboard, runs a log session on it, and keeps the session going across dropped links.
@@ -156,15 +164,26 @@ func fail(_ message: String) -> Never {
         }
     }
 
-    /// Ends the session, so that the firmware sets its levels back to info, and quits.
+    /// Ends the session, so that the firmware sets its levels back to info, and quits once the keyboard
+    /// has acknowledged both the stop command and the unsubscription, or after 1 s.
     func stop() {
-        if stopping { exit(0) }
+        if stopping { printer.quit(0) }
         stopping = true
-        guard let peripheral, peripheral.state == .connected, let command, let records else { exit(0) }
+        // A second Ctrl-C kills the process even if the main thread never gets back to its queue.
+        signal(SIGINT, SIG_DFL)
+        signal(SIGTERM, SIG_DFL)
+        guard let peripheral, peripheral.state == .connected, let command, let records else { printer.quit(0) }
         pendingWrites.append(Commands.stop)
         peripheral.writeValue(Data(Commands.stop.utf8), for: command, type: .withResponse)
         peripheral.setNotifyValue(false, for: records)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { exit(0) }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [printer] in printer.quit(0) }
+    }
+
+    private var stopWritten = false
+    private var unsubscribed = false
+
+    private func quitIfStopAcknowledged() {
+        if stopWritten && unsubscribed { printer.quit(0) }
     }
 }
 
@@ -208,7 +227,7 @@ extension LogClient: @MainActor CBCentralManagerDelegate {
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral,
                         error: (any Error)?) {
-        if stopping { exit(0) }
+        if stopping { printer.quit(0) }
         records = nil
         command = nil
         pendingWrites.removeAll()
@@ -243,7 +262,12 @@ extension LogClient: @MainActor CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic,
                     error: (any Error)?) {
-        guard characteristic.uuid == recordsCharacteristic, !stopping else { return }
+        guard characteristic.uuid == recordsCharacteristic else { return }
+        if stopping {
+            unsubscribed = unsubscribed || !characteristic.isNotifying || error != nil
+            quitIfStopAcknowledged()
+            return
+        }
         if let error {
             fail(describe(error, doing: "subscribing to the records"))
         }
@@ -252,7 +276,12 @@ extension LogClient: @MainActor CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: (any Error)?) {
         let text = pendingWrites.isEmpty ? "?" : pendingWrites.removeFirst()
-        guard let error, !stopping else { return }
+        if stopping {
+            if text == Commands.stop { stopWritten = true }
+            quitIfStopAcknowledged()
+            return
+        }
+        guard let error else { return }
         if let attError = error as? CBATTError, attError.code.rawValue == LogService.badCommandATTError {
             fail("the firmware does not understand the command \"\(text)\"; is it older than this roamy-log?")
         }
