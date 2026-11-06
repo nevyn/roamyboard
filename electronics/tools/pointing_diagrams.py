@@ -4,7 +4,7 @@
 
 pointing-rework.svg: the MCU module rework, on the socket board's back with the nice!nano underside up, laid out
 like bench-wiring.svg. Pad positions come from KeyModule.kicad_pcb.
-pointing-bench.svg: the IQS572's pins for ringing out the TPS48's pads, and the jumpers into the MCU module's sockets.
+pointing-bench.svg: the TPS48's solder pads by silkscreen, and the jumpers from them into the MCU module's sockets.
 pointing-u1-marker.svg: K's board marks the pointing module: U1 pin 5 lifted off its pad and wired to pin 16.
 """
 import math, pathlib
@@ -98,58 +98,53 @@ def rework():
 
 
 def bench():
-    b = [text(30, 36, "Find the TPS48's pads", 16, weight="bold"),
-         text(30, 54, "Ring each solder pad on the module's back out against the IQS572's pins (continuity beep).", 11),
-         text(30, 69, "The datasheet draws only the GPIO variant (silkscreen IO1..IO5, GND, 3V3); the I2C mapping is not published.", 11)]
-    # IQS572 QFN28, top view: pins 1-7 down the left, 8-14 along the bottom, 15-21 up the right, 22-28 along the top
-    cx, cy, half, step = 200.0, 260.0, 105.0, 26.0
-    b.append(f'<rect x="{cx - half}" y="{cy - half}" width="{2 * half}" height="{2 * half}" rx="8" fill="#2b2b2b" stroke="#000"/>')
-    b.append(f'<circle cx="{cx - half + 18}" cy="{cy - half + 18}" r="6" fill="#777"/>')
-    b.append(text(cx, cy - 6, "IQS572", 16, "middle", "bold", "#eee"))
-    b.append(text(cx, cy + 14, "QFN28, top view", 11, "middle", fill="#ccc"))
-    b.append(text(cx, cy + 30, "dot = pin 1", 10, "middle", fill="#ccc"))
-    sig = {2: ("SDA", SDA), 3: ("SCL", SCL), 4: ("VDDHI", VCC), 5: ("VSS", GND), 7: ("NRST", "#7f7f7f"), 8: ("RDY", INT)}
-    for p in range(1, 29):
-        side, i = (p - 1) // 7, (p - 1) % 7
-        off = (i - 3) * step
-        x, y, ax, ay, anchor = {0: (cx - half - 8, cy + off, -1, 0, "end"), 1: (cx + off, cy + half + 8, 0, 1, "middle"),
-                                2: (cx + half + 8, cy - off, 1, 0, "start"), 3: (cx - off, cy - half - 8, 0, -1, "middle")}[side]
-        name, color = sig.get(p, ("", "#999"))
-        w, h = (14, 7) if side in (0, 2) else (7, 14)
-        b.append(f'<rect x="{x - w / 2 + ax * 4:.1f}" y="{y - h / 2 + ay * 4:.1f}" width="{w}" height="{h}" fill="{color if name else "#c9a227"}"/>')
-        tx, ty = x + ax * 18, y + ay * 22 + 4
-        label = f"{p} {name}" if name and side == 0 else (f"{name} {p}" if name else str(p))
-        b.append(text(tx, ty, label, 11 if name else 9, anchor, "bold" if name else "normal", color if name else "#777"))
-    b.append(text(cx, cy + half + 62, "Pins from the IQS5xx-B000 datasheet, p. 11.", 10, "middle", fill="#555"))
+    b = [text(30, 36, "Wire the TPS48 to the MCU module's sockets", 16, weight="bold"),
+         text(30, 54, "Pads by their silkscreen on the trackpad's back, in order from the notch end. Schematic, not to scale.", 11)]
+    # trackpad back: the seven solder pads in a column, notch end at the top
+    px, py0, pitch = 210.0, 178.0, 36.0
+    pads = [("IO4", None, None), ("IO5", "RDY", INT), ("GND", "VSS", GND), ("3V3", "VDDHI", VCC),
+            ("IO1", "SCL", SCL), ("IO2", "SDA", SDA), ("IO3", None, None)]
+    b.append(f'<path d="M60,{py0 - 34} H{px - 26} L{px + 6},{py0 - 34 + 32} V{py0 + 6 * pitch + 34} H60 Z" fill="#3d2b5a" stroke="#222"/>')
+    b.append(text(px - 4, py0 - 42, "notch end", 10, "end", fill="#555"))
+    b.append(text(110, py0 + 3 * pitch + 4, "TPS48 back", 12, "middle", "bold", "#eee"))
+    pad_y = {}
+    for i, (name, chip, color) in enumerate(pads):
+        y = py0 + i * pitch
+        pad_y[name] = y
+        b.append(f'<rect x="{px - 16}" y="{y - 7}" width="16" height="14" fill="#c9a227"/>')
+        b.append(text(px - 22, y + 5, name, 13, "end", "bold", "#fff"))
+        if chip is None:
+            b.append(text(px + 12, y + 4, "leave empty", 10, fill="#999"))
 
-    # MCU module socket face: J_LEFT1 at the SW5 end, J_LEFT3 near the SW1 end; jumper per signal
-    b += [text(600, 120, "Bench: jumpers into the MCU module's sockets", 14, "middle", "bold"),
-          text(600, 136, "socket face of the rewired MCU module, no key modules attached", 10, "middle", fill="#555")]
-    fx0, fy0, s = 470.0, 160.0, 2.6
+    # MCU module socket face: J_LEFT1 at the SW5 end, J_LEFT3 near the SW1 end
+    fx0, fy0, s = 640.0, 160.0, 2.6
     fy = lambda y: fy0 + (y - 40) * s
     b.append(f'<rect x="{fx0}" y="{fy(40)}" width="40" height="{100 * s}" rx="4" fill="#ddd" stroke="#888"/>')
     b.append(text(fx0 + 20, fy(40) - 6, "SW5 end (USB-C)", 9, "middle", fill="#555"))
     b.append(text(fx0 + 20, fy(140) + 14, "SW1 end", 9, "middle", fill="#555"))
+    b.append(text(fx0 + 20, fy(140) + 30, "MCU module, socket face", 10, "middle", fill="#555"))
     fp = footprints()
-    jump = {("J_LEFT3", "1"): ("INT", "RDY", INT), ("J_LEFT1", "2"): ("+3.3V", "VDDHI", VCC), ("J_LEFT1", "3"): ("GND", "VSS", GND),
-            ("J_LEFT3", "2"): ("SDA", "SDA", SDA), ("J_LEFT3", "3"): ("SCL", "SCL", SCL)}
+    jump = {("J_LEFT3", "1"): ("INT", "IO5", INT, 330), ("J_LEFT1", "2"): ("+3.3V", "3V3", VCC, 450),
+            ("J_LEFT1", "3"): ("GND", "GND", GND, 390), ("J_LEFT3", "2"): ("SDA", "IO2", SDA, 570),
+            ("J_LEFT3", "3"): ("SCL", "IO1", SCL, 510)}
     for ref in ("J_LEFT1", "J_LEFT2", "J_LEFT3"):
         mid = fy(fp[ref]["2"][1])
-        if ref == "J_LEFT2":
-            b.append(text(fx0 + 50, mid + 4, "J_LEFT2: leave empty", 10, fill="#999"))
         for n, (_, y, net) in fp[ref].items():
-            yy, ly = fy(y), mid + (int(n) - 2) * 24
+            yy, ly = fy(y), mid + (int(n) - 2) * 22
             b.append(f'<rect x="{fx0 + 14}" y="{yy - 3}" width="12" height="6" fill="#111"/>')
             j = jump.get((ref, n))
             if j:
-                b.append(line([(fx0 + 26, yy), (560, yy), (590, ly), (640, ly)], j[2], 3))
-                b.append(text(646, ly + 4, f"pin {n} {j[0]}  to the pad's {j[1]}", 11, weight="bold", fill=j[2]))
+                sig, pad, color, elbow = j
+                b.append(line([(px, pad_y[pad]), (elbow, pad_y[pad]), (elbow, yy), (fx0 + 14, yy)], color, 3))
+                b.append(line([(fx0 + 26, yy), (fx0 + 54, ly), (fx0 + 62, ly)], color, 1.5))
+                b.append(text(fx0 + 68, ly + 4, f"pin {n}  {sig}  from {pad}", 11, weight="bold", fill=color))
             elif ref == "J_LEFT1":
-                b.append(text(646, ly + 4, f"pin {n} (+5V, later LED): leave empty", 10, fill="#999"))
-        if ref != "J_LEFT2":
-            b.append(text(560, mid - 44, ref, 11, "middle", "bold"))
-    notes = ["Solder short stranded wires to the pad's VDDHI, VSS, SDA, SCL and RDY pads, with male Dupont pins at the far end.",
-             "Leave NRST unconnected: the IQS572 pulls it up itself.",
+                b.append(line([(fx0 + 26, yy), (fx0 + 54, ly), (fx0 + 62, ly)], "#bbb", 1))
+                b.append(text(fx0 + 68, ly + 4, f"pin {n}  +5V, later LED: leave empty", 10, fill="#999"))
+        b.append(text(fx0 + 68, mid - 40 if ref != "J_LEFT2" else mid + 4, ref if ref != "J_LEFT2" else "J_LEFT2: leave empty",
+                      11 if ref != "J_LEFT2" else 10, weight="bold" if ref != "J_LEFT2" else "normal", fill="#222" if ref != "J_LEFT2" else "#999"))
+    notes = ["IO3 and IO4 stay unconnected. The trackpad has no NRST pad: the IQS572 pulls it up itself.",
+             "In IQS572 terms: IO5 is RDY (pin 8), IO2 SDA (pin 2), IO1 SCL (pin 3), 3V3 VDDHI (pin 4), GND VSS (pin 5).",
              "Switch the half off before you plug the jumpers in. With the pad in the sockets, this half reads 0 key modules.",
              "Tape a 1 to 2 mm plastic overlay on the pad's face, without air gaps, and leave solder link S1 open."]
     b += [text(30, 470 + 18 * i, t, 11) for i, t in enumerate(notes)]

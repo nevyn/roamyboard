@@ -44,7 +44,7 @@ The TPS48-P203 has seven solder pads on its back and no connector. They carry th
 
 ## 3. Prepare the pad
 
-1. Solder short stranded wires to the pad's VDDHI, VSS, SDA, SCL and RDY pads, with male Dupont pins at their far ends. Leave NRST unconnected: the IQS572 pulls it up itself.
+1. Solder short stranded wires to the 3V3, GND, IO2, IO1 and IO5 pads, with male Dupont pins at their far ends. Leave IO3 and IO4 unconnected. The pad has no NRST pad: the IQS572 pulls NRST up itself.
 2. Leave solder link S1 open. Open selects the tuning for a 1 to 2 mm overlay.
 3. Tape a 1 to 2 mm plastic overlay to the pad's sensing face with double-sided tape, without air gaps. Azoteq requires an overlay for the pad to work as specified.
 
@@ -52,13 +52,13 @@ The TPS48-P203 has seven solder pads on its back and no connector. They carry th
 
 1. Switch the right half off. Plug the jumpers into the MCU module's socket mouths:
 
-   | Socket | Pad |
+   | Pad | Socket |
    | --- | --- |
-   | J_LEFT3 pin 1, INT | RDY |
-   | J_LEFT1 pin 2, +3.3V | VDDHI |
-   | J_LEFT1 pin 3, GND | VSS |
-   | J_LEFT3 pin 2, SDA | SDA |
-   | J_LEFT3 pin 3, SCL | SCL |
+   | IO5 (RDY) | J_LEFT3 pin 1, INT |
+   | 3V3 | J_LEFT1 pin 2, +3.3V |
+   | GND | J_LEFT1 pin 3, GND |
+   | IO2 (SDA) | J_LEFT3 pin 2, SDA |
+   | IO1 (SCL) | J_LEFT3 pin 3, SCL |
 
 2. Switch on. The pad occupies the sockets, so the right half reads 0 key modules; type on the left half.
 3. Flash the driver build on both halves: the right half runs the pad's driver, and the left half receives its events.

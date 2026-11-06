@@ -600,7 +600,7 @@
       </ol>
       <p>In the <a href="#point-assembly">assembly</a>, the trackpad goes into the upturned shell first: pressed into its pocket by its own adhesive, with its solder pads over V's half. Its wires drop into V's open bay and reach K's board round its socket-side edge.</p>
     </div>
-    <div class="step-media"><figure><img class="diagram" src="../images/pointing-bench.svg" alt="The IQS572's pins and the trackpad's solder pads"><figcaption>From electronics/Pointing module bench.md. Click to enlarge.</figcaption></figure>
+    <div class="step-media"><figure><img class="diagram" src="../images/pointing-bench.svg" alt="The trackpad's seven solder pads by silkscreen, IO4 at the notch end, and which J_LEFT pin each one goes to"><figcaption>The bench wiring, into the MCU module's sockets. On K's board, each pad goes to the J_LEFT pad with the same connector and pin number. Click to enlarge.</figcaption></figure>
       <div class="photo-slot"><b>Photo wanted</b>The trackpad's back with its five wires.</div></div></div>
   </article>
 
@@ -637,17 +637,18 @@
   <article class="step" id="point-pad-wiring" data-title="Wire the trackpad to K's board">
     <div class="step-head"><button class="done-toggle" aria-label="Mark done"></button><span class="tag">Solder</span><h3>Wire the trackpad to K's board</h3><a class="anchor" href="#point-pad-wiring">#</a></div>
     <div class="step-body single"><div class="step-text">
-      <p>The trackpad's wires land on the same J_LEFT pads as the loose sockets' wires. K's board carries them to its headers, and on to the MCU module's J_LEFT3, where the pull-ups are. Hover a signal to find it in every table.</p>
-      <div class="table-wrap"><table><thead><tr><th>Signal</th><th>Trackpad</th><th>K's board</th></tr></thead><tbody>
-        <tr data-signal="vcc"><td>+3.3V</td><td>3V3</td><td>J_LEFT1 pin 2</td></tr>
-        <tr data-signal="gnd"><td>GND</td><td>GND</td><td>J_LEFT1 pin 3</td></tr>
-        <tr data-signal="int"><td>INT</td><td>IO5 (RDY)</td><td>J_LEFT3 pin 1</td></tr>
-        <tr data-signal="sda"><td>SDA</td><td>IO2</td><td>J_LEFT3 pin 2</td></tr>
-        <tr data-signal="scl"><td>SCL</td><td>IO1</td><td>J_LEFT3 pin 3</td></tr>
+      <p>The trackpad's wires land on the same J_LEFT pads as the loose sockets' wires. K's board carries them to its headers, and on to the MCU module's J_LEFT3, where the pull-ups are. The trackpad's pads go by their silkscreen. Hover a signal to find it in every table.</p>
+      <div class="table-wrap"><table><thead><tr><th>Trackpad pad</th><th>K's board</th><th>Signal</th></tr></thead><tbody>
+        <tr data-signal="vcc"><td>3V3</td><td>J_LEFT1 pin 2</td><td>+3.3V</td></tr>
+        <tr data-signal="gnd"><td>GND</td><td>J_LEFT1 pin 3</td><td>GND</td></tr>
+        <tr data-signal="int"><td>IO5</td><td>J_LEFT3 pin 1</td><td>INT</td></tr>
+        <tr data-signal="sda"><td>IO2</td><td>J_LEFT3 pin 2</td><td>SDA</td></tr>
+        <tr data-signal="scl"><td>IO1</td><td>J_LEFT3 pin 3</td><td>SCL</td></tr>
+        <tr><td>IO3, IO4</td><td>none</td><td>unused</td></tr>
       </tbody></table></div>
       <ol class="do">
         <li>Solder the five wires to their pads, beside the loose sockets' wires.</li>
-        <li>Check with a meter: continuity from each trackpad pad to the matching pin of K's headers (J_RIGHT1 and J_RIGHT3), and no short between +3.3V, GND, INT, SDA and SCL.</li>
+        <li>Check with a meter: continuity from each of the trackpad's 3V3, GND, IO5, IO2 and IO1 pads to the matching pin of K's headers (J_RIGHT1 and J_RIGHT3), and no short between any two of them.</li>
       </ol>
     </div></div>
   </article>
