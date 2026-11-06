@@ -5,6 +5,7 @@
 pointing-rework.svg: the MCU module rework, on the socket board's back with the nice!nano underside up, laid out
 like bench-wiring.svg. Pad positions come from KeyModule.kicad_pcb.
 pointing-bench.svg: the IQS572's pins for ringing out the TPS48's pads, and the jumpers into the MCU module's sockets.
+pointing-u1-marker.svg: K's board marks the pointing module: U1 pin 5 lifted off its pad and wired to pin 16.
 """
 import math, pathlib
 from board_pads import footprints
@@ -155,7 +156,76 @@ def bench():
     return svg(980, 560, b)
 
 
+def marker():
+    fp = footprints()
+    u1 = fp["U1"]
+    s, x0, y0 = 44.0, 40.0, 150.0                     # back view, as in pointing-rework.svg, zoomed on U1
+    bx = lambda x: x0 + (87.0 - x) * s
+    by = lambda y: y0 + (y - 92.0) * s
+    lift, gnd, wire = "#e67e22", "#555555", "#2ca02c"
+    b = [text(30, 36, "Mark K's board as a pointing module", 16, weight="bold"),
+         text(30, 56, "U1 (74HC165) on the board's back: lift pin 5 (input G) off its pad and wire it to pin 16 (+3.3V).", 11),
+         text(30, 72, "Back view, as the board lies in the jig: SW5 end up, header side left. The pin 1 corner of the package is bevelled or dotted.", 11, fill="#555"),
+         f'<rect x="{bx(86.6)}" y="{by(92.3)}" width="{10.4 * s}" height="{9.0 * s}" rx="6" fill="#3d2b5a"/>']
+    # package body, 3.9 x 9.9 mm, centred on the footprint
+    cx, cy = 81.325, 96.7
+    b.append(f'<rect x="{bx(cx + 4.95)}" y="{by(cy - 1.95)}" width="{9.9 * s}" height="{3.9 * s}" rx="4" fill="#222" stroke="#000"/>')
+    b.append(f'<circle cx="{bx(cx - 4.3):.1f}" cy="{by(cy - 1.3):.1f}" r="6" fill="#777"/>')  # pin 1 corner
+    b.append(text(bx(cx), by(cy) + 6, "74HC165", 16, "middle", "bold", "#eee"))
+    for n, (x, y, net) in u1.items():
+        n = int(n)
+        top = y < cy
+        foot_y0, foot_y1 = (y - 0.75, y + 0.75)
+        pad = f'<rect x="{bx(x) - 0.3 * s:.1f}" y="{by(y - 0.8):.1f}" width="{0.6 * s:.1f}" height="{1.6 * s:.1f}" fill="#c9a227"/>'
+        b.append(pad)
+        edge = cy - 1.95 if top else cy + 1.95
+        if n == 5:
+            b.append(f'<rect x="{bx(x) - 0.3 * s:.1f}" y="{by(y - 0.8):.1f}" width="{0.6 * s:.1f}" height="{1.6 * s:.1f}" fill="none" stroke="{lift}" stroke-width="3" stroke-dasharray="5 3"/>')
+            b.append(f'<rect x="{bx(x) - 0.22 * s:.1f}" y="{by(edge - 0.55):.1f}" width="{0.44 * s:.1f}" height="{0.55 * s:.1f}" fill="#bbb" stroke="{lift}" stroke-width="2"/>')
+        else:
+            b.append(f'<rect x="{bx(x) - 0.22 * s:.1f}" y="{by(min(edge, y)):.1f}" width="{0.44 * s:.1f}" height="{abs(edge - y) * s:.1f}" fill="#bbb"/>')
+        label_y = by(y - 1.25) if top else by(y + 1.25) + 12
+        color = lift if n == 5 else VCC if net == "+3.3V" else gnd if net == "GND" else "#999"
+        b.append(text(bx(x), label_y, str(n), 13 if n in (5, 16) else 11, "middle", "bold" if n in (5, 16) else "normal", color))
+        if net == "GND" and n != 5:
+            b.append(text(bx(x), label_y + (-13 if top else 13), "GND", 9, "middle", fill=gnd))
+    # the jumper: from pin 5's lifted foot, over the package, to pin 16's joint
+    x5, y5, _ = u1["5"]; x16, y16, _ = u1["16"]
+    p5 = (bx(x5), by(cy - 1.95 - 0.55)); p16 = (bx(x16), by(y16))
+    b.append(f'<path d="M{p5[0]:.1f},{p5[1]:.1f} C{p5[0]:.1f},{p5[1] - 60:.1f} {p16[0] + 40:.1f},{by(cy):.1f} {p16[0]:.1f},{p16[1]:.1f}" fill="none" stroke="{wire}" stroke-width="5" stroke-linecap="round"/>')
+    b.append(text(bx(x16) - 14, by(y16) + 52, "pin 16 = +3.3V (VCC)", 12, "end", "bold", VCC))
+    b.append(text(bx(x5), by(92.3) - 8, "pin 5 = input G: lifted", 12, "middle", "bold", lift))
+    b.append(text(bx(cx), by(cy) + 30, "insulated wire over the package", 12, "middle", fill=wire))
+
+    # side view of the top row: pin 5 bent up off its pad
+    sx, sy, sk = 640.0, 170.0, 30.0
+    b.append(text(sx, sy - 34, "Side view of pins 4, 5 and 6", 13, weight="bold"))
+    b.append(f'<rect x="{sx - 10}" y="{sy + 70}" width="{5.6 * sk}" height="8" fill="#3d2b5a"/>')
+    b.append(f'<rect x="{sx - 10}" y="{sy + 10}" width="{5.6 * sk}" height="{1.5 * sk}" rx="4" fill="#222"/>')
+    for i, n in enumerate((4, 5, 6)):
+        px = sx + 20 + i * 1.27 * sk * 1.0 + i * 15
+        b.append(f'<rect x="{px - 10}" y="{sy + 66}" width="20" height="4" fill="#c9a227"/>')
+        if n == 5:
+            b.append(f'<polyline points="{px},{sy + 32} {px},{sy + 46} {px + 6},{sy + 28} {px + 22},{sy + 20}" fill="none" stroke="{lift}" stroke-width="4"/>')
+            b.append(f'<path d="M{px + 22},{sy + 20} C{px + 60},{sy - 10} {px + 120},{sy - 20} {px + 140},{sy - 6}" fill="none" stroke="{wire}" stroke-width="4"/>')
+            b.append(text(px, sy + 92, "5", 12, "middle", "bold", lift))
+            b.append(text(px + 145, sy - 10, "to pin 16", 11, fill=wire))
+        else:
+            b.append(f'<polyline points="{px},{sy + 32} {px},{sy + 66} {px + 8},{sy + 66}" fill="none" stroke="#bbb" stroke-width="4"/>')
+            b.append(text(px, sy + 92, str(n), 11, "middle", fill=gnd))
+    b.append(text(sx - 10, sy + 116, "Pin 5's foot clears its pad by about 0.5 mm.", 11))
+    b.append(text(sx - 10, sy + 132, "The pad stays on the GND pour: keep it bare.", 11))
+
+    notes = ["1. Heat pin 5's joint and lift the foot with tweezers or a fine pick, bending the leg at its knee, until it clears the pad.",
+             "2. Wick the pad flat, so that no solder can bridge to the lifted foot. Pins 4 and 6 stay soldered: they are GND.",
+             "3. Solder a short piece of thin insulated wire (wire-wrap wire) from pin 5's foot tip to pin 16's joint, over the package.",
+             "4. Check with a meter: continuity from pin 5 to pin 16, none from pin 5 to pin 4, 6 or 8."]
+    b += [text(30, 590 + 18 * i, t, 11) for i, t in enumerate(notes)]
+    return svg(980, 670, b)
+
+
 if __name__ == "__main__":
     (OUT / "pointing-rework.svg").write_text(rework())
     (OUT / "pointing-bench.svg").write_text(bench())
+    (OUT / "pointing-u1-marker.svg").write_text(marker())
     print("wrote", OUT / "pointing-rework.svg", "and", OUT / "pointing-bench.svg")

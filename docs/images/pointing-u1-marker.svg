@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 670" width="980" height="670"><rect width="980" height="670" fill="#fff"/>
+<text x="30.0" y="36.0" font-size="16" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">Mark K's board as a pointing module</text>
+<text x="30.0" y="56.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">U1 (74HC165) on the board's back: lift pin 5 (input G) off its pad and wire it to pin 16 (+3.3V).</text>
+<text x="30.0" y="72.0" font-size="11" text-anchor="start" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">Back view, as the board lies in the jig: SW5 end up, header side left. The pin 1 corner of the package is bevelled or dotted.</text>
+<rect x="57.60000000000025" y="163.19999999999987" width="457.6" height="396.0" rx="6" fill="#3d2b5a"/>
+<rect x="71.89999999999975" y="271.0" width="435.6" height="171.6" rx="4" fill="#222" stroke="#000"/>
+<circle cx="478.9" cy="299.6" r="6" fill="#777"/>
+<text x="289.7" y="362.8" font-size="16" text-anchor="middle" font-weight="bold" fill="#eee" font-family="Helvetica, Arial, sans-serif">74HC165</text>
+<rect x="472.1" y="212.7" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="475.6" y="247.9" width="19.4" height="23.1" fill="#bbb"/>
+<text x="485.3" y="192.9" font-size="11" text-anchor="middle" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">1</text>
+<rect x="416.2" y="212.7" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="419.7" y="247.9" width="19.4" height="23.1" fill="#bbb"/>
+<text x="429.4" y="192.9" font-size="11" text-anchor="middle" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">2</text>
+<rect x="360.3" y="212.7" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="363.8" y="247.9" width="19.4" height="23.1" fill="#bbb"/>
+<text x="373.5" y="192.9" font-size="11" text-anchor="middle" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">3</text>
+<rect x="304.4" y="212.7" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="308.0" y="247.9" width="19.4" height="23.1" fill="#bbb"/>
+<text x="317.6" y="192.9" font-size="11" text-anchor="middle" font-weight="normal" fill="#555555" font-family="Helvetica, Arial, sans-serif">4</text>
+<text x="317.6" y="179.9" font-size="9" text-anchor="middle" font-weight="normal" fill="#555555" font-family="Helvetica, Arial, sans-serif">GND</text>
+<rect x="248.6" y="212.7" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="248.6" y="212.7" width="26.4" height="70.4" fill="none" stroke="#e67e22" stroke-width="3" stroke-dasharray="5 3"/>
+<rect x="252.1" y="246.8" width="19.4" height="24.2" fill="#bbb" stroke="#e67e22" stroke-width="2"/>
+<text x="261.8" y="192.9" font-size="13" text-anchor="middle" font-weight="bold" fill="#e67e22" font-family="Helvetica, Arial, sans-serif">5</text>
+<rect x="192.7" y="212.7" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="196.2" y="247.9" width="19.4" height="23.1" fill="#bbb"/>
+<text x="205.9" y="192.9" font-size="11" text-anchor="middle" font-weight="normal" fill="#555555" font-family="Helvetica, Arial, sans-serif">6</text>
+<text x="205.9" y="179.9" font-size="9" text-anchor="middle" font-weight="normal" fill="#555555" font-family="Helvetica, Arial, sans-serif">GND</text>
+<rect x="136.8" y="212.7" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="140.3" y="247.9" width="19.4" height="23.1" fill="#bbb"/>
+<text x="150.0" y="192.9" font-size="11" text-anchor="middle" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">7</text>
+<rect x="80.9" y="212.7" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="84.4" y="247.9" width="19.4" height="23.1" fill="#bbb"/>
+<text x="94.1" y="192.9" font-size="11" text-anchor="middle" font-weight="normal" fill="#555555" font-family="Helvetica, Arial, sans-serif">8</text>
+<text x="94.1" y="179.9" font-size="9" text-anchor="middle" font-weight="normal" fill="#555555" font-family="Helvetica, Arial, sans-serif">GND</text>
+<rect x="80.9" y="430.5" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="84.4" y="442.6" width="19.4" height="23.1" fill="#bbb"/>
+<text x="94.1" y="532.7" font-size="11" text-anchor="middle" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">9</text>
+<rect x="136.8" y="430.5" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="140.3" y="442.6" width="19.4" height="23.1" fill="#bbb"/>
+<text x="150.0" y="532.7" font-size="11" text-anchor="middle" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">10</text>
+<rect x="192.7" y="430.5" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="196.2" y="442.6" width="19.4" height="23.1" fill="#bbb"/>
+<text x="205.9" y="532.7" font-size="11" text-anchor="middle" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">11</text>
+<rect x="248.6" y="430.5" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="252.1" y="442.6" width="19.4" height="23.1" fill="#bbb"/>
+<text x="261.8" y="532.7" font-size="11" text-anchor="middle" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">12</text>
+<rect x="304.4" y="430.5" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="308.0" y="442.6" width="19.4" height="23.1" fill="#bbb"/>
+<text x="317.6" y="532.7" font-size="11" text-anchor="middle" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">13</text>
+<rect x="360.3" y="430.5" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="363.8" y="442.6" width="19.4" height="23.1" fill="#bbb"/>
+<text x="373.5" y="532.7" font-size="11" text-anchor="middle" font-weight="normal" fill="#999" font-family="Helvetica, Arial, sans-serif">14</text>
+<rect x="416.2" y="430.5" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="419.7" y="442.6" width="19.4" height="23.1" fill="#bbb"/>
+<text x="429.4" y="532.7" font-size="11" text-anchor="middle" font-weight="normal" fill="#555555" font-family="Helvetica, Arial, sans-serif">15</text>
+<text x="429.4" y="545.7" font-size="9" text-anchor="middle" font-weight="normal" fill="#555555" font-family="Helvetica, Arial, sans-serif">GND</text>
+<rect x="472.1" y="430.5" width="26.4" height="70.4" fill="#c9a227"/>
+<rect x="475.6" y="442.6" width="19.4" height="23.1" fill="#bbb"/>
+<text x="485.3" y="532.7" font-size="13" text-anchor="middle" font-weight="bold" fill="#d62728" font-family="Helvetica, Arial, sans-serif">16</text>
+<path d="M261.8,246.8 C261.8,186.8 525.3,356.8 485.3,465.7" fill="none" stroke="#2ca02c" stroke-width="5" stroke-linecap="round"/>
+<text x="471.3" y="517.7" font-size="12" text-anchor="end" font-weight="bold" fill="#d62728" font-family="Helvetica, Arial, sans-serif">pin 16 = +3.3V (VCC)</text>
+<text x="261.8" y="155.2" font-size="12" text-anchor="middle" font-weight="bold" fill="#e67e22" font-family="Helvetica, Arial, sans-serif">pin 5 = input G: lifted</text>
+<text x="289.7" y="386.8" font-size="12" text-anchor="middle" font-weight="normal" fill="#2ca02c" font-family="Helvetica, Arial, sans-serif">insulated wire over the package</text>
+<text x="640.0" y="136.0" font-size="13" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">Side view of pins 4, 5 and 6</text>
+<rect x="630.0" y="240.0" width="168.0" height="8" fill="#3d2b5a"/>
+<rect x="630.0" y="180.0" width="168.0" height="45.0" rx="4" fill="#222"/>
+<rect x="650.0" y="236.0" width="20" height="4" fill="#c9a227"/>
+<polyline points="660.0,202.0 660.0,236.0 668.0,236.0" fill="none" stroke="#bbb" stroke-width="4"/>
+<text x="660.0" y="262.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#555555" font-family="Helvetica, Arial, sans-serif">4</text>
+<rect x="703.1" y="236.0" width="20" height="4" fill="#c9a227"/>
+<polyline points="713.1,202.0 713.1,216.0 719.1,198.0 735.1,190.0" fill="none" stroke="#e67e22" stroke-width="4"/>
+<path d="M735.1,190.0 C773.1,160.0 833.1,150.0 853.1,164.0" fill="none" stroke="#2ca02c" stroke-width="4"/>
+<text x="713.1" y="262.0" font-size="12" text-anchor="middle" font-weight="bold" fill="#e67e22" font-family="Helvetica, Arial, sans-serif">5</text>
+<text x="858.1" y="160.0" font-size="11" text-anchor="start" font-weight="normal" fill="#2ca02c" font-family="Helvetica, Arial, sans-serif">to pin 16</text>
+<rect x="756.2" y="236.0" width="20" height="4" fill="#c9a227"/>
+<polyline points="766.2,202.0 766.2,236.0 774.2,236.0" fill="none" stroke="#bbb" stroke-width="4"/>
+<text x="766.2" y="262.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#555555" font-family="Helvetica, Arial, sans-serif">6</text>
+<text x="630.0" y="286.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Pin 5's foot clears its pad by about 0.5 mm.</text>
+<text x="630.0" y="302.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">The pad stays on the GND pour: keep it bare.</text>
+<text x="30.0" y="590.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">1. Heat pin 5's joint and lift the foot with tweezers or a fine pick, bending the leg at its knee, until it clears the pad.</text>
+<text x="30.0" y="608.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">2. Wick the pad flat, so that no solder can bridge to the lifted foot. Pins 4 and 6 stay soldered: they are GND.</text>
+<text x="30.0" y="626.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">3. Solder a short piece of thin insulated wire (wire-wrap wire) from pin 5's foot tip to pin 16's joint, over the package.</text>
+<text x="30.0" y="644.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">4. Check with a meter: continuity from pin 5 to pin 16, none from pin 5 to pin 4, 6 or 8.</text>
+</svg>
