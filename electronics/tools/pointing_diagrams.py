@@ -6,6 +6,7 @@ pointing-rework.svg: the MCU module rework, on the socket board's back with the 
 like bench-wiring.svg. Pad positions come from KeyModule.kicad_pcb.
 pointing-bench.svg: the TPS48's solder pads by silkscreen, and the jumpers from them into the MCU module's sockets.
 pointing-u1-marker.svg: K's board marks the pointing module: U1 pin 5 lifted off its pad and wired to pin 16.
+pointing-sockets.svg: V's loose sockets wired to the J_LEFT pads of K's board.
 """
 import math, pathlib
 from board_pads import footprints
@@ -219,8 +220,73 @@ def marker():
     return svg(980, 670, b)
 
 
+def sockets():
+    fp = footprints()
+    s, x0, y0 = 4.6, 110.0, 120.0                     # back view, as in pointing-rework.svg: header side on the left
+    bx = lambda x: x0 + (87.4 - x) * s
+    by = lambda y: y0 + (y - 40.0) * s
+    LED, CLK, PL, DIN = "#ff7f0e", "#2ca02c", "#e377c2", RES
+    sig = {("J_LEFT1", "1"): ("+5V / LED", LED), ("J_LEFT1", "2"): ("+3.3V", VCC), ("J_LEFT1", "3"): ("GND", GND),
+           ("J_LEFT2", "1"): ("CLK", CLK), ("J_LEFT2", "2"): ("/PL", PL), ("J_LEFT2", "3"): ("DATA_IN", DIN),
+           ("J_LEFT3", "1"): ("INT", INT), ("J_LEFT3", "2"): ("SDA", SDA), ("J_LEFT3", "3"): ("SCL", SCL)}
+    trackpad = {("J_LEFT1", "2"): "3V3", ("J_LEFT1", "3"): "GND", ("J_LEFT3", "1"): "IO5", ("J_LEFT3", "2"): "IO2",
+                ("J_LEFT3", "3"): "IO1"}
+    b = [text(30, 36, "Wire V's loose sockets to K's board", 16, weight="bold"),
+         text(30, 54, "Back view, as K's board lies in the upturned shell. V's floor is laid out flat beside it; "
+                      "in the module it sits 16° to K's board.", 11, fill="#555")]
+    kx, kw = bx(87.4), 16.85 * s
+    b.append(f'<rect x="{kx}" y="{by(40)}" width="{kw:.1f}" height="{100 * s:.1f}" rx="4" fill="#3d2b5a" stroke="#222"/>')
+    b.append(text(kx + kw / 2, by(40) - 26, "K's board", 13, "middle", "bold"))
+    b.append(text(kx + kw / 2, by(40) - 12, "back up", 10, "middle", fill="#555"))
+    b.append(text(kx + kw / 2, by(40) + 16, "SW5 end", 9, "middle", fill="#ddd"))
+    b.append(text(kx + kw / 2, by(140) - 8, "SW1 end", 9, "middle", fill="#ddd"))
+    b.append(text(kx - 8, by(40) + 60, "header side", 10, "end", fill="#555"))
+    b.append(text(kx + kw + 8, by(40) + 60, "socket side", 10, fill="#555"))
+    xs = [v[0] for v in fp["U1"].values()]
+    ys = [v[1] for v in fp["U1"].values()]
+    b.append(f'<rect x="{bx(max(xs)):.1f}" y="{by(min(ys)) - 3:.1f}" width="{(max(xs) - min(xs)) * s:.1f}" height="{(max(ys) - min(ys)) * s + 6:.1f}" fill="#222" opacity="0.7"/>')
+    b.append(text(bx(81.3), by(96.7) + 4, "U1", 10, "middle", fill="#ddd"))
+    for ref in ("J_RIGHT1", "J_RIGHT2", "J_RIGHT3"):
+        for x, y, _ in fp[ref].values():
+            b.append(f'<rect x="{bx(x) - 3:.1f}" y="{by(y) - 3:.1f}" width="6" height="6" fill="#888"/>')
+
+    # V's floor with the three sockets in their cradles, tails toward K, mouths toward V's socket face
+    vx0, vx1 = 400.0, 500.0
+    b.append(f'<rect x="{vx0}" y="{by(40)}" width="{vx1 - vx0}" height="{100 * s:.1f}" rx="4" fill="#f1e6f5" stroke="#b9a3c4"/>')
+    b.append(text((vx0 + vx1) / 2, by(40) - 26, "V's floor", 13, "middle", "bold"))
+    b.append(text((vx0 + vx1) / 2, by(40) - 12, "sockets in their cradles", 10, "middle", fill="#555"))
+    b.append(text(vx1 + 8, by(40) + 16, "V's socket face", 10, fill="#555"))
+    tail, body0, body1 = 422.0, 434.0, 478.0
+    for ref in ("J_LEFT1", "J_LEFT2", "J_LEFT3"):
+        pins = fp[ref]
+        mid = by(pins["2"][1])
+        b.append(f'<rect x="{body0}" y="{mid - 3.94 * s:.1f}" width="{body1 - body0}" height="{7.87 * s:.1f}" rx="2" fill="#111"/>')
+        b.append(text(vx1 + 8, mid - 40, f"for {ref}", 11, weight="bold"))
+        for n, (x, y, _) in pins.items():
+            yy, ly = by(y), mid + (int(n) - 2) * 20
+            name, color = sig[(ref, n)]
+            b.append(f'<rect x="{bx(x) - 4:.1f}" y="{yy - 4:.1f}" width="8" height="8" fill="#c9a227"/>')
+            b.append(f'<rect x="{tail}" y="{yy - 1.5}" width="{body0 - tail}" height="3" fill="#c9a227"/>')
+            b.append(f'<rect x="{body1 - 6}" y="{yy - 2}" width="4" height="4" fill="#666"/>')
+            b.append(line([(bx(x), yy), (tail, yy)], color, 3))
+            b.append(line([(body1, yy), (vx1 + 30, ly), (vx1 + 40, ly)], color, 1.2))
+            b.append(text(vx1 + 46, ly + 4, f"pin {n}  {name}", 11, weight="bold", fill=color))
+            if (ref, n) in trackpad:
+                b.append(f'<circle cx="{bx(x):.1f}" cy="{yy:.1f}" r="7.5" fill="none" stroke="#fff" stroke-width="1.5"/>')
+    b.append(text(bx(70.55) + 10, by(122), "ringed: pads that already", 10, fill="#555"))
+    b.append(text(bx(70.55) + 10, by(122) + 14, "carry a trackpad wire", 10, fill="#555"))
+    b.append(text((body0 + body1) / 2, by(55.56) - 16, "pin 1 toward the SW5 end", 10, "middle", fill="#555"))
+    notes = ["Glue each socket into its cradle with epoxy: mouth toward V's socket face, pin 1 toward the SW5 end. Keep the glue off the tails.",
+             "Wire each tail to the J_LEFT pad with the same connector and pin number: nine wires, each straight across.",
+             "Five of those pads already carry a trackpad wire: the socket's wire goes onto the same pad.",
+             "Leave slack in every wire: the floor folds over onto the shell when the module closes."]
+    b += [text(30, 640 + 18 * i, t, 11) for i, t in enumerate(notes)]
+    return svg(980, 720, b)
+
+
 if __name__ == "__main__":
     (OUT / "pointing-rework.svg").write_text(rework())
     (OUT / "pointing-bench.svg").write_text(bench())
     (OUT / "pointing-u1-marker.svg").write_text(marker())
-    print("wrote", OUT / "pointing-rework.svg", "and", OUT / "pointing-bench.svg")
+    (OUT / "pointing-sockets.svg").write_text(sockets())
+    print("wrote pointing-rework.svg, pointing-bench.svg, pointing-u1-marker.svg and pointing-sockets.svg in", OUT)

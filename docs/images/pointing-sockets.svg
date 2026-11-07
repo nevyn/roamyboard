@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 720" width="980" height="720"><rect width="980" height="720" fill="#fff"/>
+<text x="30.0" y="36.0" font-size="16" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">Wire V's loose sockets to K's board</text>
+<text x="30.0" y="54.0" font-size="11" text-anchor="start" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">Back view, as K's board lies in the upturned shell. V's floor is laid out flat beside it; in the module it sits 16° to K's board.</text>
+<rect x="110.0" y="120.0" width="77.5" height="460.0" rx="4" fill="#3d2b5a" stroke="#222"/>
+<text x="148.8" y="94.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">K's board</text>
+<text x="148.8" y="108.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">back up</text>
+<text x="148.8" y="136.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#ddd" font-family="Helvetica, Arial, sans-serif">SW5 end</text>
+<text x="148.8" y="572.0" font-size="9" text-anchor="middle" font-weight="normal" fill="#ddd" font-family="Helvetica, Arial, sans-serif">SW1 end</text>
+<text x="102.0" y="180.0" font-size="10" text-anchor="end" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">header side</text>
+<text x="195.5" y="180.0" font-size="10" text-anchor="start" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">socket side</text>
+<rect x="117.5" y="366.4" width="40.9" height="28.8" fill="#222" opacity="0.7"/>
+<text x="138.1" y="384.8" font-size="10" text-anchor="middle" font-weight="normal" fill="#ddd" font-family="Helvetica, Arial, sans-serif">U1</text>
+<rect x="125.9" y="188.6" width="6" height="6" fill="#888"/>
+<rect x="125.9" y="200.3" width="6" height="6" fill="#888"/>
+<rect x="125.9" y="211.9" width="6" height="6" fill="#888"/>
+<rect x="125.9" y="276.0" width="6" height="6" fill="#888"/>
+<rect x="125.9" y="287.7" width="6" height="6" fill="#888"/>
+<rect x="125.9" y="299.3" width="6" height="6" fill="#888"/>
+<rect x="125.9" y="450.8" width="6" height="6" fill="#888"/>
+<rect x="125.9" y="462.5" width="6" height="6" fill="#888"/>
+<rect x="125.9" y="474.1" width="6" height="6" fill="#888"/>
+<rect x="400.0" y="120.0" width="100.0" height="460.0" rx="4" fill="#f1e6f5" stroke="#b9a3c4"/>
+<text x="450.0" y="94.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">V's floor</text>
+<text x="450.0" y="108.0" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">sockets in their cradles</text>
+<text x="508.0" y="136.0" font-size="10" text-anchor="start" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">V's socket face</text>
+<rect x="434.0" y="185.1" width="44.0" height="36.2" rx="2" fill="#111"/>
+<text x="508.0" y="163.3" font-size="11" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">for J_LEFT1</text>
+<rect x="141.4" y="187.6" width="8" height="8" fill="#c9a227"/>
+<rect x="422.0" y="190.07600000000002" width="12.0" height="3" fill="#c9a227"/>
+<rect x="472.0" y="189.57600000000002" width="4" height="4" fill="#666"/>
+<polyline points="145.4,191.6 422.0,191.6" fill="none" stroke="#ff7f0e" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="478.0,191.6 530.0,183.3 540.0,183.3" fill="none" stroke="#ff7f0e" stroke-width="1.2" stroke-linejoin="round"/>
+<text x="546.0" y="187.3" font-size="11" text-anchor="start" font-weight="bold" fill="#ff7f0e" font-family="Helvetica, Arial, sans-serif">pin 1  +5V / LED</text>
+<rect x="141.4" y="199.3" width="8" height="8" fill="#c9a227"/>
+<rect x="422.0" y="201.76" width="12.0" height="3" fill="#c9a227"/>
+<rect x="472.0" y="201.26" width="4" height="4" fill="#666"/>
+<polyline points="145.4,203.3 422.0,203.3" fill="none" stroke="#d62728" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="478.0,203.3 530.0,203.3 540.0,203.3" fill="none" stroke="#d62728" stroke-width="1.2" stroke-linejoin="round"/>
+<text x="546.0" y="207.3" font-size="11" text-anchor="start" font-weight="bold" fill="#d62728" font-family="Helvetica, Arial, sans-serif">pin 2  +3.3V</text>
+<circle cx="145.4" cy="203.3" r="7.5" fill="none" stroke="#fff" stroke-width="1.5"/>
+<rect x="141.4" y="210.9" width="8" height="8" fill="#c9a227"/>
+<rect x="422.0" y="213.444" width="12.0" height="3" fill="#c9a227"/>
+<rect x="472.0" y="212.944" width="4" height="4" fill="#666"/>
+<polyline points="145.4,214.9 422.0,214.9" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="478.0,214.9 530.0,223.3 540.0,223.3" fill="none" stroke="#222222" stroke-width="1.2" stroke-linejoin="round"/>
+<text x="546.0" y="227.3" font-size="11" text-anchor="start" font-weight="bold" fill="#222222" font-family="Helvetica, Arial, sans-serif">pin 3  GND</text>
+<circle cx="145.4" cy="214.9" r="7.5" fill="none" stroke="#fff" stroke-width="1.5"/>
+<rect x="434.0" y="272.5" width="44.0" height="36.2" rx="2" fill="#111"/>
+<text x="508.0" y="250.7" font-size="11" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">for J_LEFT2</text>
+<rect x="141.4" y="275.0" width="8" height="8" fill="#c9a227"/>
+<rect x="422.0" y="277.47599999999994" width="12.0" height="3" fill="#c9a227"/>
+<rect x="472.0" y="276.97599999999994" width="4" height="4" fill="#666"/>
+<polyline points="145.4,279.0 422.0,279.0" fill="none" stroke="#2ca02c" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="478.0,279.0 530.0,270.7 540.0,270.7" fill="none" stroke="#2ca02c" stroke-width="1.2" stroke-linejoin="round"/>
+<text x="546.0" y="274.7" font-size="11" text-anchor="start" font-weight="bold" fill="#2ca02c" font-family="Helvetica, Arial, sans-serif">pin 1  CLK</text>
+<rect x="141.4" y="286.7" width="8" height="8" fill="#c9a227"/>
+<rect x="422.0" y="289.15999999999997" width="12.0" height="3" fill="#c9a227"/>
+<rect x="472.0" y="288.65999999999997" width="4" height="4" fill="#666"/>
+<polyline points="145.4,290.7 422.0,290.7" fill="none" stroke="#e377c2" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="478.0,290.7 530.0,290.7 540.0,290.7" fill="none" stroke="#e377c2" stroke-width="1.2" stroke-linejoin="round"/>
+<text x="546.0" y="294.7" font-size="11" text-anchor="start" font-weight="bold" fill="#e377c2" font-family="Helvetica, Arial, sans-serif">pin 2  /PL</text>
+<rect x="141.4" y="298.3" width="8" height="8" fill="#c9a227"/>
+<rect x="422.0" y="300.844" width="12.0" height="3" fill="#c9a227"/>
+<rect x="472.0" y="300.344" width="4" height="4" fill="#666"/>
+<polyline points="145.4,302.3 422.0,302.3" fill="none" stroke="#8c564b" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="478.0,302.3 530.0,310.7 540.0,310.7" fill="none" stroke="#8c564b" stroke-width="1.2" stroke-linejoin="round"/>
+<text x="546.0" y="314.7" font-size="11" text-anchor="start" font-weight="bold" fill="#8c564b" font-family="Helvetica, Arial, sans-serif">pin 3  DATA_IN</text>
+<rect x="434.0" y="447.3" width="44.0" height="36.2" rx="2" fill="#111"/>
+<text x="508.0" y="425.5" font-size="11" text-anchor="start" font-weight="bold" fill="#222" font-family="Helvetica, Arial, sans-serif">for J_LEFT3</text>
+<rect x="141.4" y="449.8" width="8" height="8" fill="#c9a227"/>
+<rect x="422.0" y="452.2759999999999" width="12.0" height="3" fill="#c9a227"/>
+<rect x="472.0" y="451.7759999999999" width="4" height="4" fill="#666"/>
+<polyline points="145.4,453.8 422.0,453.8" fill="none" stroke="#17becf" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="478.0,453.8 530.0,445.5 540.0,445.5" fill="none" stroke="#17becf" stroke-width="1.2" stroke-linejoin="round"/>
+<text x="546.0" y="449.5" font-size="11" text-anchor="start" font-weight="bold" fill="#17becf" font-family="Helvetica, Arial, sans-serif">pin 1  INT</text>
+<circle cx="145.4" cy="453.8" r="7.5" fill="none" stroke="#fff" stroke-width="1.5"/>
+<rect x="141.4" y="461.5" width="8" height="8" fill="#c9a227"/>
+<rect x="422.0" y="463.9599999999999" width="12.0" height="3" fill="#c9a227"/>
+<rect x="472.0" y="463.4599999999999" width="4" height="4" fill="#666"/>
+<polyline points="145.4,465.5 422.0,465.5" fill="none" stroke="#1f77b4" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="478.0,465.5 530.0,465.5 540.0,465.5" fill="none" stroke="#1f77b4" stroke-width="1.2" stroke-linejoin="round"/>
+<text x="546.0" y="469.5" font-size="11" text-anchor="start" font-weight="bold" fill="#1f77b4" font-family="Helvetica, Arial, sans-serif">pin 2  SDA</text>
+<circle cx="145.4" cy="465.5" r="7.5" fill="none" stroke="#fff" stroke-width="1.5"/>
+<rect x="141.4" y="473.1" width="8" height="8" fill="#c9a227"/>
+<rect x="422.0" y="475.64399999999995" width="12.0" height="3" fill="#c9a227"/>
+<rect x="472.0" y="475.14399999999995" width="4" height="4" fill="#666"/>
+<polyline points="145.4,477.1 422.0,477.1" fill="none" stroke="#9467bd" stroke-width="3" stroke-linejoin="round"/>
+<polyline points="478.0,477.1 530.0,485.5 540.0,485.5" fill="none" stroke="#9467bd" stroke-width="1.2" stroke-linejoin="round"/>
+<text x="546.0" y="489.5" font-size="11" text-anchor="start" font-weight="bold" fill="#9467bd" font-family="Helvetica, Arial, sans-serif">pin 3  SCL</text>
+<circle cx="145.4" cy="477.1" r="7.5" fill="none" stroke="#fff" stroke-width="1.5"/>
+<text x="197.5" y="497.2" font-size="10" text-anchor="start" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">ringed: pads that already</text>
+<text x="197.5" y="511.2" font-size="10" text-anchor="start" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">carry a trackpad wire</text>
+<text x="456.0" y="175.6" font-size="10" text-anchor="middle" font-weight="normal" fill="#555" font-family="Helvetica, Arial, sans-serif">pin 1 toward the SW5 end</text>
+<text x="30.0" y="640.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Glue each socket into its cradle with epoxy: mouth toward V's socket face, pin 1 toward the SW5 end. Keep the glue off the tails.</text>
+<text x="30.0" y="658.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Wire each tail to the J_LEFT pad with the same connector and pin number: nine wires, each straight across.</text>
+<text x="30.0" y="676.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Five of those pads already carry a trackpad wire: the socket's wire goes onto the same pad.</text>
+<text x="30.0" y="694.0" font-size="11" text-anchor="start" font-weight="normal" fill="#222" font-family="Helvetica, Arial, sans-serif">Leave slack in every wire: the floor folds over onto the shell when the module closes.</text>
+</svg>

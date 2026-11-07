@@ -569,7 +569,7 @@
       <p>K's board is a key module board with fewer parts, and with one pin of U1 moved to +3.3V.</p>
       <ol class="do">
         <li>Solder the <a href="#front">front</a> (R1 to R5, C1) and U1, as on a key module board.</li>
-        <li>Lift U1's pin 5 (input G) off its pad: heat the joint and lift the pin clear with tweezers. Jumper it to +3.3V with a short piece of thin wire to U1's pin 16, across the package. Keep the wire clear of pins 4 and 6, which are GND.</li>
+        <li>Lift U1's pin 5 (input G) off its pad: heat the joint and lift the pin clear with tweezers. Jumper it to +3.3V with a short piece of thin wire to U1's pin 16, across the package. Keep the wire clear of pins 4 and 6, which are GND, and tape it down to the package with a strip of Kapton tape.</li>
         <li>Fit SW5's hotswap socket only. SW4's pads take V's button later.</li>
         <li>Solder the three headers in the jig at 8° (<a href="#headers">Headers at 8°</a>), and <a href="#stake">glue them</a> to the board.</li>
         <li>Leave J_LEFT1 to J_LEFT3 empty: their pads take the wires from the loose sockets and the trackpad.</li>
@@ -631,7 +631,8 @@
       <div class="warn"><p>Leave slack in every wire. On the first socket board, a wire tugging on a pad broke its connection.</p></div>
       <div class="gap"><p>Only the glue holds the loose sockets when modules are pulled apart. How well it holds is untested.</p></div>
     </div>
-    <div class="step-media"><div class="photo-slot"><b>Photo wanted</b>The floor with the three loose sockets glued into their cradles and wired.</div></div></div>
+    <div class="step-media"><figure><img class="diagram" src="../images/pointing-sockets.svg" alt="K's board from the back and V's floor beside it: each loose socket's three tails wired straight across to the J_LEFT pads with the same connector and pin number"><figcaption>From electronics/tools/pointing_diagrams.py. Click to enlarge.</figcaption></figure>
+      <div class="photo-slot"><b>Photo wanted</b>The floor with the three loose sockets glued into their cradles and wired.</div></div></div>
   </article>
 
   <article class="step" id="point-pad-wiring" data-title="Wire the trackpad to K's board">
