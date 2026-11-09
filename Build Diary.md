@@ -346,9 +346,58 @@ The MCU module is wired (all but the battery and the power switch) and reads the
 
 Plugging and unplugging key modules pulls on the connectors, and the only thing holding a connector to the board is its solder. The case now takes the slide-on push and the tipping (clamp pads and rear stops in the floor), so the pull is the glue's job. First staking, with Gorilla Epoxy while it was still semi-gooey: slide the header body up its pins, put glue on the board under the tails, then press the body back down into the glue so it bonds to the board as well. Curing; no pull test yet.
 
+### A pointing device
+*2026-10-18*
+
+![MCU module rework for the trackpad](docs/images/pointing-rework.svg)
+
+Typing while walking is half of it; the other half is pointing without reaching for a mouse. The survey ([[Pointing device survey]]) compared finished trackpads, custom capacitive sensors and trackballs against what a module can hold: 42 mm across two columns, a few millimetres deep, and three free lines on the interconnect. The Azoteq TPS48 won: an IQS572 on a 48 × 38 mm board, 2 mm thick, I2C at 0x74, with taps, scrolling and five fingers done on the chip, for under three dollars. It goes on the right half beside the MCU module, under the index finger and the thumb. The nRF52840 shares each I2C peripheral with an SPI one, so the chain moved from SPIM1 to SPIM2 to free TWIM1, and the right MCU module got three wires (SDA, SCL and INT on D4 to D6) and two 2.2 kΩ pull-ups. INT took the bottom connector's pin 1, so that connector carries the whole I2C bus, and the LED line moved to the unused +5V pin.
+
 ### First pointer
 *2026-10-22, evening*
 
 ![trackpad bench irl](Images/trackpad%20bench%20irl.webp)
 
 An Azoteq TPS48 trackpad, with Dupont jumpers soldered to its pads, plugged into the right MCU module's sockets; the right MCU module got three new wires (D4, D5, D6 to J_LEFT3) and two pull-ups the night before. Azoteq publishes no I2C pinout for the TPS48's pads, so the pads were found by plugging pairs into the SDA and SCL sockets until the driver's log said "IQS572 (product 58)": SDA is IO2, SCL is IO1, and RDY, found by touch, is IO5. The pointer moved on the first build of our own IQS5xx driver, through the split to the left half and on to the Mac. Directions match the pad's silkscreen read from the touch side, a tap clicks, two fingers scroll, and press-and-hold drags and lets go when the finger lifts. A two-finger tap did not right-click on the loose bench setup. Details in [[Pointing module bench]].
+
+
+### Pointing module r1
+*2026-10-23*
+
+![U1 pin 5 marker on K's board](docs/images/pointing-u1-marker.svg)
+
+The pointing module is two columns in one shell. K holds a key module board with only its headers and SW5 fitted, and V holds three loose sockets glued into floor cradles and a second SW5. The trackpad lies in a pocket under a 1.2 mm skin, which is its overlay, and the floor's ribs press it up against the skin. The two buttons read through K's 165 as SW5 and SW4. Its input G (pin 5) is lifted off its pad and tied to VCC, so bit 6 of the module's chain byte is set: no key module ever sets it, since a key module now has at most six keys. The firmware will use that bit to leave the pointing module out of the column mapping, so the key modules beyond it keep their keymap columns. The assembly guide got a chapter for building it.
+
+### Lost in discovery
+*2026-10-26*
+
+On the keyboard, rather than the bench, the pointer sometimes never moved. The trackpad was fine; its events never crossed the split. ZMK's split discovery gives up on subscribing to the input split if an ATT request cannot be sent at that moment, and our own GATT clients (the PDA link and the log relay) were discovering at the same time. Our clients now wait 2 s after encryption, staggered, and retry failed steps, and the left half got more ATT buffers. On battery, without a good ground, a touch could also look like drift: the trackpad's automatic recalibration (Re-ATI) then ran under the finger and failed, leaving the tracking jittery. The driver turns Re-ATI off and asks for a fresh calibration once no finger is down.
+
+### Pin 5
+*2026-11-06*
+
+![U1 with pin 5 lifted](docs/assembly/photos/u1-pin5-lifted.jpg)
+
+K's board, with U1's pin 5 lifted off its pad and a jumper to pin 16. The pads on the TPS48 got their silkscreen names in the guide (IO1 to IO5, GND, 3V3), so that the wiring can be read off the board instead of a table.
+
+### It points from the case
+*2026-11-07*
+
+![open pointing module](docs/assembly/photos/pointing-module-open.jpg)
+
+The trackpad in its pocket, K's board over it, five wires from the pad to K's connector pads: the pointer moved from inside its case. Then the loose sockets, nine wires from K's J_LEFT pads to the sockets in V's floor ([diagram](docs/images/pointing-sockets.svg)), glued so that no wire pulls on a joint.
+
+### No term
+*2026-11-07 to 2026-11-09*
+
+![the wired pointing module](Images/pointing%20module%20wired.webp)
+
+With the pointing module between the MCU module and the key modules, the right half showed "no term", and the log's chain dump read all zeros, 33 bytes of them. Without it, the seven key modules worked. Every check with the multimeter passed, at the IC's legs: supply, /CE, /PL, SER and the pin 5 marker all at the right levels; CLK and /PL 0 Ω from header to leg; no shorts between any two connector pins; every pin reflowed. In the old 165 tester (an M5Stick) the module worked perfectly for 10 to 20 seconds and then read zeros until a power cycle, but the supply current stayed at 4.0 mA, so the chip was not latched up. Shorts, bad joints, latch-up from hot-plugging and the trackpad were each plausible and each wrong.
+
+![HUZZAH32 wired as the chain probe](electronics/tools/chain_probe/huzzah32-wiring.png)
+
+What found it was handing the controls over. A HUZZAH32 got a wire on every line of the module, including its supply, and a sketch that scans the 165 every 20 ms, power-cycles the module and tests each line: the [chain probe](electronics/tools/chain_probe/README.md). The module was dead from the first scan. With its supply left floating, driving an input high powers the whole module through that input's protection diode: CLK lifted the rail to 1.9 V, SER and SW4 likewise, and /PL to nothing, though /PL measured 0 Ω from the probe's pin to U1's leg. So the leg was fine and the inside was not: pin 1's connection inside the package was broken, most likely its bond wire, and /PL inside the chip floated. A floating /PL starts high after power-up, so the chip works for a while; as it leaks low, the 165 loads continuously, and QH shows input H, which is 0, whatever the clock does. And then the memory: the 165 came out of its bag with pin 1 bent, and it was straightened before soldering.
+
+![U1, pin 1 at the bottom right](Images/pointing%20module%20U1.webp)
+
+Pin 1 is the bottom right leg here; it looks like the others. Lessons: a bent IC leg is a reason to reach for a new chip, since straightening it can break the bond inside where no meter reaches; and when the multimeter stops narrowing things down, wire up a probe that can drive the lines and watch the result, rather than think harder. U1 gets replaced, with pin 5 lifted before the new chip is soldered down.
