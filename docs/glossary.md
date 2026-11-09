@@ -177,6 +177,9 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 **fault**: A read of the chain with no sentinel in it.
 *Avoid:* chain error, bad read.
 
+**chain probe**: An ESP32 Feather wired to every line of one module, which powers it, reads its 165 and tests each line over USB serial; `electronics/tools/chain_probe`.
+*Avoid:* tester, test harness, debug rig.
+
 **physical column**: A key module's position in the chain, counted from 0 at the key module nearest the MCU module.
 *Avoid:* chain index, module index, hardware column.
 
