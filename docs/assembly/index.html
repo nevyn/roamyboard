@@ -569,8 +569,10 @@
     <div class="step-body"><div class="step-text">
       <p>K's board is a key module board with fewer parts, and with one pin of U1 moved to +3.3V.</p>
       <ol class="do">
+        <li>Check U1's legs. Use a chip with straight legs only: a leg that was bent and straightened can break inside the package, where it passes every meter test.</li>
+        <li>Before U1 goes down, bend its pin 5 (input G) up with tweezers, and cover pin 5's pad with a strip of Kapton tape, so that the leg cannot touch it.</li>
         <li>Solder the <a href="#front">front</a> (R1 to R5, C1) and U1, as on a key module board.</li>
-        <li>Lift U1's pin 5 (input G) off its pad: heat the joint and lift the pin clear with tweezers. Jumper it to +3.3V with a short piece of thin wire to U1's pin 16, across the package. Keep the wire clear of pins 4 and 6, which are GND, and tape it down to the package with a strip of Kapton tape.</li>
+        <li>Jumper pin 5 to +3.3V with a short piece of thin wire to U1's pin 16, across the package. Keep the wire clear of pins 4 and 6, which are GND, and tape it down to the package with a strip of Kapton tape.</li>
         <li>Fit SW5's hotswap socket only. SW4's pads take V's button later.</li>
         <li>Solder the three headers in the jig at 8° (<a href="#headers">Headers at 8°</a>), and <a href="#stake">glue them</a> to the board.</li>
         <li>Leave J_LEFT1 to J_LEFT3 empty: their pads take the wires from the loose sockets and the trackpad.</li>
@@ -578,6 +580,7 @@
       <div class="note"><p>With pin 5 tied high, bit 6 of the module's byte in the chain is set, which marks it as a pointing module. The firmware leaves it out of the keymap columns, so the key modules keep theirs, and reports its two switches as mouse buttons.</p></div>
     </div>
     <div class="step-media"><figure><img class="diagram" src="../images/pointing-u1-marker.svg" alt="U1 seen from the board's back, with pin 5 lifted off its pad and a wire over the package to pin 16"><figcaption>From electronics/tools/pointing_diagrams.py. Click to enlarge.</figcaption></figure>
+      <figure class="photo"><img src="photos/u1-pin5-kapton.jpg" alt="K's board before U1 goes down: a strip of Kapton tape over pin 5's pad, with the 74HC165 beside the board" loading="lazy"><figcaption>Kapton over pin 5's pad, before U1 goes down (2026-11-20).</figcaption></figure>
       <figure class="photo"><img src="photos/u1-pin5-lifted.jpg" alt="U1 on K's board, with pin 5 bent up off its bare pad and a blue wire over the package to pin 16" loading="lazy"><figcaption>U1 with pin 5 lifted and jumpered to pin 16 (2026-11-06).</figcaption></figure></div></div>
   </article>
 
@@ -601,7 +604,7 @@
       <p>In the <a href="#point-assembly">assembly</a>, the trackpad goes into the upturned shell first: pressed into its pocket by its own adhesive, with its solder pads over V's half. Its wires drop into V's open bay and reach K's board round its socket-side edge.</p>
     </div>
     <div class="step-media"><figure><img class="diagram" src="../images/pointing-bench.svg" alt="The trackpad's seven solder pads by silkscreen, IO4 at the notch end, and which J_LEFT pin each one goes to"><figcaption>The bench wiring, into the MCU module's sockets. On K's board, each pad goes to the J_LEFT pad with the same connector and pin number. Click to enlarge.</figcaption></figure>
-      <div class="photo-slot"><b>Photo wanted</b>The trackpad's back with its five wires.</div></div></div>
+      <figure class="photo"><img src="photos/trackpad-pads-wired.jpg" alt="The TPS48's solder pads with five wires: green on IO5, black on GND, red on 3V3, purple on IO1 and yellow on IO2" loading="lazy"><figcaption>Green on IO5, black on GND, red on 3V3, purple on IO1, yellow on IO2; IO4 and IO3 stay bare (2026-11-20).</figcaption></figure></div></div>
   </article>
 
   <article class="step" id="point-sockets" data-title="Loose sockets">
@@ -683,7 +686,7 @@
       <div class="gap"><p>The wire lengths and how the wires fold under the floor are untested. With an M2 × 5 mm screw at the seam, the model has it reach about 1 mm less far into its pilot than the others.</p></div>
     </div>
     <div class="step-media"><div class="viewer" data-scene="pointing"></div>
-      <figure class="photo"><img src="photos/pointing-module-open.jpg" alt="An open pointing module in its upturned shell: the TPS48 in its pocket, K's board over it back up, and five wires from the trackpad's pads to K's headers" loading="lazy"><figcaption>An open pointing module: the trackpad in its pocket, K's board over it, and the trackpad's wires, before the loose sockets (2026-11-07).</figcaption></figure></div></div>
+      <figure class="photo"><img src="photos/pointing-module-wired.jpg" alt="An open pointing module in its upturned shell: the TPS48 in its pocket, K's board back up beside its pads, V's switch glued in its plate, and wires from the trackpad and V's switch to K's board" loading="lazy"><figcaption>An open pointing module: the trackpad in its pocket, K's board back up, V's switch in its plate, and the wires from the trackpad and V's switch to K's board, before the loose sockets (2026-11-20).</figcaption></figure></div></div>
   </article>
 
   <article class="step" id="point-test" data-title="Test the pointing module">
