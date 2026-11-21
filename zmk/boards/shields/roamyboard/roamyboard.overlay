@@ -10,3 +10,11 @@
     columns = <24>;
     anchor = "mcu";
 };
+
+/ {
+    // Buttons of a pointing module on the chain.
+    chain_buttons_listener: chain_buttons_listener {
+        compatible = "zmk,input-listener";
+        device = <&roamyboard_chain>;
+    };
+};

@@ -30,7 +30,7 @@ static int failures;
         }                                                                                          \
     } while (0)
 
-#define MAX_ROWS 7
+#define MAX_ROWS 6
 #define MAX_COLUMNS 30
 #define MAX_KEYS (MAX_ROWS * MAX_COLUMNS)
 #define MAX_MODULES 32
@@ -57,6 +57,7 @@ struct fixture {
     struct chain chain;
     bool reported[MAX_KEYS];
     bool active[MAX_KEYS];
+    uint8_t buttons;
     struct recorder rec;
 };
 
@@ -81,7 +82,7 @@ static size_t read_of(uint8_t *buf, const uint8_t *modules, int count) {
 static enum chain_scan_result scan(struct fixture *f, const uint8_t *modules, int count) {
     uint8_t buf[MAX_MODULES + 1];
     const size_t len = read_of(buf, modules, count);
-    return chain_scan(&f->chain, buf, len, f->active);
+    return chain_scan(&f->chain, buf, len, f->active, &f->buttons);
 }
 
 /* Scans until the count is accepted, then once more; returns the result of the last scan. */
@@ -241,16 +242,16 @@ static void test_missing_sentinel(void) {
     for (int i = 0; i < MAX_KEYS; i++) {
         f.active[i] = true;
     }
-    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active), CHAIN_SCAN_SETTLING);
+    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active, &f.buttons), CHAIN_SCAN_SETTLING);
     CHECK_EQ(f.chain.observed, CHAIN_COUNT_FAULT);
     CHECK_EQ(f.chain.accepted, 2);
     CHECK_EQ(active_total(&f), 5 * 30); /* untouched: no key states from a faulty read */
 
     /* A persistent fault is accepted like a count, so held keys get released. */
-    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active), CHAIN_SCAN_SETTLING);
-    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active), CHAIN_SCAN_REMAP);
+    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active, &f.buttons), CHAIN_SCAN_SETTLING);
+    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active, &f.buttons), CHAIN_SCAN_REMAP);
     CHECK_EQ(f.chain.accepted, CHAIN_COUNT_FAULT);
-    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active), CHAIN_SCAN_FAULT);
+    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active, &f.buttons), CHAIN_SCAN_FAULT);
 
     /* Recovery goes through the stabilizer again. */
     CHECK_EQ(scan(&f, modules, 2), CHAIN_SCAN_SETTLING);
@@ -269,7 +270,7 @@ static void test_fault_recovery_needs_a_longer_run(void) {
     uint8_t broken[MAX_MODULES + 1];
     memset(broken, 0x00, sizeof(broken));
     for (int i = 0; i < 3; i++) {
-        chain_scan(&f.chain, broken, sizeof(broken), f.active);
+        chain_scan(&f.chain, broken, sizeof(broken), f.active, &f.buttons);
     }
     CHECK_EQ(f.chain.accepted, CHAIN_COUNT_FAULT);
 
@@ -278,7 +279,7 @@ static void test_fault_recovery_needs_a_longer_run(void) {
         CHECK_EQ(scan(&f, modules, 2), CHAIN_SCAN_SETTLING);
     }
     /* ...and one faulty scan starts the run over. */
-    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active), CHAIN_SCAN_FAULT);
+    CHECK_EQ(chain_scan(&f.chain, broken, sizeof(broken), f.active, &f.buttons), CHAIN_SCAN_FAULT);
     for (int i = 0; i < 9; i++) {
         CHECK_EQ(scan(&f, modules, 2), CHAIN_SCAN_SETTLING);
     }
@@ -303,7 +304,7 @@ static void test_flapping_during_insertion(void) {
     uint8_t garbage[MAX_MODULES + 1];
     memset(garbage, 0x00, sizeof(garbage));
     CHECK_EQ(scan(&f, modules, 3), CHAIN_SCAN_SETTLING);
-    CHECK_EQ(chain_scan(&f.chain, garbage, sizeof(garbage), f.active), CHAIN_SCAN_SETTLING);
+    CHECK_EQ(chain_scan(&f.chain, garbage, sizeof(garbage), f.active, &f.buttons), CHAIN_SCAN_SETTLING);
     CHECK_EQ(scan(&f, modules, 3), CHAIN_SCAN_SETTLING);
     CHECK_EQ(scan(&f, modules, 3), CHAIN_SCAN_SETTLING);
     CHECK_EQ(scan(&f, modules, 2), CHAIN_SCAN_KEYS); /* back to the accepted count */
@@ -366,18 +367,92 @@ static void test_count_change_releases_held_keys(void) {
     CHECK_EQ(active_total(&f), 2);
 }
 
-static void test_seven_rows(void) {
+static void test_six_rows(void) {
     struct fixture f;
     memset(&f, 0, sizeof(f));
-    const struct chain_config config = {CHAIN_ANCHOR_MCU, 2, 7, 1, 1, false};
+    const struct chain_config config = {CHAIN_ANCHOR_MCU, 2, 6, 1, 1, false};
     chain_init(&f.chain, &config, f.reported);
-    const uint8_t modules[] = {0x40 /* G, SW7 */, 0x20 /* F, SW6 */};
+    const uint8_t modules[] = {0x20 /* F, SW6 */, 0x10 /* E, SW5 */};
     uint8_t buf[MAX_MODULES + 1];
     const size_t len = read_of(buf, modules, 2);
-    CHECK_EQ(chain_scan(&f.chain, buf, len, f.active), CHAIN_SCAN_REMAP);
-    CHECK_EQ(chain_scan(&f.chain, buf, len, f.active), CHAIN_SCAN_KEYS);
-    CHECK(f.active[0 * 2 + 1]); /* SW7 on physical 0: row 0, column 1 */
-    CHECK(f.active[1 * 2 + 0]); /* SW6 on physical 1: row 1, column 0 */
+    CHECK_EQ(chain_scan(&f.chain, buf, len, f.active, &f.buttons), CHAIN_SCAN_REMAP);
+    CHECK_EQ(chain_scan(&f.chain, buf, len, f.active, &f.buttons), CHAIN_SCAN_KEYS);
+    CHECK(f.active[0 * 2 + 1]); /* SW6 on physical 0: row 0, column 1 */
+    CHECK(f.active[1 * 2 + 0]); /* SW5 on physical 1: row 1, column 0 */
+}
+
+/* A pointing module byte: the marker, plus SW4 and SW5 as its buttons. */
+#define POINTING(sw) (CHAIN_MARKER_BIT | (sw))
+
+static void test_pointing_module_takes_no_column(void) {
+    struct fixture with, without;
+    setup(&with, CHAIN_ANCHOR_MCU, 15, 3);
+    setup(&without, CHAIN_ANCHOR_MCU, 15, 3);
+    const uint8_t keys[] = {SW(1), SW(5)};
+    const uint8_t mixed[] = {POINTING(0), SW(1), SW(5)};
+    CHECK_EQ(settle(&with, mixed, 3), CHAIN_SCAN_KEYS);
+    CHECK_EQ(settle(&without, keys, 2), CHAIN_SCAN_KEYS);
+    CHECK_EQ(with.chain.accepted, 3);
+    CHECK_EQ(with.chain.marked, 0x1);
+    CHECK_EQ(chain_key_module_count(&with.chain), 2);
+    CHECK(memcmp(with.active, without.active, sizeof(with.active)) == 0);
+    CHECK_EQ(with.buttons, 0);
+}
+
+static void test_pointing_module_between_key_modules(void) {
+    struct fixture f;
+    setup(&f, CHAIN_ANCHOR_TERMINATOR, 15, 3);
+    const uint8_t modules[] = {SW(1), POINTING(0), SW(5)};
+    CHECK_EQ(settle(&f, modules, 3), CHAIN_SCAN_KEYS);
+    CHECK_EQ(chain_key_module_count(&f.chain), 2);
+    CHECK(active_at(&f, 4, 1)); /* physical 0, nearest the MCU module */
+    CHECK(active_at(&f, 0, 0)); /* physical 1, nearest the terminator module */
+    CHECK_EQ(active_total(&f), 2);
+}
+
+static void test_pointing_module_buttons(void) {
+    struct fixture f;
+    setup(&f, CHAIN_ANCHOR_MCU, 12, 1);
+    const uint8_t sw5[] = {POINTING(SW(5)), SW(5)};
+    CHECK_EQ(settle(&f, sw5, 2), CHAIN_SCAN_KEYS);
+    CHECK_EQ(f.buttons, CHAIN_BUTTON_RIGHT); /* unrotated: the MCU module is at the right */
+    CHECK_EQ(active_total(&f), 1);           /* the key module's SW5 only */
+    const uint8_t sw4[] = {POINTING(SW(4)), 0x00};
+    CHECK_EQ(scan(&f, sw4, 2), CHAIN_SCAN_KEYS);
+    CHECK_EQ(f.buttons, CHAIN_BUTTON_LEFT);
+    CHECK_EQ(active_total(&f), 0);
+
+    setup(&f, CHAIN_ANCHOR_MCU, 12, 1);
+    f.chain.config.rotated = true;
+    CHECK_EQ(settle(&f, sw5, 2), CHAIN_SCAN_KEYS);
+    CHECK_EQ(f.buttons, CHAIN_BUTTON_LEFT); /* rotated: the MCU module is at the left */
+    CHECK_EQ(scan(&f, sw4, 2), CHAIN_SCAN_KEYS);
+    CHECK_EQ(f.buttons, CHAIN_BUTTON_RIGHT);
+    const uint8_t both[] = {POINTING(SW(4) | SW(5)), 0x00};
+    CHECK_EQ(scan(&f, both, 2), CHAIN_SCAN_KEYS);
+    CHECK_EQ(f.buttons, CHAIN_BUTTON_LEFT | CHAIN_BUTTON_RIGHT);
+}
+
+static void test_marker_change_is_a_new_observation(void) {
+    struct fixture f;
+    setup(&f, CHAIN_ANCHOR_MCU, 15, 3);
+    const uint8_t keys[] = {0x00, 0x00};
+    const uint8_t pointing[] = {POINTING(0), 0x00};
+    CHECK_EQ(settle(&f, keys, 2), CHAIN_SCAN_KEYS);
+    CHECK_EQ(chain_key_module_count(&f.chain), 2);
+    CHECK_EQ(scan(&f, pointing, 2), CHAIN_SCAN_SETTLING);
+    CHECK_EQ(scan(&f, pointing, 2), CHAIN_SCAN_SETTLING);
+    CHECK_EQ(scan(&f, pointing, 2), CHAIN_SCAN_REMAP);
+    CHECK_EQ(chain_key_module_count(&f.chain), 1);
+    CHECK_EQ(f.chain.accepted, 2);
+}
+
+static void test_key_module_count_passes_special_counts(void) {
+    struct fixture f;
+    setup(&f, CHAIN_ANCHOR_MCU, 15, 3);
+    CHECK_EQ(chain_key_module_count(&f.chain), CHAIN_COUNT_UNKNOWN);
+    f.chain.accepted = CHAIN_COUNT_FAULT;
+    CHECK_EQ(chain_key_module_count(&f.chain), CHAIN_COUNT_FAULT);
 }
 
 int main(void) {
@@ -394,7 +469,12 @@ int main(void) {
     test_flapping_during_insertion();
     test_report_diff();
     test_count_change_releases_held_keys();
-    test_seven_rows();
+    test_six_rows();
+    test_pointing_module_takes_no_column();
+    test_pointing_module_between_key_modules();
+    test_pointing_module_buttons();
+    test_marker_change_is_a_new_observation();
+    test_key_module_count_passes_special_counts();
 
     if (failures) {
         fprintf(stderr, "%d check(s) failed\n", failures);

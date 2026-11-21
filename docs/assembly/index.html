@@ -575,8 +575,7 @@
         <li>Solder the three headers in the jig at 8° (<a href="#headers">Headers at 8°</a>), and <a href="#stake">glue them</a> to the board.</li>
         <li>Leave J_LEFT1 to J_LEFT3 empty: their pads take the wires from the loose sockets and the trackpad.</li>
       </ol>
-      <div class="note"><p>With pin 5 tied high, bit 6 of the module's byte in the chain is set, which will mark it as a pointing module. Today's firmware reads only bits 0 to 4 of each byte for the keys and bit 7 for the sentinel, so it ignores bit 6: tie it high now.</p>
-        <p>The firmware that knows the marker does not exist yet. Until it does, the module's 74HC165 counts as a key module, so the right half's key modules each move one keymap column outward while the pointing module is attached.</p></div>
+      <div class="note"><p>With pin 5 tied high, bit 6 of the module's byte in the chain is set, which marks it as a pointing module. The firmware leaves it out of the keymap columns, so the key modules keep theirs, and reports its two switches as mouse buttons.</p></div>
     </div>
     <div class="step-media"><figure><img class="diagram" src="../images/pointing-u1-marker.svg" alt="U1 seen from the board's back, with pin 5 lifted off its pad and a wire over the package to pin 16"><figcaption>From electronics/tools/pointing_diagrams.py. Click to enlarge.</figcaption></figure>
       <figure class="photo"><img src="photos/u1-pin5-lifted.jpg" alt="U1 on K's board, with pin 5 bent up off its bare pad and a blue wire over the package to pin 16" loading="lazy"><figcaption>U1 with pin 5 lifted and jumpered to pin 16 (2026-11-06).</figcaption></figure></div></div>
@@ -696,8 +695,7 @@
         <li>The log shows <code>Trackpad absent -&gt; configuring</code>, then <code>Trackpad IQS572 (product 58), version 2.1, resolution 768 x 1024</code> and <code>Trackpad configuring -&gt; running</code>: the right half found the trackpad.</li>
         <li>Move a finger on the plateau: the pointer follows. A tap clicks, and two fingers scroll.</li>
       </ol>
-      <p>Until the firmware knows the pointing module's marker, the log counts it as a key module (<code>Chain has 8 key modules</code> with seven key modules), and its buttons type as the keys of the right half's innermost keymap column: K's button as its SW5 key, Backspace on QWERTY, and V's button as its SW4 key, N. Each key module types the keys of the next column outward.</p>
-      <div class="gap"><p>On the bench, the pointer moved the way the finger did with no axis flips, with the silkscreen read from the touch side. If it moves the wrong way in the module, the axis flips go in the right half's devicetree (<a href="https://github.com/nevyn/roamyboard/blob/main/docs/firmware.md#trackpad">docs/firmware.md</a>, Trackpad).</p></div>
+      <p>The log shows <code>Chain has 7 key modules and 1 pointing module</code>. K's button, beside the MCU module, left-clicks, and V's button right-clicks.</p>
     </div>
     <div class="step-media"><div class="photo-slot"><b>Photo wanted</b>The pointing module between the right MCU module and its key modules.</div></div></div>
   </article>

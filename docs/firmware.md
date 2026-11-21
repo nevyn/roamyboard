@@ -34,17 +34,23 @@ Each key module has one 74HC165. Its inputs A to E are SW1 (the bottom key, at t
 Every scan:
 
 1. The driver pulses /PL low for 1 µs. All 165s load their switch states, and QH shows input H of the nearest key module.
-2. The driver reads `max-key-modules + 1` bytes (33 by default) over SPIM2 at 1 MHz, MSB first. Each byte is one key module, nearest first:
+2. The driver reads `max-key-modules + 1` bytes (33 by default, 32 modules at most) over SPIM2 at 1 MHz, MSB first. Each byte is one module, nearest first:
 
    | Bit | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
    | --- | --- | --- | --- | --- | --- | --- | --- | --- |
    | Input | H | G | F | E | D | C | B | A |
-   | Key | always 0 | SW7 | SW6 | SW5 | SW4 | SW3 | SW2 | SW1 |
-   | Row | | 0 (7-key) | 1 (7-key) | 0 | 1 | 2 | 3 | 4 |
+   | Key | always 0 | marker | SW6 | SW5 | SW4 | SW3 | SW2 | SW1 |
+   | Row | | | 0 (6-key) | 0 | 1 | 2 | 3 | 4 |
 
 3. The first byte with bit 7 set is the **sentinel**: the terminator module ties the far end's DATA to +3.3V, so the bytes after the last key module read 0xFF. The sentinel's index is the key module count. No key modules means the first byte is the sentinel. DATA has the nRF52840's pull-up, so an MCU module with nothing attached also reads as zero key modules.
 
-Row 0 is the top key. The `rows` property (default 5) sets how many inputs each key module uses, so a 7-key module needs only `rows = <7>`.
+Row 0 is the top key. The `rows` property (default 5) sets how many inputs each key module uses, up to 6: a 6-key module needs only `rows = <6>`.
+
+### Pointing modules
+
+Input G is grounded on every key module and tied high on a [pointing module](../electronics/Pointing%20module.md), so a byte with bit 6 set, and bit 7 clear, is a pointing module. The driver leaves pointing modules out of the column mapping: the key modules beyond one keep their keymap columns, and the key module count that the status screen shows leaves them out. The stabilizer treats a change in which positions hold pointing modules like a change in count.
+
+A pointing module's SW5 and SW4 are its two buttons. The driver debounces them like keys and reports them as input events from the kscan device: `INPUT_BTN_0` for the left button and `INPUT_BTN_1` for the right, as the user sees them. SW5 sits on the MCU module's side, so it is the left button on the rotated right half and the right button on the left half. The buttons click on every layer and take no keymap positions. The chain's `button-device` property picks the device that they are reported from. On the right half it is the trackpad, so the buttons travel to the left half through the trackpad's input split: ZMK's central subscribes to only one input split per peripheral, since its discovery skips the second input characteristic. On the left half and the unibody, the buttons come from the chain itself, and a `zmk,input-listener` on the chain reports them.
 
 The SPI bus runs in mode 2 (`spi-cpol`): SCK idles high, SPIM2 samples DATA on each falling edge, and the 165s shift on each rising edge, so every sample lands half a clock period after the last shift. The first falling edge samples input H of the nearest key module, which is on QH straight after /PL. Mode 0 would sample on the same rising edge that shifts, and then depend on the 165's propagation delay, which the datasheet gives no minimum for.
 
@@ -214,9 +220,9 @@ The trackpad recognises the gestures itself, and the driver turns them into Zeph
 | Press and hold | `INPUT_BTN_0`, held until every finger lifts, so that the finger drags |
 | Two fingers moving in parallel (scroll) | `INPUT_REL_WHEEL` for Y and `INPUT_REL_HWHEEL` for X: one step per `scroll-divisor` (32) relative counts |
 
-The driver keeps the scroll counts that do not make a full step for the next frame, and drops them when the fingers lift. The trackpad's swipe and zoom gestures are disabled. The last event of each frame carries the input sync. The axis flips (`flip-x`, `flip-y`, `switch-xy`) and the scroll direction are untested; the bench decides them.
+The driver keeps the scroll counts that do not make a full step for the next frame, and drops them when the fingers lift. The trackpad's swipe and zoom gestures are disabled. The last event of each frame carries the input sync. The pointing module holds the pad turned by 180 degrees on the right half, so `roamyboard_right.overlay` sets `flip-x` and `flip-y`. The scroll direction is untested.
 
-The right half sends the events to the left half over ZMK's input split: `roamyboard_right.overlay` has a `zmk,input-split` node with reg 0 for the trackpad. The left half's proxy node with the same reg raises them again, and its `zmk,input-listener` reports them to the host (`roamyboard_left.overlay`). `CONFIG_ZMK_POINTING` in `zmk/config/roamyboard.conf` turns on input support on both halves.
+The right half sends the events to the left half over ZMK's input split: `roamyboard_right.overlay` has a `zmk,input-split` node with reg 1 for the trackpad. Keep it the only input split on the right half, and its reg above 0: ZMK's central handles one input split per peripheral, and it reads a reg of 0 as a slot that discovery has not filled yet. The left half's proxy node with the same reg raises them again, and its `zmk,input-listener` reports them to the host (`roamyboard_left.overlay`). `CONFIG_ZMK_POINTING` in `zmk/config/roamyboard.conf` turns on input support on both halves.
 
 ### Split clients
 

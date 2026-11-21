@@ -64,8 +64,17 @@ properties:
     type: int
     default: 5
     description: |
-      Keys per key module, 1 to 7. Row r reads 74HC165 input number rows - 1 - r,
+      Keys per key module, 1 to 6; input G marks a pointing module. Row r reads 74HC165 input number rows - 1 - r,
       counting A as 0: with 5, rows 0 to 4 are SW5 (input E) to SW1 (input A).
+
+  button-device:
+    type: phandle
+    description: |
+      Input device that a pointing module's buttons are reported from, as INPUT_BTN_0
+      (left) and INPUT_BTN_1 (right). Defaults to this kscan device. On a split
+      peripheral, point it at the trackpad, so that the buttons travel through the
+      trackpad's zmk,input-split: ZMK's central subscribes to only one input split
+      per peripheral.
 
   max-key-modules:
     type: int

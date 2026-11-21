@@ -16,6 +16,7 @@
     columns = <12>;
     anchor = "mcu";
     rotated;
+    button-device = <&trackpad>; // the buttons share the trackpad's input split
 };
 
 // The pointing module's trackpad. RDY floats while no pointing module is attached.
@@ -24,19 +25,24 @@
         compatible = "azoteq,iqs5xx";
         reg = <0x74>;
         rdy-gpios = <&pro_micro 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>; // D6, P1.00
+        // The pointing module holds the pad turned by 180 degrees on this half.
+        flip-x;
+        flip-y;
     };
 };
 
 / {
-    // Sends the trackpad's input events to the central, which reports them to the host.
+    // Sends the trackpad's input events, the pointing module's buttons among them, to the
+    // central, which reports them to the host.
     split_inputs {
         #address-cells = <1>;
         #size-cells = <0>;
 
-        trackpad_split: trackpad_split@0 {
+        trackpad_split: trackpad_split@1 {
             compatible = "zmk,input-split";
-            reg = <0>;
+            reg = <1>;
             device = <&trackpad>;
         };
+
     };
 };

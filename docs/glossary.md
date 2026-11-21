@@ -177,6 +177,9 @@ One term per concept. Use the bold term in code, docs, commits and conversation;
 **fault**: A read of the chain with no sentinel in it.
 *Avoid:* chain error, bad read.
 
+**marker**: Bit 6 of a chain byte, input G of the module's 74HC165: tied high on a pointing module and grounded on key modules.
+*Avoid:* flag, tag, type bit.
+
 **chain probe**: An ESP32 Feather wired to every line of one module, which powers it, reads its 165 and tests each line over USB serial; `electronics/tools/chain_probe`.
 *Avoid:* tester, test harness, debug rig.
 

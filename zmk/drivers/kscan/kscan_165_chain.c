@@ -14,6 +14,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/kscan.h>
 #include <zephyr/drivers/spi.h>
+#include <zephyr/input/input.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/atomic.h>
@@ -50,6 +51,8 @@ struct kscan_chain_config {
     struct gpio_dt_spec load;
     struct chain_config chain;
     struct zmk_debounce_config debounce;
+    /** Device that the pointing module's buttons are reported from. */
+    const struct device *button_dev;
     size_t read_len;
     size_t keys;
     int32_t debounce_scan_period_ms;
@@ -70,6 +73,10 @@ struct kscan_chain_data {
     bool *pressed;
     bool *reported;
     struct zmk_debounce_state *debounce;
+    /** Pointing module buttons: this scan's CHAIN_BUTTON_* bits, and the ones reported. */
+    uint8_t buttons_active;
+    uint8_t buttons_reported;
+    struct zmk_debounce_state button_debounce[2];
     int64_t next_fault_log;
     uint8_t last_dump[DEBUG_DUMP_LEN];
     unsigned int faults_since_log;
@@ -120,6 +127,31 @@ static void kscan_chain_emit(void *ctx, int row, int column, bool pressed) {
     data->callback(dev, row, column, pressed);
 }
 
+static const uint8_t button_bits[2] = {CHAIN_BUTTON_LEFT, CHAIN_BUTTON_RIGHT};
+
+/** Reports a pointing module button as INPUT_BTN_0 (left) or INPUT_BTN_1 (right). */
+static void kscan_chain_report_button(const struct device *dev, int index, bool pressed) {
+    const struct kscan_chain_config *config = dev->config;
+    struct kscan_chain_data *data = dev->data;
+
+    LOG_DBG("Pointing module button %d %s", index, pressed ? "pressed" : "released");
+    WRITE_BIT(data->buttons_reported, index, pressed);
+#if IS_ENABLED(CONFIG_INPUT)
+    input_report_key(config->button_dev, INPUT_BTN_0 + index, pressed, true, K_FOREVER);
+#endif
+}
+
+static void kscan_chain_release_buttons(const struct device *dev) {
+    struct kscan_chain_data *data = dev->data;
+
+    for (int i = 0; i < ARRAY_SIZE(button_bits); i++) {
+        if (data->buttons_reported & button_bits[i]) {
+            kscan_chain_report_button(dev, i, false);
+        }
+    }
+    memset(data->button_debounce, 0, sizeof(data->button_debounce));
+}
+
 static int kscan_chain_read(const struct device *dev) {
     const struct kscan_chain_config *config = dev->config;
     struct kscan_chain_data *data = dev->data;
@@ -156,8 +188,8 @@ static bool kscan_chain_process(const struct device *dev) {
         LOG_HEXDUMP_DBG(data->buf, dump_len, "chain bytes changed, nearest key module first");
     }
 
-    const enum chain_scan_result result =
-        chain_scan(&data->chain, data->buf, config->read_len, data->active);
+    const enum chain_scan_result result = chain_scan(&data->chain, data->buf, config->read_len,
+                                                     data->active, &data->buttons_active);
     if (data->chain.observed == CHAIN_COUNT_FAULT) {
         kscan_chain_log_missing_sentinel(dev);
     }
@@ -168,13 +200,17 @@ static bool kscan_chain_process(const struct device *dev) {
             LOG_WRN("Chain has had no sentinel for %d scans; releasing all keys",
                     config->chain.stable_scans);
         } else {
-            LOG_INF("Chain has %d key modules", data->chain.accepted);
+            const int pointing = __builtin_popcount(data->chain.marked);
+            LOG_INF("Chain has %d key modules and %d pointing module%s",
+                    chain_key_module_count(&data->chain), pointing, pointing == 1 ? "" : "s");
         }
         chain_release_all(&data->chain, kscan_chain_emit, (void *)dev);
+        kscan_chain_release_buttons(dev);
         memset(data->debounce, 0, config->keys * sizeof(data->debounce[0]));
-        atomic_set(&accepted_key_module_count, data->chain.accepted);
+        const int key_modules = chain_key_module_count(&data->chain);
+        atomic_set(&accepted_key_module_count, key_modules);
         raise_roamyboard_chain_state_changed(
-            (struct roamyboard_chain_state_changed){.key_module_count = data->chain.accepted});
+            (struct roamyboard_chain_state_changed){.key_module_count = key_modules});
         return true;
 
     case CHAIN_SCAN_SETTLING:
@@ -194,6 +230,17 @@ static bool kscan_chain_process(const struct device *dev) {
         busy = busy || zmk_debounce_is_active(state);
     }
     chain_report(&data->chain, data->pressed, kscan_chain_emit, (void *)dev);
+
+    for (int i = 0; i < ARRAY_SIZE(button_bits); i++) {
+        struct zmk_debounce_state *state = &data->button_debounce[i];
+        zmk_debounce_update(state, data->buttons_active & button_bits[i],
+                            config->debounce_scan_period_ms, &config->debounce);
+        const bool pressed = zmk_debounce_is_pressed(state);
+        if (pressed != (bool)(data->buttons_reported & button_bits[i])) {
+            kscan_chain_report_button(dev, i, pressed);
+        }
+        busy = busy || zmk_debounce_is_active(state);
+    }
     return busy;
 }
 
@@ -279,9 +326,11 @@ static const struct kscan_driver_api kscan_chain_api = {
 
 #define KSCAN_CHAIN_INIT(n)                                                                        \
     BUILD_ASSERT(DT_INST_PROP(n, rows) >= 1 && DT_INST_PROP(n, rows) <= CHAIN_MAX_ROWS,            \
-                 "rows must be 1 to 7");                                                           \
+                 "rows must be 1 to 6");                                                           \
     BUILD_ASSERT(DT_INST_PROP(n, columns) >= 1, "columns must be at least 1");                     \
     BUILD_ASSERT(DT_INST_PROP(n, max_key_modules) >= 1, "max-key-modules must be at least 1");     \
+    BUILD_ASSERT(DT_INST_PROP(n, max_key_modules) <= CHAIN_MAX_MODULES,                            \
+                 "max-key-modules must be at most 32");                                            \
     BUILD_ASSERT(DT_INST_PROP(n, stable_scans) >= 1, "stable-scans must be at least 1");           \
     BUILD_ASSERT(DT_INST_PROP(n, debounce_press_ms) <= DEBOUNCE_COUNTER_MAX,                       \
                  "debounce-press-ms is too large");                                                \
@@ -320,6 +369,9 @@ static const struct kscan_driver_api kscan_chain_api = {
                 .debounce_press_ms = DT_INST_PROP(n, debounce_press_ms),                           \
                 .debounce_release_ms = DT_INST_PROP(n, debounce_release_ms),                       \
             },                                                                                     \
+        .button_dev = COND_CODE_1(DT_INST_NODE_HAS_PROP(n, button_device),                         \
+                                  (DEVICE_DT_GET(DT_INST_PHANDLE(n, button_device))),               \
+                                  (DEVICE_DT_INST_GET(n))),                                         \
         .read_len = INST_READ_LEN(n),                                                              \
         .keys = INST_KEYS(n),                                                                      \
         .debounce_scan_period_ms = DT_INST_PROP(n, debounce_scan_period_ms),                       \

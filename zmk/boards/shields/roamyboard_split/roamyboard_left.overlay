@@ -13,19 +13,26 @@
 };
 
 / {
-    // Raises the right half's trackpad events here; reg matches the right half's input split.
+    // Raises the right half's trackpad events, its pointing module buttons among them, here;
+    // reg matches the right half's input split.
     split_inputs {
         #address-cells = <1>;
         #size-cells = <0>;
 
-        trackpad_split: trackpad_split@0 {
+        trackpad_split: trackpad_split@1 {
             compatible = "zmk,input-split";
-            reg = <0>;
+            reg = <1>;
         };
     };
 
     trackpad_listener: trackpad_listener {
         compatible = "zmk,input-listener";
         device = <&trackpad_split>;
+    };
+
+    // Buttons of a pointing module on this half's own chain.
+    chain_buttons_listener: chain_buttons_listener {
+        compatible = "zmk,input-listener";
+        device = <&roamyboard_chain>;
     };
 };
